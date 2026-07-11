@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@layer base {
+  :root {
+    --gold-primary: #e8b811;
+    --gold-hover: #f0cf4f;
+    --bg-primary: #0a0a0d;
+    --bg-secondary: #141418;
+    --bg-card: #1e1e23;
+    --bg-card-hover: #2d2d33;
+    --text-primary: #f4f4f5;
+    --text-secondary: #9e9ea6;
+    --text-muted: #71717a;
+    --border-color: #2d2d33;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  * {
+    border-color: var(--border-color);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gold-400 text-anthracite-950 font-semibold px-6 py-3 rounded-lg
+           hover:bg-gold-300 transition-all duration-200 active:scale-[0.97];
+  }
+
+  .btn-secondary {
+    @apply border border-gold-400/30 text-gold-400 font-medium px-6 py-3 rounded-lg
+           hover:bg-gold-400/10 transition-all duration-200 active:scale-[0.97];
+  }
+
+  .btn-ghost {
+    @apply text-anthracite-300 font-medium px-4 py-2 rounded-lg
+           hover:text-white hover:bg-anthracite-700 transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-anthracite-800 border border-anthracite-700 rounded-xl p-6
+           hover:border-gold-400/30 transition-all duration-300;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-lg hover:shadow-gold-400/5 hover:-translate-y-1;
+  }
+
+  .input-field {
+    @apply w-full bg-anthracite-900 border border-anthracite-600 rounded-lg px-4 py-3
+           text-white placeholder:text-anthracite-400
+           focus:outline-none focus:border-gold-400 focus:ring-1 focus:ring-gold-400/30
+           transition-all duration-200;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold text-white;
+  }
+
+  .gold-gradient {
+    @apply bg-gradient-to-r from-gold-400 to-gold-300 bg-clip-text text-transparent;
+  }
+
+  .glass-card {
+    @apply bg-anthracite-800/50 backdrop-blur-xl border border-anthracite-700/50 rounded-2xl;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
