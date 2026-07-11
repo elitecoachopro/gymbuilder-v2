@@ -67,9 +67,9 @@ export default function SupplierDashboard() {
               <h1 className="text-2xl font-bold text-white">Supplier Dashboard</h1>
               <p className="text-anthracite-400 text-sm mt-1">FitPro Equipment &middot; Professional Plan</p>
             </div>
-            <button className="btn-primary flex items-center gap-2">
+            <Link href="/supplier/products/new" className="btn-primary flex items-center gap-2">
               <Plus className="w-4 h-4" /> Adaugă Produs
-            </button>
+            </Link>
           </div>
 
           {/* Stats */}
