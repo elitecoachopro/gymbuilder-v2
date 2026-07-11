@@ -1,8 +1,10 @@
 'use client';
 
+import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Search, MapPin, Star, Filter, Building2, Globe, Phone } from 'lucide-react';
+import { Search, MapPin, Star, Filter, Building2, Globe, Phone, ArrowRight, Mail } from 'lucide-react';
+import { useState } from 'react';
 
 const suppliers = [
   { id: 1, name: 'FitPro Equipment', country: 'România', city: 'București', plan: 'professional', rating: 4.8, products: 45, description: 'Distribuitor oficial Life Fitness și Hammer Strength pentru Europa de Est.' },
@@ -16,9 +18,67 @@ const suppliers = [
 const countries = ['Toate', 'România', 'Germania', 'Suedia', 'Polonia', 'Italia', 'Spania'];
 
 export default function SuppliersPage() {
+  const [activeCountry, setActiveCountry] = useState('Toate');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showContactModal, setShowContactModal] = useState<number | null>(null);
+  const [toast, setToast] = useState('');
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  };
+
+  const filteredSuppliers = suppliers.filter((s) => {
+    const matchesCountry = activeCountry === 'Toate' || s.country === activeCountry;
+    const matchesSearch = !searchQuery || s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCountry && matchesSearch;
+  });
+
   return (
     <main className="min-h-screen">
       <Navbar />
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed top-20 right-4 z-50 bg-anthracite-800 border border-gold-400/30 text-gold-400 px-4 py-3 rounded-lg shadow-lg text-sm">
+          {toast}
+        </div>
+      )}
+
+      {/* Contact Modal */}
+      {showContactModal !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="glass-card p-8 max-w-md w-full relative">
+            <button
+              onClick={() => setShowContactModal(null)}
+              className="absolute top-4 right-4 text-anthracite-400 hover:text-white text-xl"
+            >
+              &times;
+            </button>
+            <h3 className="text-xl font-bold text-white mb-2">Cerere Ofertă</h3>
+            <p className="text-sm text-anthracite-400 mb-6">
+              Trimite o cerere de ofertă către {suppliers.find(s => s.id === showContactModal)?.name}
+            </p>
+            <form onSubmit={(e) => { e.preventDefault(); showToast('Cerere trimisă cu succes!'); setShowContactModal(null); }} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Nume *</label>
+                <input type="text" className="input-field" placeholder="Numele tău" required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Email *</label>
+                <input type="email" className="input-field" placeholder="email@exemplu.com" required />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Mesaj *</label>
+                <textarea className="input-field min-h-[100px] resize-y" placeholder="Descrie ce echipamente cauți..." required />
+              </div>
+              <button type="submit" className="btn-primary w-full py-3">
+                Trimite Cererea
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       <section className="pt-24 pb-8 px-4">
         <div className="max-w-7xl mx-auto">
@@ -40,13 +100,20 @@ export default function SuppliersPage() {
               type="text"
               placeholder="Caută furnizori..."
               className="input-field pl-12"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <div className="flex gap-3 flex-wrap">
             {countries.slice(0, 5).map((country) => (
               <button
                 key={country}
-                className="px-4 py-2.5 rounded-lg text-sm font-medium border border-anthracite-600 text-anthracite-300 hover:border-gold-400 hover:text-gold-400 transition-colors"
+                onClick={() => setActiveCountry(country)}
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium border transition-colors ${
+                  activeCountry === country
+                    ? 'border-gold-400 text-gold-400 bg-gold-400/10'
+                    : 'border-anthracite-600 text-anthracite-300 hover:border-gold-400 hover:text-gold-400'
+                }`}
               >
                 {country}
               </button>
@@ -59,8 +126,8 @@ export default function SuppliersPage() {
       <section className="py-12 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {suppliers.map((supplier) => (
-              <div key={supplier.id} className="card-hover">
+            {filteredSuppliers.map((supplier) => (
+              <div key={supplier.id} className="card-hover flex flex-col">
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-14 h-14 bg-anthracite-700 rounded-xl flex items-center justify-center">
                     <Building2 className="w-7 h-7 text-gold-400" />
@@ -80,18 +147,41 @@ export default function SuppliersPage() {
                   {supplier.city}, {supplier.country}
                 </div>
 
-                <p className="text-sm text-anthracite-400 mb-4 line-clamp-2">{supplier.description}</p>
+                <p className="text-sm text-anthracite-400 mb-4 line-clamp-2 flex-1">{supplier.description}</p>
 
-                <div className="flex items-center justify-between pt-4 border-t border-anthracite-700">
+                <div className="flex items-center justify-between pt-4 border-t border-anthracite-700 mb-4">
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 text-gold-400 fill-gold-400" />
                     <span className="text-sm font-medium text-white">{supplier.rating}</span>
                   </div>
                   <span className="text-sm text-anthracite-400">{supplier.products} produse</span>
                 </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2">
+                  <Link
+                    href="/products"
+                    className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium border border-anthracite-600 text-anthracite-200 hover:border-gold-400 hover:text-gold-400 transition-colors"
+                  >
+                    Vezi Produse
+                  </Link>
+                  <button
+                    onClick={() => setShowContactModal(supplier.id)}
+                    className="flex-1 btn-primary py-2.5 text-sm flex items-center justify-center gap-1"
+                  >
+                    <Mail className="w-3.5 h-3.5" /> Cerere Ofertă
+                  </button>
+                </div>
               </div>
             ))}
           </div>
+
+          {filteredSuppliers.length === 0 && (
+            <div className="text-center py-16">
+              <Building2 className="w-12 h-12 text-anthracite-600 mx-auto mb-4" />
+              <p className="text-anthracite-400">Nu s-au găsit furnizori cu aceste filtre.</p>
+            </div>
+          )}
         </div>
       </section>
 

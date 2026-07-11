@@ -49,13 +49,17 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Contact</h4>
             <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-anthracite-400 text-sm">
-                <Mail className="w-4 h-4 text-gold-400" />
-                contact@gymbuilder.app
+              <li>
+                <a href="mailto:contact@gymbuilder.app" className="flex items-center gap-2 text-anthracite-400 hover:text-gold-400 text-sm transition-colors">
+                  <Mail className="w-4 h-4 text-gold-400" />
+                  contact@gymbuilder.app
+                </a>
               </li>
-              <li className="flex items-center gap-2 text-anthracite-400 text-sm">
-                <Phone className="w-4 h-4 text-gold-400" />
-                +40 700 000 000
+              <li>
+                <a href="tel:+40700000000" className="flex items-center gap-2 text-anthracite-400 hover:text-gold-400 text-sm transition-colors">
+                  <Phone className="w-4 h-4 text-gold-400" />
+                  +40 700 000 000
+                </a>
               </li>
               <li className="flex items-center gap-2 text-anthracite-400 text-sm">
                 <MapPin className="w-4 h-4 text-gold-400" />
@@ -71,10 +75,10 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
           </p>
           <div className="flex gap-6">
-            <Link href="#" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
+            <Link href="/terms" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
               Termeni & Condiții
             </Link>
-            <Link href="#" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
+            <Link href="/privacy" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
               Politica de Confidențialitate
             </Link>
           </div>

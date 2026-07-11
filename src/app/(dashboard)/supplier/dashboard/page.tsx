@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Settings, Star } from 'lucide-react';
+import { useState } from 'react';
 
 const stats = [
   { label: 'Produse Active', value: '24', icon: Package },
@@ -17,9 +18,31 @@ const products = [
   { id: 4, name: 'Hammer Strength HD Elite', category: 'Forță', price: 3600, views: 98, status: 'inactive' },
 ];
 
+const sidebarLinks = [
+  { href: '/supplier/dashboard', label: 'Dashboard', icon: BarChart3, active: true },
+  { href: '/supplier/products/new', label: 'Produsele Mele', icon: Package, active: false },
+  { href: null, label: 'Promovări', icon: Megaphone, active: false, comingSoon: true },
+  { href: null, label: 'Analytics', icon: TrendingUp, active: false, comingSoon: true },
+  { href: null, label: 'Setări', icon: Settings, active: false, comingSoon: true },
+];
+
 export default function SupplierDashboard() {
+  const [toast, setToast] = useState('');
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  };
+
   return (
     <main className="min-h-screen bg-anthracite-950">
+      {/* Toast */}
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 bg-anthracite-800 border border-gold-400/30 text-gold-400 px-4 py-3 rounded-lg shadow-lg text-sm animate-fade-in">
+          {toast}
+        </div>
+      )}
+
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-anthracite-900 border-r border-anthracite-800 p-6 hidden lg:block">
         <Link href="/" className="flex items-center gap-2 mb-10">
@@ -31,21 +54,29 @@ export default function SupplierDashboard() {
         </Link>
 
         <nav className="space-y-1">
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gold-400/10 text-gold-400 font-medium text-sm">
-            <BarChart3 className="w-4 h-4" /> Dashboard
-          </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm">
-            <Package className="w-4 h-4" /> Produsele Mele
-          </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm">
-            <Megaphone className="w-4 h-4" /> Promovări
-          </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm">
-            <TrendingUp className="w-4 h-4" /> Analytics
-          </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm">
-            <Settings className="w-4 h-4" /> Setări
-          </a>
+          {sidebarLinks.map((link) => (
+            link.href ? (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm ${
+                  link.active
+                    ? 'bg-gold-400/10 text-gold-400 font-medium'
+                    : 'text-anthracite-300 hover:text-white hover:bg-anthracite-800'
+                }`}
+              >
+                <link.icon className="w-4 h-4" /> {link.label}
+              </Link>
+            ) : (
+              <button
+                key={link.label}
+                onClick={() => showToast(`${link.label} - Funcționalitate în curând!`)}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm w-full text-left"
+              >
+                <link.icon className="w-4 h-4" /> {link.label}
+              </button>
+            )
+          ))}
         </nav>
 
         <div className="absolute bottom-6 left-6 right-6">
@@ -91,7 +122,9 @@ export default function SupplierDashboard() {
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-white">Produsele Mele</h3>
-              <button className="text-sm text-gold-400 hover:text-gold-300">Vezi toate</button>
+              <Link href="/supplier/products/new" className="text-sm text-gold-400 hover:text-gold-300">
+                + Adaugă Produs
+              </Link>
             </div>
 
             <div className="overflow-x-auto">
@@ -123,7 +156,10 @@ export default function SupplierDashboard() {
                         </span>
                       </td>
                       <td className="py-3 text-right">
-                        <button className="p-1.5 hover:bg-anthracite-700 rounded">
+                        <button
+                          onClick={() => showToast('Editare produs - Funcționalitate în curând!')}
+                          className="p-1.5 hover:bg-anthracite-700 rounded"
+                        >
                           <Edit className="w-4 h-4 text-anthracite-400" />
                         </button>
                       </td>

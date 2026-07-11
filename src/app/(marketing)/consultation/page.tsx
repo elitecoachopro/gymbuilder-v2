@@ -3,6 +3,7 @@
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { MessageSquare, CheckCircle2, Phone, Mail, Clock, Users, Target, Lightbulb } from 'lucide-react';
+import { useState } from 'react';
 
 const benefits = [
   { icon: Target, title: 'Plan Personalizat', desc: 'Strategie completă adaptată bugetului și spațiului tău.' },
@@ -20,6 +21,27 @@ const stages = [
 ];
 
 export default function ConsultationPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    stage: '',
+    message: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    // Simulate API call (in production, this would POST to /api/consultation)
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    setIsSubmitting(false);
+    setSubmitted(true);
+  };
+
   return (
     <main className="min-h-screen">
       <Navbar />
@@ -93,52 +115,101 @@ export default function ConsultationPage() {
 
             {/* Right - Form */}
             <div className="glass-card p-8">
-              <h2 className="text-2xl font-bold text-white mb-2">Solicită Consultanță</h2>
-              <p className="text-anthracite-400 text-sm mb-8">Completează formularul și te contactăm în 24h.</p>
-
-              <form className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Nume complet *</label>
-                    <input type="text" className="input-field" placeholder="Ion Popescu" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Email *</label>
-                    <input type="email" className="input-field" placeholder="ion@email.com" />
-                  </div>
+              {submitted ? (
+                <div className="text-center py-12">
+                  <CheckCircle2 className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
+                  <h2 className="text-2xl font-bold text-white mb-2">Cerere Trimisă!</h2>
+                  <p className="text-anthracite-300 mb-6">
+                    Mulțumim! Echipa noastră te va contacta în maxim 24 de ore pentru programarea sesiunii de consultanță.
+                  </p>
+                  <button
+                    onClick={() => { setSubmitted(false); setFormData({ name: '', email: '', phone: '', stage: '', message: '' }); }}
+                    className="btn-secondary"
+                  >
+                    Trimite altă cerere
+                  </button>
                 </div>
+              ) : (
+                <>
+                  <h2 className="text-2xl font-bold text-white mb-2">Solicită Consultanță</h2>
+                  <p className="text-anthracite-400 text-sm mb-8">Completează formularul și te contactăm în 24h.</p>
 
-                <div>
-                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Telefon</label>
-                  <input type="tel" className="input-field" placeholder="+40 7XX XXX XXX" />
-                </div>
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Nume complet *</label>
+                        <input
+                          type="text"
+                          className="input-field"
+                          placeholder="Ion Popescu"
+                          required
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Email *</label>
+                        <input
+                          type="email"
+                          className="input-field"
+                          placeholder="ion@email.com"
+                          required
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        />
+                      </div>
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Stadiul proiectului *</label>
-                  <select className="input-field">
-                    <option value="">Selectează...</option>
-                    {stages.map((stage) => (
-                      <option key={stage} value={stage}>{stage}</option>
-                    ))}
-                  </select>
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Telefon</label>
+                      <input
+                        type="tel"
+                        className="input-field"
+                        placeholder="+40 7XX XXX XXX"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      />
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Mesaj</label>
-                  <textarea
-                    className="input-field min-h-[120px] resize-y"
-                    placeholder="Descrie pe scurt proiectul tău..."
-                  />
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Stadiul proiectului *</label>
+                      <select
+                        className="input-field"
+                        required
+                        value={formData.stage}
+                        onChange={(e) => setFormData({ ...formData, stage: e.target.value })}
+                      >
+                        <option value="">Selectează...</option>
+                        {stages.map((stage) => (
+                          <option key={stage} value={stage}>{stage}</option>
+                        ))}
+                      </select>
+                    </div>
 
-                <button type="submit" className="btn-primary w-full py-4 text-base">
-                  Trimite Cererea - &euro;99
-                </button>
+                    <div>
+                      <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Mesaj</label>
+                      <textarea
+                        className="input-field min-h-[120px] resize-y"
+                        placeholder="Descrie pe scurt proiectul tău..."
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      />
+                    </div>
 
-                <p className="text-xs text-anthracite-500 text-center">
-                  Plata se procesează doar după confirmarea programării.
-                </p>
-              </form>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="btn-primary w-full py-4 text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? 'Se trimite...' : 'Trimite Cererea - €99'}
+                    </button>
+
+                    <p className="text-xs text-anthracite-500 text-center">
+                      Plata se procesează doar după confirmarea programării.
+                    </p>
+                  </form>
+                </>
+              )}
             </div>
           </div>
         </div>

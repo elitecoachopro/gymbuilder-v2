@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Dumbbell, Users, Package, Building2, TrendingUp, CheckCircle2, XCircle, Clock, BarChart3, Eye } from 'lucide-react';
+import { useState } from 'react';
 
 const stats = [
   { label: 'Furnizori Activi', value: '48', change: '+3', icon: Building2 },
@@ -23,9 +24,39 @@ const recentActivity = [
   { type: 'payment', text: 'Plată €149 de la Nordic Fitness', time: '8 ore' },
 ];
 
+const sidebarLinks = [
+  { href: '/admin', label: 'Dashboard', icon: BarChart3, active: true },
+  { href: '/suppliers', label: 'Furnizori', icon: Building2, active: false },
+  { href: '/products', label: 'Produse', icon: Package, active: false },
+  { href: null, label: 'Clienți', icon: Users, active: false, comingSoon: true },
+  { href: null, label: 'Promovări', icon: TrendingUp, active: false, comingSoon: true },
+];
+
 export default function AdminDashboard() {
+  const [toast, setToast] = useState('');
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  };
+
+  const handleApprove = (supplierId: number, companyName: string) => {
+    showToast(`✅ ${companyName} a fost aprobat!`);
+  };
+
+  const handleReject = (supplierId: number, companyName: string) => {
+    showToast(`❌ ${companyName} a fost respins.`);
+  };
+
   return (
     <main className="min-h-screen bg-anthracite-950">
+      {/* Toast */}
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 bg-anthracite-800 border border-gold-400/30 text-gold-400 px-4 py-3 rounded-lg shadow-lg text-sm animate-fade-in">
+          {toast}
+        </div>
+      )}
+
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-anthracite-900 border-r border-anthracite-800 p-6 hidden lg:block">
         <Link href="/" className="flex items-center gap-2 mb-10">
@@ -37,21 +68,29 @@ export default function AdminDashboard() {
         </Link>
 
         <nav className="space-y-1">
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gold-400/10 text-gold-400 font-medium text-sm">
-            <BarChart3 className="w-4 h-4" /> Dashboard
-          </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm">
-            <Building2 className="w-4 h-4" /> Furnizori
-          </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm">
-            <Package className="w-4 h-4" /> Produse
-          </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm">
-            <Users className="w-4 h-4" /> Clienți
-          </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm">
-            <TrendingUp className="w-4 h-4" /> Promovări
-          </a>
+          {sidebarLinks.map((link) => (
+            link.href ? (
+              <Link
+                key={link.label}
+                href={link.href}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm ${
+                  link.active
+                    ? 'bg-gold-400/10 text-gold-400 font-medium'
+                    : 'text-anthracite-300 hover:text-white hover:bg-anthracite-800'
+                }`}
+              >
+                <link.icon className="w-4 h-4" /> {link.label}
+              </Link>
+            ) : (
+              <button
+                key={link.label}
+                onClick={() => showToast(`${link.label} - Funcționalitate în curând!`)}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm w-full text-left"
+              >
+                <link.icon className="w-4 h-4" /> {link.label}
+              </button>
+            )
+          ))}
         </nav>
       </aside>
 
@@ -98,10 +137,18 @@ export default function AdminDashboard() {
                       <p className="text-xs text-anthracite-400">{supplier.city} &middot; {supplier.date}</p>
                     </div>
                     <div className="flex gap-2">
-                      <button className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center hover:bg-emerald-500/20">
+                      <button
+                        onClick={() => handleApprove(supplier.id, supplier.company)}
+                        className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center hover:bg-emerald-500/20 transition-colors"
+                        title="Aprobă"
+                      >
                         <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                       </button>
-                      <button className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center hover:bg-red-500/20">
+                      <button
+                        onClick={() => handleReject(supplier.id, supplier.company)}
+                        className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center hover:bg-red-500/20 transition-colors"
+                        title="Respinge"
+                      >
                         <XCircle className="w-4 h-4 text-red-400" />
                       </button>
                     </div>
