@@ -13,11 +13,16 @@ const features = [
   { icon: Shield, title: 'Calitate Garantată', desc: 'Toate produsele sunt verificate pentru calitate și autenticitate.' },
 ];
 
-const ofertaZilei = [
-  { id: 1, name: 'Life Fitness Treadmill T5', price: 4200, oldPrice: 5800, brand: 'Life Fitness', category: 'Cardio' },
-  { id: 2, name: 'Technogym Skillmill Connect', price: 6900, oldPrice: 8500, brand: 'Technogym', category: 'Cardio' },
-  { id: 3, name: 'Matrix S-Drive Performance', price: 3400, oldPrice: 4200, brand: 'Matrix', category: 'Functional' },
-];
+const ofertaZilei = {
+  id: 1,
+  name: 'Technogym Skillmill Connect',
+  price: 6900,
+  oldPrice: 8500,
+  brand: 'Technogym',
+  category: 'Cardio',
+  description: 'Banda de alergare profesională cu conectivitate avansată, ecran tactil HD și programe personalizate. Ideală pentru săli de fitness comerciale cu trafic intens.',
+  image: '/images/technogym-skillmill.jpg',
+};
 
 const anunturiZilei = [
   { id: 1, title: 'Lot 50 Gantere Chrome 1-50kg', supplier: 'FitPro Equipment', price: 12000, city: 'București' },
@@ -94,23 +99,29 @@ export default function HomePage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {ofertaZilei.map((item) => (
-              <div key={item.id} className="card-hover relative overflow-hidden">
-                <div className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-                  -{Math.round((1 - item.price / item.oldPrice) * 100)}%
-                </div>
-                <div className="h-48 bg-anthracite-700 rounded-lg mb-4 flex items-center justify-center">
-                  <Dumbbell className="w-16 h-16 text-anthracite-500" />
-                </div>
-                <span className="text-xs text-gold-400 font-medium">{item.brand} &middot; {item.category}</span>
-                <h3 className="text-white font-semibold mt-1 mb-3">{item.name}</h3>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-bold text-gold-400">&euro;{item.price.toLocaleString()}</span>
-                  <span className="text-sm text-anthracite-400 line-through">&euro;{item.oldPrice.toLocaleString()}</span>
-                </div>
+          <div className="card-hover relative overflow-hidden max-w-4xl mx-auto">
+            <div className="absolute top-4 right-4 bg-red-500 text-white text-sm font-bold px-3 py-1.5 rounded-lg z-10">
+              -{Math.round((1 - ofertaZilei.price / ofertaZilei.oldPrice) * 100)}% REDUCERE
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Image */}
+              <div className="h-64 md:h-80 bg-anthracite-700 rounded-xl flex items-center justify-center">
+                <Dumbbell className="w-24 h-24 text-anthracite-500" />
               </div>
-            ))}
+              {/* Details */}
+              <div className="flex flex-col justify-center py-4">
+                <span className="text-sm text-gold-400 font-medium mb-2">{ofertaZilei.brand} &middot; {ofertaZilei.category}</span>
+                <h3 className="text-2xl md:text-3xl text-white font-bold mb-4">{ofertaZilei.name}</h3>
+                <p className="text-anthracite-300 mb-6 leading-relaxed">{ofertaZilei.description}</p>
+                <div className="flex items-center gap-4 mb-6">
+                  <span className="text-3xl font-bold text-gold-400">&euro;{ofertaZilei.price.toLocaleString()}</span>
+                  <span className="text-lg text-anthracite-400 line-through">&euro;{ofertaZilei.oldPrice.toLocaleString()}</span>
+                </div>
+                <Link href="/products" className="btn-primary inline-flex items-center gap-2 w-fit px-6 py-3">
+                  Vezi Oferta <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
