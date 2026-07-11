@@ -58,14 +58,37 @@ export default function HomePage() {
               Găsește, compară și achiziționează echipamente premium.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/products" className="btn-primary text-base px-8 py-4 flex items-center gap-2">
-                Explorează Echipamente
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link href="/register/supplier" className="btn-secondary text-base px-8 py-4">
-                Devino Furnizor
-              </Link>
+            {/* 3 Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+              {/* Card 1 - CLIENT */}
+              <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-8 text-left">
+                <span className="text-xs font-bold text-gold-400 tracking-wider uppercase mb-3 block">Client</span>
+                <h3 className="text-xl font-bold text-white mb-3">Deschizi o sală de fitness?</h3>
+                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">Găsește echipamente premium la prețuri corecte direct de la furnizori verificați din toată lumea.</p>
+                <Link href="/products" className="inline-block bg-anthracite-950 text-gold-400 font-bold text-sm px-6 py-3 rounded-lg hover:bg-anthracite-900 transition-colors">
+                  CAUTĂ ECHIPAMENTE
+                </Link>
+              </div>
+
+              {/* Card 2 - FURNIZOR */}
+              <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-8 text-left">
+                <span className="text-xs font-bold text-gold-400 tracking-wider uppercase mb-3 block">Furnizor</span>
+                <h3 className="text-xl font-bold text-white mb-3">Ești furnizor de echipamente?</h3>
+                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">Promovează-te gratuit și ajunge la proprietarii de săli din toată Europa și din întreaga lume.</p>
+                <Link href="/register/supplier" className="inline-block bg-gold-400 text-anthracite-950 font-bold text-sm px-6 py-3 rounded-lg hover:bg-gold-300 transition-colors">
+                  DEVINO FURNIZOR
+                </Link>
+              </div>
+
+              {/* Card 3 - CONSULTANȚĂ */}
+              <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-8 text-left">
+                <span className="text-xs font-bold text-gold-400 tracking-wider uppercase mb-3 block">Consultanță</span>
+                <h3 className="text-xl font-bold text-white mb-3">Vrei să deschizi o sală?</h3>
+                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">Consultanță personalizată de la un antreprenor care a deschis mai multe săli de fitness de la zero.</p>
+                <Link href="/consultation" className="inline-block border-2 border-gold-400 text-gold-400 font-bold text-sm px-6 py-3 rounded-lg hover:bg-gold-400/10 transition-colors">
+                  REZERVĂ CONSULTANȚĂ €99
+                </Link>
+              </div>
             </div>
 
             {/* Stats */}
@@ -83,6 +106,18 @@ export default function HomePage() {
                 <div className="text-sm text-anthracite-400 mt-1">Branduri</div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* De Ce Am Creat GymBuilder */}
+      <section className="py-20 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="border-2 border-gold-400 rounded-2xl p-10 md:p-14">
+            <h2 className="text-2xl md:text-3xl font-bold text-gold-400 mb-6">DE CE AM CREAT GYMBUILDER</h2>
+            <p className="text-white leading-relaxed text-base md:text-lg">
+              GymBuilder s-a născut din experiența reală a unui antreprenor care a deschis mai multe săli de fitness de la zero. Am trăit personal dificultatea de a găsi furnizori corecți, de a compara prețuri și de a lua decizii bune cu un buget limitat. Nu exista nicio platformă care să conecteze viitorii proprietari de săli cu furnizorii de echipamente din întreaga lume. Astăzi GymBuilder rezolvă exact această problemă — o piață globală de echipamente fitness unde transparența și calitatea sunt prioritatea numărul unu.
+            </p>
           </div>
         </div>
       </section>
