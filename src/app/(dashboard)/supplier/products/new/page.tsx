@@ -25,9 +25,11 @@ const brands = [
 export default function NewProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [imagePreview, setImagePreview] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     name: '',
@@ -46,20 +48,39 @@ export default function NewProductPage() {
     const files = e.target.files;
     if (!files) return;
 
-    const newPreviews: string[] = [];
-    for (let i = 0; i < files.length && imagePreview.length + newPreviews.length < 6; i++) {
+    const remaining = 6 - imageFiles.length;
+    const newFiles = Array.from(files).slice(0, remaining);
+
+    // Validate each file
+    for (const file of newFiles) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError(`Fișierul "${file.name}" depășește limita de 5MB.`);
+        return;
+      }
+      if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
+        setError(`Fișierul "${file.name}" nu este un format acceptat (JPG, PNG, WebP, GIF).`);
+        return;
+      }
+    }
+
+    setError('');
+    setImageFiles(prev => [...prev, ...newFiles]);
+
+    // Generate previews
+    newFiles.forEach(file => {
       const reader = new FileReader();
       reader.onload = (ev) => {
         if (ev.target?.result) {
-          setImagePreview((prev) => [...prev, ev.target!.result as string]);
+          setImagePreviews(prev => [...prev, ev.target!.result as string]);
         }
       };
-      reader.readAsDataURL(files[i]);
-    }
+      reader.readAsDataURL(file);
+    });
   };
 
   const removeImage = (index: number) => {
-    setImagePreview((prev) => prev.filter((_, i) => i !== index));
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,6 +103,32 @@ export default function NewProductPage() {
     setLoading(true);
 
     try {
+      // Upload images first via /api/upload
+      const uploadedUrls: string[] = [];
+      
+      if (imageFiles.length > 0) {
+        setUploadingImages(true);
+        for (const file of imageFiles) {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('folder', 'products');
+
+          const uploadRes = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+
+          if (uploadRes.ok) {
+            const uploadData = await uploadRes.json();
+            if (uploadData.url) {
+              uploadedUrls.push(uploadData.url);
+            }
+          }
+        }
+        setUploadingImages(false);
+      }
+
+      // Save product with image URLs
       const res = await fetch('/api/supplier/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -92,7 +139,7 @@ export default function NewProductPage() {
           condition: form.condition,
           price_eur: price,
           description: form.description || null,
-          images: imagePreview, // Base64 encoded images
+          images: uploadedUrls,
         }),
       });
 
@@ -103,16 +150,17 @@ export default function NewProductPage() {
         return;
       }
 
-      setSuccess('Produs adăugat cu succes!');
+      setSuccess('Produs adăugat cu succes! Redirecționare...');
 
-      // Redirect to dashboard after 2 seconds
+      // Redirect to products list after 1.5 seconds
       setTimeout(() => {
-        router.push('/supplier/dashboard');
-      }, 2000);
+        router.push('/supplier/products');
+      }, 1500);
     } catch (err) {
       setError('Eroare de conexiune. Verifică conexiunea la internet.');
     } finally {
       setLoading(false);
+      setUploadingImages(false);
     }
   };
 
@@ -122,7 +170,7 @@ export default function NewProductPage() {
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link
-            href="/supplier/dashboard"
+            href="/supplier/products"
             className="p-2 rounded-lg hover:bg-anthracite-800 text-anthracite-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -263,15 +311,16 @@ export default function NewProductPage() {
           {/* Images */}
           <div className="glass-card p-6">
             <h2 className="text-lg font-semibold text-white mb-4">Imagini Produs</h2>
-            <p className="text-sm text-anthracite-400 mb-4">Adaugă până la 6 imagini. Prima imagine va fi cea principală.</p>
+            <p className="text-sm text-anthracite-400 mb-4">Adaugă până la 6 imagini (max 5MB fiecare). Prima imagine va fi cea principală.</p>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {imagePreview.map((img, index) => (
+              {imagePreviews.map((img, index) => (
                 <div key={index} className="relative aspect-square rounded-xl overflow-hidden border border-anthracite-700">
                   <img src={img} alt={`Produs ${index + 1}`} className="w-full h-full object-cover" />
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
+                    disabled={loading}
                     className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
                   >
                     <X className="w-3 h-3" />
@@ -284,13 +333,13 @@ export default function NewProductPage() {
                 </div>
               ))}
 
-              {imagePreview.length < 6 && (
+              {imagePreviews.length < 6 && (
                 <label className="aspect-square rounded-xl border-2 border-dashed border-anthracite-600 hover:border-gold-400/50 flex flex-col items-center justify-center cursor-pointer transition-colors">
                   <ImagePlus className="w-8 h-8 text-anthracite-500 mb-2" />
                   <span className="text-xs text-anthracite-400">Adaugă imagine</span>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     multiple
                     className="hidden"
                     onChange={handleImageChange}
@@ -304,7 +353,7 @@ export default function NewProductPage() {
           {/* Submit */}
           <div className="flex items-center gap-4">
             <Link
-              href="/supplier/dashboard"
+              href="/supplier/products"
               className="btn-ghost px-6 py-3"
             >
               Anulează
@@ -317,7 +366,7 @@ export default function NewProductPage() {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Se salvează...
+                  {uploadingImages ? 'Se încarcă imaginile...' : 'Se salvează...'}
                 </>
               ) : (
                 <>

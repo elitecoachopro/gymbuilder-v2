@@ -20,7 +20,7 @@ const products = [
 
 const sidebarLinks = [
   { href: '/supplier/dashboard', label: 'Dashboard', icon: BarChart3, active: true },
-  { href: '/supplier/products/new', label: 'Produsele Mele', icon: Package, active: false },
+  { href: '/supplier/products', label: 'Produsele Mele', icon: Package, active: false },
   { href: null, label: 'Promovări', icon: Megaphone, active: false, comingSoon: true },
   { href: null, label: 'Analytics', icon: TrendingUp, active: false, comingSoon: true },
   { href: null, label: 'Setări', icon: Settings, active: false, comingSoon: true },
