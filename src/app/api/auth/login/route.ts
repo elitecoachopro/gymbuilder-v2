@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import { verifyPassword } from '@/lib/password';
+import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
+import { sanitizeEmail, isValidEmail } from '@/lib/sanitize';
 
 function getSupabaseAdmin() {
   return createClient(
@@ -10,9 +12,8 @@ function getSupabaseAdmin() {
   );
 }
 
-// Simple JWT-like token using HMAC (pure JS, no native deps)
 function generateSessionToken(userId: string): string {
-  const payload = JSON.stringify({ userId, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 }); // 7 days
+  const payload = JSON.stringify({ userId, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 });
   const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || 'fallback-secret';
   const hmac = crypto.createHmac('sha256', secret).update(payload).digest('hex');
   const token = Buffer.from(payload).toString('base64') + '.' + hmac;
@@ -21,6 +22,13 @@ function generateSessionToken(userId: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 5 attempts per minute per IP
+    const ip = getClientIP(request);
+    const rateCheck = checkRateLimit(`login:${ip}`, { maxRequests: 5, windowMs: 60 * 1000 });
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(rateCheck.resetTime);
+    }
+
     const body = await request.json();
     const { email, password } = body;
 
@@ -32,13 +40,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Sanitize email
+    const cleanEmail = sanitizeEmail(email);
+    if (!isValidEmail(cleanEmail)) {
+      return NextResponse.json(
+        { error: 'Format email invalid.' },
+        { status: 400 }
+      );
+    }
+
+    // Password length check (prevent DoS with huge passwords)
+    if (password.length > 128) {
+      return NextResponse.json(
+        { error: 'Parola nu poate depăși 128 caractere.' },
+        { status: 400 }
+      );
+    }
+
     const supabase = getSupabaseAdmin();
 
-    // Find user by email
+    // Find user by email (parameterized query - SQL injection safe)
     const { data: user, error: fetchError } = await supabase
       .from('users')
       .select('id, email, full_name, password_hash, role, email_verified, avatar_url')
-      .eq('email', email.toLowerCase())
+      .eq('email', cleanEmail)
       .single();
 
     if (fetchError || !user) {
@@ -87,7 +112,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: 7 * 24 * 60 * 60,
       path: '/',
     });
 

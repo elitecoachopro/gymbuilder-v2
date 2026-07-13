@@ -3,21 +3,34 @@
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Search, Filter, Dumbbell, Heart, ShoppingCart, SlidersHorizontal, Mail } from 'lucide-react';
-import { useState } from 'react';
+import { Search, Filter, Dumbbell, Heart, ShoppingCart, SlidersHorizontal, Mail, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const categories = [
-  { slug: 'all', name: 'Toate', count: 500 },
-  { slug: 'cardio', name: 'Cardio', count: 120 },
-  { slug: 'strength', name: 'Forță', count: 180 },
-  { slug: 'functional', name: 'Funcțional', count: 85 },
-  { slug: 'accessories', name: 'Accesorii', count: 60 },
-  { slug: 'wellness', name: 'Wellness', count: 30 },
-  { slug: 'lockers', name: 'Vestiare', count: 15 },
-  { slug: 'reception', name: 'Recepție', count: 10 },
+  { slug: 'all', name: 'Toate' },
+  { slug: 'Cardio', name: 'Cardio' },
+  { slug: 'Forță', name: 'Forță' },
+  { slug: 'Funcțional', name: 'Funcțional' },
+  { slug: 'Accesorii', name: 'Accesorii' },
+  { slug: 'Wellness', name: 'Wellness' },
+  { slug: 'Vestiare', name: 'Vestiare' },
+  { slug: 'Recepție', name: 'Recepție' },
 ];
 
-const products = [
+interface Product {
+  id: number;
+  name: string;
+  brand: string;
+  category: string;
+  condition: string;
+  price: number;
+  description?: string;
+  images?: string[];
+  supplier: string;
+}
+
+// Fallback data when Supabase is not connected
+const fallbackProducts: Product[] = [
   { id: 1, name: 'Life Fitness Integrity Series Treadmill', brand: 'Life Fitness', category: 'Cardio', condition: 'Nou', price: 8500, supplier: 'FitPro Equipment' },
   { id: 2, name: 'Technogym Selection Pro Chest Press', brand: 'Technogym', category: 'Forță', condition: 'Nou', price: 4200, supplier: 'GymTech Solutions' },
   { id: 3, name: 'Matrix Rower', brand: 'Matrix', category: 'Cardio', condition: 'Nou', price: 2800, supplier: 'Nordic Fitness' },
@@ -35,6 +48,55 @@ export default function ProductsPage() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [toast, setToast] = useState('');
   const [showContactModal, setShowContactModal] = useState<number | null>(null);
+  const [products, setProducts] = useState<Product[]>(fallbackProducts);
+  const [loading, setLoading] = useState(true);
+  const [dataSource, setDataSource] = useState<'api' | 'fallback'>('fallback');
+
+  // Fetch products from API
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const params = new URLSearchParams();
+        if (activeCategory !== 'all') params.set('category', activeCategory);
+        if (searchQuery) params.set('search', searchQuery);
+
+        const res = await fetch(`/api/products?${params.toString()}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.products && data.products.length > 0) {
+            const mapped = data.products.map((p: any) => ({
+              id: p.id,
+              name: p.name,
+              brand: p.brand,
+              category: p.category,
+              condition: p.condition,
+              price: p.price,
+              description: p.description,
+              images: p.images,
+              supplier: p.supplier_profiles?.company_name || 'Furnizor GymBuilder',
+            }));
+            setProducts(mapped);
+            setDataSource('api');
+          } else {
+            // No products in DB, use fallback
+            setProducts(fallbackProducts);
+            setDataSource('fallback');
+          }
+        } else {
+          setProducts(fallbackProducts);
+          setDataSource('fallback');
+        }
+      } catch {
+        setProducts(fallbackProducts);
+        setDataSource('fallback');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    const debounce = setTimeout(fetchProducts, 300);
+    return () => clearTimeout(debounce);
+  }, [activeCategory, searchQuery]);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -51,13 +113,14 @@ export default function ProductsPage() {
     }
   };
 
-  const categoryMap: Record<string, string> = { 'Cardio': 'cardio', 'Forță': 'strength', 'Funcțional': 'functional', 'Accesorii': 'accessories', 'Wellness': 'wellness', 'Vestiare': 'lockers', 'Recepție': 'reception' };
-
-  const filteredProducts = products.filter((p) => {
-    const matchesCategory = activeCategory === 'all' || categoryMap[p.category] === activeCategory;
-    const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  // Client-side filter for fallback data
+  const filteredProducts = dataSource === 'fallback'
+    ? products.filter((p) => {
+        const matchesCategory = activeCategory === 'all' || p.category === activeCategory;
+        const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+      })
+    : products;
 
   return (
     <main className="min-h-screen">
@@ -115,7 +178,7 @@ export default function ProductsPage() {
             Catalog <span className="gold-gradient">Echipamente</span>
           </h1>
           <p className="text-anthracite-300 text-lg max-w-2xl">
-            Peste 500 de echipamente fitness de la branduri premium, verificate și gata de livrare.
+            Echipamente fitness de la branduri premium, verificate și gata de livrare.
           </p>
         </div>
       </section>
@@ -166,7 +229,10 @@ export default function ProductsPage() {
       <section className="py-12 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <p className="text-anthracite-400 text-sm">{filteredProducts.length} produse găsite</p>
+            <p className="text-anthracite-400 text-sm">
+              {loading ? 'Se încarcă...' : `${filteredProducts.length} produse găsite`}
+              {dataSource === 'api' && <span className="ml-2 text-emerald-400 text-xs">(date live)</span>}
+            </p>
             <select className="bg-anthracite-800 border border-anthracite-600 rounded-lg px-3 py-2 text-sm text-anthracite-200">
               <option>Sortare: Recomandate</option>
               <option>Preț: Crescător</option>
@@ -175,55 +241,65 @@ export default function ProductsPage() {
             </select>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
-              <div key={product.id} className="card-hover group flex flex-col">
-                {/* Image Placeholder */}
-                <div className="relative h-52 bg-anthracite-700 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
-                  <Dumbbell className="w-16 h-16 text-anthracite-500" />
-                  <button
-                    onClick={() => toggleFavorite(product.id)}
-                    className="absolute top-3 right-3 w-8 h-8 bg-anthracite-800/80 rounded-full flex items-center justify-center hover:bg-anthracite-700 transition-all"
-                  >
-                    <Heart className={`w-4 h-4 transition-colors ${
-                      favorites.includes(product.id) ? 'text-red-400 fill-red-400' : 'text-anthracite-300 hover:text-red-400'
-                    }`} />
-                  </button>
-                  <span className={`absolute top-3 left-3 px-2 py-0.5 rounded text-xs font-medium ${
-                    product.condition === 'Nou' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
-                  }`}>
-                    {product.condition}
-                  </span>
-                </div>
-
-                {/* Info */}
-                <div className="space-y-2 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gold-400 font-medium">{product.brand}</span>
-                    <span className="text-xs text-anthracite-500">&middot;</span>
-                    <span className="text-xs text-anthracite-400">{product.category}</span>
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 text-gold-400 animate-spin" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProducts.map((product) => (
+                <div key={product.id} className="card-hover group flex flex-col">
+                  {/* Image */}
+                  <div className="relative h-52 bg-anthracite-700 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                    {product.images && product.images[0] ? (
+                      <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Dumbbell className="w-16 h-16 text-anthracite-500" />
+                    )}
+                    <button
+                      onClick={() => toggleFavorite(product.id)}
+                      className="absolute top-3 right-3 w-8 h-8 bg-anthracite-800/80 rounded-full flex items-center justify-center hover:bg-anthracite-700 transition-all"
+                    >
+                      <Heart className={`w-4 h-4 transition-colors ${
+                        favorites.includes(product.id) ? 'text-red-400 fill-red-400' : 'text-anthracite-300 hover:text-red-400'
+                      }`} />
+                    </button>
+                    <span className={`absolute top-3 left-3 px-2 py-0.5 rounded text-xs font-medium ${
+                      product.condition === 'Nou' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
+                    }`}>
+                      {product.condition}
+                    </span>
                   </div>
-                  <h3 className="text-white font-semibold line-clamp-2 group-hover:text-gold-400 transition-colors">
-                    {product.name}
-                  </h3>
-                  <p className="text-xs text-anthracite-500">de la {product.supplier}</p>
-                </div>
 
-                {/* Price + Actions */}
-                <div className="flex items-center justify-between pt-4 mt-3 border-t border-anthracite-700">
-                  <span className="text-xl font-bold text-gold-400">&euro;{product.price.toLocaleString()}</span>
-                  <button
-                    onClick={() => setShowContactModal(product.id)}
-                    className="px-3 py-2 bg-gold-400/10 rounded-lg flex items-center gap-1.5 hover:bg-gold-400 hover:text-anthracite-950 text-gold-400 transition-colors text-sm font-medium"
-                  >
-                    <Mail className="w-3.5 h-3.5" /> Ofertă
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+                  {/* Info */}
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gold-400 font-medium">{product.brand}</span>
+                      <span className="text-xs text-anthracite-500">&middot;</span>
+                      <span className="text-xs text-anthracite-400">{product.category}</span>
+                    </div>
+                    <h3 className="text-white font-semibold line-clamp-2 group-hover:text-gold-400 transition-colors">
+                      {product.name}
+                    </h3>
+                    <p className="text-xs text-anthracite-500">de la {product.supplier}</p>
+                  </div>
 
-          {filteredProducts.length === 0 && (
+                  {/* Price + Actions */}
+                  <div className="flex items-center justify-between pt-4 mt-3 border-t border-anthracite-700">
+                    <span className="text-xl font-bold text-gold-400">&euro;{product.price.toLocaleString()}</span>
+                    <button
+                      onClick={() => setShowContactModal(product.id)}
+                      className="px-3 py-2 bg-gold-400/10 rounded-lg flex items-center gap-1.5 hover:bg-gold-400 hover:text-anthracite-950 text-gold-400 transition-colors text-sm font-medium"
+                    >
+                      <Mail className="w-3.5 h-3.5" /> Ofertă
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!loading && filteredProducts.length === 0 && (
             <div className="text-center py-16">
               <Dumbbell className="w-12 h-12 text-anthracite-600 mx-auto mb-4" />
               <p className="text-anthracite-400">Nu s-au găsit produse cu aceste filtre.</p>

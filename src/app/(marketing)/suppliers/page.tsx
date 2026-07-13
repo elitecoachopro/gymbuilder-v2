@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Search, MapPin, Star, Filter, Building2, Globe, Phone, ArrowRight, Mail } from 'lucide-react';
-import { useState } from 'react';
+import { Search, MapPin, Star, Filter, Building2, Globe, Phone, ArrowRight, Mail, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
-const suppliers = [
+const fallbackSuppliers = [
   { id: 1, name: 'FitPro Equipment', country: 'România', city: 'București', plan: 'professional', rating: 4.8, products: 45, description: 'Distribuitor oficial Life Fitness și Hammer Strength pentru Europa de Est.' },
   { id: 2, name: 'GymTech Solutions', country: 'România', city: 'Cluj-Napoca', plan: 'enterprise', rating: 4.9, products: 120, description: 'Soluții complete pentru echiparea sălilor de fitness comerciale.' },
   { id: 3, name: 'IronWorks RO', country: 'România', city: 'Timișoara', plan: 'starter', rating: 4.5, products: 28, description: 'Echipamente de forță și funcționale la prețuri competitive.' },
@@ -22,17 +22,48 @@ export default function SuppliersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showContactModal, setShowContactModal] = useState<number | null>(null);
   const [toast, setToast] = useState('');
+  const [suppliers, setSuppliers] = useState(fallbackSuppliers);
+  const [loading, setLoading] = useState(true);
+  const [dataSource, setDataSource] = useState<'api' | 'fallback'>('fallback');
+
+  useEffect(() => {
+    async function fetchSuppliers() {
+      try {
+        const params = new URLSearchParams();
+        if (activeCountry !== 'Toate') params.set('country', activeCountry);
+        if (searchQuery) params.set('search', searchQuery);
+        const res = await fetch(`/api/suppliers?${params.toString()}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.suppliers && data.suppliers.length > 0) {
+            const mapped = data.suppliers.map((s: any) => ({
+              id: s.id, name: s.company_name, country: s.country, city: s.city,
+              plan: s.plan || 'free', rating: 4.5, products: 0,
+              description: s.description || '',
+            }));
+            setSuppliers(mapped);
+            setDataSource('api');
+          } else { setSuppliers(fallbackSuppliers); setDataSource('fallback'); }
+        } else { setSuppliers(fallbackSuppliers); setDataSource('fallback'); }
+      } catch { setSuppliers(fallbackSuppliers); setDataSource('fallback'); }
+      finally { setLoading(false); }
+    }
+    const debounce = setTimeout(fetchSuppliers, 300);
+    return () => clearTimeout(debounce);
+  }, [activeCountry, searchQuery]);
 
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(''), 3000);
   };
 
-  const filteredSuppliers = suppliers.filter((s) => {
-    const matchesCountry = activeCountry === 'Toate' || s.country === activeCountry;
-    const matchesSearch = !searchQuery || s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCountry && matchesSearch;
-  });
+  const filteredSuppliers = dataSource === 'fallback'
+    ? suppliers.filter((s) => {
+        const matchesCountry = activeCountry === 'Toate' || s.country === activeCountry;
+        const matchesSearch = !searchQuery || s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.description.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCountry && matchesSearch;
+      })
+    : suppliers;
 
   return (
     <main className="min-h-screen">

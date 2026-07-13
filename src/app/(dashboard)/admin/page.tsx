@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Dumbbell, Users, Package, Building2, TrendingUp, CheckCircle2, XCircle, Clock, BarChart3, Eye } from 'lucide-react';
-import { useState } from 'react';
+import { Dumbbell, Users, Package, Building2, TrendingUp, CheckCircle2, XCircle, Clock, BarChart3, Eye, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const stats = [
   { label: 'Furnizori Activi', value: '48', change: '+3', icon: Building2 },
@@ -11,10 +11,19 @@ const stats = [
   { label: 'Venituri Lunare', value: '€12,450', change: '+18%', icon: TrendingUp },
 ];
 
-const pendingSuppliers = [
-  { id: 1, name: 'ProFit Equipment', company: 'SC ProFit SRL', city: 'Iași', date: '2024-01-15' },
-  { id: 2, name: 'GymZone Direct', company: 'GymZone SRL', city: 'Brașov', date: '2024-01-14' },
-  { id: 3, name: 'FitMax Pro', company: 'FitMax International', city: 'Constanța', date: '2024-01-13' },
+interface PendingSupplier {
+  id: number;
+  company_name: string;
+  country: string;
+  city: string;
+  created_at: string;
+  users?: { full_name: string; email: string };
+}
+
+const fallbackPending = [
+  { id: 1, company_name: 'ProFit Equipment', country: 'România', city: 'Iași', created_at: '2024-01-15' },
+  { id: 2, company_name: 'GymZone Direct', country: 'România', city: 'Brașov', created_at: '2024-01-14' },
+  { id: 3, company_name: 'FitMax Pro', country: 'România', city: 'Constanța', created_at: '2024-01-13' },
 ];
 
 const recentActivity = [
@@ -34,18 +43,76 @@ const sidebarLinks = [
 
 export default function AdminDashboard() {
   const [toast, setToast] = useState('');
+  const [pendingSuppliers, setPendingSuppliers] = useState<PendingSupplier[]>(fallbackPending as any);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function fetchPending() {
+      try {
+        const res = await fetch('/api/admin/suppliers?status=pending');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.suppliers && data.suppliers.length > 0) {
+            setPendingSuppliers(data.suppliers);
+          }
+        }
+      } catch {
+        // Keep fallback data
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPending();
+  }, []);
 
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(''), 3000);
   };
 
-  const handleApprove = (supplierId: number, companyName: string) => {
-    showToast(`✅ ${companyName} a fost aprobat!`);
+  const handleApprove = async (supplierId: number, companyName: string) => {
+    setActionLoading(supplierId);
+    try {
+      const res = await fetch('/api/admin/suppliers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ supplierId, action: 'approve' }),
+      });
+      if (res.ok) {
+        showToast(`✅ ${companyName} a fost aprobat!`);
+        setPendingSuppliers(prev => prev.filter(s => s.id !== supplierId));
+      } else {
+        const data = await res.json();
+        showToast(`❌ Eroare: ${data.error || 'Nu s-a putut aproba.'}`);
+      }
+    } catch {
+      showToast('❌ Eroare de rețea. Încearcă din nou.');
+    } finally {
+      setActionLoading(null);
+    }
   };
 
-  const handleReject = (supplierId: number, companyName: string) => {
-    showToast(`❌ ${companyName} a fost respins.`);
+  const handleReject = async (supplierId: number, companyName: string) => {
+    setActionLoading(supplierId);
+    try {
+      const res = await fetch('/api/admin/suppliers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ supplierId, action: 'reject' }),
+      });
+      if (res.ok) {
+        showToast(`❌ ${companyName} a fost respins.`);
+        setPendingSuppliers(prev => prev.filter(s => s.id !== supplierId));
+      } else {
+        const data = await res.json();
+        showToast(`❌ Eroare: ${data.error || 'Nu s-a putut respinge.'}`);
+      }
+    } catch {
+      showToast('❌ Eroare de rețea. Încearcă din nou.');
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   return (
@@ -129,32 +196,52 @@ export default function AdminDashboard() {
                   {pendingSuppliers.length} noi
                 </span>
               </div>
-              <div className="space-y-3">
-                {pendingSuppliers.map((supplier) => (
-                  <div key={supplier.id} className="flex items-center justify-between p-3 bg-anthracite-900 rounded-lg">
-                    <div>
-                      <p className="text-sm font-medium text-white">{supplier.company}</p>
-                      <p className="text-xs text-anthracite-400">{supplier.city} &middot; {supplier.date}</p>
+              
+              {loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 text-gold-400 animate-spin" />
+                </div>
+              ) : pendingSuppliers.length === 0 ? (
+                <div className="text-center py-8">
+                  <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
+                  <p className="text-sm text-anthracite-400">Toți furnizorii au fost procesați!</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {pendingSuppliers.map((supplier) => (
+                    <div key={supplier.id} className="flex items-center justify-between p-3 bg-anthracite-900 rounded-lg">
+                      <div>
+                        <p className="text-sm font-medium text-white">{supplier.company_name}</p>
+                        <p className="text-xs text-anthracite-400">
+                          {supplier.city}, {supplier.country} &middot; {new Date(supplier.created_at).toLocaleDateString('ro-RO')}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleApprove(supplier.id, supplier.company_name)}
+                          disabled={actionLoading === supplier.id}
+                          className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center hover:bg-emerald-500/20 transition-colors disabled:opacity-50"
+                          title="Aprobă"
+                        >
+                          {actionLoading === supplier.id ? (
+                            <Loader2 className="w-4 h-4 text-emerald-400 animate-spin" />
+                          ) : (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleReject(supplier.id, supplier.company_name)}
+                          disabled={actionLoading === supplier.id}
+                          className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                          title="Respinge"
+                        >
+                          <XCircle className="w-4 h-4 text-red-400" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleApprove(supplier.id, supplier.company)}
-                        className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center hover:bg-emerald-500/20 transition-colors"
-                        title="Aprobă"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      </button>
-                      <button
-                        onClick={() => handleReject(supplier.id, supplier.company)}
-                        className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center hover:bg-red-500/20 transition-colors"
-                        title="Respinge"
-                      >
-                        <XCircle className="w-4 h-4 text-red-400" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Recent Activity */}

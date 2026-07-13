@@ -3,8 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import { hashPassword } from '@/lib/password';
 import { sendVerificationEmail } from '@/lib/email';
+import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
+import { sanitizeEmail, sanitizeString, sanitizePhone, isValidEmail, isStrongPassword } from '@/lib/sanitize';
 
-// Use service role to bypass RLS for user creation
 function getSupabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,6 +15,13 @@ function getSupabaseAdmin() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 5 attempts per minute per IP
+    const ip = getClientIP(request);
+    const rateCheck = checkRateLimit(`register:${ip}`, { maxRequests: 5, windowMs: 60 * 1000 });
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(rateCheck.resetTime);
+    }
+
     const body = await request.json();
     const { email, password, firstName, lastName, phone } = body;
 
@@ -25,17 +33,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (password.length < 8) {
+    // Sanitize inputs
+    const cleanEmail = sanitizeEmail(email);
+    const cleanFirstName = sanitizeString(firstName).slice(0, 50);
+    const cleanLastName = sanitizeString(lastName).slice(0, 50);
+    const cleanPhone = phone ? sanitizePhone(phone).slice(0, 20) : null;
+
+    // Validate email
+    if (!isValidEmail(cleanEmail)) {
       return NextResponse.json(
-        { error: 'Parola trebuie să aibă minim 8 caractere.' },
+        { error: 'Adresa de email nu este validă.' },
         { status: 400 }
       );
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Validate password strength
+    const passwordCheck = isStrongPassword(password);
+    if (!passwordCheck.valid) {
       return NextResponse.json(
-        { error: 'Adresa de email nu este validă.' },
+        { error: passwordCheck.message },
+        { status: 400 }
+      );
+    }
+
+    // Validate name length
+    if (cleanFirstName.length < 2 || cleanLastName.length < 2) {
+      return NextResponse.json(
+        { error: 'Numele trebuie să aibă minim 2 caractere.' },
         { status: 400 }
       );
     }
@@ -46,7 +70,7 @@ export async function POST(request: NextRequest) {
     const { data: existingUser } = await supabase
       .from('users')
       .select('id')
-      .eq('email', email.toLowerCase())
+      .eq('email', cleanEmail)
       .single();
 
     if (existingUser) {
@@ -66,9 +90,10 @@ export async function POST(request: NextRequest) {
     const { data: newUser, error: insertError } = await supabase
       .from('users')
       .insert({
-        email: email.toLowerCase(),
+        email: cleanEmail,
         password_hash: passwordHash,
-        full_name: `${firstName} ${lastName}`,
+        full_name: `${cleanFirstName} ${cleanLastName}`,
+        phone: cleanPhone,
         role: 'client',
         email_verified: false,
         verification_token: verificationToken,
@@ -86,10 +111,9 @@ export async function POST(request: NextRequest) {
 
     // Send verification email
     try {
-      await sendVerificationEmail(email.toLowerCase(), verificationToken, firstName);
+      await sendVerificationEmail(cleanEmail, verificationToken, cleanFirstName);
     } catch (emailError) {
       console.error('Email send error:', emailError);
-      // Don't fail registration if email fails - user can request resend
     }
 
     return NextResponse.json({

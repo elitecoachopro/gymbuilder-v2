@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
+import { sanitizeEmail, isValidEmail } from '@/lib/sanitize';
 
 function getSupabaseAdmin() {
   return createClient(
@@ -12,6 +14,13 @@ function getSupabaseAdmin() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 3 attempts per minute per IP (stricter for password reset)
+    const ip = getClientIP(request);
+    const rateCheck = checkRateLimit(`forgot-password:${ip}`, { maxRequests: 3, windowMs: 60 * 1000 });
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(rateCheck.resetTime);
+    }
+
     const body = await request.json();
     const { email } = body;
 
@@ -22,13 +31,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Sanitize and validate email
+    const cleanEmail = sanitizeEmail(email);
+    if (!isValidEmail(cleanEmail)) {
+      return NextResponse.json(
+        { error: 'Format email invalid.' },
+        { status: 400 }
+      );
+    }
+
     const supabase = getSupabaseAdmin();
 
     // Find user by email
     const { data: user } = await supabase
       .from('users')
       .select('id, email, full_name')
-      .eq('email', email.toLowerCase())
+      .eq('email', cleanEmail)
       .single();
 
     // Always return success to prevent email enumeration

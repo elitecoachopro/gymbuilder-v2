@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import { hashPassword } from '@/lib/password';
 import { sendVerificationEmail, sendSupplierWelcomeEmail } from '@/lib/email';
+import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
+import { sanitizeEmail, sanitizeString, sanitizePhone, sanitizeUrl, isValidEmail, isStrongPassword } from '@/lib/sanitize';
 
 function getSupabaseAdmin() {
   return createClient(
@@ -13,6 +15,13 @@ function getSupabaseAdmin() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 5 attempts per minute per IP
+    const ip = getClientIP(request);
+    const rateCheck = checkRateLimit(`register-supplier:${ip}`, { maxRequests: 5, windowMs: 60 * 1000 });
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(rateCheck.resetTime);
+    }
+
     const body = await request.json();
     const {
       email,
@@ -36,17 +45,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (password.length < 8) {
+    // Sanitize inputs
+    const cleanEmail = sanitizeEmail(email);
+    const cleanFirstName = sanitizeString(firstName).slice(0, 50);
+    const cleanLastName = sanitizeString(lastName).slice(0, 50);
+    const cleanCompanyName = sanitizeString(companyName).slice(0, 100);
+    const cleanCountry = sanitizeString(country).slice(0, 50);
+    const cleanCity = sanitizeString(city).slice(0, 50);
+    const cleanWebsite = website ? sanitizeUrl(website) : null;
+    const cleanPhone = phone ? sanitizePhone(phone).slice(0, 20) : null;
+    const cleanDescription = description ? sanitizeString(description).slice(0, 1000) : null;
+
+    // Validate email
+    if (!isValidEmail(cleanEmail)) {
       return NextResponse.json(
-        { error: 'Parola trebuie să aibă minim 8 caractere.' },
+        { error: 'Adresa de email nu este validă.' },
         { status: 400 }
       );
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Validate password strength
+    const passwordCheck = isStrongPassword(password);
+    if (!passwordCheck.valid) {
       return NextResponse.json(
-        { error: 'Adresa de email nu este validă.' },
+        { error: passwordCheck.message },
+        { status: 400 }
+      );
+    }
+
+    // Validate names
+    if (cleanFirstName.length < 2 || cleanLastName.length < 2) {
+      return NextResponse.json(
+        { error: 'Numele trebuie să aibă minim 2 caractere.' },
+        { status: 400 }
+      );
+    }
+
+    if (cleanCompanyName.length < 2) {
+      return NextResponse.json(
+        { error: 'Numele companiei trebuie să aibă minim 2 caractere.' },
         { status: 400 }
       );
     }
@@ -60,7 +97,7 @@ export async function POST(request: NextRequest) {
     const { data: existingUser } = await supabase
       .from('users')
       .select('id')
-      .eq('email', email.toLowerCase())
+      .eq('email', cleanEmail)
       .single();
 
     if (existingUser) {
@@ -80,9 +117,9 @@ export async function POST(request: NextRequest) {
     const { data: newUser, error: userError } = await supabase
       .from('users')
       .insert({
-        email: email.toLowerCase(),
+        email: cleanEmail,
         password_hash: passwordHash,
-        full_name: `${firstName} ${lastName}`,
+        full_name: `${cleanFirstName} ${cleanLastName}`,
         role: 'supplier',
         email_verified: false,
         verification_token: verificationToken,
@@ -103,19 +140,18 @@ export async function POST(request: NextRequest) {
       .from('supplier_profiles')
       .insert({
         user_id: newUser.id,
-        company_name: companyName,
-        country,
-        city,
-        website: website || null,
-        phone: phone || null,
-        description: description || null,
+        company_name: cleanCompanyName,
+        country: cleanCountry,
+        city: cleanCity,
+        website: cleanWebsite,
+        phone: cleanPhone,
+        description: cleanDescription,
         status: 'pending',
         plan: selectedPlan,
       });
 
     if (profileError) {
       console.error('Supplier profile creation error:', profileError);
-      // Cleanup: delete the user if profile creation fails
       await supabase.from('users').delete().eq('id', newUser.id);
       return NextResponse.json(
         { error: 'Eroare la crearea profilului de furnizor. Încearcă din nou.' },
@@ -125,14 +161,14 @@ export async function POST(request: NextRequest) {
 
     // Send verification email
     try {
-      await sendVerificationEmail(email.toLowerCase(), verificationToken, firstName);
+      await sendVerificationEmail(cleanEmail, verificationToken, cleanFirstName);
     } catch (emailError) {
       console.error('Verification email error:', emailError);
     }
 
     // Send supplier welcome email
     try {
-      await sendSupplierWelcomeEmail(email.toLowerCase(), firstName, companyName);
+      await sendSupplierWelcomeEmail(cleanEmail, cleanFirstName, cleanCompanyName);
     } catch (emailError) {
       console.error('Welcome email error:', emailError);
     }
