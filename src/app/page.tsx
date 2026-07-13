@@ -70,8 +70,7 @@ export default function HomePage() {
             </h1>
 
             <p className="text-xl text-anthracite-300 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Conectăm furnizori de echipamente fitness cu proprietari de săli din toată Europa. 
-              Găsește, compară și achiziționează echipamente premium.
+              Deschizi o sală de fitness sau vrei să o modernizezi? GymBuilder îți pune la dispoziție cel mai complet catalog de echipamente fitness din Europa, instrumente de planificare și experți care au trecut prin același drum.
             </p>
 
             {/* 3 Cards */}
