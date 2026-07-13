@@ -1,30 +1,52 @@
 'use client';
 
 import Link from 'next/link';
-
+import { useState, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Star, ArrowRight, Flame, Dumbbell, Megaphone } from 'lucide-react';
+import { Star, ArrowRight, Flame, Dumbbell, Megaphone, Loader2 } from 'lucide-react';
 
-// Oferta Zilei - null when no active offer
-const ofertaZilei: { name: string; brand: string; supplier: string; price: number; description: string } | null = {
-  name: 'Technogym Skillmill Connect',
-  brand: 'Technogym',
-  supplier: 'GymTech Solutions',
-  price: 6900,
-  description: 'Bandă de alergare profesională cu conectivitate avansată, ecran tactil HD și programe personalizate.',
-};
+interface OfertaZilei {
+  id: string;
+  title: string;
+  description: string | null;
+  price_eur: number;
+  supplier_profiles?: { company_name: string; country: string } | null;
+  products?: { name: string; brand: string; images: string[] | null; category: string } | null;
+}
 
-// Anunțurile Zilei - empty array when no announcements
-const anunturiZilei: { id: number; name: string; supplier: string; price: number }[] = [
-  { id: 1, name: 'Lot 50 Gantere Chrome 1-50kg', supplier: 'FitPro Equipment', price: 12000 },
-  { id: 2, name: 'Set Complet Cardio - 20 aparate', supplier: 'GymTech Solutions', price: 45000 },
-  { id: 3, name: 'Rack-uri Squat x10 + Bare Olimpice', supplier: 'IronWorks RO', price: 8500 },
-  { id: 4, name: 'Bănci Reglabile Pro x15', supplier: 'Nordic Fitness', price: 6200 },
-  { id: 5, name: 'Concept2 RowErg x8 - Lot Nou', supplier: 'EuroGym Direct', price: 9600 },
-];
+interface AnuntZilei {
+  id: string;
+  title: string;
+  description: string | null;
+  price_eur: number;
+  supplier_profiles?: { company_name: string; country: string } | null;
+  products?: { name: string; brand: string; images: string[] | null; category: string } | null;
+}
 
 export default function HomePage() {
+  const [ofertaZilei, setOfertaZilei] = useState<OfertaZilei | null>(null);
+  const [anunturiZilei, setAnunturiZilei] = useState<AnuntZilei[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchPromotions() {
+      try {
+        const res = await fetch('/api/promotions');
+        if (res.ok) {
+          const data = await res.json();
+          setOfertaZilei(data.ofertaZilei || null);
+          setAnunturiZilei(data.anunturiZilei || []);
+        }
+      } catch {
+        // Keep null/empty state - will show "no offers" message
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPromotions();
+  }, []);
+
   return (
     <main className="min-h-screen">
       <Navbar />
@@ -119,23 +141,41 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold text-white">Oferta Zilei</h2>
           </div>
 
-          {ofertaZilei ? (
+          {loading ? (
+            <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-12 text-center">
+              <Loader2 className="w-8 h-8 text-gold-400 animate-spin mx-auto mb-3" />
+              <p className="text-anthracite-400 text-sm">Se încarcă oferta...</p>
+            </div>
+          ) : ofertaZilei ? (
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-                {/* Image placeholder */}
+                {/* Image */}
                 <div className="h-64 md:h-72 bg-anthracite-700 flex items-center justify-center">
-                  <Dumbbell className="w-20 h-20 text-anthracite-500" />
+                  {ofertaZilei.products?.images && ofertaZilei.products.images.length > 0 ? (
+                    <img 
+                      src={ofertaZilei.products.images[0]} 
+                      alt={ofertaZilei.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <Dumbbell className="w-20 h-20 text-anthracite-500" />
+                  )}
                 </div>
                 {/* Details */}
                 <div className="p-8 flex flex-col justify-center">
                   <span className="inline-flex items-center gap-1.5 bg-gold-400/10 border border-gold-400/20 rounded-full px-3 py-1 text-xs font-bold text-gold-400 w-fit mb-4">
                     <Flame className="w-3 h-3" /> OFERTA ZILEI
                   </span>
-                  <h3 className="text-xl md:text-2xl font-bold text-white mb-2">{ofertaZilei.name}</h3>
-                  <p className="text-sm text-anthracite-400 mb-3">de la {ofertaZilei.supplier} &middot; {ofertaZilei.brand}</p>
-                  <p className="text-sm text-anthracite-300 mb-5 leading-relaxed">{ofertaZilei.description}</p>
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-2">{ofertaZilei.title}</h3>
+                  <p className="text-sm text-anthracite-400 mb-3">
+                    de la {ofertaZilei.supplier_profiles?.company_name || 'Furnizor'}
+                    {ofertaZilei.products?.brand && ` · ${ofertaZilei.products.brand}`}
+                  </p>
+                  {ofertaZilei.description && (
+                    <p className="text-sm text-anthracite-300 mb-5 leading-relaxed">{ofertaZilei.description}</p>
+                  )}
                   <div className="flex items-center gap-4 mb-6">
-                    <span className="text-2xl font-bold text-gold-400">&euro;{ofertaZilei.price.toLocaleString()}</span>
+                    <span className="text-2xl font-bold text-gold-400">&euro;{Number(ofertaZilei.price_eur).toLocaleString()}</span>
                   </div>
                   <Link href="/products" className="inline-block bg-gold-400 text-anthracite-950 font-bold text-sm px-6 py-3 rounded-lg hover:bg-gold-300 transition-colors w-fit">
                     Vezi Oferta
@@ -146,7 +186,7 @@ export default function HomePage() {
           ) : (
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-12 text-center">
               <Dumbbell className="w-12 h-12 text-anthracite-600 mx-auto mb-4" />
-              <p className="text-anthracite-400">Nicio ofertă disponibilă astăzi</p>
+              <p className="text-anthracite-400">Nicio ofertă disponibilă momentan</p>
             </div>
           )}
         </div>
@@ -160,20 +200,35 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold text-white">Anunțurile Zilei</h2>
           </div>
 
-          {anunturiZilei.length > 0 ? (
+          {loading ? (
+            <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-12 text-center">
+              <Loader2 className="w-8 h-8 text-gold-400 animate-spin mx-auto mb-3" />
+              <p className="text-anthracite-400 text-sm">Se încarcă anunțurile...</p>
+            </div>
+          ) : anunturiZilei.length > 0 ? (
             <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
               {anunturiZilei.map((item) => (
                 <div key={item.id} className="min-w-[280px] max-w-[300px] bg-anthracite-800 border border-anthracite-700 rounded-2xl overflow-hidden flex-shrink-0 snap-start">
-                  {/* Image placeholder */}
+                  {/* Image */}
                   <div className="h-40 bg-anthracite-700 flex items-center justify-center">
-                    <Dumbbell className="w-12 h-12 text-anthracite-500" />
+                    {item.products?.images && item.products.images.length > 0 ? (
+                      <img 
+                        src={item.products.images[0]} 
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Dumbbell className="w-12 h-12 text-anthracite-500" />
+                    )}
                   </div>
                   {/* Info */}
                   <div className="p-5">
-                    <h3 className="text-white font-semibold text-sm mb-1 line-clamp-2">{item.name}</h3>
-                    <p className="text-xs text-anthracite-400 mb-3">de la {item.supplier}</p>
+                    <h3 className="text-white font-semibold text-sm mb-1 line-clamp-2">{item.title}</h3>
+                    <p className="text-xs text-anthracite-400 mb-3">
+                      de la {item.supplier_profiles?.company_name || 'Furnizor'}
+                    </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-gold-400">&euro;{item.price.toLocaleString()}</span>
+                      <span className="text-lg font-bold text-gold-400">&euro;{Number(item.price_eur).toLocaleString()}</span>
                       <Link href="/products" className="text-xs font-medium text-gold-400 hover:text-gold-300 flex items-center gap-1">
                         Detalii <ArrowRight className="w-3 h-3" />
                       </Link>
