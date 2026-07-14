@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, TrendingUp, Star, MessageSquare } from 'lucide-react';
+import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, TrendingUp, Star, MessageSquare, LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Supplier {
   id: string;
@@ -40,6 +41,7 @@ const sidebarLinks = [
 ];
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -48,6 +50,17 @@ export default function AdminDashboard() {
   const [toastType, setToastType] = useState<'success' | 'error'>('success');
   const [rejectModal, setRejectModal] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [logoutLoading, setLogoutLoading] = useState(false);
+
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/login');
+    } catch {
+      router.push('/login');
+    }
+  };
   const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
   const [adminSection, setAdminSection] = useState<'suppliers' | 'reviews'>('suppliers');
   const [reviewsList, setReviewsList] = useState<ReviewItem[]>([]);
@@ -260,6 +273,14 @@ export default function AdminDashboard() {
                   <span className="text-sm font-medium text-amber-400">{pendingCount} pending</span>
                 </div>
               )}
+              <button
+                onClick={handleLogout}
+                disabled={logoutLoading}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-anthracite-700 text-anthracite-300 hover:text-red-400 hover:border-red-400/30 text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                <LogOut className="w-4 h-4" />
+                {logoutLoading ? 'Se deconectează...' : 'Logout'}
+              </button>
             </div>
           </div>
 

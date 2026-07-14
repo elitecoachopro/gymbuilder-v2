@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Search, Heart, MessageSquare, Star, Building2, Package, Loader2, Dumbbell, Clock, Send, CheckCircle, ArrowRight, Trash2 } from 'lucide-react';
+import { Search, Heart, MessageSquare, Star, Building2, Package, Loader2, Dumbbell, Clock, Send, CheckCircle, ArrowRight, Trash2, LogOut } from 'lucide-react';
 
 interface ContactRequest {
   id: string;
@@ -56,9 +57,21 @@ interface DashboardData {
 }
 
 export default function ClientDashboard() {
+  const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [logoutLoading, setLogoutLoading] = useState(false);
+
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/login');
+    } catch {
+      router.push('/login');
+    }
+  };
 
   useEffect(() => {
     fetchDashboard();
@@ -138,13 +151,23 @@ export default function ClientDashboard() {
             <h1 className="text-2xl font-bold text-white">Bun venit, {data.user.full_name}!</h1>
             <p className="text-anthracite-400 text-sm mt-1">Dashboard-ul tău de client</p>
           </div>
-          <Link
-            href="/products"
-            className="flex items-center gap-2 bg-gold-400 text-anthracite-950 font-bold px-5 py-3 rounded-lg hover:bg-gold-300 transition-colors"
-          >
-            <Search className="w-4 h-4" />
-            Caută Echipamente
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/products"
+              className="flex items-center gap-2 bg-gold-400 text-anthracite-950 font-bold px-5 py-3 rounded-lg hover:bg-gold-300 transition-colors"
+            >
+              <Search className="w-4 h-4" />
+              Caută Echipamente
+            </Link>
+            <button
+              onClick={handleLogout}
+              disabled={logoutLoading}
+              className="flex items-center gap-2 px-4 py-3 rounded-lg border border-anthracite-700 text-anthracite-300 hover:text-red-400 hover:border-red-400/30 text-sm font-medium transition-colors disabled:opacity-50"
+            >
+              <LogOut className="w-4 h-4" />
+              {logoutLoading ? 'Se deconectează...' : 'Logout'}
+            </button>
+          </div>
         </div>
 
         {/* Stats Row */}

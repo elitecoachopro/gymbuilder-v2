@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Settings, Star } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Settings, Star, LogOut } from 'lucide-react';
 import { useState } from 'react';
 
 const stats = [
@@ -27,11 +28,23 @@ const sidebarLinks = [
 ];
 
 export default function SupplierDashboard() {
+  const router = useRouter();
   const [toast, setToast] = useState('');
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(''), 3000);
+  };
+
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/login');
+    } catch {
+      router.push('/login');
+    }
   };
 
   return (
@@ -98,9 +111,19 @@ export default function SupplierDashboard() {
               <h1 className="text-2xl font-bold text-white">Supplier Dashboard</h1>
               <p className="text-anthracite-400 text-sm mt-1">FitPro Equipment &middot; Professional Plan</p>
             </div>
-            <Link href="/supplier/products/new" className="btn-primary flex items-center gap-2">
-              <Plus className="w-4 h-4" /> Adaugă Produs
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link href="/supplier/products/new" className="btn-primary flex items-center gap-2">
+                <Plus className="w-4 h-4" /> Adaugă Produs
+              </Link>
+              <button
+                onClick={handleLogout}
+                disabled={logoutLoading}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-anthracite-700 text-anthracite-300 hover:text-red-400 hover:border-red-400/30 text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                <LogOut className="w-4 h-4" />
+                {logoutLoading ? 'Se deconectează...' : 'Logout'}
+              </button>
+            </div>
           </div>
 
           {/* Stats */}

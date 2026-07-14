@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Dumbbell, Plus, Pencil, Trash2, Loader2, Package, ArrowLeft, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { Dumbbell, Plus, Pencil, Trash2, Loader2, Package, ArrowLeft, Eye, EyeOff, AlertCircle, CheckCircle, LogOut } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -176,13 +177,21 @@ export default function SupplierProductsPage() {
               </p>
             </div>
           </div>
-          <Link
-            href="/supplier/products/new"
-            className="btn-primary px-5 py-2.5 flex items-center gap-2 text-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Adaugă Produs
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/supplier/products/new"
+              className="btn-primary px-5 py-2.5 flex items-center gap-2 text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Adaugă Produs
+            </Link>
+            <button
+              onClick={async () => { await fetch('/api/auth/logout', { method: 'POST' }); window.location.href = '/login'; }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-anthracite-700 text-anthracite-300 hover:text-red-400 hover:border-red-400/30 text-sm font-medium transition-colors"
+            >
+              <LogOut className="w-4 h-4" /> Logout
+            </button>
+          </div>
         </div>
 
         {/* Content */}
