@@ -2,7 +2,7 @@
 
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { MessageSquare, CheckCircle2, Phone, Mail, Clock, Users, Target, Lightbulb } from 'lucide-react';
+import { MessageSquare, CheckCircle2, Clock, Users, Target, Lightbulb } from 'lucide-react';
 import { useState } from 'react';
 
 const benefits = [
@@ -12,12 +12,10 @@ const benefits = [
   { icon: Clock, title: 'Răspuns în 24h', desc: 'Echipa noastră te contactează în maxim 24 de ore.' },
 ];
 
-const stages = [
-  'Planific deschiderea unei săli noi',
-  'Vreau să reechipez sala existentă',
-  'Extind sala cu echipamente noi',
-  'Am nevoie de consultanță generală',
-  'Altceva',
+const businessStages = [
+  { value: 'idee', label: 'Idee – Încă mă documentez' },
+  { value: 'în pregătire', label: 'În pregătire – Am planuri concrete' },
+  { value: 'deja deschis', label: 'Deja deschis – Vreau să reechipez/extind' },
 ];
 
 export default function ConsultationPage() {
@@ -25,21 +23,40 @@ export default function ConsultationPage() {
     name: '',
     email: '',
     phone: '',
-    stage: '',
+    businessStage: '',
+    budget: '',
     message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError('');
 
-    // Simulate API call (in production, this would POST to /api/consultation)
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const res = await fetch('/api/consultation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    setIsSubmitting(false);
-    setSubmitted(true);
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'A apărut o eroare. Te rugăm să încerci din nou.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      setSubmitted(true);
+    } catch {
+      setError('Eroare de conexiune. Verifică internetul și încearcă din nou.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -118,12 +135,16 @@ export default function ConsultationPage() {
               {submitted ? (
                 <div className="text-center py-12">
                   <CheckCircle2 className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
-                  <h2 className="text-2xl font-bold text-white mb-2">Cerere Trimisă!</h2>
-                  <p className="text-anthracite-300 mb-6">
-                    Mulțumim! Echipa noastră te va contacta în maxim 24 de ore pentru programarea sesiunii de consultanță.
+                  <h2 className="text-2xl font-bold text-white mb-2">Cerere Trimisă cu Succes!</h2>
+                  <p className="text-anthracite-300 mb-4">
+                    Mulțumim, {formData.name}! Cererea ta de consultanță a fost înregistrată.
+                  </p>
+                  <p className="text-anthracite-400 text-sm mb-6">
+                    Vei primi un email de confirmare la <strong className="text-gold-400">{formData.email}</strong>. 
+                    Echipa noastră te va contacta în maxim 24 de ore pentru programarea sesiunii.
                   </p>
                   <button
-                    onClick={() => { setSubmitted(false); setFormData({ name: '', email: '', phone: '', stage: '', message: '' }); }}
+                    onClick={() => { setSubmitted(false); setFormData({ name: '', email: '', phone: '', businessStage: '', budget: '', message: '' }); }}
                     className="btn-secondary"
                   >
                     Trimite altă cerere
@@ -133,6 +154,12 @@ export default function ConsultationPage() {
                 <>
                   <h2 className="text-2xl font-bold text-white mb-2">Solicită Consultanță</h2>
                   <p className="text-anthracite-400 text-sm mb-8">Completează formularul și te contactăm în 24h.</p>
+
+                  {error && (
+                    <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg mb-6 text-sm">
+                      {error}
+                    </div>
+                  )}
 
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -161,36 +188,48 @@ export default function ConsultationPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Telefon</label>
+                      <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Telefon *</label>
                       <input
                         type="tel"
                         className="input-field"
                         placeholder="+40 7XX XXX XXX"
+                        required
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Stadiul proiectului *</label>
+                      <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Stadiul afacerii *</label>
                       <select
                         className="input-field"
                         required
-                        value={formData.stage}
-                        onChange={(e) => setFormData({ ...formData, stage: e.target.value })}
+                        value={formData.businessStage}
+                        onChange={(e) => setFormData({ ...formData, businessStage: e.target.value })}
                       >
-                        <option value="">Selectează...</option>
-                        {stages.map((stage) => (
-                          <option key={stage} value={stage}>{stage}</option>
+                        <option value="">Selectează stadiul...</option>
+                        {businessStages.map((stage) => (
+                          <option key={stage.value} value={stage.value}>{stage.label}</option>
                         ))}
                       </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Buget estimat</label>
+                      <input
+                        type="text"
+                        className="input-field"
+                        placeholder="ex: €5.000 - €20.000"
+                        value={formData.budget}
+                        onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                      />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Mesaj</label>
                       <textarea
                         className="input-field min-h-[120px] resize-y"
-                        placeholder="Descrie pe scurt proiectul tău..."
+                        placeholder="Descrie pe scurt proiectul tău, dimensiunea sălii, tipul de echipamente dorite..."
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       />
@@ -201,11 +240,11 @@ export default function ConsultationPage() {
                       disabled={isSubmitting}
                       className="btn-primary w-full py-4 text-base disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {isSubmitting ? 'Se trimite...' : 'Trimite Cererea - €99'}
+                      {isSubmitting ? 'Se trimite...' : 'Trimite Cererea – €99/sesiune'}
                     </button>
 
                     <p className="text-xs text-anthracite-500 text-center">
-                      Plata se procesează doar după confirmarea programării.
+                      Plata se procesează doar după confirmarea programării sesiunii.
                     </p>
                   </form>
                 </>
