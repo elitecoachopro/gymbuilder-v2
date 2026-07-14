@@ -41,13 +41,21 @@ export async function GET(
       .eq('status', 'active')
       .order('created_at', { ascending: false });
 
-    // Calculate stats (no reviews table yet, so return defaults)
+    // Calculate stats from reviews table
     const totalProducts = products?.length || 0;
 
-    // If a reviews table exists in the future, query it here
-    // For now, return placeholder stats
-    const avgRating = 0;
-    const reviewCount = 0;
+    const { data: reviews } = await supabase
+      .from('reviews')
+      .select('rating')
+      .eq('supplier_id', id)
+      .eq('verified', true);
+
+    let avgRating = 0;
+    let reviewCount = 0;
+    if (reviews && reviews.length > 0) {
+      reviewCount = reviews.length;
+      avgRating = Math.round((reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount) * 10) / 10;
+    }
 
     return NextResponse.json({
       supplier,

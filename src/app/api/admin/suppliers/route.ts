@@ -51,12 +51,14 @@ async function verifyAdmin(request: NextRequest) {
 
   try {
     const [payloadB64, hmac] = sessionToken.split('.');
-    const payload = JSON.parse(Buffer.from(payloadB64, 'base64').toString());
-    
+    if (!payloadB64 || !hmac) return null;
+    const payloadStr = Buffer.from(payloadB64, 'base64').toString();
+    const payload = JSON.parse(payloadStr);
+
     const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || 'fallback-secret';
-    const expectedHmac = crypto.createHmac('sha256', secret).update(JSON.stringify(payload)).digest('hex');
+    const expectedHmac = crypto.createHmac('sha256', secret).update(payloadStr).digest('hex');
     if (hmac !== expectedHmac) return null;
-    
+
     if (Date.now() > payload.exp) return null;
 
     const supabase = getSupabaseAdmin();
@@ -84,19 +86,37 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const status = searchParams.get('status') || 'pending';
 
-  // Get suppliers with the requested status
+  // Get suppliers with the requested status (no join to avoid FK detection issues)
   const { data: suppliers, error } = await supabase
     .from('supplier_profiles')
-    .select(`
-      id, user_id, company_name, country, city, website, phone, description, status, plan, created_at,
-      users!inner(full_name, email)
-    `)
+    .select('id, user_id, company_name, country, city, website, phone, description, status, plan, created_at')
     .eq('status', status)
     .order('created_at', { ascending: false });
 
   if (error) {
     console.error('Admin suppliers fetch error:', error);
-    return NextResponse.json({ error: 'Eroare la încărcarea furnizorilor.' }, { status: 500 });
+    return NextResponse.json({ error: 'Eroare la incarcarea furnizorilor.', debug: error.message }, { status: 500 });
+  }
+
+  // Enrich with user info via separate query
+  const enrichedSuppliers = [];
+  if (suppliers && suppliers.length > 0) {
+    const userIds = suppliers.map(s => s.user_id);
+    const { data: users } = await supabase
+      .from('users')
+      .select('id, full_name, email')
+      .in('id', userIds);
+
+    const userMap = new Map((users || []).map(u => [u.id, u]));
+
+    for (const supplier of suppliers) {
+      const user = userMap.get(supplier.user_id);
+      enrichedSuppliers.push({
+        ...supplier,
+        full_name: user?.full_name || 'N/A',
+        email: user?.email || 'N/A',
+      });
+    }
   }
 
   // Get pending count for badge
@@ -105,8 +125,8 @@ export async function GET(request: NextRequest) {
     .select('id', { count: 'exact', head: true })
     .eq('status', 'pending');
 
-  return NextResponse.json({ 
-    suppliers: suppliers || [],
+  return NextResponse.json({
+    suppliers: enrichedSuppliers,
     pendingCount: pendingCount || 0,
   });
 }
@@ -124,7 +144,7 @@ export async function PATCH(request: NextRequest) {
 
     if (!supplierId || !['approve', 'reject'].includes(action)) {
       return NextResponse.json(
-        { error: 'Parametri invalizi. Trebuie supplierId și action (approve/reject).' },
+        { error: 'Parametri invalizi. Trebuie supplierId si action (approve/reject).' },
         { status: 400 }
       );
     }
@@ -132,19 +152,23 @@ export async function PATCH(request: NextRequest) {
     const supabase = getSupabaseAdmin();
     const newStatus = action === 'approve' ? 'approved' : 'rejected';
 
-    // Get supplier info with user email before updating
+    // Get supplier info before updating
     const { data: supplierInfo } = await supabase
       .from('supplier_profiles')
-      .select(`
-        id, company_name, user_id,
-        users!inner(full_name, email)
-      `)
+      .select('id, company_name, user_id')
       .eq('id', supplierId)
       .single();
 
     if (!supplierInfo) {
-      return NextResponse.json({ error: 'Furnizor negăsit.' }, { status: 404 });
+      return NextResponse.json({ error: 'Furnizor negasit.' }, { status: 404 });
     }
+
+    // Get user email via separate query (avoids join issues)
+    const { data: userData } = await supabase
+      .from('users')
+      .select('full_name, email')
+      .eq('id', supplierInfo.user_id)
+      .single();
 
     // Update status
     const { data, error } = await supabase
@@ -160,8 +184,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Send email notification
-    const userEmail = (supplierInfo.users as any)?.email;
-    const userName = (supplierInfo.users as any)?.full_name || 'Furnizor';
+    const userEmail = userData?.email;
+    const userName = userData?.full_name || 'Furnizor';
     const companyName = supplierInfo.company_name;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gymbuilder.app';
 
@@ -169,33 +193,31 @@ export async function PATCH(request: NextRequest) {
       if (action === 'approve') {
         await sendEmail(
           userEmail,
-          'Contul tău GymBuilder a fost aprobat',
+          'Contul tau GymBuilder a fost aprobat',
           `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #1a1a1a; color: #ffffff;">
             <div style="text-align: center; margin-bottom: 30px;">
               <h1 style="color: #f5c542; font-size: 28px; margin: 0;">GymBuilder</h1>
             </div>
             <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
-              <h2 style="color: #4ade80; margin-top: 0;">✅ Felicitări, ${userName}!</h2>
+              <h2 style="color: #4ade80; margin-top: 0;">Felicitari, ${userName}!</h2>
               <p style="color: #d1d5db; line-height: 1.6;">
-                Contul tău de furnizor <strong style="color: #f5c542;">${companyName}</strong> a fost aprobat cu succes pe platforma GymBuilder.
+                Contul tau de furnizor <strong style="color: #f5c542;">${companyName}</strong> a fost aprobat cu succes pe platforma GymBuilder.
               </p>
-              <p style="color: #d1d5db; line-height: 1.6;">
-                Acum poți:
-              </p>
+              <p style="color: #d1d5db; line-height: 1.6;">Acum poti:</p>
               <ul style="color: #d1d5db; line-height: 2;">
-                <li>Adăuga produse și echipamente pe platformă</li>
-                <li>Primi cereri de ofertă de la clienți</li>
-                <li>Gestiona profilul tău de furnizor</li>
+                <li>Adauga produse si echipamente pe platforma</li>
+                <li>Primi cereri de oferta de la clienti</li>
+                <li>Gestiona profilul tau de furnizor</li>
               </ul>
               <div style="text-align: center; margin-top: 24px;">
                 <a href="${appUrl}/login" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 14px 28px; border-radius: 8px; text-decoration: none;">
-                  Accesează Dashboard-ul
+                  Acceseaza Dashboard-ul
                 </a>
               </div>
             </div>
             <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 24px;">
-              © ${new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
+              &copy; ${new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
             </p>
           </div>
           `
@@ -203,19 +225,17 @@ export async function PATCH(request: NextRequest) {
       } else {
         await sendEmail(
           userEmail,
-          'Cererea ta a fost respinsă',
+          'Cererea ta a fost respinsa',
           `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #1a1a1a; color: #ffffff;">
             <div style="text-align: center; margin-bottom: 30px;">
               <h1 style="color: #f5c542; font-size: 28px; margin: 0;">GymBuilder</h1>
             </div>
             <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
-              <h2 style="color: #f87171; margin-top: 0;">Cererea ta a fost respinsă</h2>
+              <h2 style="color: #f87171; margin-top: 0;">Cererea ta a fost respinsa</h2>
+              <p style="color: #d1d5db; line-height: 1.6;">Buna, ${userName},</p>
               <p style="color: #d1d5db; line-height: 1.6;">
-                Bună, ${userName},
-              </p>
-              <p style="color: #d1d5db; line-height: 1.6;">
-                Din păcate, cererea de înregistrare pentru compania <strong style="color: #f5c542;">${companyName}</strong> nu a fost aprobată.
+                Din pacate, cererea de inregistrare pentru compania <strong style="color: #f5c542;">${companyName}</strong> nu a fost aprobata.
               </p>
               ${reason ? `
               <div style="background: #1a1a1a; border-left: 3px solid #f87171; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
@@ -223,19 +243,16 @@ export async function PATCH(request: NextRequest) {
               </div>
               ` : ''}
               <p style="color: #d1d5db; line-height: 1.6;">
-                Dacă consideri că este o eroare sau dorești să trimiți informații suplimentare, te rugăm să ne contactezi la <a href="mailto:contact@gymbuilder.app" style="color: #f5c542;">contact@gymbuilder.app</a>.
-              </p>
-              <p style="color: #d1d5db; line-height: 1.6;">
-                Poți oricând să te reînregistrezi cu informații actualizate.
+                Daca consideri ca este o eroare, contacteaza-ne la <a href="mailto:contact@gymbuilder.app" style="color: #f5c542;">contact@gymbuilder.app</a>.
               </p>
               <div style="text-align: center; margin-top: 24px;">
                 <a href="${appUrl}/register/supplier" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 14px 28px; border-radius: 8px; text-decoration: none;">
-                  Înregistrează-te din nou
+                  Inregistreaza-te din nou
                 </a>
               </div>
             </div>
             <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 24px;">
-              © ${new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
+              &copy; ${new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
             </p>
           </div>
           `
@@ -251,7 +268,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: action === 'approve' 
+      message: action === 'approve'
         ? `Furnizorul "${data.company_name}" a fost aprobat. Email trimis.`
         : `Furnizorul "${data.company_name}" a fost respins. Email trimis.`,
       supplier: data,
@@ -260,6 +277,6 @@ export async function PATCH(request: NextRequest) {
     });
   } catch (error) {
     console.error('Admin PATCH error:', error);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return NextResponse.json({ error: 'Eroare interna.' }, { status: 500 });
   }
 }

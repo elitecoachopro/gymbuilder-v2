@@ -93,7 +93,6 @@ export async function POST(request: NextRequest) {
         email: cleanEmail,
         password_hash: passwordHash,
         full_name: `${cleanFirstName} ${cleanLastName}`,
-        phone: cleanPhone,
         role: 'client',
         email_verified: false,
         verification_token: verificationToken,

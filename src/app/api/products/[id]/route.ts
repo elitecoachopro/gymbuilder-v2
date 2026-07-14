@@ -21,20 +21,27 @@ export async function GET(
   try {
     const supabase = getSupabase();
 
-    // Fetch product with supplier info
+    // Fetch product
     const { data: product, error } = await supabase
       .from('products')
-      .select(`
-        id, name, description, category, condition, price_eur, images, specs, status, created_at,
-        brand_id,
-        supplier_profiles!inner(id, company_name, country, city, logo_url, website)
-      `)
+      .select('id, name, description, category, condition, price_eur, images, specs, status, supplier_id, brand_id, created_at')
       .eq('id', id)
       .eq('status', 'active')
       .single();
 
     if (error || !product) {
       return NextResponse.json({ error: 'Produs negăsit.' }, { status: 404 });
+    }
+
+    // Fetch supplier info separately
+    let supplierInfo = null;
+    if (product.supplier_id) {
+      const { data: supplier } = await supabase
+        .from('supplier_profiles')
+        .select('id, company_name, country, city, logo_url, website')
+        .eq('id', product.supplier_id)
+        .single();
+      supplierInfo = supplier;
     }
 
     // Fetch brand name if brand_id exists
@@ -49,20 +56,35 @@ export async function GET(
     }
 
     // Fetch similar products (same category, different product, max 4)
-    const { data: similar } = await supabase
+    const { data: similarRaw } = await supabase
       .from('products')
-      .select(`
-        id, name, price_eur, images, condition, category,
-        supplier_profiles!inner(company_name)
-      `)
+      .select('id, name, price_eur, images, condition, category, supplier_id')
       .eq('category', product.category)
       .eq('status', 'active')
       .neq('id', id)
       .limit(4);
 
+    // Enrich similar products with supplier names
+    let similar = similarRaw || [];
+    if (similar.length > 0) {
+      const supplierIds = Array.from(new Set(similar.map(p => p.supplier_id).filter(Boolean)));
+      if (supplierIds.length > 0) {
+        const { data: suppliers } = await supabase
+          .from('supplier_profiles')
+          .select('id, company_name')
+          .in('id', supplierIds);
+
+        const supplierMap = new Map((suppliers || []).map(s => [s.id, s]));
+        similar = similar.map(p => ({
+          ...p,
+          supplier: supplierMap.get(p.supplier_id) || null,
+        }));
+      }
+    }
+
     return NextResponse.json({
-      product: { ...product, brand_name: brandName },
-      similar: similar || [],
+      product: { ...product, supplier: supplierInfo, brand_name: brandName },
+      similar,
     });
   } catch (err) {
     console.error('Product detail error:', err);

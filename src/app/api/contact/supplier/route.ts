@@ -35,27 +35,51 @@ async function sendEmail(to: string, subject: string, html: string) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, phone, message, supplierId } = body;
+    const { name, email, phone, message, supplierId, supplier_id } = body;
+    const resolvedSupplierId = supplierId || supplier_id;
 
-    if (!name || !email || !message || !supplierId) {
+    if (!name || !email || !message || !resolvedSupplierId) {
       return NextResponse.json({ error: 'Câmpuri obligatorii lipsă.' }, { status: 400 });
     }
 
     const supabase = getSupabase();
 
-    // Get supplier info with user email
+    // Get supplier info
     const { data: supplier } = await supabase
       .from('supplier_profiles')
-      .select('id, company_name, user_id, users!inner(email, full_name)')
-      .eq('id', supplierId)
+      .select('id, company_name, user_id')
+      .eq('id', resolvedSupplierId)
       .single();
+
+    // Get supplier user email
+    let supplierEmail = null;
+    if (supplier) {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('email, full_name')
+        .eq('id', supplier.user_id)
+        .single();
+      supplierEmail = userData?.email;
+    }
 
     if (!supplier) {
       return NextResponse.json({ error: 'Furnizor negăsit.' }, { status: 404 });
     }
 
-    const supplierEmail = (supplier.users as any)?.email;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gymbuilder.app';
+
+    // Save contact request to database
+    const { productId, product_id: productIdAlt } = body;
+    const resolvedProductId = productId || productIdAlt || null;
+    await supabase.from('contact_requests').insert({
+      client_name: name,
+      client_email: email,
+      client_phone: phone || null,
+      supplier_id: resolvedSupplierId,
+      product_id: resolvedProductId,
+      message: message,
+      status: 'sent',
+    });
 
     // Send email to supplier
     if (supplierEmail) {
