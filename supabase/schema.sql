@@ -128,7 +128,36 @@ CREATE TABLE reviews (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Contact Requests (Cereri de Ofertă) Table
+CREATE TYPE contact_request_status AS ENUM ('sent', 'replied', 'completed');
+CREATE TABLE contact_requests (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  client_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  client_name TEXT NOT NULL,
+  client_email TEXT NOT NULL,
+  client_phone TEXT,
+  supplier_id UUID REFERENCES supplier_profiles(id) ON DELETE CASCADE NOT NULL,
+  product_id UUID REFERENCES products(id) ON DELETE SET NULL,
+  message TEXT,
+  status contact_request_status NOT NULL DEFAULT 'sent',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Favorites Table
+CREATE TABLE favorites (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  product_id UUID REFERENCES products(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, product_id)
+);
+
 -- Indexes
+CREATE INDEX idx_contact_requests_client ON contact_requests(client_id);
+CREATE INDEX idx_contact_requests_supplier ON contact_requests(supplier_id);
+CREATE INDEX idx_favorites_user ON favorites(user_id);
+CREATE INDEX idx_favorites_product ON favorites(product_id);
 CREATE INDEX idx_reviews_supplier ON reviews(supplier_id);
 CREATE INDEX idx_reviews_verified ON reviews(verified);
 CREATE INDEX idx_users_email ON users(email);

@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { Menu, X, ShoppingCart, User, Dumbbell } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Menu, X, User, Dumbbell, LayoutDashboard, LogOut } from 'lucide-react';
 
 const navLinks = [
   { href: '/suppliers', label: 'Furnizori' },
@@ -11,8 +11,44 @@ const navLinks = [
   { href: '/consultation', label: 'Consultanță' },
 ];
 
+interface SessionUser {
+  id: string;
+  full_name: string;
+  role: string;
+}
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<SessionUser | null>(null);
+
+  useEffect(() => {
+    // Check if user is logged in via cookie-based session
+    async function checkSession() {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) setUser(data.user);
+        }
+      } catch {}
+    }
+    checkSession();
+  }, []);
+
+  function getDashboardLink() {
+    if (!user) return '/login';
+    if (user.role === 'admin') return '/admin';
+    if (user.role === 'supplier') return '/supplier/dashboard';
+    return '/client/dashboard';
+  }
+
+  async function handleLogout() {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      setUser(null);
+      window.location.href = '/';
+    } catch {}
+  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-anthracite-950/80 backdrop-blur-xl border-b border-anthracite-800">
@@ -42,13 +78,31 @@ export default function Navbar() {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/login" className="btn-ghost text-sm flex items-center gap-2">
-              <User className="w-4 h-4" />
-              Autentificare
-            </Link>
-            <Link href="/register/supplier" className="btn-primary text-sm">
-              Devino Furnizor
-            </Link>
+            {user ? (
+              <>
+                <Link href={getDashboardLink()} className="btn-ghost text-sm flex items-center gap-2">
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="btn-ghost text-sm flex items-center gap-2 text-anthracite-400 hover:text-white"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Ieșire
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="btn-ghost text-sm flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Autentificare
+                </Link>
+                <Link href="/register/supplier" className="btn-primary text-sm">
+                  Devino Furnizor
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -76,12 +130,33 @@ export default function Navbar() {
               </Link>
             ))}
             <div className="pt-4 border-t border-anthracite-700 space-y-2">
-              <Link href="/login" className="block px-4 py-3 text-anthracite-200 hover:text-white">
-                Autentificare
-              </Link>
-              <Link href="/register/supplier" className="block btn-primary text-center text-sm">
-                Devino Furnizor
-              </Link>
+              {user ? (
+                <>
+                  <Link
+                    href={getDashboardLink()}
+                    className="block px-4 py-3 text-anthracite-200 hover:text-white hover:bg-anthracite-800 rounded-lg flex items-center gap-2"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <LayoutDashboard className="w-4 h-4 text-gold-400" />
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => { handleLogout(); setIsOpen(false); }}
+                    className="block w-full text-left px-4 py-3 text-anthracite-400 hover:text-white hover:bg-anthracite-800 rounded-lg"
+                  >
+                    Ieșire
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="block px-4 py-3 text-anthracite-200 hover:text-white">
+                    Autentificare
+                  </Link>
+                  <Link href="/register/supplier" className="block btn-primary text-center text-sm">
+                    Devino Furnizor
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
