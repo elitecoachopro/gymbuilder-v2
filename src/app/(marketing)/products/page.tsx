@@ -250,6 +250,7 @@ export default function ProductsPage() {
               {filteredProducts.map((product) => (
                 <div key={product.id} className="card-hover group flex flex-col">
                   {/* Image */}
+                  <Link href={`/products/${product.id}`} className="block">
                   <div className="relative h-52 bg-anthracite-700 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
                     {product.images && product.images[0] ? (
                       <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
@@ -283,6 +284,7 @@ export default function ProductsPage() {
                     </h3>
                     <p className="text-xs text-anthracite-500">de la {product.supplier}</p>
                   </div>
+                  </Link>
 
                   {/* Price + Actions */}
                   <div className="flex items-center justify-between pt-4 mt-3 border-t border-anthracite-700">
