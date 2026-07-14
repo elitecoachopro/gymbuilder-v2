@@ -115,7 +115,22 @@ CREATE TABLE consultation_requests (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Reviews Table
+CREATE TABLE reviews (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  supplier_id UUID REFERENCES supplier_profiles(id) ON DELETE CASCADE NOT NULL,
+  client_name TEXT NOT NULL,
+  client_email TEXT NOT NULL,
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  title TEXT NOT NULL,
+  body TEXT,
+  verified BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Indexes
+CREATE INDEX idx_reviews_supplier ON reviews(supplier_id);
+CREATE INDEX idx_reviews_verified ON reviews(verified);
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role ON users(role);
 CREATE INDEX idx_supplier_profiles_status ON supplier_profiles(status);

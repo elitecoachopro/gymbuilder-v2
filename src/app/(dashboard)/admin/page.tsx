@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, TrendingUp } from 'lucide-react';
+import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, TrendingUp, Star, MessageSquare } from 'lucide-react';
 
 interface Supplier {
   id: string;
@@ -17,6 +17,18 @@ interface Supplier {
   plan: string;
   created_at: string;
   users: { full_name: string; email: string };
+}
+
+interface ReviewItem {
+  id: string;
+  client_name: string;
+  client_email: string;
+  rating: number;
+  title: string;
+  body: string | null;
+  verified: boolean;
+  created_at: string;
+  supplier_profiles: { id: string; company_name: string };
 }
 
 const sidebarLinks = [
@@ -37,6 +49,11 @@ export default function AdminDashboard() {
   const [rejectModal, setRejectModal] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
+  const [adminSection, setAdminSection] = useState<'suppliers' | 'reviews'>('suppliers');
+  const [reviewsList, setReviewsList] = useState<ReviewItem[]>([]);
+  const [reviewsPendingCount, setReviewsPendingCount] = useState(0);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewActionLoading, setReviewActionLoading] = useState<string | null>(null);
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast(msg);
@@ -47,6 +64,45 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchSuppliers(activeTab);
   }, [activeTab]);
+
+  useEffect(() => {
+    if (adminSection === 'reviews') fetchReviews();
+  }, [adminSection]);
+
+  async function fetchReviews() {
+    setReviewsLoading(true);
+    try {
+      const res = await fetch('/api/admin/reviews?status=unverified');
+      if (res.ok) {
+        const data = await res.json();
+        setReviewsList(data.reviews || []);
+        setReviewsPendingCount(data.pendingCount || 0);
+      }
+    } catch {}
+    setReviewsLoading(false);
+  }
+
+  async function handleReviewAction(reviewId: string, action: 'approve' | 'reject') {
+    setReviewActionLoading(reviewId);
+    try {
+      const res = await fetch('/api/admin/reviews', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reviewId, action }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        showToast(data.message);
+        setReviewsList(prev => prev.filter(r => r.id !== reviewId));
+        setReviewsPendingCount(prev => Math.max(0, prev - 1));
+      } else {
+        showToast('Eroare.', 'error');
+      }
+    } catch {
+      showToast('Eroare de conexiune.', 'error');
+    }
+    setReviewActionLoading(null);
+  }
 
   async function fetchSuppliers(status: string) {
     setLoading(true);
@@ -207,6 +263,98 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {/* Section Switch */}
+          <div className="flex gap-1 bg-anthracite-900 rounded-lg p-1 mb-6 w-fit">
+            <button
+              onClick={() => setAdminSection('suppliers')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                adminSection === 'suppliers'
+                  ? 'bg-anthracite-700 text-gold-400'
+                  : 'text-anthracite-400 hover:text-white'
+              }`}
+            >
+              <Building2 className="w-4 h-4" /> Furnizori
+              {pendingCount > 0 && (
+                <span className="bg-amber-500 text-anthracite-950 text-xs font-bold px-1.5 py-0.5 rounded-full">{pendingCount}</span>
+              )}
+            </button>
+            <button
+              onClick={() => setAdminSection('reviews')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                adminSection === 'reviews'
+                  ? 'bg-anthracite-700 text-gold-400'
+                  : 'text-anthracite-400 hover:text-white'
+              }`}
+            >
+              <MessageSquare className="w-4 h-4" /> Recenzii
+              {reviewsPendingCount > 0 && (
+                <span className="bg-amber-500 text-anthracite-950 text-xs font-bold px-1.5 py-0.5 rounded-full">{reviewsPendingCount}</span>
+              )}
+            </button>
+          </div>
+
+          {adminSection === 'reviews' ? (
+            /* Reviews Moderation */
+            <div>
+              {reviewsLoading ? (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <Loader2 className="w-8 h-8 text-gold-400 animate-spin mb-4" />
+                  <p className="text-anthracite-400 text-sm">Se încarcă recenziile...</p>
+                </div>
+              ) : reviewsList.length === 0 ? (
+                <div className="text-center py-20">
+                  <MessageSquare className="w-16 h-16 text-anthracite-600 mx-auto mb-4" />
+                  <h2 className="text-xl font-semibold text-white mb-2">Nicio recenzie de moderat</h2>
+                  <p className="text-anthracite-400 text-sm">Toate recenziile au fost procesate.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {reviewsList.map((review) => (
+                    <div key={review.id} className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-6">
+                      <div className="flex items-start justify-between gap-4 flex-wrap">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-2 flex-wrap">
+                            <div className="flex">
+                              {[1,2,3,4,5].map(s => (
+                                <Star key={s} className={`w-4 h-4 ${s <= review.rating ? 'text-gold-400 fill-gold-400' : 'text-anthracite-600'}`} />
+                              ))}
+                            </div>
+                            <h3 className="text-base font-semibold text-white">{review.title}</h3>
+                          </div>
+                          {review.body && <p className="text-sm text-anthracite-300 mb-3">{review.body}</p>}
+                          <div className="flex items-center gap-4 text-xs text-anthracite-400">
+                            <span>De: <span className="text-white">{review.client_name}</span> ({review.client_email})</span>
+                            <span>Furnizor: <span className="text-gold-400">{(review.supplier_profiles as any)?.company_name}</span></span>
+                            <span>{new Date(review.created_at).toLocaleDateString('ro-RO')}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 flex-shrink-0">
+                          <button
+                            onClick={() => handleReviewAction(review.id, 'approve')}
+                            disabled={reviewActionLoading === review.id}
+                            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-lg text-sm font-medium hover:bg-emerald-500/20 transition-colors disabled:opacity-50"
+                          >
+                            {reviewActionLoading === review.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                            Aprobă
+                          </button>
+                          <button
+                            onClick={() => handleReviewAction(review.id, 'reject')}
+                            disabled={reviewActionLoading === review.id}
+                            className="flex items-center gap-1.5 px-4 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                          >
+                            <XCircle className="w-4 h-4" />
+                            Șterge
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+          /* Suppliers Section */
+          <>
           {/* Tabs */}
           <div className="flex gap-1 bg-anthracite-900 rounded-lg p-1 mb-6 w-fit">
             <button
@@ -341,6 +489,8 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </div>
+          )}
+          </>
           )}
         </div>
       </div>
