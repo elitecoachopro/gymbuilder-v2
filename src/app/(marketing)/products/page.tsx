@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Search, Dumbbell, Heart, SlidersHorizontal, Mail, Loader2, X, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Dumbbell, Heart, SlidersHorizontal, Mail, Loader2, X, RotateCcw, ChevronDown, ChevronUp, GitCompareArrows } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
+import { useCompareStore, CompareProduct } from '@/store/compare';
 
 const categories = [
   { slug: 'all', name: 'Toate' },
@@ -177,6 +178,33 @@ export default function ProductsPage() {
   }, [products, dataSource, activeCategory, searchQuery, conditionFilter, priceMin, priceMax, sortBy]);
 
   const conditionLabel = (c: string) => c === 'new' ? 'Nou' : c === 'used' ? 'Second-hand' : c;
+
+  // Compare
+  const compareItems = useCompareStore((s) => s.items);
+  const addToCompare = useCompareStore((s) => s.addItem);
+  const removeFromCompare = useCompareStore((s) => s.removeItem);
+  const isInCompare = useCompareStore((s) => s.isInCompare);
+  const [compareMounted, setCompareMounted] = useState(false);
+  useEffect(() => { setCompareMounted(true); }, []);
+
+  const toggleCompare = (product: Product) => {
+    if (isInCompare(product.id)) {
+      removeFromCompare(product.id);
+    } else {
+      const cp: CompareProduct = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        category: product.category,
+        condition: product.condition,
+        brand: product.brand,
+        supplier: product.supplier,
+        images: product.images,
+      };
+      const added = addToCompare(cp);
+      if (!added) showToast('Maxim 4 produse pentru comparație');
+    }
+  };
 
   return (
     <main className="min-h-screen">
@@ -500,12 +528,29 @@ export default function ProductsPage() {
                   {/* Price + Actions */}
                   <div className="flex items-center justify-between pt-4 mt-3 border-t border-anthracite-700">
                     <span className="text-xl font-bold text-gold-400">&euro;{product.price.toLocaleString()}</span>
-                    <button
-                      onClick={() => setShowContactModal(product.id)}
-                      className="px-3 py-2 bg-gold-400/10 rounded-lg flex items-center gap-1.5 hover:bg-gold-400 hover:text-anthracite-950 text-gold-400 transition-colors text-sm font-medium"
-                    >
-                      <Mail className="w-3.5 h-3.5" /> Ofertă
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* Compare checkbox */}
+                      {compareMounted && (
+                        <button
+                          onClick={() => toggleCompare(product)}
+                          className={`px-2.5 py-2 rounded-lg flex items-center gap-1.5 text-xs font-medium transition-colors border ${
+                            isInCompare(product.id)
+                              ? 'bg-blue-500/10 text-blue-400 border-blue-500/30'
+                              : 'bg-anthracite-800 text-anthracite-400 border-anthracite-700 hover:border-anthracite-500 hover:text-anthracite-200'
+                          }`}
+                          title={isInCompare(product.id) ? 'Elimină din comparație' : 'Adaugă la comparație'}
+                        >
+                          <GitCompareArrows className="w-3.5 h-3.5" />
+                          {isInCompare(product.id) ? '✓' : ''}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setShowContactModal(product.id)}
+                        className="px-3 py-2 bg-gold-400/10 rounded-lg flex items-center gap-1.5 hover:bg-gold-400 hover:text-anthracite-950 text-gold-400 transition-colors text-sm font-medium"
+                      >
+                        <Mail className="w-3.5 h-3.5" /> Ofertă
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -513,6 +558,52 @@ export default function ProductsPage() {
           )}
         </div>
       </section>
+
+      {/* Compare Bar - Fixed bottom */}
+      {compareMounted && compareItems.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-anthracite-900/95 backdrop-blur-xl border-t border-anthracite-700 shadow-2xl">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <GitCompareArrows className="w-5 h-5 text-blue-400" />
+              <span className="text-sm text-anthracite-300">
+                <span className="text-white font-semibold">{compareItems.length}</span>/4 produse selectate
+              </span>
+              <div className="hidden sm:flex items-center gap-2 ml-2">
+                {compareItems.map((item) => (
+                  <div key={String(item.id)} className="flex items-center gap-1.5 bg-anthracite-800 border border-anthracite-700 rounded-lg px-2.5 py-1">
+                    <span className="text-xs text-anthracite-200 max-w-[120px] truncate">{item.name}</span>
+                    <button
+                      onClick={() => removeFromCompare(item.id)}
+                      className="text-anthracite-500 hover:text-red-400 transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => useCompareStore.getState().clearAll()}
+                className="text-xs text-anthracite-400 hover:text-white transition-colors"
+              >
+                Șterge tot
+              </button>
+              <Link
+                href={`/compare?ids=${compareItems.map(i => i.id).join(',')}`}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ${
+                  compareItems.length >= 2
+                    ? 'bg-blue-500 text-white hover:bg-blue-400'
+                    : 'bg-anthracite-700 text-anthracite-500 cursor-not-allowed pointer-events-none'
+                }`}
+              >
+                <GitCompareArrows className="w-4 h-4" />
+                Compară Acum
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </main>
