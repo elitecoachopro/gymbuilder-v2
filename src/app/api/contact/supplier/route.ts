@@ -81,35 +81,54 @@ export async function POST(request: NextRequest) {
       status: 'sent',
     });
 
+    // Get product info if available
+    let productName = '';
+    let productCategory = '';
+    if (resolvedProductId) {
+      const { data: productData } = await supabase
+        .from('products')
+        .select('name, category')
+        .eq('id', resolvedProductId)
+        .single();
+      if (productData) {
+        productName = productData.name;
+        productCategory = productData.category || '';
+      }
+    }
+
     // Send email to supplier
     if (supplierEmail) {
       await sendEmail(
         supplierEmail,
-        `Cerere Ofertă nouă pe GymBuilder de la ${name}`,
+        'Ai o cerere nouă pe GymBuilder',
         `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #1a1a1a; color: #ffffff;">
           <div style="text-align: center; margin-bottom: 30px;">
             <h1 style="color: #f5c542; font-size: 28px; margin: 0;">GymBuilder</h1>
           </div>
           <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
-            <h2 style="color: #f5c542; margin-top: 0;">📩 Cerere Ofertă Nouă</h2>
+            <h2 style="color: #f5c542; margin-top: 0;">📩 Ai o cerere nouă pe GymBuilder</h2>
             <p style="color: #d1d5db; line-height: 1.6;">
-              Ai primit o cerere de ofertă pe platforma GymBuilder.
+              Un client a trimis o cerere de ofertă pe platforma GymBuilder.
             </p>
             <div style="background: #1a1a1a; border-radius: 8px; padding: 16px; margin: 16px 0;">
-              <p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Nume:</strong> ${name}</p>
+              <p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Client:</strong> ${name}</p>
               <p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Email:</strong> ${email}</p>
               ${phone ? `<p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Telefon:</strong> ${phone}</p>` : ''}
+              ${productName ? `<p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Produs solicitat:</strong> ${productName}${productCategory ? ` (${productCategory})` : ''}</p>` : ''}
             </div>
+            ${message ? `
             <div style="background: #1a1a1a; border-left: 3px solid #f5c542; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
+              <p style="color: #6b7280; font-size: 12px; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Mesajul clientului:</p>
               <p style="color: #d1d5db; margin: 0; font-size: 14px; white-space: pre-wrap;">${message}</p>
             </div>
+            ` : ''}
             <p style="color: #9ca3af; font-size: 13px; margin-top: 16px;">
-              Răspunde direct la <a href="mailto:${email}" style="color: #f5c542;">${email}</a> pentru a continua conversația.
+              Răspunde direct la <a href="mailto:${email}" style="color: #f5c542;">${email}</a> sau accesează dashboard-ul pentru a vedea toate cererile.
             </p>
             <div style="text-align: center; margin-top: 24px;">
-              <a href="${appUrl}/supplier/dashboard" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
-                Accesează Dashboard
+              <a href="${appUrl}/supplier/dashboard#cereri" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
+                Vezi Cererea în Dashboard
               </a>
             </div>
           </div>
@@ -150,6 +169,18 @@ export async function POST(request: NextRequest) {
       </div>
       `
     );
+
+    // Create in-app notification for supplier
+    if (supplier?.user_id) {
+      await supabase.from('notifications').insert({
+        user_id: supplier.user_id,
+        type: 'new_request',
+        title: `Cerere nouă de la ${name}`,
+        message: productName ? `Produs solicitat: ${productName}` : (message ? message.substring(0, 100) : null),
+        link: '/supplier/dashboard#cereri',
+        is_read: false,
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {

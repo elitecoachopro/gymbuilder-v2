@@ -119,6 +119,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Eroare la salvarea recenziei.' }, { status: 500 });
     }
 
+    // Create notification for admin users about new review to moderate
+    const { data: adminUsers } = await supabase
+      .from('users')
+      .select('id')
+      .eq('role', 'admin')
+      .limit(5);
+
+    if (adminUsers && adminUsers.length > 0) {
+      const notifications = adminUsers.map((admin: { id: string }) => ({
+        user_id: admin.id,
+        type: 'review_new',
+        title: `Recenzie nouă de moderat`,
+        message: `${sanitize(client_name)} a lăsat o recenzie (${rating}★)`,
+        link: '/admin#reviews',
+        is_read: false,
+      }));
+      await supabase.from('notifications').insert(notifications);
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Recenzia a fost trimisă și va fi publicată după verificare.',

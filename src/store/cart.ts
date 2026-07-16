@@ -2,21 +2,31 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Product } from '@/types/database';
+
+export interface CartProduct {
+  id: string;
+  name: string;
+  price_eur: number;
+  images: string[];
+  category: string;
+  condition: string;
+  supplier_id: string;
+  supplier_name: string;
+}
 
 interface CartItem {
-  product: Product;
+  product: CartProduct;
   quantity: number;
 }
 
 interface CartState {
   items: CartItem[];
-  addItem: (product: Product) => void;
+  addItem: (product: CartProduct) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   totalItems: () => number;
-  totalPrice: () => number;
+  getGroupedBySupplier: () => Record<string, { supplierName: string; items: CartItem[] }>;
 }
 
 export const useCartStore = create<CartState>()(
@@ -27,13 +37,8 @@ export const useCartStore = create<CartState>()(
         const items = get().items;
         const existing = items.find((i) => i.product.id === product.id);
         if (existing) {
-          set({
-            items: items.map((i) =>
-              i.product.id === product.id
-                ? { ...i, quantity: i.quantity + 1 }
-                : i
-            ),
-          });
+          // Already in cart, don't add again
+          return;
         } else {
           set({ items: [...items, { product, quantity: 1 }] });
         }
@@ -53,9 +58,18 @@ export const useCartStore = create<CartState>()(
         }
       },
       clearCart: () => set({ items: [] }),
-      totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
-      totalPrice: () =>
-        get().items.reduce((sum, i) => sum + i.product.price_eur * i.quantity, 0),
+      totalItems: () => get().items.length,
+      getGroupedBySupplier: () => {
+        const groups: Record<string, { supplierName: string; items: CartItem[] }> = {};
+        for (const item of get().items) {
+          const sid = item.product.supplier_id;
+          if (!groups[sid]) {
+            groups[sid] = { supplierName: item.product.supplier_name, items: [] };
+          }
+          groups[sid].items.push(item);
+        }
+        return groups;
+      },
     }),
     { name: 'gymbuilder-cart' }
   )

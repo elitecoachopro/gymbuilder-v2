@@ -104,10 +104,21 @@ export async function GET(request: NextRequest) {
     // Get recent contact requests (last 5)
     const { data: recentRequests } = await supabase
       .from('contact_requests')
-      .select('id, client_name, client_email, message, status, created_at')
+      .select('id, client_name, client_email, message, status, created_at, viewed_at')
       .eq('supplier_id', supplier.id)
       .order('created_at', { ascending: false })
       .limit(5);
+
+    // Mark 'sent' requests as 'viewed' when supplier opens dashboard
+    const unviewedIds = (recentRequests || [])
+      .filter((r: any) => r.status === 'sent')
+      .map((r: any) => r.id);
+    if (unviewedIds.length > 0) {
+      await supabase
+        .from('contact_requests')
+        .update({ status: 'viewed', viewed_at: new Date().toISOString() })
+        .in('id', unviewedIds);
+    }
 
     return NextResponse.json({
       supplier: {

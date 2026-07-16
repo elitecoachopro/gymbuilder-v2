@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Menu, X, User, Dumbbell, LayoutDashboard, LogOut } from 'lucide-react';
+import CartIcon from '@/components/CartIcon';
 
 const navLinks = [
   { href: '/suppliers', label: 'Furnizori' },
@@ -78,6 +79,7 @@ export default function Navbar() {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
+            <CartIcon />
             {user ? (
               <>
                 <Link href={getDashboardLink()} className="btn-ghost text-sm flex items-center gap-2">
@@ -129,6 +131,13 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/cos-cerere"
+              className="block px-4 py-3 text-anthracite-200 hover:text-white hover:bg-anthracite-800 rounded-lg transition-colors"
+              onClick={() => setIsOpen(false)}
+            >
+              🛒 Coș Cerere
+            </Link>
             <div className="pt-4 border-t border-anthracite-700 space-y-2">
               {user ? (
                 <>

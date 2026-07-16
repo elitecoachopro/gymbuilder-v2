@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Package, Send, X, Loader2, Building2, MapPin, Tag, Wrench, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Package, Send, X, Loader2, Building2, MapPin, Tag, Wrench, Star, ChevronLeft, ChevronRight, ShoppingCart, Check } from 'lucide-react';
+import { useCartStore, CartProduct } from '@/store/cart';
 
 interface SupplierInfo {
   id: string;
@@ -314,14 +315,15 @@ export default function ProductDetailPage() {
               <span className="text-sm text-anthracite-400 ml-2">+ TVA</span>
             </div>
 
-            {/* CTA Button */}
+            {/* CTA Buttons */}
             <button
               onClick={() => setShowModal(true)}
-              className="w-full bg-gold-400 text-anthracite-950 font-bold py-4 rounded-xl hover:bg-gold-300 transition-colors flex items-center justify-center gap-2 text-lg mb-6"
+              className="w-full bg-gold-400 text-anthracite-950 font-bold py-4 rounded-xl hover:bg-gold-300 transition-colors flex items-center justify-center gap-2 text-lg mb-3"
             >
               <Send className="w-5 h-5" />
               Solicită Ofertă
             </button>
+            <AddToCartButton product={product} supplier={supplier} />
 
             {/* Supplier Card */}
             <Link
@@ -412,5 +414,51 @@ export default function ProductDetailPage() {
         )}
       </div>
     </main>
+  );
+}
+
+function AddToCartButton({ product, supplier }: { product: Product; supplier: SupplierInfo }) {
+  const addItem = useCartStore((s) => s.addItem);
+  const items = useCartStore((s) => s.items);
+  const [added, setAdded] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
+
+  const isInCart = mounted && items.some((i) => i.product.id === product.id);
+
+  const handleAdd = () => {
+    const cartProduct: CartProduct = {
+      id: product.id,
+      name: product.name,
+      price_eur: product.price_eur,
+      images: product.images || [],
+      category: product.category,
+      condition: product.condition,
+      supplier_id: supplier.id,
+      supplier_name: supplier.company_name,
+    };
+    addItem(cartProduct);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
+  };
+
+  if (isInCart || added) {
+    return (
+      <div className="w-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold py-3 rounded-xl flex items-center justify-center gap-2 text-sm mb-6">
+        <Check className="w-4 h-4" />
+        Adăugat în coșul de cerere
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleAdd}
+      className="w-full bg-anthracite-700 border border-anthracite-600 text-white font-semibold py-3 rounded-xl hover:bg-anthracite-600 hover:border-anthracite-500 transition-colors flex items-center justify-center gap-2 text-sm mb-6"
+    >
+      <ShoppingCart className="w-4 h-4" />
+      Adaugă la Cerere
+    </button>
   );
 }

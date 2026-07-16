@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox } from 'lucide-react';
+import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox, Send, Loader2, MessageSquare } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import NotificationBell from '@/components/NotificationBell';
 
 interface SupplierData {
   id: string;
@@ -60,6 +61,11 @@ export default function SupplierDashboard() {
   const [contactType, setContactType] = useState<'oferta' | 'anunt'>('oferta');
   const [slots, setSlots] = useState<SlotsData | null>(null);
   const [slotsLoading, setSlotsLoading] = useState(true);
+
+  // Reply states
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyMessage, setReplyMessage] = useState('');
+  const [replySending, setReplySending] = useState(false);
 
   // Real data states
   const [loading, setLoading] = useState(true);
@@ -297,6 +303,7 @@ export default function SupplierDashboard() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <NotificationBell />
               <Link href="/supplier/products/new" className="btn-primary flex items-center gap-2">
                 <Plus className="w-4 h-4" /> Adaugă Produs
               </Link>
@@ -422,26 +429,107 @@ export default function SupplierDashboard() {
 
           {/* Recent Contact Requests */}
           {recentRequests.length > 0 && (
-            <div className="card mb-8">
+            <div id="cereri" className="card mb-8">
               <h3 className="font-semibold text-white mb-4">Ultimele Cereri de Ofertă</h3>
               <div className="space-y-3">
-                {recentRequests.map((req) => (
-                  <div key={req.id} className="flex items-start gap-3 p-3 bg-anthracite-800/50 rounded-lg">
-                    <div className="w-8 h-8 bg-gold-400/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                      <Mail className="w-4 h-4 text-gold-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-white">{req.client_name}</p>
-                        <span className="text-xs text-anthracite-500">
-                          {new Date(req.created_at).toLocaleDateString('ro-RO')}
-                        </span>
+                {[...recentRequests].sort((a, b) => {
+                  // New (sent/viewed) first, then replied/completed
+                  const isNewA = a.status === 'sent' || a.status === 'viewed' ? 0 : 1;
+                  const isNewB = b.status === 'sent' || b.status === 'viewed' ? 0 : 1;
+                  if (isNewA !== isNewB) return isNewA - isNewB;
+                  return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+                }).map((req) => (
+                  <div key={req.id} className={`p-3 rounded-lg ${req.status === 'sent' ? 'bg-red-500/5 border border-red-500/20' : 'bg-anthracite-800/50'}`}>
+                    <div className="flex items-start gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${req.status === 'sent' ? 'bg-red-500/10' : 'bg-gold-400/10'}`}>
+                        <Mail className={`w-4 h-4 ${req.status === 'sent' ? 'text-red-400' : 'text-gold-400'}`} />
                       </div>
-                      <p className="text-xs text-anthracite-400 mt-0.5">{req.client_email}</p>
-                      {req.message && (
-                        <p className="text-sm text-anthracite-300 mt-1 line-clamp-2">{req.message}</p>
-                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium text-white">{req.client_name}</p>
+                          <div className="flex items-center gap-2">
+                            {req.status === 'sent' && (
+                              <span className="text-xs bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-semibold animate-pulse">Nouă</span>
+                            )}
+                            {req.status === 'viewed' && (
+                              <span className="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded-full">Văzută</span>
+                            )}
+                            {req.status === 'replied' && (
+                              <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">Procesată</span>
+                            )}
+                            {req.status === 'completed' && (
+                              <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">Procesată</span>
+                            )}
+                            <span className="text-xs text-anthracite-500">
+                              {new Date(req.created_at).toLocaleDateString('ro-RO')}
+                            </span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-anthracite-400 mt-0.5">{req.client_email}</p>
+                        {req.message && (
+                          <p className="text-sm text-anthracite-300 mt-1 line-clamp-2">{req.message}</p>
+                        )}
+                        {req.status !== 'replied' && req.status !== 'completed' && (
+                          <button
+                            onClick={() => setReplyingTo(replyingTo === req.id ? null : req.id)}
+                            className="mt-2 text-xs text-gold-400 hover:text-gold-300 flex items-center gap-1 transition-colors"
+                          >
+                            <MessageSquare className="w-3 h-3" /> Răspunde
+                          </button>
+                        )}
+                      </div>
                     </div>
+                    {replyingTo === req.id && (
+                      <div className="mt-3 ml-11">
+                        <textarea
+                          className="w-full bg-anthracite-900 border border-anthracite-600 rounded-lg px-3 py-2 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 resize-none"
+                          rows={3}
+                          placeholder="Scrie răspunsul tău..."
+                          value={replyMessage}
+                          onChange={(e) => setReplyMessage(e.target.value)}
+                          disabled={replySending}
+                        />
+                        <div className="flex items-center gap-2 mt-2">
+                          <button
+                            onClick={async () => {
+                              if (!replyMessage.trim()) return;
+                              setReplySending(true);
+                              try {
+                                const res = await fetch('/api/contact/reply', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ requestId: req.id, replyMessage: replyMessage.trim() }),
+                                });
+                                if (res.ok) {
+                                  setToast('Răspuns trimis cu succes! Clientul a fost notificat pe email.');
+                                  setReplyingTo(null);
+                                  setReplyMessage('');
+                                  setRecentRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'replied' } : r));
+                                } else {
+                                  const data = await res.json();
+                                  setToast(data.error || 'Eroare la trimiterea răspunsului.');
+                                }
+                              } catch {
+                                setToast('Eroare de rețea.');
+                              } finally {
+                                setReplySending(false);
+                              }
+                            }}
+                            disabled={replySending || !replyMessage.trim()}
+                            className="bg-gold-400 text-anthracite-950 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-gold-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                          >
+                            {replySending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
+                            Trimite
+                          </button>
+                          <button
+                            onClick={() => { setReplyingTo(null); setReplyMessage(''); }}
+                            className="text-xs text-anthracite-400 hover:text-white transition-colors"
+                          >
+                            Anulează
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

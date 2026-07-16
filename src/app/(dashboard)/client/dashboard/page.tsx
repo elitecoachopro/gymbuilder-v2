@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Search, Heart, MessageSquare, Star, Building2, Package, Loader2, Dumbbell, Clock, Send, CheckCircle, ArrowRight, Trash2, LogOut } from 'lucide-react';
+import NotificationBell from '@/components/NotificationBell';
 
 interface ContactRequest {
   id: string;
@@ -133,12 +134,22 @@ export default function ClientDashboard() {
 
   if (!data) return null;
 
-  const statusLabel = (status: string) => {
-    switch (status) {
-      case 'sent': return { text: 'Trimis', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30' };
-      case 'replied': return { text: 'Răspuns', color: 'bg-amber-500/10 text-amber-400 border-amber-500/30' };
-      case 'completed': return { text: 'Finalizat', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' };
-      default: return { text: status, color: 'bg-anthracite-700 text-anthracite-300 border-anthracite-600' };
+  const getDisplayStatus = (cr: ContactRequest) => {
+    // Check if expired: sent more than 14 days ago without reply
+    if (cr.status === 'sent' || cr.status === 'viewed') {
+      const createdAt = new Date(cr.created_at).getTime();
+      const now = Date.now();
+      const daysSince = (now - createdAt) / (1000 * 60 * 60 * 24);
+      if (daysSince > 14) {
+        return { text: 'Expirată', color: 'bg-anthracite-700/50 text-anthracite-400 border-anthracite-600', icon: '⏰' };
+      }
+    }
+    switch (cr.status) {
+      case 'sent': return { text: 'Trimisă', color: 'bg-amber-500/10 text-amber-400 border-amber-500/30', icon: '📤' };
+      case 'viewed': return { text: 'Văzută de furnizor', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30', icon: '👁️' };
+      case 'replied': return { text: 'Răspuns primit', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30', icon: '✅' };
+      case 'completed': return { text: 'Finalizat', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30', icon: '✅' };
+      default: return { text: cr.status, color: 'bg-anthracite-700 text-anthracite-300 border-anthracite-600', icon: '' };
     }
   };
 
@@ -152,6 +163,7 @@ export default function ClientDashboard() {
             <p className="text-anthracite-400 text-sm mt-1">Dashboard-ul tău de client</p>
           </div>
           <div className="flex items-center gap-3">
+            <NotificationBell />
             <Link
               href="/products"
               className="flex items-center gap-2 bg-gold-400 text-anthracite-950 font-bold px-5 py-3 rounded-lg hover:bg-gold-300 transition-colors"
@@ -313,7 +325,7 @@ export default function ClientDashboard() {
           ) : (
             <div className="space-y-3">
               {data.contactRequests.map((cr) => {
-                const status = statusLabel(cr.status);
+                const status = getDisplayStatus(cr);
                 return (
                   <div key={cr.id} className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4">
                     <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -332,7 +344,7 @@ export default function ClientDashboard() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${status.color}`}>
-                          {status.text}
+                          {status.icon} {status.text}
                         </span>
                         <span className="text-xs text-anthracite-500">
                           {new Date(cr.created_at).toLocaleDateString('ro-RO')}
