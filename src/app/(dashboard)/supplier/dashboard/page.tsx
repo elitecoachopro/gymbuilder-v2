@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Settings, Star, LogOut } from 'lucide-react';
-import { useState } from 'react';
+import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Settings, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const stats = [
   { label: 'Produse Active', value: '24', icon: Package },
@@ -22,15 +22,41 @@ const products = [
 const sidebarLinks = [
   { href: '/supplier/dashboard', label: 'Dashboard', icon: BarChart3, active: true },
   { href: '/supplier/products', label: 'Produsele Mele', icon: Package, active: false },
-  { href: null, label: 'Promovări', icon: Megaphone, active: false, comingSoon: true },
+  { href: null, label: 'Promovări', icon: Megaphone, active: false, scrollTo: 'promotions' },
   { href: null, label: 'Analytics', icon: TrendingUp, active: false, comingSoon: true },
   { href: null, label: 'Setări', icon: Settings, active: false, comingSoon: true },
 ];
+
+interface SlotsData {
+  ofertaZilei: { total: number; occupied: number; available: number };
+  anunturiZilei: { total: number; occupied: number; available: number };
+}
 
 export default function SupplierDashboard() {
   const router = useRouter();
   const [toast, setToast] = useState('');
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [contactType, setContactType] = useState<'oferta' | 'anunt'>('oferta');
+  const [slots, setSlots] = useState<SlotsData | null>(null);
+  const [slotsLoading, setSlotsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchSlots() {
+      try {
+        const res = await fetch('/api/promotions');
+        if (res.ok) {
+          const data = await res.json();
+          setSlots(data.slots || null);
+        }
+      } catch {
+        // Silently fail
+      } finally {
+        setSlotsLoading(false);
+      }
+    }
+    fetchSlots();
+  }, []);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -47,12 +73,73 @@ export default function SupplierDashboard() {
     }
   };
 
+  const openContactModal = (type: 'oferta' | 'anunt') => {
+    setContactType(type);
+    setShowContactModal(true);
+  };
+
   return (
     <main className="min-h-screen bg-anthracite-950">
       {/* Toast */}
       {toast && (
         <div className="fixed top-4 right-4 z-50 bg-anthracite-800 border border-gold-400/30 text-gold-400 px-4 py-3 rounded-lg shadow-lg text-sm animate-fade-in">
           {toast}
+        </div>
+      )}
+
+      {/* Contact Modal */}
+      {showContactModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl p-8 max-w-md w-full relative">
+            <button
+              onClick={() => setShowContactModal(false)}
+              className="absolute top-4 right-4 text-anthracite-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center mb-6">
+              <div className="w-14 h-14 bg-gold-400/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                {contactType === 'oferta' ? <Crown className="w-7 h-7 text-gold-400" /> : <Zap className="w-7 h-7 text-gold-400" />}
+              </div>
+              <h3 className="text-xl font-bold text-white">
+                {contactType === 'oferta' ? 'Rezervă Oferta Zilei' : 'Rezervă Anunț Zilei'}
+              </h3>
+              <p className="text-anthracite-400 text-sm mt-2">
+                {contactType === 'oferta'
+                  ? 'Contactează-ne pentru a rezerva locul premium pe homepage (€25/24h).'
+                  : 'Contactează-ne pentru a rezerva un loc în secțiunea Anunțurile Zilei (€9/loc/7 zile).'}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <a
+                href="mailto:contact@gymbuilder.app?subject=Rezervare%20Promovare%20-%20GymBuilder"
+                className="flex items-center gap-3 w-full px-4 py-3 bg-gold-400/10 border border-gold-400/30 rounded-xl text-gold-400 hover:bg-gold-400/20 transition-colors"
+              >
+                <Mail className="w-5 h-5" />
+                <div className="text-left">
+                  <p className="text-sm font-medium">Email</p>
+                  <p className="text-xs text-anthracite-400">contact@gymbuilder.app</p>
+                </div>
+              </a>
+
+              <a
+                href="tel:+40700000000"
+                className="flex items-center gap-3 w-full px-4 py-3 bg-anthracite-800 border border-anthracite-700 rounded-xl text-white hover:border-gold-400/30 transition-colors"
+              >
+                <Phone className="w-5 h-5 text-gold-400" />
+                <div className="text-left">
+                  <p className="text-sm font-medium">Telefon</p>
+                  <p className="text-xs text-anthracite-400">Luni - Vineri, 9:00 - 18:00</p>
+                </div>
+              </a>
+            </div>
+
+            <p className="text-xs text-anthracite-500 text-center mt-6">
+              Plata se procesează doar după confirmarea rezervării. Integrare Stripe în curând.
+            </p>
+          </div>
         </div>
       )}
 
@@ -83,7 +170,13 @@ export default function SupplierDashboard() {
             ) : (
               <button
                 key={link.label}
-                onClick={() => showToast(`${link.label} - Funcționalitate în curând!`)}
+                onClick={() => {
+                  if (link.scrollTo) {
+                    document.getElementById(link.scrollTo)?.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    showToast(`${link.label} - Funcționalitate în curând!`);
+                  }
+                }}
                 className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm w-full text-left"
               >
                 <link.icon className="w-4 h-4" /> {link.label}
@@ -139,6 +232,136 @@ export default function SupplierDashboard() {
                 <div className="text-xs text-anthracite-400 mt-1">{stat.label}</div>
               </div>
             ))}
+          </div>
+
+          {/* Promovează-te Section */}
+          <div id="promotions" className="mb-8">
+            <div className="flex items-center gap-3 mb-5">
+              <Megaphone className="w-5 h-5 text-gold-400" />
+              <h2 className="text-xl font-bold text-white">Promovează-te</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Oferta Zilei Card */}
+              <div className="bg-gradient-to-br from-gold-400/5 to-anthracite-900 border border-gold-400/30 rounded-2xl p-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gold-400/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+                
+                <div className="relative">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Crown className="w-5 h-5 text-gold-400" />
+                    <span className="text-xs font-semibold text-gold-400 uppercase tracking-wider">Premium</span>
+                  </div>
+
+                  <h3 className="text-lg font-bold text-white mb-1">Oferta Zilei</h3>
+                  <p className="text-anthracite-400 text-sm mb-4">Locul #1 pe homepage — vizibilitate maximă</p>
+
+                  <div className="flex items-baseline gap-1 mb-4">
+                    <span className="text-3xl font-bold text-gold-400">&euro;25</span>
+                    <span className="text-anthracite-400 text-sm">/24 ore</span>
+                  </div>
+
+                  <ul className="space-y-2 mb-5">
+                    <li className="flex items-center gap-2 text-sm text-anthracite-200">
+                      <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
+                      Afișaj premium pe homepage (secțiune dedicată)
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-anthracite-200">
+                      <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
+                      Badge &quot;Oferta Zilei&quot; pe produs
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-anthracite-200">
+                      <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
+                      Vizibilitate maximă — primul lucru văzut de clienți
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-anthracite-200">
+                      <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
+                      1 singur loc disponibil (exclusivitate)
+                    </li>
+                  </ul>
+
+                  {/* Available slots indicator */}
+                  <div className="flex items-center justify-between mb-4 bg-anthracite-900/60 rounded-lg px-3 py-2">
+                    <span className="text-xs text-anthracite-400">Locuri disponibile:</span>
+                    {slotsLoading ? (
+                      <span className="text-xs text-anthracite-500">Se verifică...</span>
+                    ) : (
+                      <span className={`text-sm font-bold ${
+                        (slots?.ofertaZilei.available ?? 1) > 0 ? 'text-emerald-400' : 'text-red-400'
+                      }`}>
+                        {slots?.ofertaZilei.available ?? 1} / {slots?.ofertaZilei.total ?? 1}
+                      </span>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => openContactModal('oferta')}
+                    className="w-full py-3 bg-gold-400 text-anthracite-950 font-semibold rounded-xl hover:bg-gold-300 transition-colors text-sm"
+                  >
+                    Rezervă Oferta Zilei — &euro;25
+                  </button>
+                </div>
+              </div>
+
+              {/* Anunțurile Zilei Card */}
+              <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl p-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gold-400/3 rounded-full -translate-y-1/2 translate-x-1/2" />
+                
+                <div className="relative">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Zap className="w-5 h-5 text-gold-400" />
+                    <span className="text-xs font-semibold text-anthracite-300 uppercase tracking-wider">Promovare</span>
+                  </div>
+
+                  <h3 className="text-lg font-bold text-white mb-1">Anunțurile Zilei</h3>
+                  <p className="text-anthracite-400 text-sm mb-4">Secțiune dedicată pe homepage — 7 zile vizibilitate</p>
+
+                  <div className="flex items-baseline gap-1 mb-4">
+                    <span className="text-3xl font-bold text-gold-400">&euro;9</span>
+                    <span className="text-anthracite-400 text-sm">/loc /7 zile</span>
+                  </div>
+
+                  <ul className="space-y-2 mb-5">
+                    <li className="flex items-center gap-2 text-sm text-anthracite-200">
+                      <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
+                      Afișaj în secțiunea &quot;Anunțurile Zilei&quot; pe homepage
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-anthracite-200">
+                      <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
+                      Vizibilitate 7 zile continue
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-anthracite-200">
+                      <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
+                      Link direct către produsul tău
+                    </li>
+                    <li className="flex items-center gap-2 text-sm text-anthracite-200">
+                      <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
+                      Maxim 5 locuri (competiție redusă)
+                    </li>
+                  </ul>
+
+                  {/* Available slots indicator */}
+                  <div className="flex items-center justify-between mb-4 bg-anthracite-800/60 rounded-lg px-3 py-2">
+                    <span className="text-xs text-anthracite-400">Locuri disponibile:</span>
+                    {slotsLoading ? (
+                      <span className="text-xs text-anthracite-500">Se verifică...</span>
+                    ) : (
+                      <span className={`text-sm font-bold ${
+                        (slots?.anunturiZilei.available ?? 5) > 0 ? 'text-emerald-400' : 'text-red-400'
+                      }`}>
+                        {slots?.anunturiZilei.available ?? 5} / {slots?.anunturiZilei.total ?? 5}
+                      </span>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => openContactModal('anunt')}
+                    className="w-full py-3 bg-anthracite-800 border border-gold-400/30 text-gold-400 font-semibold rounded-xl hover:bg-gold-400/10 transition-colors text-sm"
+                  >
+                    Rezervă Anunț — &euro;9/7 zile
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Products Table */}

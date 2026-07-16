@@ -8,6 +8,10 @@ function getSupabaseAdmin() {
   );
 }
 
+// Promotion system constants
+const MAX_OFERTA_ZILEI_SLOTS = 1;
+const MAX_ANUNTURI_ZILEI_SLOTS = 5;
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin();
@@ -42,6 +46,12 @@ export async function GET(request: NextRequest) {
     if (anunturiError) {
       console.error('Anunturi Zilei fetch error:', anunturiError);
     }
+
+    // Calculate available slots
+    const ofertaOccupied = ofertaRaw ? 1 : 0;
+    const anunturiOccupied = (anunturiRaw || []).length;
+    const ofertaAvailable = MAX_OFERTA_ZILEI_SLOTS - ofertaOccupied;
+    const anunturiAvailable = MAX_ANUNTURI_ZILEI_SLOTS - anunturiOccupied;
 
     // Enrich with supplier and product info
     const allPromos = [...(ofertaRaw ? [ofertaRaw] : []), ...(anunturiRaw || [])];
@@ -87,12 +97,31 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       ofertaZilei,
       anunturiZilei,
+      slots: {
+        ofertaZilei: {
+          total: MAX_OFERTA_ZILEI_SLOTS,
+          occupied: ofertaOccupied,
+          available: ofertaAvailable,
+        },
+        anunturiZilei: {
+          total: MAX_ANUNTURI_ZILEI_SLOTS,
+          occupied: anunturiOccupied,
+          available: anunturiAvailable,
+        },
+      },
     });
   } catch (error) {
     console.error('Promotions API error:', error);
     return NextResponse.json(
-      { ofertaZilei: null, anunturiZilei: [] },
-      { status: 200 } // Return empty data instead of error to not break homepage
+      {
+        ofertaZilei: null,
+        anunturiZilei: [],
+        slots: {
+          ofertaZilei: { total: MAX_OFERTA_ZILEI_SLOTS, occupied: 0, available: MAX_OFERTA_ZILEI_SLOTS },
+          anunturiZilei: { total: MAX_ANUNTURI_ZILEI_SLOTS, occupied: 0, available: MAX_ANUNTURI_ZILEI_SLOTS },
+        },
+      },
+      { status: 200 }
     );
   }
 }
