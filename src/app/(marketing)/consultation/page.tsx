@@ -216,13 +216,17 @@ export default function ConsultationPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Buget estimat</label>
-                      <input
-                        type="text"
+                      <select
                         className="input-field"
-                        placeholder="ex: €5.000 - €20.000"
                         value={formData.budget}
                         onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                      />
+                      >
+                        <option value="">Selectează bugetul estimat</option>
+                        <option value="50.000€ - 100.000€">50.000€ - 100.000€</option>
+                        <option value="100.000€ - 200.000€">100.000€ - 200.000€</option>
+                        <option value="200.000€ - 500.000€">200.000€ - 500.000€</option>
+                        <option value="500.000€+">500.000€+</option>
+                      </select>
                     </div>
 
                     <div>
