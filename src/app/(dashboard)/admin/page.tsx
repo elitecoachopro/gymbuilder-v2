@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, TrendingUp, Star, MessageSquare, LogOut } from 'lucide-react';
+import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, Star, MessageSquare, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Supplier {
@@ -36,8 +36,6 @@ const sidebarLinks = [
   { href: '/admin', label: 'Dashboard', icon: BarChart3, active: true },
   { href: '/suppliers', label: 'Furnizori', icon: Building2, active: false },
   { href: '/products', label: 'Produse', icon: Package, active: false },
-  { href: null, label: 'Clienți', icon: Users, active: false, comingSoon: true },
-  { href: null, label: 'Promovări', icon: TrendingUp, active: false, comingSoon: true },
 ];
 
 export default function AdminDashboard() {
@@ -227,7 +225,6 @@ export default function AdminDashboard() {
 
         <nav className="space-y-1">
           {sidebarLinks.map((link) => (
-            link.href ? (
               <Link
                 key={link.label}
                 href={link.href}
@@ -244,15 +241,6 @@ export default function AdminDashboard() {
                   </span>
                 )}
               </Link>
-            ) : (
-              <button
-                key={link.label}
-                onClick={() => showToast(`${link.label} - Funcționalitate în curând!`)}
-                className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm w-full text-left"
-              >
-                <link.icon className="w-4 h-4" /> {link.label}
-              </button>
-            )
           ))}
         </nav>
       </aside>

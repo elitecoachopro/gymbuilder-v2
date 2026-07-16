@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Settings, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox } from 'lucide-react';
+import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface SupplierData {
@@ -50,7 +50,6 @@ const sidebarLinks = [
   { href: '/supplier/dashboard', label: 'Dashboard', icon: BarChart3, active: true },
   { href: '/supplier/products', label: 'Produsele Mele', icon: Package, active: false },
   { href: null, label: 'Promovări', icon: Megaphone, active: false, scrollTo: 'promotions' },
-  { href: null, label: 'Setări', icon: Settings, active: false, comingSoon: true },
 ];
 
 export default function SupplierDashboard() {
@@ -262,8 +261,6 @@ export default function SupplierDashboard() {
                 onClick={() => {
                   if (link.scrollTo) {
                     document.getElementById(link.scrollTo)?.scrollIntoView({ behavior: 'smooth' });
-                  } else {
-                    showToast(`${link.label} - Funcționalitate în curând!`);
                   }
                 }}
                 className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-anthracite-300 hover:text-white hover:bg-anthracite-800 text-sm w-full text-left"
