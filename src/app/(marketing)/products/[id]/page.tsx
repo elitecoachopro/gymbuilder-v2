@@ -40,12 +40,24 @@ interface SimilarProduct {
   supplier_profiles: { company_name: string };
 }
 
+interface Review {
+  id: string;
+  rating: number;
+  client_name: string;
+  title: string | null;
+  body: string | null;
+  created_at: string;
+}
+
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params?.id as string;
 
   const [product, setProduct] = useState<Product | null>(null);
   const [similar, setSimilar] = useState<SimilarProduct[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [avgRating, setAvgRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedImage, setSelectedImage] = useState(0);
@@ -66,6 +78,10 @@ export default function ProductDetailPage() {
         const json = await res.json();
         setProduct(json.product);
         setSimilar(json.similar || []);
+        // Fetch reviews for this supplier
+        if (json.product?.supplier_profiles?.id) {
+          fetchReviews(json.product.supplier_profiles.id);
+        }
       } else if (res.status === 404) {
         setError('Produsul nu a fost găsit.');
       } else {
@@ -76,6 +92,20 @@ export default function ProductDetailPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function fetchReviews(supplierId: string) {
+    try {
+      const res = await fetch(`/api/reviews?supplier_id=${supplierId}&status=approved&limit=3`);
+      if (res.ok) {
+        const data = await res.json();
+        setReviews(data.reviews || []);
+        if (data.stats) {
+          setAvgRating(data.stats.avgRating || 0);
+          setReviewCount(data.stats.count || 0);
+        }
+      }
+    } catch {}
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -375,6 +405,79 @@ export default function ProductDetailPage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-16">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Star className="w-5 h-5 text-amber-400" />
+              Recenzii Furnizor
+            </h2>
+            {reviewCount > 0 && (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`w-4 h-4 ${star <= Math.round(avgRating) ? 'text-amber-400 fill-amber-400' : 'text-anthracite-600'}`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm text-white font-semibold">{avgRating.toFixed(1)}</span>
+                <span className="text-xs text-anthracite-500">({reviewCount} {reviewCount === 1 ? 'recenzie' : 'recenzii'})</span>
+              </div>
+            )}
+          </div>
+
+          {reviews.length === 0 ? (
+            <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-8 text-center">
+              <Star className="w-8 h-8 text-anthracite-600 mx-auto mb-3" />
+              <p className="text-anthracite-400">Nu există încă recenzii pentru acest furnizor.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {reviews.map((review) => (
+                <div key={review.id} className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-5">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-anthracite-700 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-bold text-anthracite-300">
+                          {(review.client_name || 'A')[0].toUpperCase()}
+                        </span>
+                      </div>
+                      <span className="text-sm font-medium text-white">{review.client_name || 'Anonim'}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className={`w-3.5 h-3.5 ${star <= review.rating ? 'text-amber-400 fill-amber-400' : 'text-anthracite-600'}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  {review.title && (
+                    <p className="text-sm font-semibold text-white mb-1">{review.title}</p>
+                  )}
+                  {review.body && (
+                    <p className="text-sm text-anthracite-300 leading-relaxed">{review.body}</p>
+                  )}
+                  <p className="text-xs text-anthracite-500 mt-2">
+                    {new Date(review.created_at).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  </p>
+                </div>
+              ))}
+              {reviewCount > 3 && product?.supplier_profiles && (
+                <Link
+                  href={`/suppliers/${product.supplier_profiles.id}`}
+                  className="inline-flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium"
+                >
+                  Vezi toate cele {reviewCount} recenzii →
+                </Link>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Similar Products */}

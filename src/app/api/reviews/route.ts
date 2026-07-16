@@ -17,25 +17,40 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'supplier_id este obligatoriu.' }, { status: 400 });
   }
 
+  const limit = searchParams.get('limit');
+
   try {
     const supabase = getSupabase();
 
-    const { data: reviews, error } = await supabase
+    let query = supabase
       .from('reviews')
       .select('id, client_name, rating, title, body, created_at, verified')
       .eq('supplier_id', supplierId)
       .eq('verified', true)
       .order('created_at', { ascending: false });
 
+    if (limit) {
+      query = query.limit(parseInt(limit, 10));
+    }
+
+    const { data: reviews, error } = await query;
+
+    // Also get total count for stats (without limit)
+    const { count: totalCount } = await supabase
+      .from('reviews')
+      .select('id', { count: 'exact', head: true })
+      .eq('supplier_id', supplierId)
+      .eq('verified', true);
+
     if (error) {
       console.error('Reviews fetch error:', error);
       return NextResponse.json({ reviews: [], stats: { avgRating: 0, count: 0 } });
     }
 
-    // Calculate stats
-    const count = reviews?.length || 0;
-    const avgRating = count > 0
-      ? reviews!.reduce((sum, r) => sum + r.rating, 0) / count
+    // Calculate stats from all reviews (not just limited)
+    const count = totalCount || reviews?.length || 0;
+    const avgRating = (reviews && reviews.length > 0)
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
       : 0;
 
     return NextResponse.json({
