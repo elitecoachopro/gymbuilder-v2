@@ -74,8 +74,8 @@ export default function ConsultationPage() {
               </div>
 
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                Consultanță pentru
-                <span className="block gold-gradient">Echiparea Sălii</span>
+                Nu știi de unde să începi?
+                <span className="block gold-gradient">Programează o sesiune de consultanță cu un expert.</span>
               </h1>
 
               <p className="text-anthracite-300 text-lg mb-8 leading-relaxed">
