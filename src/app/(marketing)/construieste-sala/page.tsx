@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Building2, ArrowRight, DoorOpen, Lock, Heart, Dumbbell, Cog, Swords, Music, StretchHorizontal, Waves, Coffee } from 'lucide-react';
+import { Building2, ArrowRight, DoorOpen, Lock, Heart, Dumbbell, Cog, Swords, Music, StretchHorizontal, Waves, Coffee, Calculator } from 'lucide-react';
 
 const gymZones = [
   {
@@ -143,9 +143,17 @@ export default function ConstruiesteSalaPage() {
             Fiecare categorie te duce direct la produsele potrivite.
           </p>
 
-          <p className="text-sm text-anthracite-500">
+          <p className="text-sm text-anthracite-500 mb-6">
             10 zone · Navigare liberă · Fără cont necesar
           </p>
+
+          <Link
+            href="/estimator-buget"
+            className="inline-flex items-center gap-2 bg-gold-400 text-anthracite-950 font-bold px-6 py-3 rounded-xl hover:bg-gold-300 transition-colors text-sm"
+          >
+            <Calculator className="w-4 h-4" />
+            Estimează Bugetul Sălii Tale
+          </Link>
         </div>
       </section>
 
@@ -199,11 +207,12 @@ export default function ConstruiesteSalaPage() {
               Programează o sesiune de consultanță cu un expert care a deschis mai multe săli de fitness de la zero.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/consultation" className="inline-block bg-gold-400 text-anthracite-950 font-bold text-sm px-6 py-3 rounded-lg hover:bg-gold-300 transition-colors">
-                Consultanță — €99/sesiune
+              <Link href="/estimator-buget" className="inline-flex items-center gap-2 bg-gold-400 text-anthracite-950 font-bold text-sm px-6 py-3 rounded-lg hover:bg-gold-300 transition-colors">
+                <Calculator className="w-4 h-4" />
+                Estimează Bugetul
               </Link>
-              <Link href="/products" className="inline-flex items-center gap-2 text-sm text-anthracite-400 hover:text-gold-400 transition-colors">
-                Sau explorează tot catalogul <ArrowRight className="w-3.5 h-3.5" />
+              <Link href="/consultation" className="inline-block bg-anthracite-700 border border-anthracite-600 text-white font-semibold text-sm px-6 py-3 rounded-lg hover:bg-anthracite-600 transition-colors">
+                Consultanță — €99/sesiune
               </Link>
             </div>
           </div>
