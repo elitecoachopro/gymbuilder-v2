@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Search, Dumbbell, Heart, SlidersHorizontal, Mail, Loader2, X, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
@@ -53,7 +54,11 @@ const fallbackProducts: Product[] = [
 ];
 
 export default function ProductsPage() {
-  const [activeCategory, setActiveCategory] = useState('all');
+  const searchParams = useSearchParams();
+  const urlCondition = searchParams?.get('condition') || 'all';
+  const urlCategory = searchParams?.get('category') || 'all';
+
+  const [activeCategory, setActiveCategory] = useState(urlCategory);
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState<number[]>([]);
   const [toast, setToast] = useState('');
@@ -63,8 +68,8 @@ export default function ProductsPage() {
   const [dataSource, setDataSource] = useState<'api' | 'fallback'>('fallback');
 
   // Advanced filters
-  const [showFilters, setShowFilters] = useState(false);
-  const [conditionFilter, setConditionFilter] = useState('all');
+  const [showFilters, setShowFilters] = useState(urlCondition !== 'all' || urlCategory !== 'all');
+  const [conditionFilter, setConditionFilter] = useState(urlCondition);
   const [priceMin, setPriceMin] = useState('');
   const [priceMax, setPriceMax] = useState('');
   const [sortBy, setSortBy] = useState('recommended');

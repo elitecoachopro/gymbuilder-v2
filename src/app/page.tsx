@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Star, ArrowRight, Flame, Dumbbell, Megaphone, Loader2 } from 'lucide-react';
+import { Star, ArrowRight, Flame, Dumbbell, Megaphone, Loader2, Sparkles, RefreshCw, Building2 } from 'lucide-react';
 
 interface OfertaZilei {
   id: string;
@@ -73,43 +73,55 @@ export default function HomePage() {
               Deschizi o sală de fitness sau vrei să o modernizezi? GymBuilder îți pune la dispoziție cel mai complet catalog de echipamente fitness din Europa, instrumente de planificare și experți care au trecut prin același drum.
             </p>
 
-            {/* 3 Cards */}
+            {/* 3 Main CTAs */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Card 1 - CLIENT */}
-              <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-8 text-left">
-                <span className="text-xs font-bold text-gold-400 tracking-wider uppercase mb-3 block">Client</span>
-                <h3 className="text-xl font-bold text-white mb-3">Deschizi o sală de fitness?</h3>
-                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">Găsește echipamente premium la prețuri corecte direct de la furnizori verificați din toată lumea.</p>
-                <Link href="/products" className="inline-block bg-gold-400 text-anthracite-950 font-bold text-sm px-6 py-3 rounded-lg hover:bg-gold-300 transition-colors">
-                  CAUTĂ ECHIPAMENTE
-                </Link>
-              </div>
+              {/* CTA 1 - Echipamente Noi */}
+              <Link href="/products?condition=new" className="group bg-anthracite-800 border border-anthracite-700 rounded-2xl p-8 text-left hover:border-emerald-500/40 transition-all duration-200">
+                <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-500/20 transition-colors">
+                  <Sparkles className="w-6 h-6 text-emerald-400" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Echipamente Noi</h3>
+                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">Echipamente noi de la distribuitori autorizați și producători premium din toată Europa.</p>
+                <span className="inline-flex items-center gap-2 text-emerald-400 font-bold text-sm group-hover:gap-3 transition-all">
+                  VEZI CATALOG NOU <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
 
-              {/* Card 2 - FURNIZOR */}
-              <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-8 text-left">
-                <span className="text-xs font-bold text-gold-400 tracking-wider uppercase mb-3 block">Furnizor</span>
-                <h3 className="text-xl font-bold text-white mb-3">Ești furnizor de echipamente?</h3>
-                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">Promovează-te gratuit și ajunge la proprietarii de săli din toată Europa și din întreaga lume.</p>
-                <Link href="/register/supplier" className="inline-block bg-gold-400 text-anthracite-950 font-bold text-sm px-6 py-3 rounded-lg hover:bg-gold-300 transition-colors">
-                  DEVINO FURNIZOR
-                </Link>
-              </div>
+              {/* CTA 2 - Second-Hand */}
+              <Link href="/products?condition=used" className="group bg-anthracite-800 border border-anthracite-700 rounded-2xl p-8 text-left hover:border-amber-500/40 transition-all duration-200">
+                <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
+                  <RefreshCw className="w-6 h-6 text-amber-400" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Second-Hand</h3>
+                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">Echipamente verificate și recondiţionate la prețuri accesibile. Economisești până la 60%.</p>
+                <span className="inline-flex items-center gap-2 text-amber-400 font-bold text-sm group-hover:gap-3 transition-all">
+                  VEZI SECOND-HAND <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
 
-              {/* Card 3 - CONSULTANȚĂ */}
-              <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-8 text-left">
-                <span className="text-xs font-bold text-gold-400 tracking-wider uppercase mb-3 block">Consultanță</span>
-                <h3 className="text-xl font-bold text-white mb-3">Vrei să deschizi o sală?</h3>
-                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">Consultanță personalizată de la un antreprenor care a deschis mai multe săli de fitness de la zero.</p>
-                <Link href="/consultation" className="inline-block bg-gold-400 text-anthracite-950 font-bold text-sm px-6 py-3 rounded-lg hover:bg-gold-300 transition-colors">
-                  REZERVĂ CONSULTANȚĂ
-                </Link>
-              </div>
+              {/* CTA 3 - Construiește-ți sala */}
+              <Link href="/construieste-sala" className="group bg-anthracite-800 border border-anthracite-700 rounded-2xl p-8 text-left hover:border-gold-400/40 transition-all duration-200">
+                <div className="w-12 h-12 bg-gold-400/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-gold-400/20 transition-colors">
+                  <Building2 className="w-6 h-6 text-gold-400" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">Construiește-ți Sala de la 0</h3>
+                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">Planifică fiecare zonă a sălii tale. 10 categorii pe zone, de la recepție la zona spa.</p>
+                <span className="inline-flex items-center gap-2 text-gold-400 font-bold text-sm group-hover:gap-3 transition-all">
+                  PLANIFICĂ SALA <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
             </div>
 
-            {/* Link to About */}
-            <div className="mt-8">
+            {/* Secondary links */}
+            <div className="flex flex-wrap items-center justify-center gap-6 mt-8">
+              <Link href="/register/supplier" className="text-sm text-anthracite-400 hover:text-gold-400 transition-colors inline-flex items-center gap-1">
+                Ești furnizor? Înregistrează-te gratuit <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link href="/consultation" className="text-sm text-anthracite-400 hover:text-gold-400 transition-colors inline-flex items-center gap-1">
+                Consultanță personalizată — €99/sesiune <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
               <Link href="/about" className="text-sm text-anthracite-400 hover:text-gold-400 transition-colors inline-flex items-center gap-1">
-                Află povestea din spatele GymBuilder <ArrowRight className="w-3.5 h-3.5" />
+                Despre GymBuilder <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
