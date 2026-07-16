@@ -13,6 +13,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
     const search = searchParams.get('search');
+    const condition = searchParams.get('condition');
+    const priceMin = searchParams.get('price_min');
+    const priceMax = searchParams.get('price_max');
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
 
     const supabase = getSupabaseAdmin();
@@ -26,6 +29,18 @@ export async function GET(request: NextRequest) {
 
     if (category && category !== 'Toate' && category !== 'all') {
       query = query.eq('category', category.toLowerCase());
+    }
+
+    if (condition && condition !== 'all') {
+      query = query.eq('condition', condition);
+    }
+
+    if (priceMin) {
+      query = query.gte('price_eur', parseFloat(priceMin));
+    }
+
+    if (priceMax) {
+      query = query.lte('price_eur', parseFloat(priceMax));
     }
 
     if (search) {

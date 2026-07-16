@@ -3,19 +3,29 @@
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import { Search, Filter, Dumbbell, Heart, ShoppingCart, SlidersHorizontal, Mail, Loader2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Search, Dumbbell, Heart, SlidersHorizontal, Mail, Loader2, X, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
 
 const categories = [
   { slug: 'all', name: 'Toate' },
-  { slug: 'Cardio', name: 'Cardio' },
-  { slug: 'Forță', name: 'Forță' },
-  { slug: 'Funcțional', name: 'Funcțional' },
-  { slug: 'Accesorii', name: 'Accesorii' },
-  { slug: 'Wellness', name: 'Wellness' },
-  { slug: 'Vestiare', name: 'Vestiare' },
-  { slug: 'Recepție', name: 'Recepție' },
+  { slug: 'cardio', name: 'Cardio' },
+  { slug: 'strength', name: 'Forță' },
+  { slug: 'functional', name: 'Funcțional' },
+  { slug: 'accessories', name: 'Accesorii' },
+  { slug: 'wellness', name: 'Wellness' },
+  { slug: 'lockers', name: 'Vestiare' },
+  { slug: 'reception', name: 'Recepție' },
 ];
+
+const categoryDisplayMap: Record<string, string> = {
+  cardio: 'Cardio',
+  strength: 'Forță',
+  functional: 'Funcțional',
+  accessories: 'Accesorii',
+  wellness: 'Wellness',
+  lockers: 'Vestiare',
+  reception: 'Recepție',
+};
 
 interface Product {
   id: number;
@@ -31,15 +41,15 @@ interface Product {
 
 // Fallback data when Supabase is not connected
 const fallbackProducts: Product[] = [
-  { id: 1, name: 'Life Fitness Integrity Series Treadmill', brand: 'Life Fitness', category: 'Cardio', condition: 'Nou', price: 8500, supplier: 'FitPro Equipment' },
-  { id: 2, name: 'Technogym Selection Pro Chest Press', brand: 'Technogym', category: 'Forță', condition: 'Nou', price: 4200, supplier: 'GymTech Solutions' },
-  { id: 3, name: 'Matrix Rower', brand: 'Matrix', category: 'Cardio', condition: 'Nou', price: 2800, supplier: 'Nordic Fitness' },
-  { id: 4, name: 'Hammer Strength HD Elite Power Rack', brand: 'Hammer Strength', category: 'Forță', condition: 'Nou', price: 3600, supplier: 'FitPro Equipment' },
-  { id: 5, name: 'Precor EFX 885 Elliptical', brand: 'Precor', category: 'Cardio', condition: 'Second Hand', price: 3200, supplier: 'EuroGym Direct' },
-  { id: 6, name: 'Cybex VR3 Leg Press', brand: 'Cybex', category: 'Forță', condition: 'Nou', price: 5100, supplier: 'Fitness Factory' },
-  { id: 7, name: 'TRX Suspension Training Set Pro', brand: 'TRX', category: 'Funcțional', condition: 'Nou', price: 450, supplier: 'IronWorks RO' },
-  { id: 8, name: 'Concept2 RowErg', brand: 'Concept2', category: 'Cardio', condition: 'Nou', price: 1200, supplier: 'Nordic Fitness' },
-  { id: 9, name: 'Eleiko IWF Competition Set', brand: 'Eleiko', category: 'Forță', condition: 'Nou', price: 2800, supplier: 'EuroGym Direct' },
+  { id: 1, name: 'Life Fitness Integrity Series Treadmill', brand: 'Life Fitness', category: 'cardio', condition: 'new', price: 8500, supplier: 'FitPro Equipment' },
+  { id: 2, name: 'Technogym Selection Pro Chest Press', brand: 'Technogym', category: 'strength', condition: 'new', price: 4200, supplier: 'GymTech Solutions' },
+  { id: 3, name: 'Matrix Rower', brand: 'Matrix', category: 'cardio', condition: 'new', price: 2800, supplier: 'Nordic Fitness' },
+  { id: 4, name: 'Hammer Strength HD Elite Power Rack', brand: 'Hammer Strength', category: 'strength', condition: 'new', price: 3600, supplier: 'FitPro Equipment' },
+  { id: 5, name: 'Precor EFX 885 Elliptical', brand: 'Precor', category: 'cardio', condition: 'used', price: 3200, supplier: 'EuroGym Direct' },
+  { id: 6, name: 'Cybex VR3 Leg Press', brand: 'Cybex', category: 'strength', condition: 'new', price: 5100, supplier: 'Fitness Factory' },
+  { id: 7, name: 'TRX Suspension Training Set Pro', brand: 'TRX', category: 'functional', condition: 'new', price: 450, supplier: 'IronWorks RO' },
+  { id: 8, name: 'Concept2 RowErg', brand: 'Concept2', category: 'cardio', condition: 'new', price: 1200, supplier: 'Nordic Fitness' },
+  { id: 9, name: 'Eleiko IWF Competition Set', brand: 'Eleiko', category: 'strength', condition: 'new', price: 2800, supplier: 'EuroGym Direct' },
 ];
 
 export default function ProductsPage() {
@@ -52,6 +62,18 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [dataSource, setDataSource] = useState<'api' | 'fallback'>('fallback');
 
+  // Advanced filters
+  const [showFilters, setShowFilters] = useState(false);
+  const [conditionFilter, setConditionFilter] = useState('all');
+  const [priceMin, setPriceMin] = useState('');
+  const [priceMax, setPriceMax] = useState('');
+  const [sortBy, setSortBy] = useState('recommended');
+
+  // Check if any filter is active
+  const hasActiveFilters = useMemo(() => {
+    return activeCategory !== 'all' || conditionFilter !== 'all' || priceMin !== '' || priceMax !== '';
+  }, [activeCategory, conditionFilter, priceMin, priceMax]);
+
   // Fetch products from API
   useEffect(() => {
     async function fetchProducts() {
@@ -59,6 +81,9 @@ export default function ProductsPage() {
         const params = new URLSearchParams();
         if (activeCategory !== 'all') params.set('category', activeCategory);
         if (searchQuery) params.set('search', searchQuery);
+        if (conditionFilter !== 'all') params.set('condition', conditionFilter);
+        if (priceMin) params.set('price_min', priceMin);
+        if (priceMax) params.set('price_max', priceMax);
 
         const res = await fetch(`/api/products?${params.toString()}`);
         if (res.ok) {
@@ -67,18 +92,17 @@ export default function ProductsPage() {
             const mapped = data.products.map((p: any) => ({
               id: p.id,
               name: p.name,
-              brand: p.brand,
+              brand: p.brand?.name || p.brand || '',
               category: p.category,
               condition: p.condition,
-              price: p.price,
+              price: Number(p.price_eur),
               description: p.description,
               images: p.images,
-              supplier: p.supplier_profiles?.company_name || 'Furnizor GymBuilder',
+              supplier: p.supplier?.company_name || p.supplier_profiles?.company_name || 'Furnizor GymBuilder',
             }));
             setProducts(mapped);
             setDataSource('api');
           } else {
-            // No products in DB, use fallback
             setProducts(fallbackProducts);
             setDataSource('fallback');
           }
@@ -94,9 +118,10 @@ export default function ProductsPage() {
       }
     }
 
+    setLoading(true);
     const debounce = setTimeout(fetchProducts, 300);
     return () => clearTimeout(debounce);
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, conditionFilter, priceMin, priceMax]);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -113,14 +138,40 @@ export default function ProductsPage() {
     }
   };
 
-  // Client-side filter for fallback data
-  const filteredProducts = dataSource === 'fallback'
-    ? products.filter((p) => {
-        const matchesCategory = activeCategory === 'all' || p.category === activeCategory;
-        const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesCategory && matchesSearch;
-      })
-    : products;
+  const resetFilters = () => {
+    setActiveCategory('all');
+    setConditionFilter('all');
+    setPriceMin('');
+    setPriceMax('');
+    setSearchQuery('');
+  };
+
+  // Client-side filter + sort for fallback data
+  const filteredProducts = useMemo(() => {
+    let result = dataSource === 'fallback'
+      ? products.filter((p) => {
+          const matchesCategory = activeCategory === 'all' || p.category === activeCategory;
+          const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase());
+          const matchesCondition = conditionFilter === 'all' || p.condition === conditionFilter;
+          const matchesPriceMin = !priceMin || p.price >= Number(priceMin);
+          const matchesPriceMax = !priceMax || p.price <= Number(priceMax);
+          return matchesCategory && matchesSearch && matchesCondition && matchesPriceMin && matchesPriceMax;
+        })
+      : products;
+
+    // Sort
+    if (sortBy === 'price_asc') {
+      result = [...result].sort((a, b) => a.price - b.price);
+    } else if (sortBy === 'price_desc') {
+      result = [...result].sort((a, b) => b.price - a.price);
+    } else if (sortBy === 'newest') {
+      result = [...result].reverse();
+    }
+
+    return result;
+  }, [products, dataSource, activeCategory, searchQuery, conditionFilter, priceMin, priceMax, sortBy]);
+
+  const conditionLabel = (c: string) => c === 'new' ? 'Nou' : c === 'used' ? 'Second-hand' : c;
 
   return (
     <main className="min-h-screen">
@@ -183,7 +234,7 @@ export default function ProductsPage() {
         </div>
       </section>
 
-      {/* Search & Filters */}
+      {/* Search & Filters Bar */}
       <section className="py-6 px-4 border-b border-anthracite-800 sticky top-16 z-40 bg-anthracite-950/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
@@ -198,11 +249,15 @@ export default function ProductsPage() {
               />
             </div>
             <button
-              onClick={() => showToast('Filtre avansate - Funcționalitate în curând!')}
-              className="btn-secondary flex items-center gap-2"
+              onClick={() => setShowFilters(!showFilters)}
+              className={`btn-secondary flex items-center gap-2 ${showFilters ? 'border-gold-400 text-gold-400' : ''}`}
             >
               <SlidersHorizontal className="w-4 h-4" />
               Filtre Avansate
+              {hasActiveFilters && (
+                <span className="w-2 h-2 bg-gold-400 rounded-full" />
+              )}
+              {showFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
           </div>
 
@@ -225,25 +280,176 @@ export default function ProductsPage() {
         </div>
       </section>
 
+      {/* Advanced Filters Panel */}
+      {showFilters && (
+        <section className="px-4 py-5 border-b border-anthracite-800 bg-anthracite-900/50">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Condition Filter */}
+              <div>
+                <label className="block text-xs font-medium text-anthracite-400 uppercase tracking-wider mb-2">
+                  Stare
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setConditionFilter('all')}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      conditionFilter === 'all'
+                        ? 'bg-gold-400/10 text-gold-400 border border-gold-400/30'
+                        : 'bg-anthracite-800 text-anthracite-300 border border-anthracite-700 hover:border-anthracite-500'
+                    }`}
+                  >
+                    Toate
+                  </button>
+                  <button
+                    onClick={() => setConditionFilter('new')}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      conditionFilter === 'new'
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                        : 'bg-anthracite-800 text-anthracite-300 border border-anthracite-700 hover:border-anthracite-500'
+                    }`}
+                  >
+                    Nou
+                  </button>
+                  <button
+                    onClick={() => setConditionFilter('used')}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      conditionFilter === 'used'
+                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                        : 'bg-anthracite-800 text-anthracite-300 border border-anthracite-700 hover:border-anthracite-500'
+                    }`}
+                  >
+                    Second-hand
+                  </button>
+                </div>
+              </div>
+
+              {/* Price Range */}
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-medium text-anthracite-400 uppercase tracking-wider mb-2">
+                  Interval Preț (EUR)
+                </label>
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-anthracite-500 text-sm">&euro;</span>
+                    <input
+                      type="number"
+                      placeholder="Min"
+                      className="input-field pl-8 text-sm"
+                      value={priceMin}
+                      onChange={(e) => setPriceMin(e.target.value)}
+                      min="0"
+                    />
+                  </div>
+                  <span className="text-anthracite-500">—</span>
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-anthracite-500 text-sm">&euro;</span>
+                    <input
+                      type="number"
+                      placeholder="Max"
+                      className="input-field pl-8 text-sm"
+                      value={priceMax}
+                      onChange={(e) => setPriceMax(e.target.value)}
+                      min="0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Reset Button */}
+              <div className="flex items-end">
+                {hasActiveFilters && (
+                  <button
+                    onClick={resetFilters}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-anthracite-800 border border-anthracite-700 text-anthracite-300 hover:text-white hover:border-anthracite-500 text-sm font-medium transition-colors w-full justify-center"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Resetează Filtre
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Active filters summary */}
+            {hasActiveFilters && (
+              <div className="flex items-center gap-2 mt-4 flex-wrap">
+                <span className="text-xs text-anthracite-500">Filtre active:</span>
+                {activeCategory !== 'all' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gold-400/10 text-gold-400 text-xs">
+                    {categoryDisplayMap[activeCategory] || activeCategory}
+                    <button onClick={() => setActiveCategory('all')} className="hover:text-white"><X className="w-3 h-3" /></button>
+                  </span>
+                )}
+                {conditionFilter !== 'all' && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gold-400/10 text-gold-400 text-xs">
+                    {conditionFilter === 'new' ? 'Nou' : 'Second-hand'}
+                    <button onClick={() => setConditionFilter('all')} className="hover:text-white"><X className="w-3 h-3" /></button>
+                  </span>
+                )}
+                {priceMin && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gold-400/10 text-gold-400 text-xs">
+                    Min: &euro;{priceMin}
+                    <button onClick={() => setPriceMin('')} className="hover:text-white"><X className="w-3 h-3" /></button>
+                  </span>
+                )}
+                {priceMax && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gold-400/10 text-gold-400 text-xs">
+                    Max: &euro;{priceMax}
+                    <button onClick={() => setPriceMax('')} className="hover:text-white"><X className="w-3 h-3" /></button>
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Products Grid */}
       <section className="py-12 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <p className="text-anthracite-400 text-sm">
-              {loading ? 'Se încarcă...' : `${filteredProducts.length} produse găsite`}
-              {dataSource === 'api' && <span className="ml-2 text-emerald-400 text-xs">(date live)</span>}
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> Se caută...
+                </span>
+              ) : (
+                <>
+                  <span className="text-white font-semibold text-base">{filteredProducts.length}</span>{' '}
+                  {filteredProducts.length === 1 ? 'produs găsit' : 'produse găsite'}
+                  {dataSource === 'api' && <span className="ml-2 text-emerald-400 text-xs">(date live)</span>}
+                </>
+              )}
             </p>
-            <select className="bg-anthracite-800 border border-anthracite-600 rounded-lg px-3 py-2 text-sm text-anthracite-200">
-              <option>Sortare: Recomandate</option>
-              <option>Preț: Crescător</option>
-              <option>Preț: Descrescător</option>
-              <option>Cele mai noi</option>
+            <select
+              className="bg-anthracite-800 border border-anthracite-600 rounded-lg px-3 py-2 text-sm text-anthracite-200"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="recommended">Sortare: Recomandate</option>
+              <option value="price_asc">Preț: Crescător</option>
+              <option value="price_desc">Preț: Descrescător</option>
+              <option value="newest">Cele mai noi</option>
             </select>
           </div>
 
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <Loader2 className="w-8 h-8 text-gold-400 animate-spin" />
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-16">
+              <Dumbbell className="w-12 h-12 text-anthracite-600 mx-auto mb-4" />
+              <p className="text-anthracite-400 mb-4">Nu s-au găsit produse cu aceste filtre.</p>
+              {hasActiveFilters && (
+                <button
+                  onClick={resetFilters}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gold-400/10 text-gold-400 text-sm font-medium hover:bg-gold-400/20 transition-colors"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Resetează Filtre
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -258,7 +464,7 @@ export default function ProductsPage() {
                       <Dumbbell className="w-16 h-16 text-anthracite-500" />
                     )}
                     <button
-                      onClick={() => toggleFavorite(product.id)}
+                      onClick={(e) => { e.preventDefault(); toggleFavorite(product.id); }}
                       className="absolute top-3 right-3 w-8 h-8 bg-anthracite-800/80 rounded-full flex items-center justify-center hover:bg-anthracite-700 transition-all"
                     >
                       <Heart className={`w-4 h-4 transition-colors ${
@@ -266,9 +472,9 @@ export default function ProductsPage() {
                       }`} />
                     </button>
                     <span className={`absolute top-3 left-3 px-2 py-0.5 rounded text-xs font-medium ${
-                      product.condition === 'Nou' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
+                      product.condition === 'new' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
                     }`}>
-                      {product.condition}
+                      {conditionLabel(product.condition)}
                     </span>
                   </div>
 
@@ -277,7 +483,7 @@ export default function ProductsPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-gold-400 font-medium">{product.brand}</span>
                       <span className="text-xs text-anthracite-500">&middot;</span>
-                      <span className="text-xs text-anthracite-400">{product.category}</span>
+                      <span className="text-xs text-anthracite-400">{categoryDisplayMap[product.category] || product.category}</span>
                     </div>
                     <h3 className="text-white font-semibold line-clamp-2 group-hover:text-gold-400 transition-colors">
                       {product.name}
@@ -298,13 +504,6 @@ export default function ProductsPage() {
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-
-          {!loading && filteredProducts.length === 0 && (
-            <div className="text-center py-16">
-              <Dumbbell className="w-12 h-12 text-anthracite-600 mx-auto mb-4" />
-              <p className="text-anthracite-400">Nu s-au găsit produse cu aceste filtre.</p>
             </div>
           )}
         </div>
