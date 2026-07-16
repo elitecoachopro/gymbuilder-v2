@@ -18,6 +18,7 @@ export default function ClientRegisterPage() {
     email: '',
     phone: '',
     password: '',
+    confirmPassword: '',
     terms: false,
   });
 
@@ -38,6 +39,11 @@ export default function ClientRegisterPage() {
 
     if (form.password.length < 8) {
       setError('Parola trebuie să aibă minim 8 caractere.');
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setError('Parolele nu coincid.');
       return;
     }
 
@@ -187,6 +193,26 @@ export default function ClientRegisterPage() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Repetă parola *</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className={`input-field pl-11 ${form.confirmPassword && form.password !== form.confirmPassword ? 'border-red-500 focus:border-red-500 focus:ring-red-500/30' : ''}`}
+                  placeholder="Repetă parola"
+                  value={form.confirmPassword}
+                  onChange={(e) => updateField('confirmPassword', e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+              {form.confirmPassword && form.password !== form.confirmPassword && (
+                <p className="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" /> Parolele nu coincid
+                </p>
+              )}
             </div>
 
             <div className="flex items-start gap-2">
