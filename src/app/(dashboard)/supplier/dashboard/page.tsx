@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox, Send, Loader2, MessageSquare, ImagePlus, Trash2, Camera } from 'lucide-react';
+import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox, Send, Loader2, MessageSquare, ImagePlus, Trash2, Camera, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import NotificationBell from '@/components/NotificationBell';
 
@@ -50,6 +50,7 @@ interface SlotsData {
 const sidebarLinks = [
   { href: '/supplier/dashboard', label: 'Dashboard', icon: BarChart3, active: true },
   { href: '/supplier/products', label: 'Produsele Mele', icon: Package, active: false },
+  { href: null, label: 'Analytics', icon: TrendingUp, active: false, scrollTo: 'analytics' },
   { href: null, label: 'Galerie Foto', icon: Camera, active: false, scrollTo: 'gallery' },
   { href: null, label: 'Promovări', icon: Megaphone, active: false, scrollTo: 'promotions' },
 ];
@@ -67,6 +68,10 @@ export default function SupplierDashboard() {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyMessage, setReplyMessage] = useState('');
   const [replySending, setReplySending] = useState(false);
+
+  // Analytics states
+  const [analyticsData, setAnalyticsData] = useState<any[]>([]);
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
 
   // Gallery states
   const [galleryImages, setGalleryImages] = useState<{id: string; image_url: string; caption: string; created_at: string}[]>([]);
@@ -144,6 +149,20 @@ export default function SupplierDashboard() {
   };
 
   useEffect(() => { fetchGallery(); }, []);
+
+  // Fetch analytics
+  useEffect(() => {
+    async function fetchAnalytics() {
+      try {
+        const res = await fetch('/api/supplier/analytics');
+        if (res.ok) {
+          const data = await res.json();
+          setAnalyticsData(data.analytics || []);
+        }
+      } catch {} finally { setAnalyticsLoading(false); }
+    }
+    fetchAnalytics();
+  }, []);
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -591,6 +610,101 @@ export default function SupplierDashboard() {
               </div>
             </div>
           )}
+
+          {/* Analytics Section */}
+          <div id="analytics" className="mb-8">
+            <div className="flex items-center gap-3 mb-5">
+              <BarChart3 className="w-5 h-5 text-gold-400" />
+              <h2 className="text-xl font-bold text-white">Analytics Produse</h2>
+            </div>
+
+            {analyticsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-gold-400" />
+              </div>
+            ) : analyticsData.length === 0 ? (
+              <div className="bg-anthracite-800/50 rounded-xl p-6 text-center">
+                <BarChart3 className="w-10 h-10 text-anthracite-600 mx-auto mb-2" />
+                <p className="text-sm text-anthracite-400">Nu există date de analytics încă.</p>
+                <p className="text-xs text-anthracite-500 mt-1">Statisticile vor apărea pe măsură ce produsele primesc vizualizări.</p>
+              </div>
+            ) : (
+              <div className="bg-anthracite-800/50 border border-anthracite-700 rounded-xl overflow-hidden">
+                {/* Table header */}
+                <div className="grid grid-cols-12 gap-2 px-4 py-3 border-b border-anthracite-700 text-xs font-medium text-anthracite-400 uppercase tracking-wider">
+                  <div className="col-span-4">Produs</div>
+                  <div className="col-span-2 text-center">Vizualizări</div>
+                  <div className="col-span-2 text-center">Cereri</div>
+                  <div className="col-span-2 text-center">Viz. vs. Luna Ant.</div>
+                  <div className="col-span-2 text-center">Cereri vs. Luna Ant.</div>
+                </div>
+                {/* Table rows */}
+                {analyticsData.map((item) => (
+                  <div key={item.product_id} className="grid grid-cols-12 gap-2 px-4 py-3 border-b border-anthracite-700/50 last:border-b-0 items-center hover:bg-anthracite-800/80 transition-colors">
+                    <div className="col-span-4 flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-lg bg-anthracite-700 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                        {item.product_image ? (
+                          <img src={item.product_image} alt={item.product_name} className="w-full h-full object-cover" />
+                        ) : (
+                          <Package className="w-4 h-4 text-anthracite-500" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm text-white font-medium truncate">{item.product_name}</p>
+                        <p className="text-xs text-anthracite-500">&euro;{Number(item.price_eur).toLocaleString()}</p>
+                      </div>
+                    </div>
+                    <div className="col-span-2 text-center">
+                      <span className="text-sm font-semibold text-white">{item.views_total}</span>
+                      <p className="text-xs text-anthracite-500">{item.views_current_month} luna asta</p>
+                    </div>
+                    <div className="col-span-2 text-center">
+                      <span className="text-sm font-semibold text-white">{item.requests_total}</span>
+                      <p className="text-xs text-anthracite-500">{item.requests_current_month} luna asta</p>
+                    </div>
+                    <div className="col-span-2 text-center">
+                      {item.views_change_percent === null ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-anthracite-500">
+                          <Minus className="w-3 h-3" /> N/A
+                        </span>
+                      ) : item.views_change_percent > 0 ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-emerald-400 font-medium">
+                          <ArrowUpRight className="w-3 h-3" /> +{item.views_change_percent}%
+                        </span>
+                      ) : item.views_change_percent < 0 ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-red-400 font-medium">
+                          <ArrowDownRight className="w-3 h-3" /> {item.views_change_percent}%
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs text-anthracite-400">
+                          <Minus className="w-3 h-3" /> 0%
+                        </span>
+                      )}
+                    </div>
+                    <div className="col-span-2 text-center">
+                      {item.requests_change_percent === null ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-anthracite-500">
+                          <Minus className="w-3 h-3" /> N/A
+                        </span>
+                      ) : item.requests_change_percent > 0 ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-emerald-400 font-medium">
+                          <ArrowUpRight className="w-3 h-3" /> +{item.requests_change_percent}%
+                        </span>
+                      ) : item.requests_change_percent < 0 ? (
+                        <span className="inline-flex items-center gap-1 text-xs text-red-400 font-medium">
+                          <ArrowDownRight className="w-3 h-3" /> {item.requests_change_percent}%
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-xs text-anthracite-400">
+                          <Minus className="w-3 h-3" /> 0%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Galerie Foto Section */}
           <div id="gallery" className="mb-8">
