@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, Star, MessageSquare, LogOut, BadgeCheck } from 'lucide-react';
+import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, Star, MessageSquare, LogOut, BadgeCheck, Send, Newspaper } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Supplier {
@@ -61,11 +61,19 @@ export default function AdminDashboard() {
     }
   };
   const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
-  const [adminSection, setAdminSection] = useState<'suppliers' | 'reviews'>('suppliers');
+  const [adminSection, setAdminSection] = useState<'suppliers' | 'reviews' | 'newsletter'>('suppliers');
   const [reviewsList, setReviewsList] = useState<ReviewItem[]>([]);
   const [reviewsPendingCount, setReviewsPendingCount] = useState(0);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [reviewActionLoading, setReviewActionLoading] = useState<string | null>(null);
+
+  // Newsletter states
+  const [newsletterStats, setNewsletterStats] = useState<{ total: number; active: number; unsubscribed: number } | null>(null);
+  const [newsletterSubscribers, setNewsletterSubscribers] = useState<any[]>([]);
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+  const [newsletterSubject, setNewsletterSubject] = useState('');
+  const [newsletterContent, setNewsletterContent] = useState('');
+  const [newsletterSending, setNewsletterSending] = useState(false);
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast(msg);
@@ -133,6 +141,45 @@ export default function AdminDashboard() {
       showToast('Eroare de conexiune.', 'error');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchNewsletter() {
+    setNewsletterLoading(true);
+    try {
+      const res = await fetch('/api/admin/newsletter');
+      if (res.ok) {
+        const data = await res.json();
+        setNewsletterStats(data.stats);
+        setNewsletterSubscribers(data.subscribers || []);
+      }
+    } catch {} finally { setNewsletterLoading(false); }
+  }
+
+  async function sendNewsletter() {
+    if (!newsletterSubject.trim() || !newsletterContent.trim()) {
+      showToast('Subiectul și conținutul sunt obligatorii.', 'error');
+      return;
+    }
+    setNewsletterSending(true);
+    try {
+      const res = await fetch('/api/admin/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject: newsletterSubject.trim(), content: newsletterContent.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(data.message || 'Newsletter trimis!', 'success');
+        setNewsletterSubject('');
+        setNewsletterContent('');
+      } else {
+        showToast(data.error || 'Eroare la trimitere.', 'error');
+      }
+    } catch {
+      showToast('Eroare de conexiune.', 'error');
+    } finally {
+      setNewsletterSending(false);
     }
   }
 
@@ -301,9 +348,33 @@ export default function AdminDashboard() {
                 <span className="bg-amber-500 text-anthracite-950 text-xs font-bold px-1.5 py-0.5 rounded-full">{reviewsPendingCount}</span>
               )}
             </button>
+            <button
+              onClick={() => { setAdminSection('newsletter'); fetchNewsletter(); }}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                adminSection === 'newsletter'
+                  ? 'bg-anthracite-700 text-gold-400'
+                  : 'text-anthracite-400 hover:text-white'
+              }`}
+            >
+              <Newspaper className="w-4 h-4" /> Newsletter
+            </button>
           </div>
 
-          {adminSection === 'reviews' ? (
+          {adminSection === 'newsletter' ? (
+            /* Newsletter Section */
+            <NewsletterSection
+              stats={newsletterStats}
+              subscribers={newsletterSubscribers}
+              loading={newsletterLoading}
+              subject={newsletterSubject}
+              setSubject={setNewsletterSubject}
+              content={newsletterContent}
+              setContent={setNewsletterContent}
+              sending={newsletterSending}
+              onSend={sendNewsletter}
+              showToast={showToast}
+            />
+          ) : adminSection === 'reviews' ? (
             /* Reviews Moderation */
             <div>
               {reviewsLoading ? (
@@ -547,5 +618,145 @@ export default function AdminDashboard() {
         </div>
       </div>
     </main>
+  );
+}
+
+function NewsletterSection({
+  stats,
+  subscribers,
+  loading,
+  subject,
+  setSubject,
+  content,
+  setContent,
+  sending,
+  onSend,
+  showToast,
+}: {
+  stats: { total: number; active: number; unsubscribed: number } | null;
+  subscribers: any[];
+  loading: boolean;
+  subject: string;
+  setSubject: (v: string) => void;
+  content: string;
+  setContent: (v: string) => void;
+  sending: boolean;
+  onSend: () => void;
+  showToast: (msg: string, type: 'success' | 'error') => void;
+}) {
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 text-gold-400 animate-spin mb-4" />
+        <p className="text-anthracite-400 text-sm">Se încarcă datele newsletter...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Stats */}
+      {stats && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-5">
+            <p className="text-anthracite-400 text-xs uppercase tracking-wider mb-1">Total Abonați</p>
+            <p className="text-2xl font-bold text-white">{stats.total}</p>
+          </div>
+          <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-5">
+            <p className="text-anthracite-400 text-xs uppercase tracking-wider mb-1">Activi</p>
+            <p className="text-2xl font-bold text-emerald-400">{stats.active}</p>
+          </div>
+          <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-5">
+            <p className="text-anthracite-400 text-xs uppercase tracking-wider mb-1">Dezabonați</p>
+            <p className="text-2xl font-bold text-red-400">{stats.unsubscribed}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Send Newsletter */}
+      <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-6">
+        <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+          <Send className="w-5 h-5 text-gold-400" />
+          Trimite Newsletter
+        </h3>
+        <div className="space-y-4">
+          <div>
+            <label className="text-anthracite-400 text-sm mb-1 block">Subiect</label>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Ex: Echipamente noi disponibile pe GymBuilder"
+              className="w-full bg-anthracite-900 border border-anthracite-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors"
+            />
+          </div>
+          <div>
+            <label className="text-anthracite-400 text-sm mb-1 block">Conținut</label>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Scrie conținutul email-ului aici..."
+              rows={8}
+              className="w-full bg-anthracite-900 border border-anthracite-700 rounded-lg px-4 py-3 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors resize-y"
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-anthracite-500 text-xs">
+              Va fi trimis către {stats?.active || 0} abonați activi.
+            </p>
+            <button
+              onClick={onSend}
+              disabled={sending || !subject.trim() || !content.trim()}
+              className="bg-gold-400 text-anthracite-950 px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-gold-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              {sending ? 'Se trimite...' : 'Trimite Newsletter'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Subscribers List */}
+      <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-6">
+        <h3 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
+          <Users className="w-5 h-5 text-gold-400" />
+          Lista Abonaților ({subscribers.length})
+        </h3>
+        {subscribers.length === 0 ? (
+          <p className="text-anthracite-500 text-sm text-center py-8">Nu există abonați încă.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-anthracite-700">
+                  <th className="text-left text-anthracite-400 font-medium py-2 px-3">Email</th>
+                  <th className="text-left text-anthracite-400 font-medium py-2 px-3">Status</th>
+                  <th className="text-left text-anthracite-400 font-medium py-2 px-3">Data abonării</th>
+                </tr>
+              </thead>
+              <tbody>
+                {subscribers.map((sub: any) => (
+                  <tr key={sub.id} className="border-b border-anthracite-700/50">
+                    <td className="py-2.5 px-3 text-white">{sub.email}</td>
+                    <td className="py-2.5 px-3">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                        sub.status === 'active'
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                          : 'bg-red-500/10 text-red-400 border border-red-500/30'
+                      }`}>
+                        {sub.status === 'active' ? 'Activ' : 'Dezabonat'}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3 text-anthracite-400">
+                      {new Date(sub.subscribed_at).toLocaleDateString('ro-RO')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

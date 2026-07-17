@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-
-import { Dumbbell, Mail, Phone, MapPin } from 'lucide-react';
+import { useState } from 'react';
+import { Dumbbell, Mail, Phone, MapPin, Send, Loader2, CheckCircle } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -69,6 +69,11 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Newsletter */}
+        <div className="border-t border-anthracite-800 pt-8 pb-8">
+          <NewsletterForm />
+        </div>
+
         {/* Bottom */}
         <div className="border-t border-anthracite-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-anthracite-500 text-sm">
@@ -85,5 +90,74 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function NewsletterForm() {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setStatus('loading');
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setStatus('success');
+        setMessage(data.message || 'Abonat cu succes!');
+        setEmail('');
+      } else {
+        setStatus('error');
+        setMessage(data.error || 'Eroare la abonare.');
+      }
+    } catch {
+      setStatus('error');
+      setMessage('Eroare de conexiune.');
+    }
+  }
+
+  if (status === 'success') {
+    return (
+      <div className="flex items-center justify-center gap-2 py-2">
+        <CheckCircle className="w-5 h-5 text-emerald-400" />
+        <p className="text-emerald-400 text-sm font-medium">{message}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-lg mx-auto text-center">
+      <h4 className="text-white font-semibold mb-2">Abonează-te la Newsletter</h4>
+      <p className="text-anthracite-400 text-sm mb-4">Primește noutăți despre echipamente, oferte și sfaturi pentru sala ta.</p>
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => { setEmail(e.target.value); if (status === 'error') setStatus('idle'); }}
+          placeholder="adresa@email.com"
+          className="flex-1 bg-anthracite-800 border border-anthracite-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors"
+          disabled={status === 'loading'}
+          required
+        />
+        <button
+          type="submit"
+          disabled={status === 'loading' || !email.trim()}
+          className="bg-gold-400 text-anthracite-950 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-gold-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+          {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+          Abonare
+        </button>
+      </form>
+      {status === 'error' && (
+        <p className="text-red-400 text-xs mt-2">{message}</p>
+      )}
+    </div>
   );
 }
