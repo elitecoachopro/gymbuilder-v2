@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Search, Heart, MessageSquare, Star, Building2, Package, Loader2, Dumbbell, Clock, Send, CheckCircle, ArrowRight, Trash2, LogOut } from 'lucide-react';
+import { Search, Heart, MessageSquare, Star, Building2, Package, Loader2, Dumbbell, Clock, Send, CheckCircle, ArrowRight, Trash2, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
 import NotificationBell from '@/components/NotificationBell';
 
 interface ContactRequest {
@@ -62,6 +62,7 @@ export default function ClientDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [openChat, setOpenChat] = useState<string | null>(null);
   const [logoutLoading, setLogoutLoading] = useState(false);
 
   const handleLogout = async () => {
@@ -354,6 +355,18 @@ export default function ClientDashboard() {
                     {cr.message && (
                       <p className="text-xs text-anthracite-400 mt-2 pl-12 line-clamp-2">{cr.message}</p>
                     )}
+                    {/* Chat toggle */}
+                    <button
+                      onClick={() => setOpenChat(openChat === cr.id ? null : cr.id)}
+                      className="mt-3 ml-12 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+                    >
+                      <MessageSquare className="w-3 h-3" />
+                      {openChat === cr.id ? 'Ascunde conversația' : 'Deschide conversația'}
+                      {openChat === cr.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                    </button>
+                    {openChat === cr.id && (
+                      <ChatBox requestId={cr.id} userRole="client" />
+                    )}
                   </div>
                 );
               })}
@@ -412,5 +425,103 @@ export default function ClientDashboard() {
         </section>
       </div>
     </main>
+  );
+}
+
+// ChatBox component for inline messaging
+function ChatBox({ requestId, userRole }: { requestId: string; userRole: 'client' | 'supplier' }) {
+  const [messages, setMessages] = useState<{ id: string; sender_type: string; sender_name: string; content: string; created_at: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newMessage, setNewMessage] = useState('');
+  const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    fetchMessages();
+  }, [requestId]);
+
+  async function fetchMessages() {
+    try {
+      const res = await fetch(`/api/messages?request_id=${requestId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data.messages || []);
+      }
+    } catch {} finally { setLoading(false); }
+  }
+
+  async function handleSend() {
+    if (!newMessage.trim() || sending) return;
+    setSending(true);
+    try {
+      const res = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request_id: requestId, content: newMessage.trim() }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(prev => [...prev, data.message]);
+        setNewMessage('');
+      }
+    } catch {} finally { setSending(false); }
+  }
+
+  if (loading) {
+    return (
+      <div className="mt-3 ml-12 flex items-center gap-2 text-xs text-anthracite-400">
+        <Loader2 className="w-3 h-3 animate-spin" /> Se încarcă mesajele...
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-3 ml-12 border border-anthracite-700 rounded-lg overflow-hidden">
+      {/* Messages list */}
+      <div className="max-h-64 overflow-y-auto p-3 space-y-2 bg-anthracite-900/50">
+        {messages.length === 0 ? (
+          <p className="text-xs text-anthracite-500 text-center py-4">Niciun mesaj încă. Începe conversația!</p>
+        ) : (
+          messages.map((msg) => {
+            const isOwn = msg.sender_type === userRole;
+            return (
+              <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[75%] rounded-lg px-3 py-2 ${
+                  isOwn
+                    ? 'bg-gold-400/10 border border-gold-400/30'
+                    : 'bg-anthracite-700 border border-anthracite-600'
+                }`}>
+                  <p className={`text-[10px] font-medium mb-0.5 ${isOwn ? 'text-gold-400' : 'text-blue-400'}`}>
+                    {msg.sender_name}
+                  </p>
+                  <p className="text-sm text-white whitespace-pre-wrap">{msg.content}</p>
+                  <p className="text-[10px] text-anthracite-500 mt-1">
+                    {new Date(msg.created_at).toLocaleString('ro-RO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+      {/* Composer */}
+      <div className="flex items-center gap-2 p-2 border-t border-anthracite-700 bg-anthracite-800">
+        <input
+          type="text"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+          placeholder="Scrie un mesaj..."
+          className="flex-1 bg-anthracite-900 border border-anthracite-600 rounded-lg px-3 py-2 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400"
+          disabled={sending}
+        />
+        <button
+          onClick={handleSend}
+          disabled={sending || !newMessage.trim()}
+          className="bg-gold-400 text-anthracite-950 p-2 rounded-lg hover:bg-gold-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+        </button>
+      </div>
+    </div>
   );
 }

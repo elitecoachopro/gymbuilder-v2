@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox, Send, Loader2, MessageSquare, ImagePlus, Trash2, Camera, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox, Send, Loader2, MessageSquare, ImagePlus, Trash2, Camera, ArrowUpRight, ArrowDownRight, Minus, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import NotificationBell from '@/components/NotificationBell';
 
@@ -68,6 +68,9 @@ export default function SupplierDashboard() {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyMessage, setReplyMessage] = useState('');
   const [replySending, setReplySending] = useState(false);
+
+  // Chat states
+  const [openChat, setOpenChat] = useState<string | null>(null);
 
   // Analytics states
   const [analyticsData, setAnalyticsData] = useState<any[]>([]);
@@ -605,6 +608,20 @@ export default function SupplierDashboard() {
                         </div>
                       </div>
                     )}
+                    {/* Chat toggle */}
+                    <div className="mt-2 ml-11">
+                      <button
+                        onClick={() => setOpenChat(openChat === req.id ? null : req.id)}
+                        className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+                      >
+                        <MessageSquare className="w-3 h-3" />
+                        {openChat === req.id ? 'Ascunde conversația' : 'Deschide conversația'}
+                        {openChat === req.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                      </button>
+                      {openChat === req.id && (
+                        <SupplierChatBox requestId={req.id} />
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -884,5 +901,103 @@ export default function SupplierDashboard() {
         </div>
       </div>
     </main>
+  );
+}
+
+// SupplierChatBox component for inline messaging
+function SupplierChatBox({ requestId }: { requestId: string }) {
+  const [messages, setMessages] = useState<{ id: string; sender_type: string; sender_name: string; content: string; created_at: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newMessage, setNewMessage] = useState('');
+  const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    fetchMessages();
+  }, [requestId]);
+
+  async function fetchMessages() {
+    try {
+      const res = await fetch(`/api/messages?request_id=${requestId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data.messages || []);
+      }
+    } catch {} finally { setLoading(false); }
+  }
+
+  async function handleSend() {
+    if (!newMessage.trim() || sending) return;
+    setSending(true);
+    try {
+      const res = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request_id: requestId, content: newMessage.trim() }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(prev => [...prev, data.message]);
+        setNewMessage('');
+      }
+    } catch {} finally { setSending(false); }
+  }
+
+  if (loading) {
+    return (
+      <div className="mt-3 flex items-center gap-2 text-xs text-anthracite-400">
+        <Loader2 className="w-3 h-3 animate-spin" /> Se încarcă mesajele...
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-3 border border-anthracite-700 rounded-lg overflow-hidden">
+      {/* Messages list */}
+      <div className="max-h-64 overflow-y-auto p-3 space-y-2 bg-anthracite-900/50">
+        {messages.length === 0 ? (
+          <p className="text-xs text-anthracite-500 text-center py-4">Niciun mesaj încă. Începe conversația!</p>
+        ) : (
+          messages.map((msg) => {
+            const isOwn = msg.sender_type === 'supplier';
+            return (
+              <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[75%] rounded-lg px-3 py-2 ${
+                  isOwn
+                    ? 'bg-gold-400/10 border border-gold-400/30'
+                    : 'bg-anthracite-700 border border-anthracite-600'
+                }`}>
+                  <p className={`text-[10px] font-medium mb-0.5 ${isOwn ? 'text-gold-400' : 'text-blue-400'}`}>
+                    {msg.sender_name}
+                  </p>
+                  <p className="text-sm text-white whitespace-pre-wrap">{msg.content}</p>
+                  <p className="text-[10px] text-anthracite-500 mt-1">
+                    {new Date(msg.created_at).toLocaleString('ro-RO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+      {/* Composer */}
+      <div className="flex items-center gap-2 p-2 border-t border-anthracite-700 bg-anthracite-800">
+        <input
+          type="text"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+          placeholder="Scrie un mesaj..."
+          className="flex-1 bg-anthracite-900 border border-anthracite-600 rounded-lg px-3 py-2 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400"
+          disabled={sending}
+        />
+        <button
+          onClick={handleSend}
+          disabled={sending || !newMessage.trim()}
+          className="bg-gold-400 text-anthracite-950 p-2 rounded-lg hover:bg-gold-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+        </button>
+      </div>
+    </div>
   );
 }
