@@ -281,7 +281,7 @@ export async function PATCH(request: NextRequest) {
     // Verify product belongs to this supplier
     const { data: existingProduct } = await supabase
       .from('products')
-      .select('id, supplier_id, images')
+      .select('id, supplier_id, images, price_eur, name')
       .eq('id', productId)
       .eq('supplier_id', supplierProfile.id)
       .single();
@@ -334,10 +334,98 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Eroare la actualizarea produsului.' }, { status: 500 });
     }
 
+    // Check for price drop and notify users who have this product in favorites
+    if (price_eur && existingProduct.price_eur && price_eur < existingProduct.price_eur) {
+      notifyPriceDrop(
+        supabase,
+        productId,
+        existingProduct.name || name || 'Produs',
+        existingProduct.price_eur,
+        price_eur
+      ).catch((err) => console.error('Price drop notification error:', err));
+    }
+
     return NextResponse.json({ success: true, message: 'Produs actualizat!', product: updatedProduct });
   } catch (error) {
     console.error('Update product error:', error);
     return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+  }
+}
+
+// Notify users who favorited a product when its price drops
+async function notifyPriceDrop(
+  supabase: any,
+  productId: string,
+  productName: string,
+  oldPrice: number,
+  newPrice: number
+) {
+  // Get all users who have this product in favorites
+  const { data: favUsers } = await supabase
+    .from('favorites')
+    .select('user_id')
+    .eq('product_id', productId);
+
+  if (!favUsers || favUsers.length === 0) return;
+
+  // Get user emails for sending Resend notifications
+  const userIds = favUsers.map((f: any) => f.user_id);
+  const { data: users } = await supabase
+    .from('users')
+    .select('id, email, name')
+    .in('id', userIds);
+
+  if (!users || users.length === 0) return;
+
+  const title = `Prețul a scăzut la ${productName}`;
+  const message = `De la €${Number(oldPrice).toLocaleString()} la €${Number(newPrice).toLocaleString()}`;
+  const link = `/products/${productId}`;
+
+  // Create in-app notifications for all users
+  const notifications = users.map((u: any) => ({
+    user_id: u.id,
+    type: 'price_drop',
+    title,
+    message,
+    link,
+    is_read: false,
+    created_at: new Date().toISOString(),
+  }));
+
+  await supabase.from('notifications').insert(notifications);
+
+  // Send email notifications via Resend
+  const { Resend } = await import('resend');
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  for (const user of users) {
+    try {
+      await resend.emails.send({
+        from: 'GymBuilder <noreply@gymbuilder.app>',
+        to: user.email,
+        subject: 'Prețul a scăzut la un produs din favoritele tale — GymBuilder',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #1a1a1a;">Prețul a scăzut! 🎉</h2>
+            <p style="color: #333;">Salut${user.name ? ` ${user.name}` : ''},</p>
+            <p style="color: #333;">Un produs din favoritele tale a primit o reducere de preț:</p>
+            <div style="background: #f8f8f8; border-radius: 8px; padding: 16px; margin: 16px 0;">
+              <h3 style="margin: 0 0 8px 0; color: #1a1a1a;">${productName}</h3>
+              <p style="margin: 0; font-size: 14px;">
+                <span style="color: #999; text-decoration: line-through;">€${Number(oldPrice).toLocaleString()}</span>
+                &nbsp;&nbsp;
+                <span style="color: #16a34a; font-weight: bold; font-size: 18px;">€${Number(newPrice).toLocaleString()}</span>
+              </p>
+              <p style="margin: 8px 0 0 0; color: #16a34a; font-size: 13px;">Economisești €${Number(oldPrice - newPrice).toLocaleString()}!</p>
+            </div>
+            <a href="https://gymbuilder.app/products/${productId}" style="display: inline-block; background: #d4a843; color: #1a1a1a; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 8px;">Vezi Produsul</a>
+            <p style="color: #999; font-size: 12px; margin-top: 24px;">Primești acest email pentru că ai adăugat acest produs la favorite pe GymBuilder.</p>
+          </div>
+        `,
+      });
+    } catch (emailErr) {
+      console.error(`Failed to send price drop email to ${user.email}:`, emailErr);
+    }
   }
 }
 
