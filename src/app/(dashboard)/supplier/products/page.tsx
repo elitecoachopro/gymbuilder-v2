@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Dumbbell, Plus, Pencil, Trash2, Loader2, Package, ArrowLeft, Eye, EyeOff, CheckCircle, LogOut, X, Save, PackagePlus, Upload, Download, AlertTriangle, FileSpreadsheet } from 'lucide-react';
+import { Dumbbell, Plus, Pencil, Trash2, Loader2, Package, ArrowLeft, Eye, EyeOff, CheckCircle, LogOut, X, Save, PackagePlus, Upload, Download, AlertTriangle, FileSpreadsheet, Layers } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -45,6 +45,13 @@ export default function SupplierProductsPage() {
   const [csvPreview, setCsvPreview] = useState<any>(null);
   const [csvLoading, setCsvLoading] = useState(false);
   const [csvImporting, setCsvImporting] = useState(false);
+
+  // Variants state
+  const [variantsProduct, setVariantsProduct] = useState<Product | null>(null);
+  const [variants, setVariants] = useState<{id: string; label: string; price_override: number|null; description_override: string|null; image_url: string|null}[]>([]);
+  const [variantsLoading, setVariantsLoading] = useState(false);
+  const [newVariant, setNewVariant] = useState({ label: '', price_override: '', description_override: '', image_url: '' });
+  const [addingVariant, setAddingVariant] = useState(false);
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast(msg);
@@ -174,6 +181,73 @@ export default function SupplierProductsPage() {
       showToast('Eroare de conexiune.', 'error');
     } finally {
       setEditLoading(false);
+    }
+  }
+
+  // Variants functions
+  async function openVariantsModal(product: Product) {
+    setVariantsProduct(product);
+    setVariantsLoading(true);
+    setVariants([]);
+    setNewVariant({ label: '', price_override: '', description_override: '', image_url: '' });
+    try {
+      const res = await fetch(`/api/supplier/products/variants?product_id=${product.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setVariants(data.variants || []);
+      } else {
+        showToast('Eroare la încărcarea variantelor.', 'error');
+      }
+    } catch {
+      showToast('Eroare de conexiune.', 'error');
+    } finally {
+      setVariantsLoading(false);
+    }
+  }
+
+  async function addVariant() {
+    if (!variantsProduct || !newVariant.label.trim()) return;
+    setAddingVariant(true);
+    try {
+      const res = await fetch('/api/supplier/products/variants', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: variantsProduct.id,
+          label: newVariant.label.trim(),
+          price_override: newVariant.price_override ? Number(newVariant.price_override) : null,
+          description_override: newVariant.description_override.trim() || null,
+          image_url: newVariant.image_url.trim() || null,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setVariants(prev => [...prev, data.variant]);
+        setNewVariant({ label: '', price_override: '', description_override: '', image_url: '' });
+        showToast('✅ Variantă adăugată cu succes!');
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Eroare la adăugare.', 'error');
+      }
+    } catch {
+      showToast('Eroare de conexiune.', 'error');
+    } finally {
+      setAddingVariant(false);
+    }
+  }
+
+  async function deleteVariant(variantId: string) {
+    try {
+      const res = await fetch(`/api/supplier/products/variants?id=${variantId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setVariants(prev => prev.filter(v => v.id !== variantId));
+        showToast('Variantă ștearsă.');
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Eroare la ștergere.', 'error');
+      }
+    } catch {
+      showToast('Eroare de conexiune.', 'error');
     }
   }
 
@@ -405,6 +479,7 @@ export default function SupplierProductsPage() {
                       onToggleStatus={() => toggleStatus(product)}
                       onEdit={() => openEditModal(product)}
                       onDelete={() => setDeleteConfirm(product.id)}
+                      onVariants={() => openVariantsModal(product)}
                     />
                   ))}
                 </div>
@@ -427,6 +502,7 @@ export default function SupplierProductsPage() {
                       onToggleStatus={() => toggleStatus(product)}
                       onEdit={() => openEditModal(product)}
                       onDelete={() => setDeleteConfirm(product.id)}
+                      onVariants={() => openVariantsModal(product)}
                     />
                   ))}
                 </div>
@@ -435,6 +511,125 @@ export default function SupplierProductsPage() {
           </div>
         )}
       </div>
+
+      {/* Variants Management Modal */}
+      {variantsProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl p-6 max-w-lg w-full relative max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setVariantsProduct(null)}
+              className="absolute top-4 right-4 text-anthracite-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
+              <Layers className="w-5 h-5 text-purple-400" />
+              Variante Produs
+            </h3>
+            <p className="text-sm text-anthracite-400 mb-6 truncate">{variantsProduct.name}</p>
+
+            {/* Existing variants list */}
+            {variantsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-gold-400" />
+              </div>
+            ) : variants.length > 0 ? (
+              <div className="space-y-2 mb-6">
+                <p className="text-xs font-medium text-anthracite-300 uppercase tracking-wider">Variante existente ({variants.length}/10)</p>
+                {variants.map(v => (
+                  <div key={v.id} className="flex items-center justify-between bg-anthracite-800 border border-anthracite-700 rounded-lg px-3 py-2">
+                    <div className="flex-1 min-w-0">
+                      <span className="text-sm text-white font-medium">{v.label}</span>
+                      {v.price_override && (
+                        <span className="ml-2 text-xs text-gold-400">&euro;{Number(v.price_override).toLocaleString()}</span>
+                      )}
+                      {v.description_override && (
+                        <p className="text-xs text-anthracite-400 truncate mt-0.5">{v.description_override}</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => deleteVariant(v.id)}
+                      className="p-1.5 rounded text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0 ml-2"
+                      title="Șterge variantă"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-6 mb-6">
+                <Layers className="w-8 h-8 text-anthracite-600 mx-auto mb-2" />
+                <p className="text-sm text-anthracite-400">Nicio variantă adăugată încă.</p>
+                <p className="text-xs text-anthracite-500 mt-1">Adaugă variante precum: dimensiuni, culori, greutăți.</p>
+              </div>
+            )}
+
+            {/* Add new variant form */}
+            {variants.length < 10 && (
+              <div className="border-t border-anthracite-700 pt-4">
+                <p className="text-xs font-medium text-anthracite-300 uppercase tracking-wider mb-3">Adaugă variantă nouă</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-anthracite-400 mb-1">Etichetă / Nume *</label>
+                    <input
+                      type="text"
+                      className="input-field text-sm"
+                      placeholder="ex: 20kg, Roșu, 180cm"
+                      value={newVariant.label}
+                      onChange={(e) => setNewVariant({ ...newVariant, label: e.target.value })}
+                      maxLength={100}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-anthracite-400 mb-1">Preț alternativ (EUR) — opțional</label>
+                    <input
+                      type="number"
+                      className="input-field text-sm"
+                      placeholder="Lasă gol pentru prețul de bază"
+                      value={newVariant.price_override}
+                      onChange={(e) => setNewVariant({ ...newVariant, price_override: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-anthracite-400 mb-1">Descriere alternativă — opțional</label>
+                    <textarea
+                      className="input-field text-sm min-h-[60px] resize-y"
+                      placeholder="Detalii specifice acestei variante..."
+                      value={newVariant.description_override}
+                      onChange={(e) => setNewVariant({ ...newVariant, description_override: e.target.value })}
+                      maxLength={500}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-anthracite-400 mb-1">URL imagine — opțional</label>
+                    <input
+                      type="url"
+                      className="input-field text-sm"
+                      placeholder="https://..."
+                      value={newVariant.image_url}
+                      onChange={(e) => setNewVariant({ ...newVariant, image_url: e.target.value })}
+                    />
+                  </div>
+                  <button
+                    onClick={addVariant}
+                    disabled={addingVariant || !newVariant.label.trim()}
+                    className="w-full py-2.5 rounded-lg bg-purple-500 text-white hover:bg-purple-400 text-sm font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {addingVariant ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Plus className="w-4 h-4" />
+                    )}
+                    Adaugă Variantă
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* CSV Import Modal */}
       {showCsvImport && (
@@ -618,12 +813,14 @@ function ProductCard({
   onToggleStatus,
   onEdit,
   onDelete,
+  onVariants,
 }: {
   product: Product;
   actionLoading: string | null;
   onToggleStatus: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onVariants: () => void;
 }) {
   return (
     <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 flex items-center gap-4">
@@ -662,6 +859,15 @@ function ProductCard({
 
       {/* Actions */}
       <div className="flex items-center gap-1.5 flex-shrink-0">
+        {/* Variants */}
+        <button
+          onClick={onVariants}
+          className="p-2 rounded-lg text-anthracite-400 hover:text-purple-400 hover:bg-purple-400/10 transition-colors"
+          title="Variante"
+        >
+          <Layers className="w-4 h-4" />
+        </button>
+
         {/* Edit */}
         <button
           onClick={onEdit}

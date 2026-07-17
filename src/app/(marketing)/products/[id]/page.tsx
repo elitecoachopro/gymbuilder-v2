@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Package, Send, X, Loader2, Building2, MapPin, Tag, Wrench, Star, ChevronLeft, ChevronRight, ShoppingCart, Check } from 'lucide-react';
+import { ArrowLeft, Package, Send, X, Loader2, Building2, MapPin, Tag, Wrench, Star, ChevronLeft, ChevronRight, ShoppingCart, Check, Layers } from 'lucide-react';
 import { useCartStore, CartProduct } from '@/store/cart';
 
 interface SupplierInfo {
@@ -49,6 +49,14 @@ interface Review {
   created_at: string;
 }
 
+interface Variant {
+  id: string;
+  label: string;
+  price_override: number | null;
+  description_override: string | null;
+  image_url: string | null;
+}
+
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params?.id as string;
@@ -65,10 +73,25 @@ export default function ProductDetailPage() {
   const [formLoading, setFormLoading] = useState(false);
   const [formSuccess, setFormSuccess] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
+  const [variants, setVariants] = useState<Variant[]>([]);
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
 
   useEffect(() => {
-    if (productId) fetchProduct();
+    if (productId) {
+      fetchProduct();
+      fetchVariants();
+    }
   }, [productId]);
+
+  async function fetchVariants() {
+    try {
+      const res = await fetch(`/api/supplier/products/variants?product_id=${productId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setVariants(data.variants || []);
+      }
+    } catch {}
+  }
 
   async function fetchProduct() {
     setLoading(true);
@@ -339,10 +362,60 @@ export default function ProductDetailPage() {
               </div>
             )}
 
+            {/* Variant Selector */}
+            {variants.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-purple-400" />
+                  Variante disponibile
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedVariant(null)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
+                      !selectedVariant
+                        ? 'bg-gold-400/10 border-gold-400/50 text-gold-400'
+                        : 'bg-anthracite-800 border-anthracite-700 text-anthracite-300 hover:border-anthracite-500'
+                    }`}
+                  >
+                    Standard
+                  </button>
+                  {variants.map(v => (
+                    <button
+                      key={v.id}
+                      onClick={() => setSelectedVariant(v)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
+                        selectedVariant?.id === v.id
+                          ? 'bg-purple-500/10 border-purple-400/50 text-purple-400'
+                          : 'bg-anthracite-800 border-anthracite-700 text-anthracite-300 hover:border-anthracite-500'
+                      }`}
+                    >
+                      {v.label}
+                      {v.price_override && (
+                        <span className="ml-1.5 text-xs text-gold-400">€{Number(v.price_override).toLocaleString()}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+                {selectedVariant?.description_override && (
+                  <p className="mt-3 text-sm text-anthracite-300 bg-anthracite-800 border border-anthracite-700 rounded-lg p-3">
+                    {selectedVariant.description_override}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Price */}
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-5 mb-6">
-              <span className="text-3xl font-bold text-gold-400">€{Number(product.price_eur).toLocaleString()}</span>
+              <span className="text-3xl font-bold text-gold-400">
+                €{Number(selectedVariant?.price_override || product.price_eur).toLocaleString()}
+              </span>
               <span className="text-sm text-anthracite-400 ml-2">+ TVA</span>
+              {selectedVariant?.price_override && (
+                <span className="ml-3 text-sm text-anthracite-500 line-through">
+                  €{Number(product.price_eur).toLocaleString()}
+                </span>
+              )}
             </div>
 
             {/* CTA Buttons */}
