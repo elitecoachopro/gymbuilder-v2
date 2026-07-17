@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox, Send, Loader2, MessageSquare } from 'lucide-react';
+import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox, Send, Loader2, MessageSquare, ImagePlus, Trash2, Camera } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import NotificationBell from '@/components/NotificationBell';
 
@@ -50,6 +50,7 @@ interface SlotsData {
 const sidebarLinks = [
   { href: '/supplier/dashboard', label: 'Dashboard', icon: BarChart3, active: true },
   { href: '/supplier/products', label: 'Produsele Mele', icon: Package, active: false },
+  { href: null, label: 'Galerie Foto', icon: Camera, active: false, scrollTo: 'gallery' },
   { href: null, label: 'Promovări', icon: Megaphone, active: false, scrollTo: 'promotions' },
 ];
 
@@ -66,6 +67,12 @@ export default function SupplierDashboard() {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyMessage, setReplyMessage] = useState('');
   const [replySending, setReplySending] = useState(false);
+
+  // Gallery states
+  const [galleryImages, setGalleryImages] = useState<{id: string; image_url: string; caption: string; created_at: string}[]>([]);
+  const [galleryLoading, setGalleryLoading] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const [galleryCaption, setGalleryCaption] = useState('');
 
   // Real data states
   const [loading, setLoading] = useState(true);
@@ -123,6 +130,55 @@ export default function SupplierDashboard() {
     }
     fetchSlots();
   }, []);
+
+  // Gallery functions
+  const fetchGallery = async () => {
+    setGalleryLoading(true);
+    try {
+      const res = await fetch('/api/supplier/gallery');
+      if (res.ok) {
+        const data = await res.json();
+        setGalleryImages(data.images || []);
+      }
+    } catch {} finally { setGalleryLoading(false); }
+  };
+
+  useEffect(() => { fetchGallery(); }, []);
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (galleryImages.length >= 10) { showToast('Limita de 10 imagini a fost atinsă'); return; }
+    setGalleryUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('caption', galleryCaption);
+      const res = await fetch('/api/supplier/gallery', { method: 'POST', body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        setGalleryImages(prev => [data.image, ...prev]);
+        setGalleryCaption('');
+        showToast('Imagine adăugată cu succes!');
+      } else {
+        const err = await res.json();
+        showToast(err.error || 'Eroare la upload');
+      }
+    } catch { showToast('Eroare la upload'); }
+    finally { setGalleryUploading(false); }
+    e.target.value = '';
+  };
+
+  const handleGalleryDelete = async (imageId: string) => {
+    if (!confirm('Sigur vrei să ștergi această imagine?')) return;
+    try {
+      const res = await fetch(`/api/supplier/gallery?id=${imageId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setGalleryImages(prev => prev.filter(img => img.id !== imageId));
+        showToast('Imagine ștearsă');
+      }
+    } catch { showToast('Eroare la ștergere'); }
+  };
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -535,6 +591,52 @@ export default function SupplierDashboard() {
               </div>
             </div>
           )}
+
+          {/* Galerie Foto Section */}
+          <div id="gallery" className="mb-8">
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-3">
+                <Camera className="w-5 h-5 text-gold-400" />
+                <h2 className="text-xl font-bold text-white">Galerie Foto</h2>
+                <span className="text-sm text-anthracite-400">({galleryImages.length}/10)</span>
+              </div>
+              {galleryImages.length < 10 && (
+                <label className="cursor-pointer flex items-center gap-2 px-3 py-2 bg-gold-500/10 border border-gold-500/30 rounded-lg text-gold-400 text-sm hover:bg-gold-500/20 transition-colors">
+                  <ImagePlus className="w-4 h-4" />
+                  {galleryUploading ? 'Se încarcă...' : 'Adaugă Imagine'}
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={handleGalleryUpload} disabled={galleryUploading} />
+                </label>
+              )}
+            </div>
+
+            {galleryLoading ? (
+              <div className="flex items-center justify-center py-8"><Loader2 className="w-5 h-5 animate-spin text-anthracite-400" /></div>
+            ) : galleryImages.length === 0 ? (
+              <div className="text-center py-8 bg-anthracite-800/50 rounded-xl border border-anthracite-700">
+                <Camera className="w-10 h-10 text-anthracite-500 mx-auto mb-3" />
+                <p className="text-anthracite-400 mb-1">Nu ai nicio imagine în galerie</p>
+                <p className="text-anthracite-500 text-sm">Adaugă imagini cu showroom-ul, certificări sau echipa ta (max 10, max 5MB/imagine)</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                {galleryImages.map((img) => (
+                  <div key={img.id} className="relative group rounded-lg overflow-hidden border border-anthracite-700 aspect-square">
+                    <img src={img.image_url} alt={img.caption || 'Galerie'} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <button onClick={() => handleGalleryDelete(img.id)} className="p-2 bg-red-500/80 rounded-full text-white hover:bg-red-600 transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    {img.caption && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-2 py-1">
+                        <p className="text-xs text-white truncate">{img.caption}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Promovează-te Section */}
           <div id="promotions" className="mb-8">

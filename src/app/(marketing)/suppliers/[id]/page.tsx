@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Globe, MapPin, Star, Package, Send, X, Loader2, Building2, Phone, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Globe, MapPin, Star, Package, Send, X, Loader2, Building2, Phone, MessageSquare, Camera } from 'lucide-react';
 
 interface SupplierProfile {
   id: string;
@@ -57,6 +57,9 @@ export default function SupplierProfilePage() {
   const [formSuccess, setFormSuccess] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
 
+  // Gallery state
+  const [galleryImages, setGalleryImages] = useState<{id: string; image_url: string; caption: string; created_at: string}[]>([]);
+
   // Reviews state
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewStats, setReviewStats] = useState({ avgRating: 0, count: 0 });
@@ -70,8 +73,19 @@ export default function SupplierProfilePage() {
     if (supplierId) {
       fetchSupplier();
       fetchReviews();
+      fetchGallery();
     }
   }, [supplierId]);
+
+  async function fetchGallery() {
+    try {
+      const res = await fetch(`/api/supplier/gallery?supplier_id=${supplierId}`);
+      if (res.ok) {
+        const json = await res.json();
+        setGalleryImages(json.images || []);
+      }
+    } catch {}
+  }
 
   async function fetchReviews() {
     try {
@@ -499,6 +513,23 @@ export default function SupplierProfilePage() {
             )}
           </div>
         </div>
+
+        {/* Gallery Section */}
+        {galleryImages.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <Camera className="w-5 h-5 text-gold-400" />
+              <h2 className="text-xl font-bold text-white">Galerie Foto</h2>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+              {galleryImages.map((img) => (
+                <div key={img.id} className="aspect-square rounded-lg overflow-hidden border border-anthracite-700 hover:border-gold-500/50 transition-colors cursor-pointer" onClick={() => window.open(img.image_url, '_blank')}>
+                  <img src={img.image_url} alt={img.caption || 'Galerie'} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Products Section */}
         <div className="mb-8">
