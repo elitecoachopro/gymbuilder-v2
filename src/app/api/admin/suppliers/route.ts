@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
   // Get suppliers with the requested status (no join to avoid FK detection issues)
   const { data: suppliers, error } = await supabase
     .from('supplier_profiles')
-    .select('id, user_id, company_name, country, city, website, phone, description, status, plan, created_at')
+    .select('id, user_id, company_name, country, city, website, phone, description, status, plan, verified, created_at')
     .eq('status', status)
     .order('created_at', { ascending: false });
 
@@ -142,11 +142,34 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const { supplierId, action, reason } = body;
 
-    if (!supplierId || !['approve', 'reject'].includes(action)) {
+    if (!supplierId || !['approve', 'reject', 'verify', 'unverify'].includes(action)) {
       return NextResponse.json(
-        { error: 'Parametri invalizi. Trebuie supplierId si action (approve/reject).' },
+        { error: 'Parametri invalizi. Trebuie supplierId si action (approve/reject/verify/unverify).' },
         { status: 400 }
       );
+    }
+
+    // Handle verify/unverify action
+    if (action === 'verify' || action === 'unverify') {
+      const supabase = getSupabaseAdmin();
+      const { data, error } = await supabase
+        .from('supplier_profiles')
+        .update({ verified: action === 'verify', updated_at: new Date().toISOString() })
+        .eq('id', supplierId)
+        .select('id, company_name, verified')
+        .single();
+
+      if (error) {
+        return NextResponse.json({ error: 'Eroare la actualizare.' }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: action === 'verify'
+          ? `Furnizorul "${data.company_name}" a fost marcat ca verificat.`
+          : `Furnizorul "${data.company_name}" nu mai este verificat.`,
+        supplier: data,
+      });
     }
 
     const supabase = getSupabaseAdmin();

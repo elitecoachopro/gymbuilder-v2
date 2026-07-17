@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, Star, MessageSquare, LogOut } from 'lucide-react';
+import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, Star, MessageSquare, LogOut, BadgeCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Supplier {
@@ -16,6 +16,7 @@ interface Supplier {
   description: string | null;
   status: string;
   plan: string;
+  verified: boolean;
   created_at: string;
   users: { full_name: string; email: string };
 }
@@ -430,6 +431,11 @@ export default function AdminDashboard() {
                       <div className="flex items-center gap-3 mb-2 flex-wrap">
                         <Building2 className="w-5 h-5 text-gold-400 flex-shrink-0" />
                         <h3 className="text-lg font-semibold text-white">{supplier.company_name}</h3>
+                        {supplier.verified && (
+                          <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                            <BadgeCheck className="w-3.5 h-3.5" /> Verificat
+                          </span>
+                        )}
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                           supplier.status === 'pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
                           supplier.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
@@ -469,7 +475,44 @@ export default function AdminDashboard() {
                       )}
                     </div>
 
-                    {/* Actions - only for pending */}
+                    {/* Actions */}
+                    {activeTab === 'approved' && (
+                      <div className="flex gap-2 flex-shrink-0">
+                        <button
+                          onClick={async () => {
+                            setActionLoading(supplier.id);
+                            try {
+                              const res = await fetch('/api/admin/suppliers', {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ supplierId: supplier.id, action: supplier.verified ? 'unverify' : 'verify' }),
+                              });
+                              const data = await res.json();
+                              if (res.ok) {
+                                showToast(data.message);
+                                setSuppliers(prev => prev.map(s => s.id === supplier.id ? { ...s, verified: !s.verified } : s));
+                              } else {
+                                showToast(data.error || 'Eroare.', 'error');
+                              }
+                            } catch { showToast('Eroare de conexiune.', 'error'); }
+                            finally { setActionLoading(null); }
+                          }}
+                          disabled={actionLoading === supplier.id}
+                          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
+                            supplier.verified
+                              ? 'bg-anthracite-700 border border-anthracite-600 text-anthracite-300 hover:text-white'
+                              : 'bg-blue-500/10 border border-blue-500/30 text-blue-400 hover:bg-blue-500/20'
+                          }`}
+                        >
+                          {actionLoading === supplier.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <BadgeCheck className="w-4 h-4" />
+                          )}
+                          {supplier.verified ? 'Revocă Verificare' : 'Marchează ca Verificat'}
+                        </button>
+                      </div>
+                    )}
                     {activeTab === 'pending' && (
                       <div className="flex gap-2 flex-shrink-0">
                         <button

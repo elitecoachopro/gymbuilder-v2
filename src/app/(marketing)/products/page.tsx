@@ -39,6 +39,7 @@ interface Product {
   description?: string;
   images?: string[];
   supplier: string;
+  supplierVerified?: boolean;
 }
 
 // Fallback data when Supabase is not connected
@@ -105,6 +106,7 @@ export default function ProductsPage() {
               description: p.description,
               images: p.images,
               supplier: p.supplier?.company_name || p.supplier_profiles?.company_name || 'Furnizor GymBuilder',
+              supplierVerified: p.supplier?.verified || false,
             }));
             setProducts(mapped);
             setDataSource('api');
@@ -521,7 +523,12 @@ export default function ProductsPage() {
                     <h3 className="text-white font-semibold line-clamp-2 group-hover:text-gold-400 transition-colors">
                       {product.name}
                     </h3>
-                    <p className="text-xs text-anthracite-500">de la {product.supplier}</p>
+                    <p className="text-xs text-anthracite-500 flex items-center gap-1">
+                      de la {product.supplier}
+                      {product.supplierVerified && (
+                        <svg className="w-3 h-3 text-blue-400" fill="currentColor" viewBox="0 0 24 24" aria-label="Furnizor Verificat"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                      )}
+                    </p>
                   </div>
                   </Link>
 

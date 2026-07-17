@@ -6,13 +6,25 @@ import Footer from '@/components/layout/Footer';
 import { Search, MapPin, Star, Filter, Building2, Globe, Phone, ArrowRight, Mail, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-const fallbackSuppliers = [
-  { id: 1, name: 'FitPro Equipment', country: 'România', city: 'București', plan: 'professional', rating: 4.8, products: 45, description: 'Distribuitor oficial Life Fitness și Hammer Strength pentru Europa de Est.' },
-  { id: 2, name: 'GymTech Solutions', country: 'România', city: 'Cluj-Napoca', plan: 'enterprise', rating: 4.9, products: 120, description: 'Soluții complete pentru echiparea sălilor de fitness comerciale.' },
-  { id: 3, name: 'IronWorks RO', country: 'România', city: 'Timișoara', plan: 'starter', rating: 4.5, products: 28, description: 'Echipamente de forță și funcționale la prețuri competitive.' },
-  { id: 4, name: 'Nordic Fitness', country: 'Suedia', city: 'Stockholm', plan: 'professional', rating: 4.7, products: 67, description: 'Importator Technogym și Precor pentru piața nordică și est-europeană.' },
-  { id: 5, name: 'EuroGym Direct', country: 'Germania', city: 'Berlin', plan: 'enterprise', rating: 4.9, products: 200, description: 'Cel mai mare distribuitor de echipamente fitness din Europa Centrală.' },
-  { id: 6, name: 'Fitness Factory', country: 'Polonia', city: 'Varșovia', plan: 'professional', rating: 4.6, products: 89, description: 'Producător și distribuitor de echipamente fitness comerciale.' },
+interface SupplierItem {
+  id: number | string;
+  name: string;
+  country: string;
+  city: string;
+  plan: string;
+  rating: number;
+  products: number;
+  description: string;
+  verified: boolean;
+}
+
+const fallbackSuppliers: SupplierItem[] = [
+  { id: 1, name: 'FitPro Equipment', country: 'România', city: 'București', plan: 'professional', rating: 4.8, products: 45, description: 'Distribuitor oficial Life Fitness și Hammer Strength pentru Europa de Est.', verified: false },
+  { id: 2, name: 'GymTech Solutions', country: 'România', city: 'Cluj-Napoca', plan: 'enterprise', rating: 4.9, products: 120, description: 'Soluții complete pentru echiparea sălilor de fitness comerciale.', verified: false },
+  { id: 3, name: 'IronWorks RO', country: 'România', city: 'Timișoara', plan: 'starter', rating: 4.5, products: 28, description: 'Echipamente de forță și funcționale la prețuri competitive.', verified: false },
+  { id: 4, name: 'Nordic Fitness', country: 'Suedia', city: 'Stockholm', plan: 'professional', rating: 4.7, products: 67, description: 'Importator Technogym și Precor pentru piața nordică și est-europeană.', verified: false },
+  { id: 5, name: 'EuroGym Direct', country: 'Germania', city: 'Berlin', plan: 'enterprise', rating: 4.9, products: 200, description: 'Cel mai mare distribuitor de echipamente fitness din Europa Centrală.', verified: false },
+  { id: 6, name: 'Fitness Factory', country: 'Polonia', city: 'Varșovia', plan: 'professional', rating: 4.6, products: 89, description: 'Producător și distribuitor de echipamente fitness comerciale.', verified: false },
 ];
 
 const countries = ['Toate', 'România', 'Germania', 'Suedia', 'Polonia', 'Italia', 'Spania'];
@@ -20,9 +32,9 @@ const countries = ['Toate', 'România', 'Germania', 'Suedia', 'Polonia', 'Italia
 export default function SuppliersPage() {
   const [activeCountry, setActiveCountry] = useState('Toate');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showContactModal, setShowContactModal] = useState<number | null>(null);
+  const [showContactModal, setShowContactModal] = useState<number | string | null>(null);
   const [toast, setToast] = useState('');
-  const [suppliers, setSuppliers] = useState(fallbackSuppliers);
+  const [suppliers, setSuppliers] = useState<SupplierItem[]>(fallbackSuppliers);
   const [loading, setLoading] = useState(true);
   const [dataSource, setDataSource] = useState<'api' | 'fallback'>('fallback');
 
@@ -39,7 +51,7 @@ export default function SuppliersPage() {
             const mapped = data.suppliers.map((s: any) => ({
               id: s.id, name: s.company_name, country: s.country, city: s.city,
               plan: s.plan || 'free', rating: 4.5, products: 0,
-              description: s.description || '',
+              description: s.description || '', verified: s.verified || false,
             }));
             setSuppliers(mapped);
             setDataSource('api');
@@ -172,7 +184,15 @@ export default function SuppliersPage() {
                   </span>
                 </div>
 
-                <h3 className="text-lg font-semibold text-white mb-1">{supplier.name}</h3>
+                <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
+                  {supplier.name}
+                  {supplier.verified && (
+                    <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30 font-medium" title="Furnizor Verificat">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                      Verificat
+                    </span>
+                  )}
+                </h3>
                 <div className="flex items-center gap-2 text-sm text-anthracite-400 mb-3">
                   <MapPin className="w-3.5 h-3.5" />
                   {supplier.city}, {supplier.country}

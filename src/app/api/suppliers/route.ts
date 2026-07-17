@@ -20,14 +20,13 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('supplier_profiles')
       .select(`
-        id, user_id, company_name, country, city, website, phone, description, logo_url, status, plan, created_at,
-        users!inner(full_name, email, avatar_url)
+        id, user_id, company_name, country, city, website, phone, description, logo_url, status, plan, verified, created_at
       `)
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
       .limit(limit);
 
-    if (country && country !== 'Toate') {
+    if (country && country !== 'Toate' && country !== 'all') {
       query = query.eq('country', country);
     }
 
@@ -39,21 +38,25 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Suppliers fetch error:', error);
-      return NextResponse.json(
-        { error: 'Eroare la încărcarea furnizorilor.' },
-        { status: 500 }
-      );
+      return NextResponse.json({
+        suppliers: [],
+        count: 0,
+        source: 'error',
+        debug: error.message,
+      });
     }
 
     return NextResponse.json({
       suppliers: suppliers || [],
       count: suppliers?.length || 0,
+      source: 'supabase',
     });
   } catch (error) {
     console.error('Suppliers API error:', error);
-    return NextResponse.json(
-      { error: 'Eroare internă.' },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      suppliers: [],
+      count: 0,
+      source: 'error',
+    });
   }
 }

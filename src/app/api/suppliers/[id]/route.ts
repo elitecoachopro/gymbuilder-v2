@@ -24,7 +24,7 @@ export async function GET(
     // Fetch supplier profile (only approved ones are public)
     const { data: supplier, error: supplierError } = await supabase
       .from('supplier_profiles')
-      .select('id, company_name, country, city, description, logo_url, website, phone, plan, created_at')
+      .select('id, company_name, country, city, description, logo_url, website, phone, plan, verified, created_at')
       .eq('id', id)
       .eq('status', 'approved')
       .single();

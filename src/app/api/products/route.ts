@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
       if (supplierIds.length > 0) {
         const { data: suppliers } = await supabase
           .from('supplier_profiles')
-          .select('id, company_name, country, city')
+          .select('id, company_name, country, city, verified')
           .in('id', supplierIds);
 
         const supplierMap = new Map((suppliers || []).map(s => [s.id, s]));
