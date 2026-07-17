@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Dumbbell, Plus, Pencil, Trash2, Loader2, Package, ArrowLeft, Eye, EyeOff, CheckCircle, LogOut, X, Save, PackagePlus } from 'lucide-react';
+import { Dumbbell, Plus, Pencil, Trash2, Loader2, Package, ArrowLeft, Eye, EyeOff, CheckCircle, LogOut, X, Save, PackagePlus, Upload, Download, AlertTriangle, FileSpreadsheet } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -40,6 +40,11 @@ export default function SupplierProductsPage() {
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [editForm, setEditForm] = useState({ name: '', price_eur: '', description: '', category: '', condition: '' });
   const [editLoading, setEditLoading] = useState(false);
+  const [showCsvImport, setShowCsvImport] = useState(false);
+  const [csvContent, setCsvContent] = useState('');
+  const [csvPreview, setCsvPreview] = useState<any>(null);
+  const [csvLoading, setCsvLoading] = useState(false);
+  const [csvImporting, setCsvImporting] = useState(false);
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast(msg);
@@ -332,6 +337,13 @@ export default function SupplierProductsPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowCsvImport(true)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-anthracite-700 text-anthracite-300 hover:text-gold-400 hover:border-gold-400/30 text-sm font-medium transition-colors"
+            >
+              <Upload className="w-4 h-4" />
+              Import CSV
+            </button>
             <Link
               href="/supplier/products/new"
               className="btn-primary px-5 py-2.5 flex items-center gap-2 text-sm"
@@ -423,6 +435,179 @@ export default function SupplierProductsPage() {
           </div>
         )}
       </div>
+
+      {/* CSV Import Modal */}
+      {showCsvImport && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <FileSpreadsheet className="w-5 h-5 text-gold-400" />
+                Import Produse din CSV
+              </h2>
+              <button onClick={() => { setShowCsvImport(false); setCsvPreview(null); setCsvContent(''); }} className="text-anthracite-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Template download */}
+            <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 mb-4">
+              <p className="text-sm text-anthracite-300 mb-2">Descarcă template-ul CSV cu coloanele corecte:</p>
+              <button
+                onClick={() => {
+                  const template = 'nume,descriere,pret,categorie,stare,imagine_url\nBandă de alergare Pro X1,Bandă profesională cu motor 5CP,2500,cardio,nou,https://example.com/img.jpg\nGanteră 20kg,Set gantere hexagonale,150,strength,second-hand,';
+                  const blob = new Blob([template], { type: 'text/csv' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url; a.download = 'template_import_produse.csv'; a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="flex items-center gap-2 text-sm text-gold-400 hover:text-gold-300 font-medium"
+              >
+                <Download className="w-4 h-4" />
+                Descarcă Template CSV
+              </button>
+              <p className="text-xs text-anthracite-500 mt-2">Categorii valide: cardio, strength/forță, functional, accessories/accesorii, wellness, lockers/vestiare, reception/recepție</p>
+              <p className="text-xs text-anthracite-500">Stare: nou/new sau sh/second-hand/used</p>
+            </div>
+
+            {!csvPreview ? (
+              <>
+                {/* File upload */}
+                <div className="border-2 border-dashed border-anthracite-700 rounded-xl p-8 text-center mb-4 hover:border-gold-400/30 transition-colors">
+                  <Upload className="w-8 h-8 text-anthracite-500 mx-auto mb-2" />
+                  <p className="text-sm text-anthracite-300 mb-3">Încarcă fișierul CSV sau lipește conținutul mai jos</p>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => setCsvContent(ev.target?.result as string || '');
+                        reader.readAsText(file);
+                      }
+                    }}
+                    className="text-sm text-anthracite-300"
+                  />
+                </div>
+                <textarea
+                  value={csvContent}
+                  onChange={(e) => setCsvContent(e.target.value)}
+                  placeholder="Sau lipește conținutul CSV aici...\nnume,descriere,pret,categorie,stare,imagine_url\nBandă Pro,Descriere,2500,cardio,nou,https://..."
+                  className="w-full h-32 bg-anthracite-800 border border-anthracite-700 rounded-xl p-3 text-sm text-white placeholder-anthracite-500 font-mono resize-none"
+                />
+                <button
+                  onClick={async () => {
+                    if (!csvContent.trim()) { showToast('Încarcă un fișier CSV sau lipește conținutul.', 'error'); return; }
+                    setCsvLoading(true);
+                    try {
+                      const res = await fetch('/api/supplier/products/import', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ csvContent, confirm: false }),
+                      });
+                      const data = await res.json();
+                      if (!res.ok) { showToast(data.error || 'Eroare la validare.', 'error'); return; }
+                      setCsvPreview(data);
+                    } catch { showToast('Eroare la validare.', 'error'); }
+                    finally { setCsvLoading(false); }
+                  }}
+                  disabled={csvLoading || !csvContent.trim()}
+                  className="w-full mt-4 btn-primary py-3 flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {csvLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />}
+                  Validează și Previzualizează
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Preview results */}
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">
+                      <span className="text-green-400 text-sm font-medium">✓ {csvPreview.valid} valide</span>
+                    </div>
+                    {csvPreview.invalid > 0 && (
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                        <span className="text-red-400 text-sm font-medium">✗ {csvPreview.invalid} cu erori</span>
+                      </div>
+                    )}
+                    <span className="text-anthracite-400 text-sm">din {csvPreview.total} rânduri total</span>
+                  </div>
+
+                  {/* Valid rows preview */}
+                  {csvPreview.validRows?.length > 0 && (
+                    <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-3 max-h-40 overflow-y-auto">
+                      <p className="text-xs text-anthracite-400 mb-2 font-medium">Produse valide:</p>
+                      {csvPreview.validRows.slice(0, 10).map((r: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between py-1 border-b border-anthracite-700/50 last:border-0">
+                          <span className="text-sm text-white">{r.data.name}</span>
+                          <span className="text-sm text-gold-400">€{r.data.price_eur.toLocaleString()}</span>
+                        </div>
+                      ))}
+                      {csvPreview.validRows.length > 10 && (
+                        <p className="text-xs text-anthracite-500 mt-1">...și încă {csvPreview.validRows.length - 10} produse</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Error rows */}
+                  {csvPreview.invalidRows?.length > 0 && (
+                    <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-3 max-h-40 overflow-y-auto">
+                      <p className="text-xs text-red-400 mb-2 font-medium flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" /> Rânduri cu erori (nu se vor importa):
+                      </p>
+                      {csvPreview.invalidRows.map((r: any, i: number) => (
+                        <div key={i} className="py-1 border-b border-red-500/10 last:border-0">
+                          <span className="text-xs text-anthracite-400">Rândul {r.rowIndex}:</span>
+                          {r.errors.map((err: string, j: number) => (
+                            <p key={j} className="text-xs text-red-300 ml-2">• {err}</p>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => { setCsvPreview(null); }}
+                    className="flex-1 py-3 rounded-xl border border-anthracite-700 text-anthracite-300 hover:text-white text-sm font-medium transition-colors"
+                  >
+                    ← Înapoi
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setCsvImporting(true);
+                      try {
+                        const res = await fetch('/api/supplier/products/import', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ csvContent, confirm: true }),
+                        });
+                        const data = await res.json();
+                        if (!res.ok) { showToast(data.error || 'Eroare la import.', 'error'); return; }
+                        showToast(data.message, 'success');
+                        setShowCsvImport(false);
+                        setCsvPreview(null);
+                        setCsvContent('');
+                        fetchProducts();
+                      } catch { showToast('Eroare la import.', 'error'); }
+                      finally { setCsvImporting(false); }
+                    }}
+                    disabled={csvImporting || csvPreview.valid === 0}
+                    className="flex-1 btn-primary py-3 flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {csvImporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                    Importă {csvPreview.valid} Produse
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   );
 }
