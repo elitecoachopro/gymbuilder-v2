@@ -17,5 +17,9 @@ export async function verifyPassword(password: string, storedHash: string): Prom
   const [salt, hash] = storedHash.split(':');
   if (!salt || !hash) return false;
   const verifyHash = crypto.pbkdf2Sync(password, salt, ITERATIONS, KEY_LENGTH, DIGEST).toString('hex');
-  return hash === verifyHash;
+  // Use constant-time comparison to prevent timing attacks
+  const hashBuf = Buffer.from(hash, 'hex');
+  const verifyBuf = Buffer.from(verifyHash, 'hex');
+  if (hashBuf.length !== verifyBuf.length) return false;
+  return crypto.timingSafeEqual(hashBuf, verifyBuf);
 }

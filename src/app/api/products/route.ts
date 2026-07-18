@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { sanitizePostgrestSearch } from '@/lib/sanitize';
 
 function getSupabaseAdmin() {
   return createClient(
@@ -44,7 +45,8 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
-      query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
+      const safeSearch = sanitizePostgrestSearch(search);
+      query = query.or(`name.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%`);
     }
 
     const { data: products, error } = await query;

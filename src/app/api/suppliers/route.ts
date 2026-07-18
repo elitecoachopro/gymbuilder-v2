@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { sanitizePostgrestSearch } from '@/lib/sanitize';
 
 function getSupabaseAdmin() {
   return createClient(
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('supplier_profiles')
       .select(`
-        id, user_id, company_name, country, city, website, phone, description, logo_url, status, plan, verified, created_at
+        id, company_name, country, city, website, phone, description, logo_url, status, plan, verified, created_at
       `)
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
@@ -31,7 +32,8 @@ export async function GET(request: NextRequest) {
     }
 
     if (search) {
-      query = query.or(`company_name.ilike.%${search}%,description.ilike.%${search}%,city.ilike.%${search}%`);
+      const safeSearch = sanitizePostgrestSearch(search);
+      query = query.or(`company_name.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%,city.ilike.%${safeSearch}%`);
     }
 
     const { data: suppliers, error } = await query;

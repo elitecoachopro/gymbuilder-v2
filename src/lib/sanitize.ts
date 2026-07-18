@@ -113,6 +113,23 @@ export function sanitizeObject<T extends Record<string, unknown>>(obj: T): T {
 }
 
 /**
+ * Sanitize search input for PostgREST filter interpolation.
+ * Escapes characters that have special meaning in PostgREST filter syntax:
+ * commas (,), parentheses (()), periods (.), and percent signs (%).
+ */
+export function sanitizePostgrestSearch(input: string): string {
+  if (!input || typeof input !== 'string') return '';
+  return input
+    .replace(/\\/g, '\\\\')  // escape backslashes first
+    .replace(/,/g, '\\,')     // commas separate filter arguments
+    .replace(/\(/g, '\\(')    // opening parenthesis
+    .replace(/\)/g, '\\)')    // closing parenthesis
+    .replace(/\./g, '\\.')    // dots separate column names
+    .trim()
+    .slice(0, 200);            // limit length
+}
+
+/**
  * Check if a string contains potential SQL injection patterns
  * (Defense-in-depth - Supabase already uses parameterized queries)
  */
