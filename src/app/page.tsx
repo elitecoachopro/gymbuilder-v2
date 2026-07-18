@@ -28,6 +28,7 @@ export default function HomePage() {
   const [ofertaZilei, setOfertaZilei] = useState<OfertaZilei | null>(null);
   const [anunturiZilei, setAnunturiZilei] = useState<AnuntZilei[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<{ products: number; suppliers: number; brands: number }>({ products: 0, suppliers: 0, brands: 0 });
 
   useEffect(() => {
     async function fetchPromotions() {
@@ -44,7 +45,17 @@ export default function HomePage() {
         setLoading(false);
       }
     }
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/stats');
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data);
+        }
+      } catch {}
+    }
     fetchPromotions();
+    fetchStats();
   }, []);
 
   return (
@@ -128,15 +139,15 @@ export default function HomePage() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-8 mt-16 max-w-lg mx-auto">
               <div>
-                <div className="text-3xl font-bold text-gold-400">500+</div>
+                <div className="text-3xl font-bold text-gold-400">{stats.products}</div>
                 <div className="text-sm text-anthracite-400 mt-1">Produse</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-gold-400">50+</div>
+                <div className="text-3xl font-bold text-gold-400">{stats.suppliers}</div>
                 <div className="text-sm text-anthracite-400 mt-1">Furnizori</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-gold-400">16+</div>
+                <div className="text-3xl font-bold text-gold-400">{stats.brands}</div>
                 <div className="text-sm text-anthracite-400 mt-1">Branduri</div>
               </div>
             </div>
