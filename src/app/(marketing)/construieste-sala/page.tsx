@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Building2, ArrowRight, DoorOpen, Lock, Heart, Dumbbell, Cog, Swords, Music, StretchHorizontal, Waves, Coffee, Calculator } from 'lucide-react';
 
@@ -121,7 +120,6 @@ const gymZones = [
 export default function ConstruiesteSalaPage() {
   return (
     <main className="min-h-screen">
-      <Navbar />
 
       {/* Hero */}
       <section className="relative pt-28 pb-12 px-4 overflow-hidden">

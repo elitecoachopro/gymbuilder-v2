@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import GlobalHeader from '@/components/layout/GlobalHeader';
 
 export const metadata: Metadata = {
   title: 'GymBuilder - Premium Gym Equipment Marketplace',
@@ -17,7 +18,10 @@ export default function RootLayout({
   return (
     <html lang="ro" className="dark">
       <body className="min-h-screen bg-anthracite-950 text-white antialiased">
-        {children}
+        <GlobalHeader />
+        <div className="pt-16">
+          {children}
+        </div>
       </body>
     </html>
   );

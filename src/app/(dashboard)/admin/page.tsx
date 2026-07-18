@@ -430,14 +430,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-anthracite-900 border-r border-anthracite-800 p-6 hidden lg:block">
-        <Link href="/" className="flex items-center gap-2 mb-10">
-          <Dumbbell className="w-7 h-7 text-gold-400" />
-          <span className="text-lg font-bold">
-            <span className="text-white">Gym</span>
-            <span className="text-gold-400">Builder</span>
-          </span>
-        </Link>
+      <aside className="fixed left-0 top-16 bottom-0 w-64 bg-anthracite-900 border-r border-anthracite-800 p-6 hidden lg:block overflow-y-auto">
 
         <nav className="space-y-1">
           {sidebarLinks.map((link) => (

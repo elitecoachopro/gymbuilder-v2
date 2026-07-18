@@ -1,6 +1,5 @@
 'use client';
 
-import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { MessageSquare, CheckCircle2, Clock, Users, Target, Lightbulb } from 'lucide-react';
 import { useState } from 'react';
@@ -61,7 +60,6 @@ export default function ConsultationPage() {
 
   return (
     <main className="min-h-screen">
-      <Navbar />
 
       <section className="pt-32 pb-16 px-4">
         <div className="max-w-7xl mx-auto">

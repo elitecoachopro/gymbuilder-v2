@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Search, Dumbbell, Heart, SlidersHorizontal, Mail, Loader2, X, RotateCcw, ChevronDown, ChevronUp, GitCompareArrows } from 'lucide-react';
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
@@ -242,7 +241,6 @@ export default function ProductsPage() {
 
   return (
     <main className="min-h-screen">
-      <Navbar />
 
       {/* Toast */}
       {toast && (

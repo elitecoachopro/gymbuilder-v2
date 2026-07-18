@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Search, MapPin, Star, Filter, Building2, Globe, Phone, ArrowRight, Mail, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -79,7 +78,6 @@ export default function SuppliersPage() {
 
   return (
     <main className="min-h-screen">
-      <Navbar />
 
       {/* Toast */}
       {toast && (

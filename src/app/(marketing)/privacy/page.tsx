@@ -1,12 +1,10 @@
 'use client';
 
-import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 
 export default function PrivacyPage() {
   return (
     <main className="min-h-screen">
-      <Navbar />
 
       <section className="pt-32 pb-16 px-4">
         <div className="max-w-3xl mx-auto">

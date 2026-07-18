@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Search, Heart, MessageSquare, Star, Building2, Package, Loader2, Dumbbell, Clock, Send, CheckCircle, ArrowRight, Trash2, LogOut, ChevronDown, ChevronUp, LayoutGrid, Home } from 'lucide-react';
+import { Search, Heart, MessageSquare, Star, Building2, Package, Loader2, Dumbbell, Clock, Send, CheckCircle, ArrowRight, Trash2, LogOut, ChevronDown, ChevronUp, LayoutGrid } from 'lucide-react';
 import NotificationBell from '@/components/NotificationBell';
 
 interface ContactRequest {
@@ -165,13 +165,6 @@ export default function ClientDashboard() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <NotificationBell />
-            <Link
-              href="/"
-              className="flex items-center gap-2 px-4 py-3 rounded-lg border border-anthracite-700 text-anthracite-300 hover:text-gold-400 hover:border-gold-400/30 text-sm font-medium transition-colors"
-            >
-              <Home className="w-4 h-4" />
-              Homepage
-            </Link>
             <Link
               href="/configurator"
               className="flex items-center gap-2 bg-indigo-500 text-white font-bold px-5 py-3 rounded-lg hover:bg-indigo-400 transition-colors"

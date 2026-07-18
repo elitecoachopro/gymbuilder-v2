@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { useCompareStore } from '@/store/compare';
 import { GitCompareArrows, X, Package, ArrowLeft, Loader2, Star } from 'lucide-react';
@@ -110,7 +109,6 @@ export default function ComparePage() {
   if (!mounted) {
     return (
       <main className="min-h-screen bg-anthracite-950">
-        <Navbar />
         <div className="pt-24 pb-16 flex items-center justify-center">
           <Loader2 className="w-8 h-8 text-gold-400 animate-spin" />
         </div>
@@ -120,7 +118,6 @@ export default function ComparePage() {
 
   return (
     <main className="min-h-screen bg-anthracite-950">
-      <Navbar />
 
       <section className="pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">

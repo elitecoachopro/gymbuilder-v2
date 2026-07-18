@@ -1,6 +1,5 @@
 'use client';
 
-import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -8,7 +7,6 @@ import { ArrowLeft } from 'lucide-react';
 export default function AboutPage() {
   return (
     <main className="min-h-screen">
-      <Navbar />
 
       <section className="pt-32 pb-20 px-4">
         <div className="max-w-3xl mx-auto">

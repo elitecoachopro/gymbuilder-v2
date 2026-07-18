@@ -1,6 +1,5 @@
 'use client';
 
-import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import { Check, X, Star, Zap, Crown, Rocket, Building2 } from 'lucide-react';
@@ -106,7 +105,6 @@ const plans = [
 export default function PricingPage() {
   return (
     <main className="min-h-screen">
-      <Navbar />
 
       <section className="pt-32 pb-16 px-4">
         <div className="max-w-7xl mx-auto text-center">

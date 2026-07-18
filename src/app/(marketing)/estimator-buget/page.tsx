@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Calculator, ArrowLeft, ArrowRight, CheckCircle, Save, Loader2, Building2, Ruler, Target } from 'lucide-react';
 
@@ -208,7 +207,6 @@ export default function BudgetEstimatorPage() {
 
   return (
     <main className="min-h-screen bg-anthracite-950">
-      <Navbar />
 
       <section className="pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">

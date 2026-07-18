@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Star, ArrowRight, Flame, Dumbbell, Megaphone, Loader2, Sparkles, RefreshCw, Building2 } from 'lucide-react';
 
@@ -60,7 +59,6 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen">
-      <Navbar />
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-4 overflow-hidden">
