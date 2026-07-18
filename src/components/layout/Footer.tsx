@@ -79,12 +79,15 @@ export default function Footer() {
           <p className="text-anthracite-500 text-sm">
             &copy; {new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
           </p>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-4 md:gap-6">
             <Link href="/terms" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
               Termeni & Condiții
             </Link>
             <Link href="/privacy" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
               Politica de Confidențialitate
+            </Link>
+            <Link href="/cookie-policy" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
+              Politica de Cookie-uri
             </Link>
           </div>
         </div>

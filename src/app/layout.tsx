@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import GlobalHeader from '@/components/layout/GlobalHeader';
+import CookieConsent from '@/components/CookieConsent';
 
 export const metadata: Metadata = {
   title: 'GymBuilder - Premium Gym Equipment Marketplace',
@@ -22,6 +23,7 @@ export default function RootLayout({
         <div className="pt-16">
           {children}
         </div>
+        <CookieConsent />
       </body>
     </html>
   );
