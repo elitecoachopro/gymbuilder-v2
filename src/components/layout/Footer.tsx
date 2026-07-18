@@ -42,6 +42,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li><Link href="/cum-functioneaza" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Cum Funcționează</Link></li>
               <li><Link href="/about" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Despre Noi</Link></li>
+              <li><Link href="/faq" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Întrebări Frecvente</Link></li>
               <li><Link href="/register/supplier" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Devino Furnizor</Link></li>
               <li><Link href="/register/client" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Înregistrare Client</Link></li>
             </ul>
