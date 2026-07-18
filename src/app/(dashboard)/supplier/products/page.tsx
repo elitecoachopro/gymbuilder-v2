@@ -823,9 +823,9 @@ function ProductCard({
   onVariants: () => void;
 }) {
   return (
-    <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 flex items-center gap-4">
+    <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4">
       {/* Image */}
-      <div className="w-16 h-16 rounded-lg bg-anthracite-700 flex-shrink-0 overflow-hidden flex items-center justify-center">
+      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-anthracite-700 flex-shrink-0 overflow-hidden flex items-center justify-center">
         {product.images && product.images.length > 0 ? (
           <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
         ) : (
@@ -836,14 +836,13 @@ function ProductCard({
       {/* Info */}
       <div className="flex-1 min-w-0">
         <h3 className="text-white font-medium text-sm truncate">{product.name}</h3>
-        <div className="flex items-center gap-3 mt-1">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
           <span className="text-xs text-anthracite-400">{categoryLabels[product.category] || product.category}</span>
-          <span className="text-xs text-anthracite-600">&bull;</span>
+          <span className="text-xs text-anthracite-600 hidden sm:inline">&bull;</span>
           <span className="text-xs text-anthracite-400">{product.condition === 'new' ? 'Nou' : 'Second-hand'}</span>
-          <span className="text-xs text-anthracite-600">&bull;</span>
-          <span className="text-xs text-gold-400 font-medium">&euro;{Number(product.price_eur).toLocaleString()}</span>
         </div>
-        <div className="flex items-center gap-3 mt-1">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+          <span className="text-xs text-gold-400 font-medium">&euro;{Number(product.price_eur).toLocaleString()}</span>
           <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium ${
             product.status === 'active' || product.status === 'featured'
               ? 'bg-emerald-500/10 text-emerald-400'
@@ -858,7 +857,7 @@ function ProductCard({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1.5 flex-shrink-0">
+      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0 w-full sm:w-auto justify-end mt-2 sm:mt-0 border-t border-anthracite-700 sm:border-0 pt-2 sm:pt-0">
         {/* Variants */}
         <button
           onClick={onVariants}
