@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox, Send, Loader2, MessageSquare, ImagePlus, Trash2, Camera, ArrowUpRight, ArrowDownRight, Minus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox, Send, Loader2, MessageSquare, ImagePlus, Trash2, Camera, ArrowUpRight, ArrowDownRight, Minus, ChevronDown, ChevronUp, LayoutGrid } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import NotificationBell from '@/components/NotificationBell';
 
@@ -53,6 +53,7 @@ const sidebarLinks = [
   { href: null, label: 'Analytics', icon: TrendingUp, active: false, scrollTo: 'analytics' },
   { href: null, label: 'Galerie Foto', icon: Camera, active: false, scrollTo: 'gallery' },
   { href: null, label: 'Promovări', icon: Megaphone, active: false, scrollTo: 'promotions' },
+  { href: '/configurator', label: 'Configurator Sală', icon: LayoutGrid, active: false },
 ];
 
 export default function SupplierDashboard() {

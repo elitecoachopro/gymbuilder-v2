@@ -173,7 +173,7 @@ export default function ClientDashboard() {
               Homepage
             </Link>
             <Link
-              href="/client/configurator"
+              href="/configurator"
               className="flex items-center gap-2 bg-indigo-500 text-white font-bold px-5 py-3 rounded-lg hover:bg-indigo-400 transition-colors"
             >
               <LayoutGrid className="w-4 h-4" />
