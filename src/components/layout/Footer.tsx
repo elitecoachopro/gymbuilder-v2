@@ -8,7 +8,7 @@ export default function Footer() {
   return (
     <footer className="bg-anthracite-950 border-t border-anthracite-800 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
@@ -36,13 +36,14 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Account */}
+          {/* Companie */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Cont</h4>
+            <h4 className="text-white font-semibold mb-4">Companie</h4>
             <ul className="space-y-3">
+              <li><Link href="/cum-functioneaza" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Cum Funcționează</Link></li>
+              <li><Link href="/about" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Despre Noi</Link></li>
               <li><Link href="/register/supplier" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Devino Furnizor</Link></li>
               <li><Link href="/register/client" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Înregistrare Client</Link></li>
-              <li><Link href="/login" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Autentificare</Link></li>
             </ul>
           </div>
 
