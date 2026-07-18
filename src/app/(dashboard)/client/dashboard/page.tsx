@@ -165,13 +165,14 @@ export default function ClientDashboard() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <NotificationBell />
-            <Link
+{/* Configurator Sală - hidden temporarily, code preserved on develop */}
+            {false && <Link
               href="/configurator"
               className="flex items-center gap-2 bg-indigo-500 text-white font-bold px-5 py-3 rounded-lg hover:bg-indigo-400 transition-colors"
             >
               <LayoutGrid className="w-4 h-4" />
               Configurator Sală
-            </Link>
+            </Link>}
             <Link
               href="/products"
               className="flex items-center gap-2 bg-gold-400 text-anthracite-950 font-bold px-5 py-3 rounded-lg hover:bg-gold-300 transition-colors"

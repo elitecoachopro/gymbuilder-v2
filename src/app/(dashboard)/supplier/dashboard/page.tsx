@@ -53,7 +53,7 @@ const sidebarLinks = [
   { href: null, label: 'Analytics', icon: TrendingUp, active: false, scrollTo: 'analytics' },
   { href: null, label: 'Galerie Foto', icon: Camera, active: false, scrollTo: 'gallery' },
   { href: null, label: 'Promovări', icon: Megaphone, active: false, scrollTo: 'promotions' },
-  { href: '/configurator', label: 'Configurator Sală', icon: LayoutGrid, active: false },
+  // { href: '/configurator', label: 'Configurator Sală', icon: LayoutGrid, active: false }, // HIDDEN temporarily
 ];
 
 export default function SupplierDashboard() {
@@ -376,12 +376,13 @@ export default function SupplierDashboard() {
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <NotificationBell />
-              <Link
+{/* Configurator Sală - hidden temporarily */}
+              {false && <Link
                 href="/configurator"
                 className="flex items-center gap-2 bg-indigo-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-indigo-400 transition-colors text-sm"
               >
                 <LayoutGrid className="w-4 h-4" /> Configurator Sală
-              </Link>
+              </Link>}
               <Link href="/supplier/products/new" className="btn-primary flex items-center gap-2">
                 <Plus className="w-4 h-4" /> Adaugă Produs
               </Link>
