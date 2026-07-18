@@ -12,6 +12,23 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#x27;');
 }
 
+// Validate file by checking magic bytes (binary signature)
+function validateMagicBytes(buffer: Buffer): boolean {
+  if (buffer.length < 8) return false;
+  // JPEG
+  if (buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF) return true;
+  // PNG
+  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47 &&
+      buffer[4] === 0x0D && buffer[5] === 0x0A && buffer[6] === 0x1A && buffer[7] === 0x0A) return true;
+  // WebP
+  if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 &&
+      buffer.length >= 12 && buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50) return true;
+  // GIF
+  if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x38 &&
+      (buffer[4] === 0x37 || buffer[4] === 0x39) && buffer[5] === 0x61) return true;
+  return false;
+}
+
 function getSupabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -70,6 +87,9 @@ async function uploadImage(supabase: any, base64Data: string, supplierId: string
     const data = match[2];
     const ext = mimeType.split('/')[1] || 'jpg';
     const buffer = Buffer.from(data, 'base64');
+
+    // Validate magic bytes
+    if (!validateMagicBytes(buffer)) return null;
 
     // Max 5MB
     if (buffer.length > 5 * 1024 * 1024) return null;

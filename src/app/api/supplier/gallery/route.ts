@@ -3,6 +3,27 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import * as crypto from 'crypto';
 
+// Validate file by checking magic bytes (binary signature)
+function validateMagicBytes(buffer: Buffer): { valid: boolean; detectedType: string | null } {
+  if (buffer.length < 8) return { valid: false, detectedType: null };
+  if (buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF) {
+    return { valid: true, detectedType: 'image/jpeg' };
+  }
+  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47 &&
+      buffer[4] === 0x0D && buffer[5] === 0x0A && buffer[6] === 0x1A && buffer[7] === 0x0A) {
+    return { valid: true, detectedType: 'image/png' };
+  }
+  if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 &&
+      buffer.length >= 12 && buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50) {
+    return { valid: true, detectedType: 'image/webp' };
+  }
+  if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x38 &&
+      (buffer[4] === 0x37 || buffer[4] === 0x39) && buffer[5] === 0x61) {
+    return { valid: true, detectedType: 'image/gif' };
+  }
+  return { valid: false, detectedType: null };
+}
+
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -139,6 +160,15 @@ export async function POST(request: NextRequest) {
 
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
+
+  // Validate magic bytes (real file signature)
+  const magicCheck = validateMagicBytes(buffer);
+  if (!magicCheck.valid) {
+    return NextResponse.json(
+      { error: 'Fișierul nu este o imagine validă. Semnătura binară nu corespunde unui format acceptat (JPEG, PNG, WebP, GIF).' },
+      { status: 400 }
+    );
+  }
 
   const { error: uploadError } = await supabase.storage
     .from('supplier-assets')
