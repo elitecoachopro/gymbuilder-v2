@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limiting: 5 requests per minute per IP
     const ip = getClientIP(request);
-    const allowed = checkRateLimit(`contact:${ip}`, 5, 60000);
-    if (!allowed) {
-      return rateLimitResponse();
+    const result = checkRateLimit(`contact:${ip}`, { maxRequests: 5, windowMs: 60000 });
+    if (!result.allowed) {
+      return rateLimitResponse(result.resetTime);
     }
 
     const body = await request.json();
