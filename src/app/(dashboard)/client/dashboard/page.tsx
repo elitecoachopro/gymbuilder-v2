@@ -431,6 +431,42 @@ export default function ClientDashboard() {
             </div>
           )}
         </section>
+
+        {/* Setări Cont */}
+        <section className="mt-10 bg-anthracite-900 border border-anthracite-800 rounded-2xl p-6">
+          <h3 className="text-lg font-bold text-white mb-4">Setări Cont</h3>
+          <div className="border border-red-500/20 bg-red-500/5 rounded-xl p-5">
+            <h4 className="text-sm font-semibold text-red-400 mb-2">Ștergerea contului</h4>
+            <p className="text-anthracite-400 text-xs leading-relaxed mb-4">
+              Conform GDPR Art. 17, ai dreptul de a solicita ștergerea completă a contului și a tuturor datelor personale asociate. 
+              Cererea va fi procesată în maxim 30 de zile. Această acțiune este ireversibilă.
+            </p>
+            <button
+              onClick={async () => {
+                if (!confirm('Ești sigur că vrei să soliciți ștergerea contului? Această acțiune este ireversibilă și toate datele tale vor fi șterse permanent.')) return;
+                const reason = prompt('Motiv (opțional):') || '';
+                try {
+                  const res = await fetch('/api/account/delete-request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason }),
+                  });
+                  const data = await res.json();
+                  if (res.ok) {
+                    alert(data.message || 'Cererea a fost înregistrată.');
+                  } else {
+                    alert(data.error || 'Eroare la trimiterea cererii.');
+                  }
+                } catch {
+                  alert('Eroare de conexiune.');
+                }
+              }}
+              className="px-4 py-2 text-sm font-medium text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition-colors"
+            >
+              Solicită ștergerea contului
+            </button>
+          </div>
+        </section>
       </div>
     </main>
   );
