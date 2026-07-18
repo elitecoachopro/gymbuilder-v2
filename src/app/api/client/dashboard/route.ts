@@ -16,12 +16,13 @@ async function getClientUser(request: NextRequest): Promise<{ id: string; email:
   if (!sessionToken) return null;
 
   try {
-    const [payload, signature] = sessionToken.split('.');
+    const [payloadB64, signature] = sessionToken.split('.');
     const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || '';
-    const expected = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
+    const decodedPayload = Buffer.from(payloadB64, 'base64').toString();
+    const expected = crypto.createHmac('sha256', secret).update(decodedPayload).digest('hex');
     if (signature !== expected) return null;
 
-    const data = JSON.parse(Buffer.from(payload, 'base64').toString());
+    const data = JSON.parse(decodedPayload);
     if (data.exp && data.exp < Date.now()) return null;
 
     const supabase = getSupabase();
