@@ -2,29 +2,14 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Dumbbell, Mail, Phone, MapPin, Send, Loader2, CheckCircle } from 'lucide-react';
+import { Dumbbell, Send, Loader2, CheckCircle } from 'lucide-react';
 
 export default function Footer() {
   return (
     <footer className="bg-anthracite-950 border-t border-anthracite-800 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
-          {/* Brand */}
-          <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Dumbbell className="w-7 h-7 text-gold-400" />
-              <span className="text-lg font-bold">
-                <span className="text-white">Gym</span>
-                <span className="text-gold-400">Builder</span>
-              </span>
-            </Link>
-            <p className="text-anthracite-400 text-sm leading-relaxed">
-              Platforma completă pentru echipamente de fitness comerciale. 
-              Conectăm furnizori verificați cu proprietari de săli.
-            </p>
-          </div>
-
-          {/* Platform */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+          {/* Platformă */}
           <div>
             <h4 className="text-white font-semibold mb-4">Platformă</h4>
             <ul className="space-y-3">
@@ -32,7 +17,7 @@ export default function Footer() {
               <li><Link href="/suppliers" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Furnizori</Link></li>
               <li><Link href="/pricing" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Pachete & Prețuri</Link></li>
               <li><Link href="/consultation" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Consultanță</Link></li>
-              <li><Link href="/contact" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Contact</Link></li>
+              <li><Link href="/blog" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Blog</Link></li>
             </ul>
           </div>
 
@@ -40,33 +25,35 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">Companie</h4>
             <ul className="space-y-3">
-              <li><Link href="/cum-functioneaza" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Cum Funcționează</Link></li>
               <li><Link href="/about" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Despre Noi</Link></li>
+              <li><Link href="/cum-functioneaza" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Cum Funcționează</Link></li>
               <li><Link href="/faq" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Întrebări Frecvente</Link></li>
-              <li><Link href="/register/supplier" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Devino Furnizor</Link></li>
-              <li><Link href="/register/client" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Înregistrare Client</Link></li>
+              <li><Link href="/contact" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Contact</Link></li>
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Cont */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Contact</h4>
+            <h4 className="text-white font-semibold mb-4">Cont</h4>
             <ul className="space-y-3">
+              <li><Link href="/register/supplier" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Devino Furnizor</Link></li>
+              <li><Link href="/register/client" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Înregistrare Client</Link></li>
+              <li><Link href="/login" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Autentificare</Link></li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h4 className="text-white font-semibold mb-4">Legal</h4>
+            <ul className="space-y-3">
+              <li><Link href="/terms" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Termeni și Condiții</Link></li>
+              <li><Link href="/privacy" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Politica de Confidențialitate</Link></li>
+              <li><Link href="/cookie-policy" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Politica de Cookie-uri</Link></li>
+              <li><Link href="/return-policy" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Politica de Retur/Anulare</Link></li>
               <li>
-                <a href="mailto:contact@gymbuilder.app" className="flex items-center gap-2 text-anthracite-400 hover:text-gold-400 text-sm transition-colors">
-                  <Mail className="w-4 h-4 text-gold-400" />
-                  contact@gymbuilder.app
-                </a>
-              </li>
-              <li>
-                <a href="tel:+40700000000" className="flex items-center gap-2 text-anthracite-400 hover:text-gold-400 text-sm transition-colors">
-                  <Phone className="w-4 h-4 text-gold-400" />
-                  +40 700 000 000
-                </a>
-              </li>
-              <li className="flex items-center gap-2 text-anthracite-400 text-sm">
-                <MapPin className="w-4 h-4 text-gold-400" />
-                București, România
+                <a href="https://www.anpc.gov.ro" target="_blank" rel="noopener noreferrer" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">ANPC</a>
+                {' / '}
+                <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">SOL</a>
               </li>
             </ul>
           </div>
@@ -77,60 +64,27 @@ export default function Footer() {
           <NewsletterForm />
         </div>
 
-        {/* ANPC & SOL */}
+        {/* ANPC & SOL notice */}
         <div className="border-t border-anthracite-800 pt-8 pb-8">
-          <div className="max-w-3xl mx-auto text-center space-y-4">
-            <p className="text-anthracite-400 text-xs leading-relaxed">
-              Conform OUG 38/2015 privind soluționarea alternativă a litigiilor dintre consumatori și comercianți, 
-              consumatorii pot depune plângeri prin platforma europeană de Soluționare Online a Litigiilor (SOL).
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-6">
-              <a
-                href="https://ec.europa.eu/consumers/odr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-gold-400 hover:text-gold-300 text-xs font-medium transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10.172 13.828a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
-                Platforma SOL (ec.europa.eu/consumers/odr)
-              </a>
-              <a
-                href="https://www.anpc.gov.ro"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-gold-400 hover:text-gold-300 text-xs font-medium transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-                ANPC (www.anpc.gov.ro)
-              </a>
-            </div>
-          </div>
+          <p className="text-anthracite-500 text-xs text-center leading-relaxed max-w-2xl mx-auto">
+            Conform OUG 38/2015, consumatorii pot depune plângeri prin platforma europeană de{' '}
+            <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:text-gold-300 transition-colors">Soluționare Online a Litigiilor (SOL)</a>{' '}
+            sau prin{' '}
+            <a href="https://www.anpc.gov.ro" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:text-gold-300 transition-colors">ANPC</a>.
+          </p>
         </div>
 
         {/* Bottom */}
         <div className="border-t border-anthracite-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Dumbbell className="w-5 h-5 text-gold-400" />
+            <span className="text-sm font-semibold">
+              <span className="text-white">Gym</span><span className="text-gold-400">Builder</span>
+            </span>
+          </div>
           <p className="text-anthracite-500 text-sm">
             &copy; {new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
           </p>
-          <div className="flex flex-wrap gap-4 md:gap-6">
-            <Link href="/terms" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
-              Termeni & Condiții
-            </Link>
-            <Link href="/privacy" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
-              Politica de Confidențialitate
-            </Link>
-            <Link href="/cookie-policy" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
-              Politica de Cookie-uri
-            </Link>
-            <Link href="/return-policy" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
-              Politica de Retur
-            </Link>
-          </div>
         </div>
       </div>
     </footer>
