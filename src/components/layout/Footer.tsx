@@ -32,6 +32,7 @@ export default function Footer() {
               <li><Link href="/suppliers" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Furnizori</Link></li>
               <li><Link href="/pricing" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Pachete & Prețuri</Link></li>
               <li><Link href="/consultation" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Consultanță</Link></li>
+              <li><Link href="/contact" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Contact</Link></li>
             </ul>
           </div>
 

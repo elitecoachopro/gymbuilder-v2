@@ -9,6 +9,7 @@ const navLinks = [
   { href: '/products?condition=used', label: 'Second-Hand' },
   { href: '/configurator', label: 'Construiește-ți sala' },
   { href: '/consultation', label: 'Consultanță' },
+  { href: '/contact', label: 'Contact' },
 ];
 
 interface SessionUser {
