@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useMemo } from 'react';
+import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -131,17 +131,7 @@ function SimpleGrid({ length, width }: { length: number; width: number }) {
   );
 }
 
-// Invalidate on orbit for demand frameloop
-function Invalidator() {
-  const ref = useRef(0);
-  useFrame(({ invalidate }) => {
-    if (ref.current < 3) {
-      invalidate();
-      ref.current++;
-    }
-  });
-  return null;
-}
+
 
 export default function GymScene3D({ lengthM, widthM, zones }: GymScene3DProps) {
   const cameraDistance = Math.max(lengthM, widthM) * 1.2;
