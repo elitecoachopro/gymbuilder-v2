@@ -2,6 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
+function escapeHtml(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 function getSupabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -407,10 +417,10 @@ async function notifyPriceDrop(
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #1a1a1a;">Prețul a scăzut! 🎉</h2>
-            <p style="color: #333;">Salut${user.name ? ` ${user.name}` : ''},</p>
+            <p style="color: #333;">Salut${user.name ? ` ${escapeHtml(user.name)}` : ''},</p>
             <p style="color: #333;">Un produs din favoritele tale a primit o reducere de preț:</p>
             <div style="background: #f8f8f8; border-radius: 8px; padding: 16px; margin: 16px 0;">
-              <h3 style="margin: 0 0 8px 0; color: #1a1a1a;">${productName}</h3>
+              <h3 style="margin: 0 0 8px 0; color: #1a1a1a;">${escapeHtml(productName)}</h3>
               <p style="margin: 0; font-size: 14px;">
                 <span style="color: #999; text-decoration: line-through;">€${Number(oldPrice).toLocaleString()}</span>
                 &nbsp;&nbsp;

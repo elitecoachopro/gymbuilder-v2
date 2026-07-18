@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+function escapeHtml(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -112,19 +122,19 @@ export async function POST(request: NextRequest) {
               Un client a trimis o cerere de ofertă pe platforma GymBuilder.
             </p>
             <div style="background: #1a1a1a; border-radius: 8px; padding: 16px; margin: 16px 0;">
-              <p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Client:</strong> ${name}</p>
-              <p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Email:</strong> ${email}</p>
-              ${phone ? `<p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Telefon:</strong> ${phone}</p>` : ''}
-              ${productName ? `<p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Produs solicitat:</strong> ${productName}${productCategory ? ` (${productCategory})` : ''}</p>` : ''}
+              <p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Client:</strong> ${escapeHtml(name)}</p>
+              <p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Email:</strong> ${escapeHtml(email)}</p>
+              ${phone ? `<p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Telefon:</strong> ${escapeHtml(phone)}</p>` : ''}
+              ${productName ? `<p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Produs solicitat:</strong> ${escapeHtml(productName)}${productCategory ? ` (${escapeHtml(productCategory)})` : ''}</p>` : ''}
             </div>
             ${message ? `
             <div style="background: #1a1a1a; border-left: 3px solid #f5c542; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
               <p style="color: #6b7280; font-size: 12px; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.5px;">Mesajul clientului:</p>
-              <p style="color: #d1d5db; margin: 0; font-size: 14px; white-space: pre-wrap;">${message}</p>
+              <p style="color: #d1d5db; margin: 0; font-size: 14px; white-space: pre-wrap;">${escapeHtml(message)}</p>
             </div>
             ` : ''}
             <p style="color: #9ca3af; font-size: 13px; margin-top: 16px;">
-              Răspunde direct la <a href="mailto:${email}" style="color: #f5c542;">${email}</a> sau accesează dashboard-ul pentru a vedea toate cererile.
+              Răspunde direct la <a href="mailto:${escapeHtml(email)}" style="color: #f5c542;">${escapeHtml(email)}</a> sau accesează dashboard-ul pentru a vedea toate cererile.
             </p>
             <div style="text-align: center; margin-top: 24px;">
               <a href="${appUrl}/supplier/dashboard#cereri" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
@@ -152,10 +162,10 @@ export async function POST(request: NextRequest) {
         <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
           <h2 style="color: #4ade80; margin-top: 0;">✅ Cerere trimisă cu succes!</h2>
           <p style="color: #d1d5db; line-height: 1.6;">
-            Bună, ${name}! Cererea ta de ofertă a fost trimisă către <strong style="color: #f5c542;">${supplier.company_name}</strong>.
+            Bună, ${escapeHtml(name)}! Cererea ta de ofertă a fost trimisă către <strong style="color: #f5c542;">${escapeHtml(supplier.company_name)}</strong>.
           </p>
           <p style="color: #d1d5db; line-height: 1.6;">
-            Furnizorul va primi notificarea și te va contacta la adresa ${email} în cel mai scurt timp posibil.
+            Furnizorul va primi notificarea și te va contacta la adresa ${escapeHtml(email)} în cel mai scurt timp posibil.
           </p>
           <div style="text-align: center; margin-top: 24px;">
             <a href="${appUrl}/suppliers" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">

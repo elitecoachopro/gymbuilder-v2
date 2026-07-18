@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import * as crypto from 'crypto';
+import { sanitizeString } from '@/lib/sanitize';
+
+// Escape HTML for safe insertion into email templates
+function escapeHtml(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
 
 function getSupabase() {
   return createClient(
@@ -129,6 +141,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'request_id și content obligatorii' }, { status: 400 });
   }
 
+  // Sanitize content before saving
+  const sanitizedContent = sanitizeString(content.trim());
+  if (!sanitizedContent) {
+    return NextResponse.json({ error: 'Conținutul mesajului este invalid' }, { status: 400 });
+  }
+
   const supabase = getSupabase();
 
   // Get the contact request with details
@@ -202,7 +220,7 @@ export async function POST(request: NextRequest) {
       sender_type: senderType,
       sender_name: senderName,
       sender_email: senderEmail,
-      content: content.trim(),
+      content: sanitizedContent,
     })
     .select('id, sender_type, sender_name, content, created_at')
     .single();
@@ -240,7 +258,7 @@ export async function POST(request: NextRequest) {
         user_id: supplierData.user_id,
         type: 'new_message',
         title: `Mesaj nou de la ${senderName}`,
-        message: productName ? `Produs: ${productName} — "${content.trim().substring(0, 80)}"` : content.trim().substring(0, 100),
+        message: productName ? `Produs: ${productName} — "${sanitizedContent.substring(0, 80)}"` : sanitizedContent.substring(0, 100),
         link: '/supplier/dashboard#cereri',
         is_read: false,
       });
@@ -264,10 +282,10 @@ export async function POST(request: NextRequest) {
             <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
               <h2 style="color: #60a5fa; margin-top: 0;">💬 Mesaj nou!</h2>
               <p style="color: #d1d5db; line-height: 1.6;">
-                <strong style="color: #f5c542;">${senderName}</strong> ți-a trimis un mesaj${productName ? ` referitor la produsul <strong>${productName}</strong>` : ''}.
+                <strong style="color: #f5c542;">${escapeHtml(senderName)}</strong> ți-a trimis un mesaj${productName ? ` referitor la produsul <strong>${escapeHtml(productName)}</strong>` : ''}.
               </p>
               <div style="background: #1a1a1a; border-left: 3px solid #60a5fa; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
-                <p style="color: #d1d5db; margin: 0; font-size: 14px; white-space: pre-wrap;">${content.trim()}</p>
+                <p style="color: #d1d5db; margin: 0; font-size: 14px; white-space: pre-wrap;">${escapeHtml(sanitizedContent)}</p>
               </div>
               <div style="text-align: center; margin-top: 24px;">
                 <a href="${appUrl}/supplier/dashboard#cereri" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
@@ -291,7 +309,7 @@ export async function POST(request: NextRequest) {
         user_id: contactRequest.client_id,
         type: 'new_message',
         title: `Mesaj nou de la ${senderName}`,
-        message: productName ? `Produs: ${productName} — "${content.trim().substring(0, 80)}"` : content.trim().substring(0, 100),
+        message: productName ? `Produs: ${productName} — "${sanitizedContent.substring(0, 80)}"` : sanitizedContent.substring(0, 100),
         link: '/client/dashboard',
         is_read: false,
       });
@@ -308,10 +326,10 @@ export async function POST(request: NextRequest) {
           <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
             <h2 style="color: #60a5fa; margin-top: 0;">💬 Mesaj nou!</h2>
             <p style="color: #d1d5db; line-height: 1.6;">
-              <strong style="color: #f5c542;">${senderName}</strong> ți-a trimis un mesaj${productName ? ` referitor la produsul <strong>${productName}</strong>` : ''}.
+              <strong style="color: #f5c542;">${escapeHtml(senderName)}</strong> ți-a trimis un mesaj${productName ? ` referitor la produsul <strong>${escapeHtml(productName)}</strong>` : ''}.
             </p>
             <div style="background: #1a1a1a; border-left: 3px solid #60a5fa; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
-              <p style="color: #d1d5db; margin: 0; font-size: 14px; white-space: pre-wrap;">${content.trim()}</p>
+              <p style="color: #d1d5db; margin: 0; font-size: 14px; white-space: pre-wrap;">${escapeHtml(sanitizedContent)}</p>
             </div>
             <div style="text-align: center; margin-top: 24px;">
               <a href="${appUrl}/client/dashboard" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">

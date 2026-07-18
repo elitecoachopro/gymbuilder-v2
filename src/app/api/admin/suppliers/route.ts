@@ -2,6 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
+function escapeHtml(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 function getSupabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -223,9 +233,9 @@ export async function PATCH(request: NextRequest) {
               <h1 style="color: #f5c542; font-size: 28px; margin: 0;">GymBuilder</h1>
             </div>
             <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
-              <h2 style="color: #4ade80; margin-top: 0;">Felicitari, ${userName}!</h2>
+              <h2 style="color: #4ade80; margin-top: 0;">Felicitari, ${escapeHtml(userName)}!</h2>
               <p style="color: #d1d5db; line-height: 1.6;">
-                Contul tau de furnizor <strong style="color: #f5c542;">${companyName}</strong> a fost aprobat cu succes pe platforma GymBuilder.
+                Contul tau de furnizor <strong style="color: #f5c542;">${escapeHtml(companyName)}</strong> a fost aprobat cu succes pe platforma GymBuilder.
               </p>
               <p style="color: #d1d5db; line-height: 1.6;">Acum poti:</p>
               <ul style="color: #d1d5db; line-height: 2;">
@@ -256,13 +266,13 @@ export async function PATCH(request: NextRequest) {
             </div>
             <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
               <h2 style="color: #f87171; margin-top: 0;">Cererea ta a fost respinsa</h2>
-              <p style="color: #d1d5db; line-height: 1.6;">Buna, ${userName},</p>
+              <p style="color: #d1d5db; line-height: 1.6;">Buna, ${escapeHtml(userName)},</p>
               <p style="color: #d1d5db; line-height: 1.6;">
-                Din pacate, cererea de inregistrare pentru compania <strong style="color: #f5c542;">${companyName}</strong> nu a fost aprobata.
+                Din pacate, cererea de inregistrare pentru compania <strong style="color: #f5c542;">${escapeHtml(companyName)}</strong> nu a fost aprobata.
               </p>
               ${reason ? `
               <div style="background: #1a1a1a; border-left: 3px solid #f87171; padding: 12px 16px; margin: 16px 0; border-radius: 4px;">
-                <p style="color: #9ca3af; margin: 0; font-size: 14px;"><strong>Motiv:</strong> ${reason}</p>
+                <p style="color: #9ca3af; margin: 0; font-size: 14px;"><strong>Motiv:</strong> ${escapeHtml(reason)}</p>
               </div>
               ` : ''}
               <p style="color: #d1d5db; line-height: 1.6;">

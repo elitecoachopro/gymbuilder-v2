@@ -3,6 +3,16 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import * as crypto from 'crypto';
 
+function escapeHtml(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 function getSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -133,8 +143,8 @@ export async function POST(request: NextRequest) {
                   <h1 style="color: #f5c542; font-size: 28px; margin: 0;">GymBuilder</h1>
                 </div>
                 <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
-                  <h2 style="color: #ffffff; margin-top: 0;">${subject.trim()}</h2>
-                  <div style="color: #d1d5db; line-height: 1.8; font-size: 15px; white-space: pre-wrap;">${content.trim()}</div>
+                  <h2 style="color: #ffffff; margin-top: 0;">${escapeHtml(subject.trim())}</h2>
+                  <div style="color: #d1d5db; line-height: 1.8; font-size: 15px; white-space: pre-wrap;">${escapeHtml(content.trim())}</div>
                 </div>
                 <div style="text-align: center; margin-top: 24px;">
                   <a href="${appUrl}" style="color: #f5c542; text-decoration: none; font-size: 14px;">Vizitează GymBuilder →</a>
