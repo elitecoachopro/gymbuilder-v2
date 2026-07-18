@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, Star, MessageSquare, LogOut, BadgeCheck, Send, Newspaper } from 'lucide-react';
+import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, Star, MessageSquare, LogOut, BadgeCheck, Send, Newspaper, Eye, Phone, MapPin, CreditCard, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Supplier {
@@ -74,6 +74,7 @@ export default function AdminDashboard() {
   const [newsletterSubject, setNewsletterSubject] = useState('');
   const [newsletterContent, setNewsletterContent] = useState('');
   const [newsletterSending, setNewsletterSending] = useState(false);
+  const [viewProfileModal, setViewProfileModal] = useState<Supplier | null>(null);
 
   const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
     setToast(msg);
@@ -256,6 +257,172 @@ export default function AdminDashboard() {
                 )}
                 Respinge
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Profile Modal */}
+      {viewProfileModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-6 max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">Profil Furnizor</h3>
+              <button
+                onClick={() => setViewProfileModal(null)}
+                className="text-anthracite-400 hover:text-white transition-colors"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Company Name */}
+              <div className="flex items-start gap-3">
+                <Building2 className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-anthracite-400 uppercase tracking-wide">Nume Companie</p>
+                  <p className="text-white font-semibold">{viewProfileModal.company_name}</p>
+                </div>
+              </div>
+
+              {/* Contact Person */}
+              <div className="flex items-start gap-3">
+                <Users className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-anthracite-400 uppercase tracking-wide">Persoană de Contact</p>
+                  <p className="text-white">{viewProfileModal.users?.full_name || 'N/A'}</p>
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="flex items-start gap-3">
+                <Mail className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-anthracite-400 uppercase tracking-wide">Email</p>
+                  <p className="text-white">{viewProfileModal.users?.email || 'N/A'}</p>
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div className="flex items-start gap-3">
+                <Phone className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-anthracite-400 uppercase tracking-wide">Telefon</p>
+                  <p className="text-white">{viewProfileModal.phone || 'N/A'}</p>
+                </div>
+              </div>
+
+              {/* Website */}
+              <div className="flex items-start gap-3">
+                <Globe className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-anthracite-400 uppercase tracking-wide">Website</p>
+                  {viewProfileModal.website ? (
+                    <a href={viewProfileModal.website} target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:underline">
+                      {viewProfileModal.website}
+                    </a>
+                  ) : (
+                    <p className="text-anthracite-400">N/A</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Location */}
+              <div className="flex items-start gap-3">
+                <MapPin className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-anthracite-400 uppercase tracking-wide">Locație</p>
+                  <p className="text-white">
+                    {viewProfileModal.city}{viewProfileModal.city && viewProfileModal.country ? ', ' : ''}{viewProfileModal.country || 'N/A'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Plan */}
+              <div className="flex items-start gap-3">
+                <CreditCard className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-anthracite-400 uppercase tracking-wide">Plan</p>
+                  <p className="text-white capitalize">{viewProfileModal.plan || 'N/A'}</p>
+                </div>
+              </div>
+
+              {/* Registration Date */}
+              <div className="flex items-start gap-3">
+                <Clock className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-anthracite-400 uppercase tracking-wide">Data Înregistrării</p>
+                  <p className="text-white">{new Date(viewProfileModal.created_at).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </div>
+              </div>
+
+              {/* Status */}
+              <div className="flex items-start gap-3">
+                <Shield className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-anthracite-400 uppercase tracking-wide">Status</p>
+                  <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${
+                    viewProfileModal.status === 'pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
+                    viewProfileModal.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
+                    'bg-red-500/10 text-red-400 border border-red-500/30'
+                  }`}>
+                    {viewProfileModal.status === 'pending' ? 'În așteptare' : viewProfileModal.status === 'approved' ? 'Aprobat' : 'Respins'}
+                  </span>
+                  {viewProfileModal.verified && (
+                    <span className="ml-2 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30">
+                      <BadgeCheck className="w-3.5 h-3.5" /> Verificat
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Description */}
+              {viewProfileModal.description && (
+                <div className="flex items-start gap-3">
+                  <MessageSquare className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-anthracite-400 uppercase tracking-wide">Descriere</p>
+                    <p className="text-sm text-anthracite-200 mt-1">{viewProfileModal.description}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 mt-6 pt-4 border-t border-anthracite-700">
+              <button
+                onClick={() => setViewProfileModal(null)}
+                className="flex-1 py-2.5 px-4 rounded-lg border border-anthracite-600 text-anthracite-300 hover:text-white text-sm font-medium transition-colors"
+              >
+                Închide
+              </button>
+              {viewProfileModal.status === 'pending' && (
+                <>
+                  <button
+                    onClick={() => {
+                      handleAction(viewProfileModal.id, 'approve');
+                      setViewProfileModal(null);
+                    }}
+                    disabled={actionLoading === viewProfileModal.id}
+                    className="flex-1 py-2.5 px-4 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    Aprobă
+                  </button>
+                  <button
+                    onClick={() => {
+                      setViewProfileModal(null);
+                      setRejectModal(viewProfileModal.id);
+                    }}
+                    disabled={actionLoading === viewProfileModal.id}
+                    className="flex-1 py-2.5 px-4 rounded-lg bg-red-500 text-white hover:bg-red-600 text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    Respinge
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -547,8 +714,16 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Actions */}
+                    <div className="flex gap-2 flex-shrink-0 flex-wrap">
+                      <button
+                        onClick={() => setViewProfileModal(supplier)}
+                        className="flex items-center gap-1.5 px-4 py-2 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-lg text-sm font-medium hover:bg-indigo-500/20 transition-colors"
+                      >
+                        <Eye className="w-4 h-4" />
+                        Vizualizează profil
+                      </button>
                     {activeTab === 'approved' && (
-                      <div className="flex gap-2 flex-shrink-0">
+                      <>
                         <button
                           onClick={async () => {
                             setActionLoading(supplier.id);
@@ -582,10 +757,10 @@ export default function AdminDashboard() {
                           )}
                           {supplier.verified ? 'Revocă Verificare' : 'Marchează ca Verificat'}
                         </button>
-                      </div>
+                      </>
                     )}
                     {activeTab === 'pending' && (
-                      <div className="flex gap-2 flex-shrink-0">
+                      <>
                         <button
                           onClick={() => handleAction(supplier.id, 'approve')}
                           disabled={actionLoading === supplier.id}
@@ -606,8 +781,9 @@ export default function AdminDashboard() {
                           <XCircle className="w-4 h-4" />
                           Respinge
                         </button>
-                      </div>
+                      </>
                     )}
+                    </div>
                   </div>
                 </div>
               ))}
