@@ -18,7 +18,8 @@ interface Supplier {
   plan: string;
   verified: boolean;
   created_at: string;
-  users: { full_name: string; email: string };
+  full_name: string;
+  email: string;
 }
 
 interface ReviewItem {
@@ -291,7 +292,7 @@ export default function AdminDashboard() {
                 <Users className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-xs text-anthracite-400 uppercase tracking-wide">Persoană de Contact</p>
-                  <p className="text-white">{viewProfileModal.users?.full_name || 'N/A'}</p>
+                  <p className="text-white">{viewProfileModal.full_name || 'N/A'}</p>
                 </div>
               </div>
 
@@ -300,7 +301,7 @@ export default function AdminDashboard() {
                 <Mail className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-xs text-anthracite-400 uppercase tracking-wide">Email</p>
-                  <p className="text-white">{viewProfileModal.users?.email || 'N/A'}</p>
+                  <p className="text-white">{viewProfileModal.email || 'N/A'}</p>
                 </div>
               </div>
 
@@ -686,11 +687,11 @@ export default function AdminDashboard() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
                         <div className="flex items-center gap-2 text-sm text-anthracite-300">
                           <Mail className="w-3.5 h-3.5 text-anthracite-500" />
-                          <span>{supplier.users?.email || 'N/A'}</span>
+                          <span>{supplier.email || 'N/A'}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-anthracite-300">
                           <Users className="w-3.5 h-3.5 text-anthracite-500" />
-                          <span>{supplier.users?.full_name || 'N/A'}</span>
+                          <span>{supplier.full_name || 'N/A'}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-anthracite-300">
                           <Globe className="w-3.5 h-3.5 text-anthracite-500" />
