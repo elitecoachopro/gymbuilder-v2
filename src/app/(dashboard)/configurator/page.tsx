@@ -4,6 +4,9 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Check, Dumbbell, LayoutGrid, Move, Save, Loader2, Info, Package, Trash2, GripVertical } from 'lucide-react';
+import dynamic from 'next/dynamic';
+
+const GymScene3D = dynamic(() => import('@/components/GymScene3D'), { ssr: false, loading: () => <div className="w-full h-[500px] sm:h-[600px] rounded-xl bg-anthracite-900 flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-gold-400" /></div> });
 
 // Zone definitions with colors
 const ZONE_DEFINITIONS = [
@@ -653,7 +656,7 @@ export default function GymConfigurator() {
                 <h2 className="text-xl font-bold text-white mb-1">Zone & Echipamente</h2>
                 <p className="text-anthracite-400 text-sm flex items-center gap-2">
                   <Move className="w-3.5 h-3.5" />
-                  Trage echipamente din bibliotecă și poziționează-le în zone
+                  Vizualizare 3D a sălii — adaugă echipamente din bibliotecă
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -691,140 +694,26 @@ export default function GymConfigurator() {
             )}
 
             <div className={`grid gap-4 ${showLibrary ? 'grid-cols-1 lg:grid-cols-[1fr_280px]' : 'grid-cols-1'}`}>
-              {/* SVG Plan */}
+              {/* 3D Plan */}
               <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 overflow-hidden">
-                <div className="relative" style={{ paddingBottom: `${Math.min((Number(widthM) / Number(lengthM)) * 100, 80)}%` }}>
-                  <svg
-                    ref={svgRef}
-                    viewBox="0 0 100 100"
-                    className="absolute inset-0 w-full h-full"
-                    style={{ cursor: dragging || draggingEquipment ? 'grabbing' : 'default' }}
-                    onClick={() => setSelectedEquipment(null)}
-                  >
-                    {/* Background */}
-                    <rect x="0" y="0" width="100" height="100" fill="#1a1a2e" stroke="#374151" strokeWidth="0.3" />
-
-                    {/* Grid lines */}
-                    {Array.from({ length: 10 }, (_, i) => (
-                      <g key={`grid-${i}`}>
-                        <line x1={i * 10} y1="0" x2={i * 10} y2="100" stroke="#374151" strokeWidth="0.1" strokeDasharray="1,1" />
-                        <line x1="0" y1={i * 10} x2="100" y2={i * 10} stroke="#374151" strokeWidth="0.1" strokeDasharray="1,1" />
-                      </g>
-                    ))}
-
-                    {/* Zones */}
-                    {zones.map((zone) => (
-                      <g key={zone.id}>
-                        <rect
-                          x={zone.x}
-                          y={zone.y}
-                          width={zone.w}
-                          height={zone.h}
-                          fill={zone.color}
-                          fillOpacity="0.15"
-                          stroke={zone.color}
-                          strokeWidth="0.3"
-                          rx="0.5"
-                        />
-                        {zone.w > 10 && zone.h > 6 && (
-                          <text
-                            x={zone.x + zone.w / 2}
-                            y={zone.y + 3}
-                            textAnchor="middle"
-                            fill={zone.color}
-                            fontSize="2"
-                            fontWeight="600"
-                            opacity="0.7"
-                          >
-                            {zone.name}
-                          </text>
-                        )}
-
-                        {/* Right edge handle */}
-                        <rect
-                          x={zone.x + zone.w - 0.8}
-                          y={zone.y + zone.h / 2 - 2}
-                          width="1.6"
-                          height="4"
-                          fill={zone.color}
-                          fillOpacity="0.5"
-                          rx="0.4"
-                          style={{ cursor: 'ew-resize' }}
-                          onMouseDown={(e) => handleMouseDown(e, zone.id, 'right')}
-                          onTouchStart={(e) => handleTouchStart(e, zone.id, 'right')}
-                        />
-                        {/* Bottom edge handle */}
-                        <rect
-                          x={zone.x + zone.w / 2 - 2}
-                          y={zone.y + zone.h - 0.8}
-                          width="4"
-                          height="1.6"
-                          fill={zone.color}
-                          fillOpacity="0.5"
-                          rx="0.4"
-                          style={{ cursor: 'ns-resize' }}
-                          onMouseDown={(e) => handleMouseDown(e, zone.id, 'bottom')}
-                          onTouchStart={(e) => handleTouchStart(e, zone.id, 'bottom')}
-                        />
-                        {/* Corner handle */}
-                        <rect
-                          x={zone.x + zone.w - 1.5}
-                          y={zone.y + zone.h - 1.5}
-                          width="2.5"
-                          height="2.5"
-                          fill={zone.color}
-                          fillOpacity="0.7"
-                          rx="0.4"
-                          style={{ cursor: 'nwse-resize' }}
-                          onMouseDown={(e) => handleMouseDown(e, zone.id, 'right-bottom')}
-                          onTouchStart={(e) => handleTouchStart(e, zone.id, 'right-bottom')}
-                        />
-                      </g>
-                    ))}
-
-                    {/* Placed Equipment */}
-                    {placedEquipment.map((eq) => (
-                      <g key={eq.instanceId}>
-                        <rect
-                          x={eq.x}
-                          y={eq.y}
-                          width={eq.w}
-                          height={eq.h}
-                          fill={getZoneColor(eq.zoneId)}
-                          fillOpacity={selectedEquipment === eq.instanceId ? 0.8 : 0.5}
-                          stroke={selectedEquipment === eq.instanceId ? '#ffffff' : getZoneColor(eq.zoneId)}
-                          strokeWidth={selectedEquipment === eq.instanceId ? 0.4 : 0.2}
-                          rx="0.3"
-                          style={{ cursor: 'grab' }}
-                          onMouseDown={(e) => handleEquipMouseDown(e, eq.instanceId)}
-                          onTouchStart={(e) => handleEquipTouchStart(e, eq.instanceId)}
-                          onClick={(e) => { e.stopPropagation(); setSelectedEquipment(eq.instanceId); }}
-                        />
-                        {eq.w > 3 && eq.h > 2 && (
-                          <text
-                            x={eq.x + eq.w / 2}
-                            y={eq.y + eq.h / 2 + 0.5}
-                            textAnchor="middle"
-                            fill="white"
-                            fontSize={Math.min(eq.w / 5, 1.8)}
-                            fontWeight="500"
-                            pointerEvents="none"
-                          >
-                            {eq.name.length > 12 ? eq.name.slice(0, 10) + '…' : eq.name}
-                          </text>
-                        )}
-                      </g>
-                    ))}
-
-                    {/* Dimension labels */}
-                    <text x="50" y="99" textAnchor="middle" fill="#9CA3AF" fontSize="2">
-                      {lengthM}m
-                    </text>
-                    <text x="1" y="50" textAnchor="middle" fill="#9CA3AF" fontSize="2" transform="rotate(-90, 1, 50)">
-                      {widthM}m
-                    </text>
-                  </svg>
+                <div className="mb-2 flex items-center gap-2 text-xs text-anthracite-400">
+                  <Info className="w-3.5 h-3.5" />
+                  Rotește: click stânga + trage · Zoom: scroll · Pan: click dreapta + trage
                 </div>
+                <GymScene3D
+                  lengthM={Number(lengthM) || 20}
+                  widthM={Number(widthM) || 15}
+                  zones={zones.map(z => ({
+                    id: z.id,
+                    name: z.name,
+                    color: z.color,
+                    x: z.x,
+                    y: z.y,
+                    width: z.w,
+                    height: z.h,
+                    area: z.area_m2,
+                  }))}
+                />
 
                 {/* Selected equipment info bar */}
                 {selectedEquipment && (
