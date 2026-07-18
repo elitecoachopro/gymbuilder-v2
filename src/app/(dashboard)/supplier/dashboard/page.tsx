@@ -356,7 +356,7 @@ export default function SupplierDashboard() {
           ))}
         </nav>
 
-        <div className="absolute bottom-6 left-6 right-6">
+        <div className="mt-6">
           <div className="bg-gold-400/5 border border-gold-400/20 rounded-xl p-4">
             <p className="text-xs text-gold-400 font-medium mb-1">
               Plan: {supplier?.plan === 'free' ? 'Gratuit' : supplier?.plan === 'professional' ? 'Professional' : supplier?.plan || 'Gratuit'}
@@ -383,6 +383,12 @@ export default function SupplierDashboard() {
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <NotificationBell />
+              <Link
+                href="/configurator"
+                className="flex items-center gap-2 bg-indigo-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-indigo-400 transition-colors text-sm"
+              >
+                <LayoutGrid className="w-4 h-4" /> Configurator Sală
+              </Link>
               <Link href="/supplier/products/new" className="btn-primary flex items-center gap-2">
                 <Plus className="w-4 h-4" /> Adaugă Produs
               </Link>
