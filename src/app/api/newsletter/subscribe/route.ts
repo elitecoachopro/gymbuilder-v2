@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
 function getSupabase() {
   return createClient(
@@ -10,6 +11,13 @@ function getSupabase() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 3 requests per minute per IP
+    const ip = getClientIP(request);
+    const rateCheck = checkRateLimit(`newsletter-subscribe:${ip}`, { maxRequests: 3, windowMs: 60 * 1000 });
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(rateCheck.resetTime);
+    }
+
     const body = await request.json();
     const { email } = body;
 

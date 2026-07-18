@@ -67,6 +67,16 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (fetchError || !user) {
+      // Log failed login attempt - user not found
+      try {
+        await supabase.from('auth_logs').insert({
+          ip_address: ip,
+          email_attempted: cleanEmail,
+          event_type: 'login_failed',
+          reason: 'user_not_found',
+        });
+      } catch (_) { /* non-blocking */ }
+
       return NextResponse.json(
         { error: 'Email sau parolă incorectă.' },
         { status: 401 }
@@ -76,6 +86,16 @@ export async function POST(request: NextRequest) {
     // Verify password
     const isValid = await verifyPassword(password, user.password_hash);
     if (!isValid) {
+      // Log failed login attempt - wrong password
+      try {
+        await supabase.from('auth_logs').insert({
+          ip_address: ip,
+          email_attempted: cleanEmail,
+          event_type: 'login_failed',
+          reason: 'invalid_password',
+        });
+      } catch (_) { /* non-blocking */ }
+
       return NextResponse.json(
         { error: 'Email sau parolă incorectă.' },
         { status: 401 }
