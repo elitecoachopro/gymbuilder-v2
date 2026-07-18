@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Search, Dumbbell, Heart, SlidersHorizontal, Mail, Loader2, X, RotateCcw, ChevronDown, ChevronUp, GitCompareArrows } from 'lucide-react';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useCompareStore, CompareProduct } from '@/store/compare';
 
 const categories = [
@@ -62,6 +62,10 @@ export default function ProductsPage() {
 
   const [activeCategory, setActiveCategory] = useState(urlCategory);
   const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<{type: string; id: string; text: string; subtitle?: string; image?: string | null}[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const [favorites, setFavorites] = useState<number[]>([]);
   const [toast, setToast] = useState('');
   const [showContactModal, setShowContactModal] = useState<number | null>(null);
@@ -80,6 +84,34 @@ export default function ProductsPage() {
   const hasActiveFilters = useMemo(() => {
     return activeCategory !== 'all' || conditionFilter !== 'all' || priceMin !== '' || priceMax !== '';
   }, [activeCategory, conditionFilter, priceMin, priceMax]);
+
+  // Autocomplete - fetch suggestions on input change
+  const fetchSuggestions = useCallback(async (q: string) => {
+    if (q.length < 2) { setSuggestions([]); setShowSuggestions(false); return; }
+    try {
+      const res = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      setSuggestions(data.suggestions || []);
+      setShowSuggestions((data.suggestions || []).length > 0);
+    } catch { setSuggestions([]); }
+  }, []);
+
+  const handleSearchInput = (value: string) => {
+    setSearchQuery(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => fetchSuggestions(value), 250);
+  };
+
+  // Close suggestions on click outside
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   // Fetch products from API
   useEffect(() => {
@@ -273,15 +305,43 @@ export default function ProductsPage() {
       <section className="py-6 px-4 border-b border-anthracite-800 sticky top-16 z-40 bg-anthracite-950/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-anthracite-400" />
+            <div className="relative flex-1" ref={searchRef}>
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-anthracite-400 z-10" />
               <input
                 type="text"
                 placeholder="Caută echipamente, branduri..."
                 className="input-field pl-12"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchInput(e.target.value)}
+                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
               />
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-anthracite-900 border border-anthracite-700 rounded-xl shadow-2xl overflow-hidden z-50">
+                  {suggestions.map((s, i) => (
+                    <Link
+                      key={`${s.type}-${s.id}-${i}`}
+                      href={s.type === 'product' ? `/products/${s.id}` : s.type === 'supplier' ? `/suppliers/${s.id}` : `/products?category=${s.id}`}
+                      onClick={() => { setShowSuggestions(false); setSearchQuery(s.text); }}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-anthracite-800 transition-colors border-b border-anthracite-800 last:border-0"
+                    >
+                      {s.image ? (
+                        <img src={s.image} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg bg-anthracite-700 flex items-center justify-center flex-shrink-0">
+                          {s.type === 'product' ? <Dumbbell className="w-5 h-5 text-anthracite-400" /> : <Search className="w-5 h-5 text-anthracite-400" />}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-medium truncate">{s.text}</p>
+                        {s.subtitle && <p className="text-anthracite-400 text-sm truncate">{s.subtitle}</p>}
+                      </div>
+                      <span className="text-xs text-anthracite-500 capitalize flex-shrink-0">
+                        {s.type === 'product' ? 'Produs' : s.type === 'supplier' ? 'Furnizor' : s.type === 'brand' ? 'Brand' : 'Categorie'}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
