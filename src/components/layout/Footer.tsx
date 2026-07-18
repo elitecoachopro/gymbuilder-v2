@@ -124,6 +124,9 @@ export default function Footer() {
             <Link href="/cookie-policy" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
               Politica de Cookie-uri
             </Link>
+            <Link href="/return-policy" className="text-anthracite-500 hover:text-gold-400 text-sm transition-colors">
+              Politica de Retur
+            </Link>
           </div>
         </div>
       </div>
