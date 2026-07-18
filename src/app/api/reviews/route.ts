@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
 function getSupabase() {
   return createClient(
@@ -66,6 +67,13 @@ export async function GET(request: NextRequest) {
 // POST /api/reviews — create a new review (unverified by default)
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 2 requests per minute per IP
+    const ip = getClientIP(request);
+    const rateCheck = checkRateLimit(`reviews:${ip}`, { maxRequests: 2, windowMs: 60 * 1000 });
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(rateCheck.resetTime!);
+    }
+
     const body = await request.json();
     const { supplier_id, client_name, client_email, rating, title, body: reviewBody } = body;
 

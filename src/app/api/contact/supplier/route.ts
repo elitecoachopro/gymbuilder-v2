@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
 function escapeHtml(str: string): string {
   if (!str) return '';
@@ -44,6 +45,13 @@ async function sendEmail(to: string, subject: string, html: string) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 3 requests per minute per IP
+    const ip = getClientIP(request);
+    const rateCheck = checkRateLimit(`contact-supplier:${ip}`, { maxRequests: 3, windowMs: 60 * 1000 });
+    if (!rateCheck.allowed) {
+      return rateLimitResponse(rateCheck.resetTime!);
+    }
+
     const body = await request.json();
     const { name, email, phone, message, supplierId, supplier_id } = body;
     const resolvedSupplierId = supplierId || supplier_id;
