@@ -462,14 +462,14 @@ export default function ProductDetailPage() {
                     <Building2 className="w-5 h-5 text-anthracite-500" />
                   )}
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">{supplier.company_name}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-white truncate">{supplier.company_name}</p>
                   <p className="text-xs text-anthracite-400 flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
-                    {supplier.city}, {supplier.country}
+                    <MapPin className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{supplier.city}, {supplier.country}</span>
                   </p>
                 </div>
-                <span className="ml-auto text-xs text-gold-400">Vezi profil →</span>
+                <span className="ml-auto text-xs text-gold-400 flex-shrink-0">Vezi profil →</span>
               </div>
             </Link>
 
@@ -503,7 +503,7 @@ export default function ProductDetailPage() {
 
         {/* Reviews Section */}
         <div className="mt-16">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
               <Star className="w-5 h-5 text-amber-400" />
               Recenzii Furnizor

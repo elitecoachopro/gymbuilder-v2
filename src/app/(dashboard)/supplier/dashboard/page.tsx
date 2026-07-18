@@ -370,7 +370,7 @@ export default function SupplierDashboard() {
       {/* Main Content */}
       <div className="lg:ml-64 p-8">
         <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
             <div>
               <h1 className="text-2xl font-bold text-white">Dashboard</h1>
               <p className="text-anthracite-400 text-sm mt-1">
@@ -380,7 +380,7 @@ export default function SupplierDashboard() {
                 </span>
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <NotificationBell />
               <Link href="/supplier/products/new" className="btn-primary flex items-center gap-2">
                 <Plus className="w-4 h-4" /> Adaugă Produs
@@ -646,7 +646,8 @@ export default function SupplierDashboard() {
                 <p className="text-xs text-anthracite-500 mt-1">Statisticile vor apărea pe măsură ce produsele primesc vizualizări.</p>
               </div>
             ) : (
-              <div className="bg-anthracite-800/50 border border-anthracite-700 rounded-xl overflow-hidden">
+              <div className="bg-anthracite-800/50 border border-anthracite-700 rounded-xl overflow-x-auto">
+                <div className="min-w-[600px]">
                 {/* Table header */}
                 <div className="grid grid-cols-12 gap-2 px-4 py-3 border-b border-anthracite-700 text-xs font-medium text-anthracite-400 uppercase tracking-wider">
                   <div className="col-span-4">Produs</div>
@@ -719,6 +720,7 @@ export default function SupplierDashboard() {
                     </div>
                   </div>
                 ))}
+                </div>
               </div>
             )}
           </div>

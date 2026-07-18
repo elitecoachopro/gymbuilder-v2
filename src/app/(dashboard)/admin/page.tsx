@@ -464,7 +464,7 @@ export default function AdminDashboard() {
       <div className="lg:ml-64 p-6 md:p-8">
         <div className="max-w-5xl mx-auto">
           {/* Header with pending badge */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
             <div>
               <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
               <p className="text-anthracite-400 text-sm mt-1">Gestionează furnizorii și platforma</p>
@@ -488,7 +488,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Section Switch */}
-          <div className="flex gap-1 bg-anthracite-900 rounded-lg p-1 mb-6 w-fit">
+          <div className="flex gap-1 bg-anthracite-900 rounded-lg p-1 mb-6 w-full sm:w-fit overflow-x-auto">
             <button
               onClick={() => setAdminSection('suppliers')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
@@ -558,8 +558,8 @@ export default function AdminDashboard() {
               ) : (
                 <div className="space-y-4">
                   {reviewsList.map((review) => (
-                    <div key={review.id} className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-6">
-                      <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div key={review.id} className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-2 flex-wrap">
                             <div className="flex">
@@ -570,7 +570,7 @@ export default function AdminDashboard() {
                             <h3 className="text-base font-semibold text-white">{review.title}</h3>
                           </div>
                           {review.body && <p className="text-sm text-anthracite-300 mb-3">{review.body}</p>}
-                          <div className="flex items-center gap-4 text-xs text-anthracite-400">
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-anthracite-400">
                             <span>De: <span className="text-white">{review.client_name}</span> ({review.client_email})</span>
                             <span>Furnizor: <span className="text-gold-400">{(review.supplier_profiles as any)?.company_name}</span></span>
                             <span>{new Date(review.created_at).toLocaleDateString('ro-RO')}</span>
@@ -604,7 +604,7 @@ export default function AdminDashboard() {
           /* Suppliers Section */
           <>
           {/* Tabs */}
-          <div className="flex gap-1 bg-anthracite-900 rounded-lg p-1 mb-6 w-fit">
+          <div className="flex gap-1 bg-anthracite-900 rounded-lg p-1 mb-6 w-full sm:w-fit overflow-x-auto">
             <button
               onClick={() => setActiveTab('pending')}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
@@ -662,8 +662,8 @@ export default function AdminDashboard() {
           ) : (
             <div className="space-y-4">
               {suppliers.map((supplier) => (
-                <div key={supplier.id} className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-6">
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div key={supplier.id} className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     {/* Supplier Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-2 flex-wrap">
@@ -714,7 +714,7 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-2 flex-shrink-0 flex-wrap">
+                    <div className="flex gap-2 flex-shrink-0 flex-wrap border-t border-anthracite-700 sm:border-0 pt-3 sm:pt-0">
                       <button
                         onClick={() => setViewProfileModal(supplier)}
                         className="flex items-center gap-1.5 px-4 py-2 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-lg text-sm font-medium hover:bg-indigo-500/20 transition-colors"

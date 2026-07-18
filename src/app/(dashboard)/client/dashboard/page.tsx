@@ -468,14 +468,14 @@ function ChatBox({ requestId, userRole }: { requestId: string; userRole: 'client
 
   if (loading) {
     return (
-      <div className="mt-3 ml-12 flex items-center gap-2 text-xs text-anthracite-400">
+      <div className="mt-3 ml-0 sm:ml-12 flex items-center gap-2 text-xs text-anthracite-400">
         <Loader2 className="w-3 h-3 animate-spin" /> Se încarcă mesajele...
       </div>
     );
   }
 
   return (
-    <div className="mt-3 ml-12 border border-anthracite-700 rounded-lg overflow-hidden">
+    <div className="mt-3 ml-0 sm:ml-12 border border-anthracite-700 rounded-lg overflow-hidden">
       {/* Messages list */}
       <div className="max-h-64 overflow-y-auto p-3 space-y-2 bg-anthracite-900/50">
         {messages.length === 0 ? (

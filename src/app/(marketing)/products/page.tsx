@@ -502,7 +502,7 @@ export default function ProductsPage() {
       {/* Products Grid */}
       <section className="py-12 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
             <p className="text-anthracite-400 text-sm">
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -593,7 +593,7 @@ export default function ProductsPage() {
                   </Link>
 
                   {/* Price + Actions */}
-                  <div className="flex items-center justify-between pt-4 mt-3 border-t border-anthracite-700">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-4 mt-3 border-t border-anthracite-700">
                     <span className="text-xl font-bold text-gold-400">&euro;{product.price.toLocaleString()}</span>
                     <div className="flex items-center gap-2">
                       {/* Compare checkbox */}
@@ -629,7 +629,7 @@ export default function ProductsPage() {
       {/* Compare Bar - Fixed bottom */}
       {compareMounted && compareItems.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-anthracite-900/95 backdrop-blur-xl border-t border-anthracite-700 shadow-2xl">
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-3">
               <GitCompareArrows className="w-5 h-5 text-blue-400" />
               <span className="text-sm text-anthracite-300">

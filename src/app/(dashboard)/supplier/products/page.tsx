@@ -823,7 +823,7 @@ function ProductCard({
   onVariants: () => void;
 }) {
   return (
-    <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4">
+    <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 cursor-pointer hover:border-anthracite-600 transition-colors" onClick={onEdit}>
       {/* Image */}
       <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-anthracite-700 flex-shrink-0 overflow-hidden flex items-center justify-center">
         {product.images && product.images.length > 0 ? (
@@ -856,8 +856,8 @@ function ProductCard({
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0 w-full sm:w-auto justify-end mt-2 sm:mt-0 border-t border-anthracite-700 sm:border-0 pt-2 sm:pt-0">
+      {/* Actions - stopPropagation prevents card click */}
+      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0 w-full sm:w-auto justify-end mt-2 sm:mt-0 border-t border-anthracite-700 sm:border-0 pt-2 sm:pt-0" onClick={(e) => e.stopPropagation()}>
         {/* Variants */}
         <button
           onClick={onVariants}

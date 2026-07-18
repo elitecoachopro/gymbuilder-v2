@@ -336,7 +336,7 @@ export default function SupplierProfilePage() {
               )}
 
               {/* Stats */}
-              <div className="flex items-center gap-6 mt-5 pt-5 border-t border-anthracite-700">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-5 pt-5 border-t border-anthracite-700">
                 <div className="flex items-center gap-2">
                   <Package className="w-4 h-4 text-gold-400" />
                   <span className="text-sm text-white font-medium">{stats.totalProducts}</span>
@@ -363,7 +363,7 @@ export default function SupplierProfilePage() {
 
         {/* Reviews Section */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
             <h2 className="text-xl font-bold text-white flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-gold-400" />
               Recenzii ({reviewStats.count})
