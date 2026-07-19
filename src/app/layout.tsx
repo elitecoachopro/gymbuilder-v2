@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import GlobalHeader from '@/components/layout/GlobalHeader';
 import CookieConsent from '@/components/CookieConsent';
+import FloatingChatButton from '@/components/FloatingChatButton';
 
 export const metadata: Metadata = {
   title: 'GymBuilder - Premium Gym Equipment Marketplace',
@@ -24,6 +25,7 @@ export default function RootLayout({
           {children}
         </div>
         <CookieConsent />
+        <FloatingChatButton />
       </body>
     </html>
   );
