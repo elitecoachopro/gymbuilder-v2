@@ -74,12 +74,12 @@ export default function HomePage() {
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-              Construiește Sala
-              <span className="block gold-gradient">Perfectă</span>
+              De la Vis la Sala Perfectă.
+              <span className="block gold-gradient">Construim Pentru Tine Succesul.</span>
             </h1>
 
             <p className="text-xl text-anthracite-300 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Deschizi o sală de fitness sau vrei să o modernizezi? GymBuilder îți pune la dispoziție cel mai complet catalog de echipamente fitness din Europa, instrumente de planificare și experți care au trecut prin același drum.
+              Echipamentul potrivit, furnizorul potrivit — de la spațiu gol la sala visurilor tale.
             </p>
 
             {/* 3 Main CTAs */}
