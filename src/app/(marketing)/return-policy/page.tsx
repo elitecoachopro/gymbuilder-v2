@@ -201,7 +201,7 @@ export default function ReturnPolicyPage() {
               </p>
               <ul className="list-none space-y-1 mt-3">
                 <li><strong className="text-white">Email:</strong> contact@gymbuilder.app</li>
-                <li><strong className="text-white">Telefon:</strong> +40 700 000 000 (Luni – Vineri, 9:00 – 18:00)</li>
+                <li><strong className="text-white">Telefon:</strong> 0743 891 218 (Luni – Vineri, 9:00 – 18:00)</li>
                 <li><strong className="text-white">Timp de răspuns:</strong> maxim 24 de ore lucrătoare</li>
               </ul>
             </div>

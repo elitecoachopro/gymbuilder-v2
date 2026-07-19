@@ -164,7 +164,7 @@ export default function CookiePolicyPage() {
               </p>
               <ul className="list-none space-y-1 mt-3">
                 <li><strong className="text-white">Email:</strong> contact@gymbuilder.app</li>
-                <li><strong className="text-white">Adresă:</strong> București, România</li>
+                <li><strong className="text-white">Adresă:</strong> Mangalia, România</li>
               </ul>
             </div>
           </div>

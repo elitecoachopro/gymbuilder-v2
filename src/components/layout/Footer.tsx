@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
-import { Dumbbell, Send, Loader2, CheckCircle } from 'lucide-react';
+import { Send, Loader2, CheckCircle } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -76,11 +77,14 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="border-t border-anthracite-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Dumbbell className="w-5 h-5 text-gold-400" />
-            <span className="text-sm font-semibold">
-              <span className="text-white">Gym</span><span className="text-gold-400">Builder</span>
-            </span>
+          <div className="flex items-center">
+            <Image
+              src="/logo.png"
+              alt="GymBuilder"
+              width={100}
+              height={44}
+              className="h-8 w-auto object-contain"
+            />
           </div>
           <p className="text-anthracite-500 text-sm">
             &copy; {new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.

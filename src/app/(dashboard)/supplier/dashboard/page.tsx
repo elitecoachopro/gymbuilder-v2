@@ -298,7 +298,7 @@ export default function SupplierDashboard() {
               </a>
 
               <a
-                href="tel:+40700000000"
+                href="tel:+40743891218"
                 className="flex items-center gap-3 w-full px-4 py-3 bg-anthracite-800 border border-anthracite-700 rounded-xl text-white hover:border-gold-400/30 transition-colors"
               >
                 <Phone className="w-5 h-5 text-gold-400" />

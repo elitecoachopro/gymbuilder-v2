@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
-import { Menu, X, Dumbbell, LayoutDashboard, LogOut, ChevronDown, User, UserPlus } from 'lucide-react';
+import { Menu, X, LayoutDashboard, LogOut, ChevronDown, User, UserPlus, Dumbbell } from 'lucide-react';
 
 const navLinks = [
   { href: '/products?condition=new', label: 'Echipamente Noi' },
@@ -74,12 +75,15 @@ export default function GlobalHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group flex-shrink-0 relative z-10">
-            <Dumbbell className="w-7 h-7 text-gold-400 group-hover:rotate-12 transition-transform duration-300" />
-            <span className="text-xl font-bold">
-              <span className="text-white">Gym</span>
-              <span className="text-gold-400">Builder</span>
-            </span>
+          <Link href="/" className="flex items-center flex-shrink-0 relative z-10">
+            <Image
+              src="/logo.png"
+              alt="GymBuilder - Build Your Gym"
+              width={140}
+              height={61}
+              className="h-10 w-auto sm:h-11 md:h-12 object-contain"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation - Center */}

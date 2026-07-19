@@ -160,13 +160,13 @@ export default function ContactPage() {
                       <p className="text-xs text-anthracite-400">contact@gymbuilder.app</p>
                     </div>
                   </a>
-                  <a href="tel:+40700000000" className="flex items-start gap-3 group">
+                  <a href="tel:+40743891218" className="flex items-start gap-3 group">
                     <div className="w-9 h-9 bg-gold-400/10 rounded-lg flex items-center justify-center shrink-0">
                       <Phone className="w-4 h-4 text-gold-400" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-white group-hover:text-gold-400 transition-colors">Telefon</p>
-                      <p className="text-xs text-anthracite-400">+40 700 000 000</p>
+                      <p className="text-xs text-anthracite-400">0743 891 218</p>
                       <p className="text-xs text-anthracite-500">Luni – Vineri, 9:00 – 18:00</p>
                     </div>
                   </a>
@@ -176,7 +176,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-white">Locație</p>
-                      <p className="text-xs text-anthracite-400">București, România</p>
+                      <p className="text-xs text-anthracite-400">Mangalia, România</p>
                     </div>
                   </div>
                 </div>
