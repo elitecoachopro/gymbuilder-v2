@@ -51,7 +51,7 @@ export default function Footer() {
               <li><Link href="/cookie-policy" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Politica de Cookie-uri</Link></li>
               <li><Link href="/return-policy" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Politica de Retur/Anulare</Link></li>
               <li>
-                <a href="https://www.anpc.gov.ro" target="_blank" rel="noopener noreferrer" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">ANPC</a>
+                <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">ANPC</a>
                 {' / '}
                 <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">SOL</a>
               </li>
@@ -70,7 +70,7 @@ export default function Footer() {
             Conform OUG 38/2015, consumatorii pot depune plângeri prin platforma europeană de{' '}
             <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:text-gold-300 transition-colors">Soluționare Online a Litigiilor (SOL)</a>{' '}
             sau prin{' '}
-            <a href="https://www.anpc.gov.ro" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:text-gold-300 transition-colors">ANPC</a>.
+            <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:text-gold-300 transition-colors">ANPC</a>.
           </p>
         </div>
 

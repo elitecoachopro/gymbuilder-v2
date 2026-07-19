@@ -181,7 +181,7 @@ export default function ReturnPolicyPage() {
               </p>
               <ul className="list-disc list-inside space-y-2 mt-3 ml-2">
                 <li>
-                  <a href="https://www.anpc.gov.ro" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
+                  <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer" className="text-gold-400 hover:text-gold-300 underline underline-offset-2">
                     ANPC (Autoritatea Națională pentru Protecția Consumatorilor)
                   </a>
                 </li>
