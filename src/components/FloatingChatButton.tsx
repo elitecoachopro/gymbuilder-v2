@@ -52,6 +52,7 @@ export default function FloatingChatButton() {
   }, [pathname]);
 
   function detectPageContext() {
+    if (!pathname) return;
     // Product page: /products/[id]
     const productMatch = pathname.match(/^\/products\/([^/]+)$/);
     if (productMatch) {
