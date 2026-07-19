@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Dumbbell, Lock, Eye, EyeOff, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
+import { useClientTranslations } from '@/i18n/client';
 
 export default function ResetPasswordPage() {
+  const { t } = useClientTranslations('auth');
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams?.get('token') || null;
@@ -23,17 +25,17 @@ export default function ResetPasswordPage() {
     setSuccess('');
 
     if (!token) {
-      setError('Token de resetare lipsă. Solicită un nou link.');
+      setError(t('tokenMissing'));
       return;
     }
 
     if (!password || password.length < 8) {
-      setError('Parola trebuie să aibă minim 8 caractere.');
+      setError(t('passwordMin'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Parolele nu coincid.');
+      setError(t('passwordsMismatch'));
       return;
     }
 
@@ -49,17 +51,17 @@ export default function ResetPasswordPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Eroare la resetarea parolei.');
+        setError(data.error || t('resetError'));
         return;
       }
 
-      setSuccess(data.message || 'Parola a fost resetată cu succes!');
+      setSuccess(data.message || t('resetSuccess'));
 
       setTimeout(() => {
         router.push('/login');
       }, 3000);
     } catch (err) {
-      setError('Eroare de conexiune. Verifică conexiunea la internet.');
+      setError(t('connectionError'));
     } finally {
       setLoading(false);
     }
@@ -70,10 +72,10 @@ export default function ResetPasswordPage() {
       <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-anthracite-950">
         <div className="w-full max-w-md text-center">
           <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <h1 className="text-xl font-bold text-white mb-2">Link invalid</h1>
-          <p className="text-anthracite-400 mb-6">Token-ul de resetare lipsește sau este invalid.</p>
+          <h1 className="text-xl font-bold text-white mb-2">{t('invalidLink')}</h1>
+          <p className="text-anthracite-400 mb-6">{t('tokenInvalid')}</p>
           <Link href="/forgot-password" className="btn-primary px-6 py-3">
-            Solicită un nou link
+            {t('requestNewLink')}
           </Link>
         </div>
       </main>
@@ -91,8 +93,8 @@ export default function ResetPasswordPage() {
               <span className="text-gold-400">Builder</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white mt-6 mb-2">Parolă Nouă</h1>
-          <p className="text-anthracite-400">Introdu noua parolă pentru contul tău.</p>
+          <h1 className="text-2xl font-bold text-white mt-6 mb-2">{t('newPasswordTitle')}</h1>
+          <p className="text-anthracite-400">{t('newPasswordSubtitle')}</p>
         </div>
 
         {success && (
@@ -111,13 +113,13 @@ export default function ResetPasswordPage() {
         <div className="glass-card p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Parolă nouă</label>
+              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('newPassword')}</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className="input-field pl-11 pr-11"
-                  placeholder="Minim 8 caractere"
+                  placeholder={t('passwordPlaceholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -134,13 +136,13 @@ export default function ResetPasswordPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Confirmă parola</label>
+              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('confirmPassword')}</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className="input-field pl-11"
-                  placeholder="Repetă parola"
+                  placeholder={t('confirmPasswordPlaceholder')}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -157,10 +159,10 @@ export default function ResetPasswordPage() {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Se resetează...
+                  {t('resetting')}
                 </>
               ) : (
-                'Resetează Parola'
+                t('resetButton')
               )}
             </button>
           </form>

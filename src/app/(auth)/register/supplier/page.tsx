@@ -4,21 +4,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Dumbbell, Mail, Lock, Building2, Globe, MapPin, Phone, Eye, EyeOff, ArrowRight, ArrowLeft, Check, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
-
-const steps = [
-  { id: 1, title: 'Cont', description: 'Date de autentificare' },
-  { id: 2, title: 'Companie', description: 'Informații firmă' },
-  { id: 3, title: 'Pachet', description: 'Alege planul' },
-];
-
-const plans = [
-  { id: 'free', name: 'Free', price: 0, desc: '3 produse, profil de bază' },
-  { id: 'starter', name: 'Starter', price: 49, desc: '25 produse, promovări' },
-  { id: 'professional', name: 'Professional', price: 149, desc: '100 produse, badge verificat', popular: true },
-  { id: 'enterprise', name: 'Enterprise', price: 399, desc: 'Nelimitat, suport dedicat' },
-];
+import { useClientTranslations } from '@/i18n/client';
 
 export default function SupplierRegisterPage() {
+  const { t } = useClientTranslations('auth');
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
@@ -26,6 +15,19 @@ export default function SupplierRegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const steps = [
+    { id: 1, title: t('stepAccount'), description: t('stepAccountDesc') },
+    { id: 2, title: t('stepCompany'), description: t('stepCompanyDesc') },
+    { id: 3, title: t('stepPlan'), description: t('stepPlanDesc') },
+  ];
+
+  const plans = [
+    { id: 'free', name: 'Free', price: 0, desc: t('planFreeDesc') },
+    { id: 'starter', name: 'Starter', price: 49, desc: t('planStarterDesc') },
+    { id: 'professional', name: 'Professional', price: 149, desc: t('planProDesc'), popular: true },
+    { id: 'enterprise', name: 'Enterprise', price: 399, desc: t('planEnterpriseDesc') },
+  ];
 
   const [form, setForm] = useState({
     firstName: '',
@@ -48,20 +50,20 @@ export default function SupplierRegisterPage() {
 
   const validateStep1 = () => {
     if (!form.firstName || !form.lastName || !form.email || !form.password) {
-      setError('Toate câmpurile marcate cu * sunt obligatorii.');
+      setError(t('requiredFields'));
       return false;
     }
     if (form.password.length < 8) {
-      setError('Parola trebuie să aibă minim 8 caractere.');
+      setError(t('passwordMin'));
       return false;
     }
     if (form.password !== form.confirmPassword) {
-      setError('Parolele nu coincid.');
+      setError(t('passwordsMismatch'));
       return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) {
-      setError('Adresa de email nu este validă.');
+      setError(t('invalidEmail'));
       return false;
     }
     setError('');
@@ -70,7 +72,7 @@ export default function SupplierRegisterPage() {
 
   const validateStep2 = () => {
     if (!form.companyName || !form.country || !form.city) {
-      setError('Numele companiei, țara și orașul sunt obligatorii.');
+      setError(t('companyRequired'));
       return false;
     }
     setError('');
@@ -85,7 +87,7 @@ export default function SupplierRegisterPage() {
 
   const handleSubmit = async () => {
     if (!form.terms) {
-      setError('Trebuie să accepți Termenii și Condițiile.');
+      setError(t('acceptTerms'));
       return;
     }
 
@@ -114,18 +116,17 @@ export default function SupplierRegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Eroare la înregistrare.');
+        setError(data.error || t('registerError'));
         return;
       }
 
-      setSuccess(data.message || 'Înregistrare completă! Verifică emailul.');
+      setSuccess(data.message || t('supplierRegisterSuccess'));
 
-      // Redirect to login after 4 seconds
       setTimeout(() => {
         router.push('/login');
       }, 4000);
     } catch (err) {
-      setError('Eroare de conexiune. Verifică conexiunea la internet.');
+      setError(t('connectionError'));
     } finally {
       setLoading(false);
     }
@@ -143,8 +144,8 @@ export default function SupplierRegisterPage() {
               <span className="text-gold-400">Builder</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white mt-6 mb-2">Devino Furnizor</h1>
-          <p className="text-anthracite-400">Înregistrare în 3 pași simpli.</p>
+          <h1 className="text-2xl font-bold text-white mt-6 mb-2">{t('becomeSupplier')}</h1>
+          <p className="text-anthracite-400">{t('supplierSubtitle')}</p>
         </div>
 
         {/* Progress Steps */}
@@ -189,7 +190,7 @@ export default function SupplierRegisterPage() {
             <form onSubmit={(e) => { e.preventDefault(); handleNext(2); }} className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Nume *</label>
+                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('firstName')} *</label>
                   <input
                     type="text"
                     className="input-field"
@@ -200,7 +201,7 @@ export default function SupplierRegisterPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Prenume *</label>
+                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('lastName')} *</label>
                   <input
                     type="text"
                     className="input-field"
@@ -228,13 +229,13 @@ export default function SupplierRegisterPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Parolă *</label>
+                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('password')} *</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     className="input-field pl-11 pr-11"
-                    placeholder="Minim 8 caractere"
+                    placeholder={t('passwordPlaceholder')}
                     value={form.password}
                     onChange={(e) => updateField('password', e.target.value)}
                     disabled={loading}
@@ -250,13 +251,13 @@ export default function SupplierRegisterPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Repetă parola *</label>
+                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('confirmPassword')} *</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     className={`input-field pl-11 ${form.confirmPassword && form.password !== form.confirmPassword ? 'border-red-500 focus:border-red-500 focus:ring-red-500/30' : ''}`}
-                    placeholder="Repetă parola"
+                    placeholder={t('confirmPasswordPlaceholder')}
                     value={form.confirmPassword}
                     onChange={(e) => updateField('confirmPassword', e.target.value)}
                     disabled={loading}
@@ -264,7 +265,7 @@ export default function SupplierRegisterPage() {
                 </div>
                 {form.confirmPassword && form.password !== form.confirmPassword && (
                   <p className="text-red-400 text-xs mt-1.5 flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" /> Parolele nu coincid
+                    <AlertCircle className="w-3 h-3" /> {t('passwordsMismatch')}
                   </p>
                 )}
               </div>
@@ -273,7 +274,7 @@ export default function SupplierRegisterPage() {
                 type="submit"
                 className="btn-primary w-full py-3.5 flex items-center justify-center gap-2"
               >
-                Continuă <ArrowRight className="w-4 h-4" />
+                {t('continue')} <ArrowRight className="w-4 h-4" />
               </button>
             </form>
           )}
@@ -282,7 +283,7 @@ export default function SupplierRegisterPage() {
           {step === 2 && (
             <form onSubmit={(e) => { e.preventDefault(); handleNext(3); }} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Nume Companie *</label>
+                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('companyName')} *</label>
                 <div className="relative">
                   <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
                   <input
@@ -298,14 +299,14 @@ export default function SupplierRegisterPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Țară *</label>
+                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('country')} *</label>
                   <select
                     className="input-field"
                     value={form.country}
                     onChange={(e) => updateField('country', e.target.value)}
                     disabled={loading}
                   >
-                    <option value="">Selectează...</option>
+                    <option value="">{t('selectCountry')}</option>
                     <option value="Romania">România</option>
                     <option value="Germany">Germania</option>
                     <option value="Italy">Italia</option>
@@ -319,7 +320,7 @@ export default function SupplierRegisterPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Oraș *</label>
+                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('city')} *</label>
                   <div className="relative">
                     <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
                     <input
@@ -350,7 +351,7 @@ export default function SupplierRegisterPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Telefon</label>
+                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('phoneLabel')}</label>
                 <div className="relative">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
                   <input
@@ -365,10 +366,10 @@ export default function SupplierRegisterPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Descriere companie</label>
+                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('companyDescription')}</label>
                 <textarea
                   className="input-field min-h-[100px] resize-y"
-                  placeholder="Descrie pe scurt activitatea companiei..."
+                  placeholder={t('companyDescPlaceholder')}
                   value={form.description}
                   onChange={(e) => updateField('description', e.target.value)}
                   disabled={loading}
@@ -381,13 +382,13 @@ export default function SupplierRegisterPage() {
                   onClick={() => setStep(1)}
                   className="btn-ghost flex items-center gap-2"
                 >
-                  <ArrowLeft className="w-4 h-4" /> Înapoi
+                  <ArrowLeft className="w-4 h-4" /> {t('back')}
                 </button>
                 <button
                   type="submit"
                   className="btn-primary flex-1 py-3.5 flex items-center justify-center gap-2"
                 >
-                  Continuă <ArrowRight className="w-4 h-4" />
+                  {t('continue')} <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </form>
@@ -396,7 +397,7 @@ export default function SupplierRegisterPage() {
           {/* Step 3: Plan */}
           {step === 3 && (
             <div className="space-y-5">
-              <p className="text-sm text-anthracite-300 mb-4">Alege pachetul care ți se potrivește. Poți face upgrade oricând.</p>
+              <p className="text-sm text-anthracite-300 mb-4">{t('choosePlan')}</p>
 
               <div className="space-y-3">
                 {plans.map((plan) => (
@@ -422,7 +423,7 @@ export default function SupplierRegisterPage() {
                       </div>
                       <div className="text-right">
                         <span className="text-lg font-bold text-white">&euro;{plan.price}</span>
-                        {plan.price > 0 && <span className="text-xs text-anthracite-400">/lună</span>}
+                        {plan.price > 0 && <span className="text-xs text-anthracite-400">/{t('month')}</span>}
                       </div>
                     </div>
                   </button>
@@ -439,8 +440,8 @@ export default function SupplierRegisterPage() {
                   disabled={loading}
                 />
                 <label htmlFor="terms" className="text-xs text-anthracite-400">
-                  Accept <Link href="#" className="text-gold-400">Termenii și Condițiile</Link> și{' '}
-                  <Link href="#" className="text-gold-400">Politica de Confidențialitate</Link>.
+                  {t('acceptTermsLabel')} <Link href="/terms" className="text-gold-400">{t('termsLink')}</Link> {t('and')}{' '}
+                  <Link href="/privacy" className="text-gold-400">{t('privacyLink')}</Link>.
                 </label>
               </div>
 
@@ -451,7 +452,7 @@ export default function SupplierRegisterPage() {
                   disabled={loading}
                   className="btn-ghost flex items-center gap-2"
                 >
-                  <ArrowLeft className="w-4 h-4" /> Înapoi
+                  <ArrowLeft className="w-4 h-4" /> {t('back')}
                 </button>
                 <button
                   type="button"
@@ -462,10 +463,10 @@ export default function SupplierRegisterPage() {
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Se procesează...
+                      {t('processing')}
                     </>
                   ) : (
-                    'Finalizează Înregistrarea'
+                    t('finishRegistration')
                   )}
                 </button>
               </div>
@@ -475,9 +476,9 @@ export default function SupplierRegisterPage() {
 
         <div className="mt-6 text-center">
           <p className="text-sm text-anthracite-400">
-            Ai deja cont?{' '}
+            {t('hasAccount')}{' '}
             <Link href="/login" className="text-gold-400 hover:text-gold-300 font-medium">
-              Autentifică-te
+              {t('loginButton')}
             </Link>
           </p>
         </div>

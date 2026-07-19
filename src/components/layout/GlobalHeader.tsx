@@ -4,15 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import { Menu, X, LayoutDashboard, LogOut, ChevronDown, User, UserPlus, Dumbbell } from 'lucide-react';
-
-const navLinks = [
-  { href: '/products?condition=new', label: 'Echipamente Noi' },
-  { href: '/products?condition=used', label: 'Second-Hand' },
-  { href: '/configurator', label: 'Construiește-ți sala' },
-  { href: '/consultation', label: 'Consultanță' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/contact', label: 'Contact' },
-];
+import { useClientTranslations } from '@/i18n/client';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 interface SessionUser {
   id: string;
@@ -21,7 +14,16 @@ interface SessionUser {
 }
 
 export default function GlobalHeader() {
+  const { t } = useClientTranslations('nav');
   const [isOpen, setIsOpen] = useState(false);
+
+  const navLinks = [
+    { href: '/products?condition=new', label: t('equipment') },
+    { href: '/products?condition=used', label: 'Second-Hand' },
+    { href: '/consultation', label: t('consultation') },
+    { href: '/blog', label: t('blog') },
+    { href: '/contact', label: t('contact') },
+  ];
   const [user, setUser] = useState<SessionUser | null>(null);
   const [userDropdown, setUserDropdown] = useState(false);
   const [registerDropdown, setRegisterDropdown] = useState(false);
@@ -101,6 +103,7 @@ export default function GlobalHeader() {
 
           {/* Desktop Actions - Right */}
           <div className="hidden lg:flex items-center gap-2">
+            <LanguageSwitcher />
             {user ? (
               <div className="relative" ref={userDropdownRef}>
                 <button
@@ -121,7 +124,7 @@ export default function GlobalHeader() {
                       onClick={() => setUserDropdown(false)}
                     >
                       <LayoutDashboard className="w-4 h-4 text-gold-400" />
-                      Dashboard-ul meu
+                      {t('dashboard')}
                     </Link>
                     <div className="border-t border-anthracite-700 my-1" />
                     <button
@@ -140,7 +143,7 @@ export default function GlobalHeader() {
                   href="/login"
                   className="px-4 py-2 text-sm text-anthracite-200 hover:text-white hover:bg-anthracite-800/50 rounded-lg transition-colors font-medium"
                 >
-                  Login
+                  {t('login')}
                 </Link>
                 <div className="relative" ref={registerDropdownRef}>
                   <button
@@ -148,7 +151,7 @@ export default function GlobalHeader() {
                     className="flex items-center gap-1.5 px-4 py-2 text-sm bg-gold-400 text-anthracite-950 font-bold rounded-lg hover:bg-gold-300 transition-colors"
                   >
                     <UserPlus className="w-4 h-4" />
-                    Înregistrare
+                    {t('register')}
                     <ChevronDown className={`w-3.5 h-3.5 transition-transform ${registerDropdown ? 'rotate-180' : ''}`} />
                   </button>
                   {registerDropdown && (
@@ -159,7 +162,7 @@ export default function GlobalHeader() {
                         onClick={() => setRegisterDropdown(false)}
                       >
                         <User className="w-4 h-4 text-blue-400" />
-                        Cont Client
+                        {t('registerClient')}
                       </Link>
                       <Link
                         href="/register/supplier"
@@ -167,7 +170,7 @@ export default function GlobalHeader() {
                         onClick={() => setRegisterDropdown(false)}
                       >
                         <Dumbbell className="w-4 h-4 text-gold-400" />
-                        Cont Furnizor
+                        {t('registerSupplier')}
                       </Link>
                     </div>
                   )}
@@ -214,7 +217,7 @@ export default function GlobalHeader() {
                     onClick={() => setIsOpen(false)}
                   >
                     <LayoutDashboard className="w-4 h-4 text-gold-400" />
-                    Dashboard-ul meu
+                    {t('dashboard')}
                   </Link>
                   <button
                     onClick={() => { handleLogout(); setIsOpen(false); }}
@@ -232,10 +235,10 @@ export default function GlobalHeader() {
                     onClick={() => setIsOpen(false)}
                   >
                     <User className="w-4 h-4" />
-                    Login
+                    {t('login')}
                   </Link>
                   <div className="px-4 py-2 text-xs text-anthracite-500 uppercase tracking-wider">
-                    Înregistrare
+                    {t('register')}
                   </div>
                   <Link
                     href="/register/client"
@@ -243,7 +246,7 @@ export default function GlobalHeader() {
                     onClick={() => setIsOpen(false)}
                   >
                     <User className="w-4 h-4 text-blue-400" />
-                    Cont Client
+                    {t('registerClient')}
                   </Link>
                   <Link
                     href="/register/supplier"
@@ -251,7 +254,7 @@ export default function GlobalHeader() {
                     onClick={() => setIsOpen(false)}
                   >
                     <Dumbbell className="w-4 h-4 text-gold-400" />
-                    Cont Furnizor
+                    {t('registerSupplier')}
                   </Link>
                 </>
               )}

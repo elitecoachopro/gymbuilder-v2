@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Dumbbell, Mail, Lock, Phone, Eye, EyeOff, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
+import { useClientTranslations } from '@/i18n/client';
 
 export default function ClientRegisterPage() {
+  const { t } = useClientTranslations('auth');
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -31,24 +33,23 @@ export default function ClientRegisterPage() {
     setError('');
     setSuccess('');
 
-    // Client-side validation
     if (!form.firstName || !form.lastName || !form.email || !form.password) {
-      setError('Toate câmpurile marcate cu * sunt obligatorii.');
+      setError(t('requiredFields'));
       return;
     }
 
     if (form.password.length < 8) {
-      setError('Parola trebuie să aibă minim 8 caractere.');
+      setError(t('passwordMin'));
       return;
     }
 
     if (form.password !== form.confirmPassword) {
-      setError('Parolele nu coincid.');
+      setError(t('passwordsMismatch'));
       return;
     }
 
     if (!form.terms) {
-      setError('Trebuie să accepți Termenii și Condițiile.');
+      setError(t('acceptTerms'));
       return;
     }
 
@@ -70,18 +71,17 @@ export default function ClientRegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Eroare la înregistrare.');
+        setError(data.error || t('registerError'));
         return;
       }
 
-      setSuccess(data.message || 'Cont creat cu succes! Verifică emailul.');
+      setSuccess(data.message || t('registerSuccess'));
       
-      // Redirect to login after 3 seconds
       setTimeout(() => {
         router.push('/login');
       }, 3000);
     } catch (err) {
-      setError('Eroare de conexiune. Verifică conexiunea la internet.');
+      setError(t('connectionError'));
     } finally {
       setLoading(false);
     }
@@ -98,11 +98,10 @@ export default function ClientRegisterPage() {
               <span className="text-gold-400">Builder</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white mt-6 mb-2">Creează Cont Client</h1>
-          <p className="text-anthracite-400">Accesează catalogul complet de echipamente.</p>
+          <h1 className="text-2xl font-bold text-white mt-6 mb-2">{t('createClientAccount')}</h1>
+          <p className="text-anthracite-400">{t('clientSubtitle')}</p>
         </div>
 
-        {/* Messages */}
         {success && (
           <div className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
@@ -120,7 +119,7 @@ export default function ClientRegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Nume *</label>
+                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('firstName')} *</label>
                 <input
                   type="text"
                   className="input-field"
@@ -131,7 +130,7 @@ export default function ClientRegisterPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Prenume *</label>
+                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('lastName')} *</label>
                 <input
                   type="text"
                   className="input-field"
@@ -159,7 +158,7 @@ export default function ClientRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Telefon</label>
+              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('phoneLabel')}</label>
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
                 <input
@@ -174,13 +173,13 @@ export default function ClientRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Parolă *</label>
+              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('password')} *</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className="input-field pl-11 pr-11"
-                  placeholder="Minim 8 caractere"
+                  placeholder={t('passwordPlaceholder')}
                   value={form.password}
                   onChange={(e) => updateField('password', e.target.value)}
                   disabled={loading}
@@ -196,13 +195,13 @@ export default function ClientRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Repetă parola *</label>
+              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('confirmPassword')} *</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className={`input-field pl-11 ${form.confirmPassword && form.password !== form.confirmPassword ? 'border-red-500 focus:border-red-500 focus:ring-red-500/30' : ''}`}
-                  placeholder="Repetă parola"
+                  placeholder={t('confirmPasswordPlaceholder')}
                   value={form.confirmPassword}
                   onChange={(e) => updateField('confirmPassword', e.target.value)}
                   disabled={loading}
@@ -210,7 +209,7 @@ export default function ClientRegisterPage() {
               </div>
               {form.confirmPassword && form.password !== form.confirmPassword && (
                 <p className="text-red-400 text-xs mt-1.5 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" /> Parolele nu coincid
+                  <AlertCircle className="w-3 h-3" /> {t('passwordsMismatch')}
                 </p>
               )}
             </div>
@@ -225,8 +224,8 @@ export default function ClientRegisterPage() {
                 disabled={loading}
               />
               <label htmlFor="terms" className="text-xs text-anthracite-400">
-                Accept <Link href="#" className="text-gold-400">Termenii și Condițiile</Link> și{' '}
-                <Link href="#" className="text-gold-400">Politica de Confidențialitate</Link>.
+                {t('acceptTermsLabel')} <Link href="/terms" className="text-gold-400">{t('termsLink')}</Link> {t('and')}{' '}
+                <Link href="/privacy" className="text-gold-400">{t('privacyLink')}</Link>.
               </label>
             </div>
 
@@ -238,25 +237,25 @@ export default function ClientRegisterPage() {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Se creează contul...
+                  {t('creatingAccount')}
                 </>
               ) : (
-                'Creează Cont'
+                t('createAccount')
               )}
             </button>
           </form>
 
           <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-anthracite-400">
-              Ai deja cont?{' '}
+              {t('hasAccount')}{' '}
               <Link href="/login" className="text-gold-400 hover:text-gold-300 font-medium">
-                Autentifică-te
+                {t('loginButton')}
               </Link>
             </p>
             <p className="text-sm text-anthracite-400">
-              Ești furnizor?{' '}
+              {t('isSupplier')}{' '}
               <Link href="/register/supplier" className="text-gold-400 hover:text-gold-300 font-medium">
-                Înregistrare Furnizor
+                {t('supplierRegister')}
               </Link>
             </p>
           </div>

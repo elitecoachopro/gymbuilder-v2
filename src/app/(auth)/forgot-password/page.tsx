@@ -3,8 +3,10 @@
 import Link from 'next/link';
 import { Dumbbell, Mail, ArrowLeft, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
+import { useClientTranslations } from '@/i18n/client';
 
 export default function ForgotPasswordPage() {
+  const { t } = useClientTranslations('auth');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -16,7 +18,7 @@ export default function ForgotPasswordPage() {
     setSuccess('');
 
     if (!email) {
-      setError('Adresa de email este obligatorie.');
+      setError(t('emailRequired'));
       return;
     }
 
@@ -32,13 +34,13 @@ export default function ForgotPasswordPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Eroare la trimiterea emailului.');
+        setError(data.error || t('resetEmailError'));
         return;
       }
 
-      setSuccess(data.message || 'Verifică emailul pentru link-ul de resetare.');
+      setSuccess(data.message || t('resetEmailSent'));
     } catch (err) {
-      setError('Eroare de conexiune. Verifică conexiunea la internet.');
+      setError(t('connectionError'));
     } finally {
       setLoading(false);
     }
@@ -55,11 +57,10 @@ export default function ForgotPasswordPage() {
               <span className="text-gold-400">Builder</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white mt-6 mb-2">Resetează Parola</h1>
-          <p className="text-anthracite-400">Introdu emailul și îți trimitem un link de resetare.</p>
+          <h1 className="text-2xl font-bold text-white mt-6 mb-2">{t('resetPasswordTitle')}</h1>
+          <p className="text-anthracite-400">{t('resetPasswordSubtitle')}</p>
         </div>
 
-        {/* Messages */}
         {success && (
           <div className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
@@ -99,10 +100,10 @@ export default function ForgotPasswordPage() {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Se trimite...
+                  {t('sending')}
                 </>
               ) : (
-                'Trimite Link de Resetare'
+                t('sendResetLink')
               )}
             </button>
           </form>
@@ -110,7 +111,7 @@ export default function ForgotPasswordPage() {
           <div className="mt-6 text-center">
             <Link href="/login" className="inline-flex items-center gap-2 text-sm text-anthracite-400 hover:text-gold-400">
               <ArrowLeft className="w-4 h-4" />
-              Înapoi la autentificare
+              {t('backToLogin')}
             </Link>
           </div>
         </div>

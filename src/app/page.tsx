@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import Footer from '@/components/layout/Footer';
 import { Star, ArrowRight, Flame, Dumbbell, Megaphone, Loader2, Sparkles, RefreshCw, Building2 } from 'lucide-react';
+import { useClientTranslations } from '@/i18n/client';
 
 interface OfertaZilei {
   id: string;
@@ -24,6 +25,7 @@ interface AnuntZilei {
 }
 
 export default function HomePage() {
+  const { t } = useClientTranslations('home');
   const [ofertaZilei, setOfertaZilei] = useState<OfertaZilei | null>(null);
   const [anunturiZilei, setAnunturiZilei] = useState<AnuntZilei[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,16 +72,16 @@ export default function HomePage() {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-gold-400/10 border border-gold-400/20 rounded-full px-4 py-1.5 mb-8">
               <Star className="w-4 h-4 text-gold-400" />
-              <span className="text-gold-400 text-sm font-medium">Platforma #1 pentru echipamente de fitness comerciale</span>
+              <span className="text-gold-400 text-sm font-medium">{t('badge')}</span>
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-              De la Vis la Sala Perfectă.
-              <span className="block gold-gradient">Construim Pentru Tine Succesul.</span>
+              {t('heroTitle1')}
+              <span className="block gold-gradient">{t('heroTitle2')}</span>
             </h1>
 
             <p className="text-xl text-anthracite-300 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Echipamentul potrivit, furnizorul potrivit — de la spațiu gol la sala visurilor tale.
+              {t('heroSubtitle')}
             </p>
 
             {/* 3 Main CTAs */}
@@ -89,10 +91,10 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-emerald-500/20 transition-colors">
                   <Sparkles className="w-6 h-6 text-emerald-400" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Echipamente Noi</h3>
-                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">Echipamente noi de la distribuitori autorizați și producători premium din toată Europa.</p>
+                <h3 className="text-xl font-bold text-white mb-3">{t('ctaNewTitle')}</h3>
+                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">{t('ctaNewDesc')}</p>
                 <span className="inline-flex items-center gap-2 text-emerald-400 font-bold text-sm group-hover:gap-3 transition-all">
-                  VEZI CATALOG NOU <ArrowRight className="w-4 h-4" />
+                  {t('ctaNewButton')} <ArrowRight className="w-4 h-4" />
                 </span>
               </Link>
 
@@ -101,10 +103,10 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
                   <RefreshCw className="w-6 h-6 text-amber-400" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Second-Hand</h3>
-                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">Echipamente verificate și recondiţionate la prețuri accesibile. Economisești până la 60%.</p>
+                <h3 className="text-xl font-bold text-white mb-3">{t('ctaUsedTitle')}</h3>
+                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">{t('ctaUsedDesc')}</p>
                 <span className="inline-flex items-center gap-2 text-amber-400 font-bold text-sm group-hover:gap-3 transition-all">
-                  VEZI SECOND-HAND <ArrowRight className="w-4 h-4" />
+                  {t('ctaUsedButton')} <ArrowRight className="w-4 h-4" />
                 </span>
               </Link>
 
@@ -113,10 +115,10 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gold-400/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-gold-400/20 transition-colors">
                   <Building2 className="w-6 h-6 text-gold-400" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Construiește-ți Sala de la 0</h3>
-                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">Planifică fiecare zonă a sălii tale. 10 categorii pe zone, de la recepție la zona spa.</p>
+                <h3 className="text-xl font-bold text-white mb-3">{t('ctaBuildTitle')}</h3>
+                <p className="text-sm text-anthracite-300 mb-6 leading-relaxed">{t('ctaBuildDesc')}</p>
                 <span className="inline-flex items-center gap-2 text-gold-400 font-bold text-sm group-hover:gap-3 transition-all">
-                  PLANIFICĂ SALA <ArrowRight className="w-4 h-4" />
+                  {t('ctaBuildButton')} <ArrowRight className="w-4 h-4" />
                 </span>
               </Link>
             </div>
@@ -124,13 +126,13 @@ export default function HomePage() {
             {/* Secondary links */}
             <div className="flex flex-wrap items-center justify-center gap-6 mt-8">
               <Link href="/register/supplier" className="text-sm text-anthracite-400 hover:text-gold-400 transition-colors inline-flex items-center gap-1">
-                Ești furnizor? Înregistrează-te gratuit <ArrowRight className="w-3.5 h-3.5" />
+                {t('supplierCta')} <ArrowRight className="w-3.5 h-3.5" />
               </Link>
               <Link href="/consultation" className="text-sm text-anthracite-400 hover:text-gold-400 transition-colors inline-flex items-center gap-1">
-                Consultanță personalizată — €99/sesiune <ArrowRight className="w-3.5 h-3.5" />
+                {t('consultationCta')} <ArrowRight className="w-3.5 h-3.5" />
               </Link>
               <Link href="/about" className="text-sm text-anthracite-400 hover:text-gold-400 transition-colors inline-flex items-center gap-1">
-                Despre GymBuilder <ArrowRight className="w-3.5 h-3.5" />
+                {t('aboutCta')} <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
@@ -138,15 +140,15 @@ export default function HomePage() {
             <div className="grid grid-cols-3 gap-8 mt-16 max-w-lg mx-auto">
               <div>
                 <div className="text-3xl font-bold text-gold-400">{stats.products}</div>
-                <div className="text-sm text-anthracite-400 mt-1">Produse</div>
+                <div className="text-sm text-anthracite-400 mt-1">{t('products')}</div>
               </div>
               <div>
                 <div className="text-3xl font-bold text-gold-400">{stats.suppliers}</div>
-                <div className="text-sm text-anthracite-400 mt-1">Furnizori</div>
+                <div className="text-sm text-anthracite-400 mt-1">{t('suppliersLabel')}</div>
               </div>
               <div>
                 <div className="text-3xl font-bold text-gold-400">{stats.brands}</div>
-                <div className="text-sm text-anthracite-400 mt-1">Branduri</div>
+                <div className="text-sm text-anthracite-400 mt-1">{t('brands')}</div>
               </div>
             </div>
           </div>
@@ -158,13 +160,13 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <Flame className="w-6 h-6 text-gold-400" />
-            <h2 className="text-2xl font-bold text-white">Oferta Zilei</h2>
+            <h2 className="text-2xl font-bold text-white">{t('dealOfDay')}</h2>
           </div>
 
           {loading ? (
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-12 text-center">
               <Loader2 className="w-8 h-8 text-gold-400 animate-spin mx-auto mb-3" />
-              <p className="text-anthracite-400 text-sm">Se încarcă oferta...</p>
+              <p className="text-anthracite-400 text-sm">{t('loading')}</p>
             </div>
           ) : ofertaZilei ? (
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl overflow-hidden">
@@ -184,7 +186,7 @@ export default function HomePage() {
                 {/* Details */}
                 <div className="p-8 flex flex-col justify-center">
                   <span className="inline-flex items-center gap-1.5 bg-gold-400/10 border border-gold-400/20 rounded-full px-3 py-1 text-xs font-bold text-gold-400 w-fit mb-4">
-                    <Flame className="w-3 h-3" /> OFERTA ZILEI
+                    <Flame className="w-3 h-3" /> {t('dealBadge')}
                   </span>
                   <h3 className="text-xl md:text-2xl font-bold text-white mb-2">{ofertaZilei.title}</h3>
                   <p className="text-sm text-anthracite-400 mb-3">
@@ -198,7 +200,7 @@ export default function HomePage() {
                     <span className="text-2xl font-bold text-gold-400">&euro;{Number(ofertaZilei.price_eur).toLocaleString()}</span>
                   </div>
                   <Link href="/products" className="inline-block bg-gold-400 text-anthracite-950 font-bold text-sm px-6 py-3 rounded-lg hover:bg-gold-300 transition-colors w-fit">
-                    Vezi Oferta
+                    {t('viewDeal')}
                   </Link>
                 </div>
               </div>
@@ -206,7 +208,7 @@ export default function HomePage() {
           ) : (
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-12 text-center">
               <Dumbbell className="w-12 h-12 text-anthracite-600 mx-auto mb-4" />
-              <p className="text-anthracite-400">Nicio ofertă disponibilă momentan</p>
+              <p className="text-anthracite-400">{t('noDeal')}</p>
             </div>
           )}
         </div>
@@ -217,13 +219,13 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <Megaphone className="w-6 h-6 text-gold-400" />
-            <h2 className="text-2xl font-bold text-white">Anunțurile Zilei</h2>
+            <h2 className="text-2xl font-bold text-white">{t('dailyAds')}</h2>
           </div>
 
           {loading ? (
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-12 text-center">
               <Loader2 className="w-8 h-8 text-gold-400 animate-spin mx-auto mb-3" />
-              <p className="text-anthracite-400 text-sm">Se încarcă anunțurile...</p>
+              <p className="text-anthracite-400 text-sm">{t('loading')}</p>
             </div>
           ) : anunturiZilei.length > 0 ? (
             <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
@@ -250,7 +252,7 @@ export default function HomePage() {
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-bold text-gold-400">&euro;{Number(item.price_eur).toLocaleString()}</span>
                       <Link href="/products" className="text-xs font-medium text-gold-400 hover:text-gold-300 flex items-center gap-1">
-                        Detalii <ArrowRight className="w-3 h-3" />
+                        {t('details')} <ArrowRight className="w-3 h-3" />
                       </Link>
                     </div>
                   </div>
@@ -260,7 +262,7 @@ export default function HomePage() {
           ) : (
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-12 text-center">
               <Megaphone className="w-12 h-12 text-anthracite-600 mx-auto mb-4" />
-              <p className="text-anthracite-400">Niciun anunț disponibil</p>
+              <p className="text-anthracite-400">{t('noAds')}</p>
             </div>
           )}
         </div>

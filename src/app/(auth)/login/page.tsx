@@ -5,8 +5,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Dumbbell, Mail, Lock, Eye, EyeOff, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/auth';
+import { useClientTranslations } from '@/i18n/client';
 
 export default function LoginPage() {
+  const { t } = useClientTranslations('auth');
   const router = useRouter();
   const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
@@ -22,12 +24,12 @@ export default function LoginPage() {
     const verified = searchParams.get('verified');
     const errorParam = searchParams.get('error');
     if (verified === 'true') {
-      setSuccess('Email confirmat cu succes! Te poți autentifica acum.');
+      setSuccess(t('emailVerified'));
     }
     if (errorParam) {
       setError(decodeURIComponent(errorParam));
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +47,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Eroare la autentificare.');
+        setError(data.error || t('loginError'));
         return;
       }
 
@@ -66,7 +68,7 @@ export default function LoginPage() {
         router.push('/');
       }
     } catch (err) {
-      setError('Eroare de conexiune. Verifică conexiunea la internet.');
+      setError(t('connectionError'));
     } finally {
       setLoading(false);
     }
@@ -84,8 +86,8 @@ export default function LoginPage() {
               <span className="text-gold-400">Builder</span>
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-white mt-6 mb-2">Bine ai revenit!</h1>
-          <p className="text-anthracite-400">Autentifică-te pentru a continua.</p>
+          <h1 className="text-2xl font-bold text-white mt-6 mb-2">{t('welcomeBack')}</h1>
+          <p className="text-anthracite-400">{t('loginSubtitle')}</p>
         </div>
 
         {/* Messages */}
@@ -123,9 +125,9 @@ export default function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-sm font-medium text-anthracite-200">Parolă</label>
+                <label className="block text-sm font-medium text-anthracite-200">{t('password')}</label>
                 <Link href="/forgot-password" className="text-xs text-gold-400 hover:text-gold-300">
-                  Ai uitat parola?
+                  {t('forgotPassword')}
                 </Link>
               </div>
               <div className="relative">
@@ -157,19 +159,19 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Se autentifică...
+                  {t('loggingIn')}
                 </>
               ) : (
-                'Autentificare'
+                t('loginButton')
               )}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-anthracite-400">
-              Nu ai cont?{' '}
+              {t('noAccount')}{' '}
               <Link href="/register/client" className="text-gold-400 hover:text-gold-300 font-medium">
-                Înregistrează-te
+                {t('register')}
               </Link>
             </p>
           </div>
