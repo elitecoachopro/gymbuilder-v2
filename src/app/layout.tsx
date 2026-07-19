@@ -3,6 +3,8 @@ import './globals.css';
 import GlobalHeader from '@/components/layout/GlobalHeader';
 import CookieConsent from '@/components/CookieConsent';
 import FloatingChatButton from '@/components/FloatingChatButton';
+import { cookies } from 'next/headers';
+import { LocaleProvider } from '@/i18n/LocaleProvider';
 
 export const metadata: Metadata = {
   title: 'GymBuilder - Premium Gym Equipment Marketplace',
@@ -12,20 +14,25 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const locale = cookieStore.get('locale')?.value || 'ro';
+
   return (
-    <html lang="ro" className="dark">
+    <html lang={locale} className="dark">
       <body className="min-h-screen bg-anthracite-950 text-white antialiased">
-        <GlobalHeader />
-        <div className="pt-16">
-          {children}
-        </div>
-        <CookieConsent />
-        <FloatingChatButton />
+        <LocaleProvider initialLocale={locale}>
+          <GlobalHeader />
+          <div className="pt-16">
+            {children}
+          </div>
+          <CookieConsent />
+          <FloatingChatButton />
+        </LocaleProvider>
       </body>
     </html>
   );
