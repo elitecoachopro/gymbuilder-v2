@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Bell, Check, CheckCheck, MessageSquare, Star, ShieldCheck, Package, X } from 'lucide-react';
 import Link from 'next/link';
+import { useClientTranslations } from '@/i18n/client';
 
 interface Notification {
   id: string;
@@ -15,6 +16,7 @@ interface Notification {
 }
 
 export default function NotificationBell() {
+  const { t, locale } = useClientTranslations('notifications');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -36,12 +38,10 @@ export default function NotificationBell() {
 
   useEffect(() => {
     fetchNotifications();
-    // Poll every 30 seconds for new notifications
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -110,13 +110,13 @@ export default function NotificationBell() {
     const date = new Date(dateStr).getTime();
     const diff = now - date;
     const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return 'Acum';
-    if (minutes < 60) return `${minutes}m`;
+    if (minutes < 1) return t('timeNow');
+    if (minutes < 60) return `${minutes}${t('timeMinutes')}`;
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h`;
+    if (hours < 24) return `${hours}${t('timeHours')}`;
     const days = Math.floor(hours / 24);
-    if (days < 7) return `${days}z`;
-    return new Date(dateStr).toLocaleDateString('ro-RO');
+    if (days < 7) return `${days}${t('timeDays')}`;
+    return new Date(dateStr).toLocaleDateString(locale === 'en' ? 'en-GB' : 'ro-RO');
   };
 
   return (
@@ -125,7 +125,7 @@ export default function NotificationBell() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-lg hover:bg-anthracite-700/50 transition-colors"
-        aria-label="Notificări"
+        aria-label={t('title')}
       >
         <Bell className="w-5 h-5 text-anthracite-300 hover:text-white transition-colors" />
         {unreadCount > 0 && (
@@ -140,7 +140,7 @@ export default function NotificationBell() {
         <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-anthracite-800 border border-anthracite-700 rounded-xl shadow-2xl z-50 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-anthracite-700">
-            <h3 className="text-sm font-semibold text-white">Notificări</h3>
+            <h3 className="text-sm font-semibold text-white">{t('title')}</h3>
             <div className="flex items-center gap-2">
               {unreadCount > 0 && (
                 <button
@@ -149,7 +149,7 @@ export default function NotificationBell() {
                   className="text-xs text-gold-400 hover:text-gold-300 flex items-center gap-1 transition-colors disabled:opacity-50"
                 >
                   <CheckCheck className="w-3 h-3" />
-                  Marchează toate
+                  {t('markAll')}
                 </button>
               )}
               <button
@@ -166,7 +166,7 @@ export default function NotificationBell() {
             {notifications.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <Bell className="w-8 h-8 text-anthracite-600 mx-auto mb-2" />
-                <p className="text-sm text-anthracite-400">Nicio notificare</p>
+                <p className="text-sm text-anthracite-400">{t('empty')}</p>
               </div>
             ) : (
               notifications.map((notification) => {
