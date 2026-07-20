@@ -69,10 +69,9 @@ async function getSupplierProfile(supabase: any, userId: string) {
 
   const { data: profile } = await supabase
     .from('supplier_profiles')
-    .select('id, status')
+    .select('id, status, plan')
     .eq('user_id', userId)
     .single();
-
   return profile;
 }
 
@@ -150,7 +149,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, category, brand, condition, price_eur, description, images } = body;
+    const { name, category, brand, condition, price_eur, description, images, images_360 } = body;
 
     // Validation
     if (!name || !category || !brand || !price_eur) {
@@ -201,6 +200,26 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Upload 360° images if provided (only professional/enterprise plans)
+    const image360Urls: string[] = [];
+    const allowedPlansFor360 = ['professional', 'enterprise'];
+    if (Array.isArray(images_360) && images_360.length > 0) {
+      if (!allowedPlansFor360.includes(supplierProfile.plan || 'free')) {
+        return NextResponse.json({ error: 'Galeria 360° este disponibilă doar pentru planurile Professional și Enterprise.' }, { status: 403 });
+      }
+      for (let i = 0; i < Math.min(images_360.length, 36); i++) {
+        const img = images_360[i];
+        if (typeof img === 'string') {
+          if (img.startsWith('data:image/')) {
+            const url = await uploadImage(supabase, img, supplierProfile.id, 100 + i);
+            if (url) image360Urls.push(url);
+          } else if (img.startsWith('http')) {
+            image360Urls.push(img);
+          }
+        }
+      }
+    }
+
     // Insert product
     const { data: newProduct, error: insertError } = await supabase
       .from('products')
@@ -213,10 +232,11 @@ export async function POST(request: NextRequest) {
         price_eur,
         description: description || null,
         images: imageUrls,
+        images_360: image360Urls,
         specs: {},
         status: 'active',
       })
-      .select('id, name, category, price_eur, status, images, created_at')
+      .select('id, name, category, price_eur, status, images, images_360, created_at')
       .single();
 
     if (insertError) {
@@ -251,29 +271,24 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = getSupabaseAdmin();
-
     const { data: supplierProfile } = await supabase
       .from('supplier_profiles')
-      .select('id')
+      .select('id, plan')
       .eq('user_id', session.userId)
       .single();
-
     if (!supplierProfile) {
       return NextResponse.json({ error: 'Profil de furnizor negăsit.' }, { status: 404 });
     }
-
     const { data: products, error } = await supabase
       .from('products')
-      .select('id, name, description, category, brand_id, condition, price_eur, images, status, created_at, updated_at')
+      .select('id, name, description, category, brand_id, condition, price_eur, images, images_360, status, created_at, updated_at')
       .eq('supplier_id', supplierProfile.id)
       .order('created_at', { ascending: false });
-
     if (error) {
       console.error('Products fetch error:', error);
       return NextResponse.json({ error: 'Eroare la încărcarea produselor.' }, { status: 500 });
     }
-
-    return NextResponse.json({ products: products || [] });
+    return NextResponse.json({ products: products || [], plan: supplierProfile.plan || 'free' });
   } catch (error) {
     console.error('Get products error:', error);
     return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
@@ -302,7 +317,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { productId, name, category, brand, condition, price_eur, description, images, status } = body;
+    const { productId, name, category, brand, condition, price_eur, description, images, images_360, status } = body;
 
     if (!productId) {
       return NextResponse.json({ error: 'ID produs lipsă.' }, { status: 400 });
@@ -352,11 +367,32 @@ export async function PATCH(request: NextRequest) {
       updateData.images = imageUrls;
     }
 
+    // Handle 360° images (upload new ones, keep existing URLs) - only professional/enterprise
+    if (Array.isArray(images_360)) {
+      const allowedPlansFor360 = ['professional', 'enterprise'];
+      if (!allowedPlansFor360.includes(supplierProfile.plan || 'free')) {
+        return NextResponse.json({ error: 'Galeria 360° este disponibilă doar pentru planurile Professional și Enterprise.' }, { status: 403 });
+      }
+      const image360Urls: string[] = [];
+      for (let i = 0; i < Math.min(images_360.length, 36); i++) {
+        const img = images_360[i];
+        if (typeof img === 'string') {
+          if (img.startsWith('data:image/')) {
+            const url = await uploadImage(supabase, img, supplierProfile.id, 100 + i);
+            if (url) image360Urls.push(url);
+          } else if (img.startsWith('http')) {
+            image360Urls.push(img);
+          }
+        }
+      }
+      updateData.images_360 = image360Urls;
+    }
+
     const { data: updatedProduct, error: updateError } = await supabase
       .from('products')
       .update(updateData)
       .eq('id', productId)
-      .select('id, name, category, price_eur, status, images, updated_at')
+      .select('id, name, category, price_eur, status, images, images_360, updated_at')
       .single();
 
     if (updateError) {

@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Package, Send, X, Loader2, Building2, MapPin, Tag, Wrench, Star, ChevronLeft, ChevronRight, ShoppingCart, Check, Layers } from 'lucide-react';
+import { ArrowLeft, Package, Send, X, Loader2, Building2, MapPin, Tag, Wrench, Star, ChevronLeft, ChevronRight, ShoppingCart, Check, Layers, RotateCw, Image as ImageIcon } from 'lucide-react';
 import { useCartStore, CartProduct } from '@/store/cart';
+import Viewer360 from '@/components/Viewer360';
+import { useClientLocale } from '@/i18n/client';
 
 interface SupplierInfo {
   id: string;
@@ -23,6 +25,7 @@ interface Product {
   condition: string;
   price_eur: number;
   images: string[];
+  images_360?: string[];
   specs: Record<string, string> | null;
   brand_name: string | null;
   brand_id: string | null;
@@ -69,6 +72,8 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedImage, setSelectedImage] = useState(0);
+  const locale = useClientLocale();
+  const [viewMode, setViewMode] = useState<'gallery' | '360'>('gallery');
   const [showModal, setShowModal] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [formSuccess, setFormSuccess] = useState(false);
@@ -208,6 +213,7 @@ export default function ProductDetailPage() {
   }
 
   const images = product.images && product.images.length > 0 ? product.images : [];
+  const has360 = product.images_360 && product.images_360.length >= 12;
   const supplier = product.supplier_profiles;
 
   return (
@@ -305,56 +311,91 @@ export default function ProductDetailPage() {
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left - Image Gallery */}
+          {/* Left - Image Gallery / 360° Viewer */}
           <div>
-            {/* Main Image */}
-            <div className="aspect-square bg-anthracite-800 border border-anthracite-700 rounded-2xl overflow-hidden relative mb-4">
-              {images.length > 0 ? (
-                <>
-                  <img
-                    src={images[selectedImage]}
-                    alt={product.name}
-                    className="w-full h-full object-contain"
-                  />
-                  {images.length > 1 && (
-                    <>
-                      <button
-                        onClick={() => setSelectedImage(prev => prev > 0 ? prev - 1 : images.length - 1)}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-anthracite-900/80 rounded-full flex items-center justify-center text-white hover:bg-anthracite-800 transition-colors"
-                      >
-                        <ChevronLeft className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => setSelectedImage(prev => prev < images.length - 1 ? prev + 1 : 0)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-anthracite-900/80 rounded-full flex items-center justify-center text-white hover:bg-anthracite-800 transition-colors"
-                      >
-                        <ChevronRight className="w-5 h-5" />
-                      </button>
-                    </>
-                  )}
-                </>
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Package className="w-20 h-20 text-anthracite-600" />
-                </div>
-              )}
-            </div>
-
-            {/* Thumbnails */}
-            {images.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setSelectedImage(i)}
-                    className={`w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${
-                      selectedImage === i ? 'border-gold-400' : 'border-anthracite-700 hover:border-anthracite-500'
-                    }`}
-                  >
-                    <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
+            {/* View mode toggle (only if 360° is available) */}
+            {has360 && (
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => setViewMode('gallery')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
+                    viewMode === 'gallery'
+                      ? 'bg-gold-400/10 border-gold-400/50 text-gold-400'
+                      : 'bg-anthracite-800 border-anthracite-700 text-anthracite-300 hover:border-anthracite-500'
+                  }`}
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  {locale === 'en' ? 'Gallery' : 'Galerie'}
+                </button>
+                <button
+                  onClick={() => setViewMode('360')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
+                    viewMode === '360'
+                      ? 'bg-gold-400/10 border-gold-400/50 text-gold-400'
+                      : 'bg-anthracite-800 border-anthracite-700 text-anthracite-300 hover:border-anthracite-500'
+                  }`}
+                >
+                  <RotateCw className="w-4 h-4" />
+                  360°
+                </button>
               </div>
+            )}
+
+            {/* 360° Viewer */}
+            {viewMode === '360' && has360 && product.images_360 ? (
+              <Viewer360 images={product.images_360} productName={product.name} locale={locale} />
+            ) : (
+              <>
+                {/* Main Image */}
+                <div className="aspect-square bg-anthracite-800 border border-anthracite-700 rounded-2xl overflow-hidden relative mb-4">
+                  {images.length > 0 ? (
+                    <>
+                      <img
+                        src={images[selectedImage]}
+                        alt={product.name}
+                        className="w-full h-full object-contain"
+                      />
+                      {images.length > 1 && (
+                        <>
+                          <button
+                            onClick={() => setSelectedImage(prev => prev > 0 ? prev - 1 : images.length - 1)}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-anthracite-900/80 rounded-full flex items-center justify-center text-white hover:bg-anthracite-800 transition-colors"
+                          >
+                            <ChevronLeft className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => setSelectedImage(prev => prev < images.length - 1 ? prev + 1 : 0)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-anthracite-900/80 rounded-full flex items-center justify-center text-white hover:bg-anthracite-800 transition-colors"
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </button>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Package className="w-20 h-20 text-anthracite-600" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Thumbnails */}
+                {images.length > 1 && (
+                  <div className="flex gap-2 overflow-x-auto pb-2">
+                    {images.map((img, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setSelectedImage(i)}
+                        className={`w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-colors ${
+                          selectedImage === i ? 'border-gold-400' : 'border-anthracite-700 hover:border-anthracite-500'
+                        }`}
+                      >
+                        <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
 

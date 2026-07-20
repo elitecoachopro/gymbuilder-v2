@@ -794,7 +794,13 @@
     "requiredFieldsError": "Completează toate câmpurile obligatorii (nume, categorie, brand, preț).",
     "selectBrand": "Selectează brandul...",
     "selectCategory": "Selectează categoria...",
-    "successMessage": "Produs adăugat cu succes! Redirecționare..."
+    "successMessage": "Produs adăugat cu succes! Redirecționare...",
+    "gallery360Title": "Galerie 360°",
+    "gallery360Hint": "Încarcă 12-36 imagini ale produsului fotografiat din unghiuri succesive (la fiecare 10-30°) pentru vizualizare interactivă.",
+    "gallery360Add": "Adaugă imagini 360°",
+    "gallery360Count": "imagini",
+    "gallery360Min": "Minim 12 imagini necesare",
+    "gallery360Locked": "Galeria 360° este disponibilă doar pentru planurile Professional și Enterprise. Upgrade-ează pentru a activa această funcție."
   },
   "notifications": {
     "title": "Notificări",

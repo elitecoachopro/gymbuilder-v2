@@ -794,7 +794,13 @@
     "requiredFieldsError": "Fill in all required fields (name, category, brand, price).",
     "selectBrand": "Select brand...",
     "selectCategory": "Select category...",
-    "successMessage": "Product added successfully! Redirecting..."
+    "successMessage": "Product added successfully! Redirecting...",
+    "gallery360Title": "360° Gallery",
+    "gallery360Hint": "Upload 12-36 images of the product photographed from successive angles (every 10-30°) for interactive viewing.",
+    "gallery360Add": "Add 360° images",
+    "gallery360Count": "images",
+    "gallery360Min": "Minimum 12 images required",
+    "gallery360Locked": "360° Gallery is available only for Professional and Enterprise plans. Upgrade to enable this feature."
   },
   "notifications": {
     "title": "Notifications",

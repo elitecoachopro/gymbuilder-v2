@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Dumbbell, Plus, Pencil, Trash2, Loader2, Package, ArrowLeft, Eye, EyeOff, CheckCircle, LogOut, X, Save, PackagePlus, Upload, Download, AlertTriangle, FileSpreadsheet, Layers } from 'lucide-react';
+import { Dumbbell, Plus, Pencil, Trash2, Loader2, Package, ArrowLeft, Eye, EyeOff, CheckCircle, LogOut, X, Save, PackagePlus, Upload, Download, AlertTriangle, FileSpreadsheet, Layers, RotateCw } from 'lucide-react';
 import { useClientTranslations } from '@/i18n/client';
 
 interface Product {
@@ -15,6 +15,7 @@ interface Product {
   condition: 'new' | 'used';
   price_eur: number;
   images: string[];
+  images_360?: string[];
   status: 'active' | 'inactive' | 'featured';
   created_at: string;
   updated_at: string;
@@ -44,6 +45,7 @@ export default function SupplierProductsPage() {
   const [variantsLoading, setVariantsLoading] = useState(false);
   const [newVariant, setNewVariant] = useState({ label: '', price_override: '', description_override: '', image_url: '' });
   const [addingVariant, setAddingVariant] = useState(false);
+  const [supplierPlan, setSupplierPlan] = useState<string>('free');
 
   const categoryLabels: Record<string, string> = {
     cardio: t('categories.cardio'),
@@ -77,6 +79,7 @@ export default function SupplierProductsPage() {
       if (res.ok) {
         const data = await res.json();
         setProducts(data.products || []);
+        if (data.plan) setSupplierPlan(data.plan);
       } else {
         const data = await res.json();
         showToast(data.error || t('loadError'), 'error');
@@ -867,6 +870,11 @@ function ProductCard({
           }`}>
             {product.status === 'active' || product.status === 'featured' ? t('statusAvailable') : t('statusUnavailable')}
           </span>
+          {product.images_360 && product.images_360.length >= 12 && (
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-gold-400/10 text-gold-400">
+              <RotateCw className="w-2.5 h-2.5" /> 360°
+            </span>
+          )}
           <span className="text-[10px] text-anthracite-500">
             {t('added')}: {new Date(product.created_at).toLocaleDateString(dateLocale)}
           </span>

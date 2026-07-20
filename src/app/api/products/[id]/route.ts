@@ -24,7 +24,7 @@ export async function GET(
     // Fetch product
     const { data: product, error } = await supabase
       .from('products')
-      .select('id, name, description, category, condition, price_eur, images, specs, status, supplier_id, brand_id, created_at')
+      .select('id, name, description, category, condition, price_eur, images, images_360, specs, status, supplier_id, brand_id, created_at')
       .eq('id', id)
       .eq('status', 'active')
       .single();

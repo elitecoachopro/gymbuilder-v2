@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { Dumbbell, ArrowLeft, Upload, X, Loader2, CheckCircle, AlertCircle, ImagePlus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Dumbbell, ArrowLeft, Upload, X, Loader2, CheckCircle, AlertCircle, ImagePlus, RotateCw } from 'lucide-react';
 import { useClientTranslations } from '@/i18n/client';
 
 const brands = [
@@ -22,6 +22,9 @@ export default function NewProductPage() {
   const [success, setSuccess] = useState('');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [images360Files, setImages360Files] = useState<File[]>([]);
+  const [images360Previews, setImages360Previews] = useState<string[]>([]);
+  const [supplierPlan, setSupplierPlan] = useState<string>('free');
 
   const [form, setForm] = useState({
     name: '',
@@ -31,6 +34,48 @@ export default function NewProductPage() {
     price: '',
     description: '',
   });
+
+  // Fetch supplier plan on mount
+  useEffect(() => {
+    fetch('/api/supplier/products').then(res => res.json()).then(data => {
+      if (data.plan) setSupplierPlan(data.plan);
+    }).catch(() => {});
+  }, []);
+
+  const has360Access = ['professional', 'enterprise'].includes(supplierPlan);
+
+  const handleImage360Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const remaining = 36 - images360Files.length;
+    const newFiles = Array.from(files).slice(0, remaining);
+    for (const file of newFiles) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError(t('fileSizeError').replace('{name}', file.name));
+        return;
+      }
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+        setError(t('fileFormatError').replace('{name}', file.name));
+        return;
+      }
+    }
+    setError('');
+    setImages360Files(prev => [...prev, ...newFiles]);
+    newFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        if (ev.target?.result) {
+          setImages360Previews(prev => [...prev, ev.target!.result as string]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage360 = (index: number) => {
+    setImages360Files(prev => prev.filter((_, i) => i !== index));
+    setImages360Previews(prev => prev.filter((_, i) => i !== index));
+  };
 
   const categories = [
     { value: 'cardio', label: t('categories.cardio') },
@@ -126,6 +171,24 @@ export default function NewProductPage() {
         setUploadingImages(false);
       }
 
+      // Upload 360° images if available
+      const uploaded360Urls: string[] = [];
+      if (images360Files.length >= 12 && has360Access) {
+        for (const file of images360Files) {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('folder', 'products-360');
+          const uploadRes = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
+          if (uploadRes.ok) {
+            const uploadData = await uploadRes.json();
+            if (uploadData.url) uploaded360Urls.push(uploadData.url);
+          }
+        }
+      }
+
       const res = await fetch('/api/supplier/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -137,6 +200,7 @@ export default function NewProductPage() {
           price_eur: price,
           description: form.description || null,
           images: uploadedUrls,
+          ...(uploaded360Urls.length >= 12 ? { images_360: uploaded360Urls } : {}),
         }),
       });
 
@@ -345,6 +409,70 @@ export default function NewProductPage() {
               )}
             </div>
           </div>
+
+          {/* 360° Gallery */}
+          {has360Access && (
+            <div className="glass-card p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <RotateCw className="w-5 h-5 text-gold-400" />
+                <h2 className="text-lg font-semibold text-white">{t('gallery360Title')}</h2>
+              </div>
+              <p className="text-sm text-anthracite-400 mb-4">{t('gallery360Hint')}</p>
+
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+                {images360Previews.map((img, index) => (
+                  <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-anthracite-700">
+                    <img src={img} alt={`360° #${index + 1}`} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage360(index)}
+                      disabled={loading}
+                      className="absolute top-1 right-1 p-0.5 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
+                    >
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                    <span className="absolute bottom-0.5 left-0.5 text-[10px] bg-anthracite-900/80 text-anthracite-300 px-1 rounded">
+                      {index + 1}
+                    </span>
+                  </div>
+                ))}
+
+                {images360Previews.length < 36 && (
+                  <label className="aspect-square rounded-lg border-2 border-dashed border-anthracite-600 hover:border-gold-400/50 flex flex-col items-center justify-center cursor-pointer transition-colors">
+                    <RotateCw className="w-5 h-5 text-anthracite-500 mb-1" />
+                    <span className="text-[10px] text-anthracite-400 text-center px-1">{t('gallery360Add')}</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      multiple
+                      className="hidden"
+                      onChange={handleImage360Change}
+                      disabled={loading}
+                    />
+                  </label>
+                )}
+              </div>
+
+              <div className="mt-3 flex items-center gap-2">
+                <span className={`text-xs ${images360Previews.length >= 12 ? 'text-emerald-400' : 'text-anthracite-400'}`}>
+                  {images360Previews.length}/36 {t('gallery360Count')}
+                </span>
+                {images360Previews.length > 0 && images360Previews.length < 12 && (
+                  <span className="text-xs text-amber-400">{t('gallery360Min')}</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {!has360Access && (
+            <div className="glass-card p-6 opacity-60">
+              <div className="flex items-center gap-3 mb-2">
+                <RotateCw className="w-5 h-5 text-anthracite-500" />
+                <h2 className="text-lg font-semibold text-anthracite-400">{t('gallery360Title')}</h2>
+              </div>
+              <p className="text-sm text-anthracite-500">{t('gallery360Locked')}</p>
+            </div>
+          )}
 
           {/* Submit */}
           <div className="flex items-center gap-4">
