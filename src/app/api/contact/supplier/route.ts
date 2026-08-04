@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
+import * as crypto from 'crypto';
 import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
 function escapeHtml(str: string): string {
@@ -17,6 +19,24 @@ function getSupabase() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
+}
+
+function getUserFromSession(): { userId: string } | null {
+  try {
+    const cookieStore = cookies();
+    const sessionToken = cookieStore.get('session_token')?.value;
+    if (!sessionToken) return null;
+    const [payloadB64, signature] = sessionToken.split('.');
+    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || '';
+    const decodedPayload = Buffer.from(payloadB64, 'base64').toString();
+    const expected = crypto.createHmac('sha256', secret).update(decodedPayload).digest('hex');
+    if (signature !== expected) return null;
+    const data = JSON.parse(decodedPayload);
+    if (data.exp && data.exp < Date.now()) return null;
+    return { userId: data.userId };
+  } catch {
+    return null;
+  }
 }
 
 async function sendEmail(to: string, subject: string, html: string) {
@@ -89,10 +109,16 @@ export async function POST(request: NextRequest) {
     // Save contact request to database
     const { productId, product_id: productIdAlt } = body;
     const resolvedProductId = productId || productIdAlt || null;
+
+    // Try to get logged-in user's ID to link the contact request
+    const session = getUserFromSession();
+    const clientId = session?.userId || null;
+
     await supabase.from('contact_requests').insert({
       client_name: name,
       client_email: email,
       client_phone: phone || null,
+      client_id: clientId,
       supplier_id: resolvedSupplierId,
       product_id: resolvedProductId,
       message: message,

@@ -148,14 +148,14 @@ function NewsletterForm() {
           value={email}
           onChange={(e) => { setEmail(e.target.value); if (status === 'error') setStatus('idle'); }}
           placeholder={t('newsletterPlaceholder')}
-          className="flex-1 bg-anthracite-800 border border-anthracite-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors"
+          className="flex-1 min-w-0 bg-anthracite-800 border border-anthracite-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors"
           disabled={status === 'loading'}
           required
         />
         <button
           type="submit"
           disabled={status === 'loading' || !email.trim()}
-          className="bg-gold-400 text-anthracite-950 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-gold-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="bg-gold-400 text-anthracite-950 px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-gold-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
         >
           {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           {t('subscribe')}

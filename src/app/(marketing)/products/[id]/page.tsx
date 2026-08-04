@@ -168,6 +168,7 @@ export default function ProductDetailPage() {
         body: JSON.stringify({
           ...form,
           supplierId: product.supplier_profiles.id,
+          productId: product.id,
           message: `[Produs: ${product.name}]\n\n${form.message}`,
         }),
       });
@@ -217,7 +218,7 @@ export default function ProductDetailPage() {
   const supplier = product.supplier_profiles;
 
   return (
-    <main className="min-h-screen bg-anthracite-950">
+    <main className="min-h-screen bg-anthracite-950" data-supplier-id={supplier.id} data-supplier-name={supplier.company_name}>
       {/* Offer Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
