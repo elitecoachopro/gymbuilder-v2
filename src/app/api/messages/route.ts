@@ -310,7 +310,7 @@ export async function POST(request: NextRequest) {
         type: 'new_message',
         title: `Mesaj nou de la ${senderName}`,
         message: productName ? `Produs: ${productName} — "${sanitizedContent.substring(0, 80)}"` : sanitizedContent.substring(0, 100),
-        link: '/client/dashboard',
+        link: '/client/dashboard#cereri',
         is_read: false,
       });
 
