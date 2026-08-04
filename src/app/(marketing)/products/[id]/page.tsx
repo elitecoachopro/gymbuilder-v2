@@ -30,7 +30,7 @@ interface Product {
   brand_name: string | null;
   brand_id: string | null;
   created_at: string;
-  supplier_profiles: SupplierInfo;
+  supplier: SupplierInfo;
 }
 
 interface SimilarProduct {
@@ -40,7 +40,7 @@ interface SimilarProduct {
   images: string[];
   condition: string;
   category: string;
-  supplier_profiles: { company_name: string };
+  supplier: { company_name: string };
 }
 
 interface Review {
@@ -128,8 +128,8 @@ export default function ProductDetailPage() {
         setProduct(json.product);
         setSimilar(json.similar || []);
         // Fetch reviews for this supplier
-        if (json.product?.supplier_profiles?.id) {
-          fetchReviews(json.product.supplier_profiles.id);
+        if (json.product?.supplier?.id) {
+          fetchReviews(json.product.supplier.id);
         }
       } else if (res.status === 404) {
         setError('Produsul nu a fost găsit.');
@@ -167,7 +167,7 @@ export default function ProductDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
-          supplierId: product.supplier_profiles.id,
+          supplierId: product.supplier.id,
           productId: product.id,
           message: `[Produs: ${product.name}]\n\n${form.message}`,
         }),
@@ -215,7 +215,7 @@ export default function ProductDetailPage() {
 
   const images = product.images && product.images.length > 0 ? product.images : [];
   const has360 = product.images_360 && product.images_360.length >= 12;
-  const supplier = product.supplier_profiles;
+  const supplier = product.supplier;
 
   return (
     <main className="min-h-screen bg-anthracite-950" data-supplier-id={supplier.id} data-supplier-name={supplier.company_name}>
@@ -604,9 +604,9 @@ export default function ProductDetailPage() {
                   </p>
                 </div>
               ))}
-              {reviewCount > 3 && product?.supplier_profiles && (
+              {reviewCount > 3 && product?.supplier && (
                 <Link
-                  href={`/suppliers/${product.supplier_profiles.id}`}
+                  href={`/suppliers/${product.supplier.id}`}
                   className="inline-flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium"
                 >
                   Vezi toate cele {reviewCount} recenzii →
@@ -642,7 +642,7 @@ export default function ProductDetailPage() {
                     </span>
                   </div>
                   <div className="p-4">
-                    <p className="text-xs text-anthracite-400">{(item.supplier_profiles as any)?.company_name}</p>
+                    <p className="text-xs text-anthracite-400">{(item.supplier as any)?.company_name}</p>
                     <h3 className="text-sm font-semibold text-white mt-1 line-clamp-2">{item.name}</h3>
                     <span className="text-lg font-bold text-gold-400 mt-2 block">€{Number(item.price_eur).toLocaleString()}</span>
                   </div>
