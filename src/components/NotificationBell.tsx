@@ -101,6 +101,7 @@ export default function NotificationBell() {
       case 'review_new': return <Star className="w-4 h-4 text-gold-400" />;
       case 'supplier_approved': return <ShieldCheck className="w-4 h-4 text-emerald-400" />;
       case 'product_approved': return <Package className="w-4 h-4 text-blue-400" />;
+      case 'contact_message': return <MessageSquare className="w-4 h-4 text-amber-400" />;
       default: return <Bell className="w-4 h-4 text-anthracite-400" />;
     }
   };

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, Star, MessageSquare, LogOut, BadgeCheck, Send, Newspaper, Eye, Phone, MapPin, CreditCard, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import NotificationBell from '@/components/NotificationBell';
 
 interface Supplier {
   id: string;
@@ -464,6 +465,7 @@ export default function AdminDashboard() {
               <p className="text-anthracite-400 text-sm mt-1">Gestionează furnizorii și platforma</p>
             </div>
             <div className="flex items-center gap-3">
+              <NotificationBell />
               {pendingCount > 0 && (
                 <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-2">
                   <Bell className="w-4 h-4 text-amber-400" />

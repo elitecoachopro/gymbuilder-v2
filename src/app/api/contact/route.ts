@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
 function escapeHtml(str: string): string {
@@ -9,6 +10,13 @@ function escapeHtml(str: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#x27;');
+}
+
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -101,6 +109,31 @@ export async function POST(request: NextRequest) {
         { error: 'Eroare la trimiterea mesajului. Încearcă din nou.' },
         { status: 500 }
       );
+    }
+
+    // Create in-app notification for all admin users
+    try {
+      const supabase = getSupabase();
+      const { data: adminUsers } = await supabase
+        .from('users')
+        .select('id')
+        .eq('role', 'admin')
+        .limit(5);
+
+      if (adminUsers && adminUsers.length > 0) {
+        const notifications = adminUsers.map((admin: { id: string }) => ({
+          user_id: admin.id,
+          type: 'contact_message',
+          title: `Mesaj contact: ${subject.trim().substring(0, 60)}`,
+          message: `De la ${name.trim()} (${email.trim()}): ${message.trim().substring(0, 120)}`,
+          link: '/admin#contact',
+          is_read: false,
+        }));
+        await supabase.from('notifications').insert(notifications);
+      }
+    } catch (notifErr) {
+      // Don't fail the request if notification insert fails
+      console.error('Admin notification insert error:', notifErr);
     }
 
     return NextResponse.json({ message: 'Mesajul a fost trimis cu succes!' });

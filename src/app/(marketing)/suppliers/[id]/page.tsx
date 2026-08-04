@@ -186,7 +186,7 @@ export default function SupplierProfilePage() {
   const { supplier, products, stats } = data;
 
   return (
-    <main className="min-h-screen bg-anthracite-950">
+    <main className="min-h-screen bg-anthracite-950" data-supplier-id={supplier.id} data-supplier-name={supplier.company_name}>
       {/* Contact Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">

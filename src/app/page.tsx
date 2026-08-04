@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import Footer from '@/components/layout/Footer';
+import SearchWidget from '@/components/SearchWidget';
 import { Star, ArrowRight, Flame, Dumbbell, Megaphone, Loader2, Sparkles, RefreshCw, Building2 } from 'lucide-react';
 import { useClientTranslations } from '@/i18n/client';
 
@@ -83,6 +84,11 @@ export default function HomePage() {
             <p className="text-xl text-anthracite-300 mb-12 max-w-2xl mx-auto leading-relaxed">
               {t('heroSubtitle')}
             </p>
+
+            {/* Search Widget */}
+            <div className="mb-12">
+              <SearchWidget />
+            </div>
 
             {/* 3 Main CTAs */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
