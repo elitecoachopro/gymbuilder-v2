@@ -810,5 +810,17 @@
     "timeMinutes": "m",
     "timeHours": "h",
     "timeDays": "d"
+  },
+  "searchWidget": {
+    "catAll": "All",
+    "catCardio": "Cardio",
+    "catStrength": "Free Weights",
+    "catFunctional": "Functional / Crossfit",
+    "catAccessories": "Accessories",
+    "placeholder": "Search treadmill, squat rack...",
+    "search": "Search",
+    "searching": "Searching...",
+    "noResults": "No results found",
+    "searchCount": "Search {count} Equipment"
   }
 }

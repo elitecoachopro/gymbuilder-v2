@@ -810,5 +810,17 @@
     "timeMinutes": "m",
     "timeHours": "h",
     "timeDays": "z"
+  },
+  "searchWidget": {
+    "catAll": "Toate",
+    "catCardio": "Cardio",
+    "catStrength": "Greutăți Libere",
+    "catFunctional": "Funcțional / Crossfit",
+    "catAccessories": "Accesorii",
+    "placeholder": "Caută bandă alergare, rack squat...",
+    "search": "Caută",
+    "searching": "Se caută...",
+    "noResults": "Niciun rezultat",
+    "searchCount": "Caută {count} Echipamente"
   }
 }
