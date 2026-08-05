@@ -63,7 +63,15 @@ export default function AdminDashboard() {
     }
   };
   const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
-  const [adminSection, setAdminSection] = useState<'suppliers' | 'reviews' | 'newsletter'>('suppliers');
+  const [adminSection, setAdminSection] = useState<'suppliers' | 'reviews' | 'newsletter' | 'contact'>('suppliers');
+  // Contact messages states
+  const [contactMessages, setContactMessages] = useState<any[]>([]);
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactReplyId, setContactReplyId] = useState<string | null>(null);
+  const [contactReplyText, setContactReplyText] = useState('');
+  const [contactReplySending, setContactReplySending] = useState(false);
+  const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
+  const [contactUnreadCount, setContactUnreadCount] = useState(0);
   const [reviewsList, setReviewsList] = useState<ReviewItem[]>([]);
   const [reviewsPendingCount, setReviewsPendingCount] = useState(0);
   const [reviewsLoading, setReviewsLoading] = useState(false);
@@ -90,7 +98,36 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (adminSection === 'reviews') fetchReviews();
+    if (adminSection === 'contact') fetchContactMessages();
   }, [adminSection]);
+
+  // Handle hash-based navigation for notifications (initial + hashchange)
+  useEffect(() => {
+    function handleHash() {
+      const hash = window.location.hash;
+      if (hash.startsWith('#contact')) {
+        setAdminSection('contact');
+        fetchContactMessages();
+        // Extract message ID from hash like #contact-uuid
+        const msgId = hash.replace('#contact-', '').replace('#contact', '');
+        if (msgId && msgId.length > 10) {
+          setHighlightedMessageId(msgId);
+          // Scroll to the message after data loads
+          setTimeout(() => {
+            const el = document.getElementById(`contact-msg-${msgId}`);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              el.classList.add('ring-2', 'ring-gold-400');
+              setTimeout(() => el.classList.remove('ring-2', 'ring-gold-400'), 3000);
+            }
+          }, 800);
+        }
+      }
+    }
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
 
   async function fetchReviews() {
     setReviewsLoading(true);
@@ -157,6 +194,58 @@ export default function AdminDashboard() {
         setNewsletterSubscribers(data.subscribers || []);
       }
     } catch {} finally { setNewsletterLoading(false); }
+  }
+
+  async function fetchContactMessages() {
+    setContactLoading(true);
+    try {
+      const res = await fetch('/api/admin/contact-messages', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        setContactMessages(data.messages || []);
+        setContactUnreadCount((data.messages || []).filter((m: any) => m.status === 'unread').length);
+      }
+    } catch {} finally { setContactLoading(false); }
+  }
+
+  async function markContactRead(id: string, status: 'read' | 'unread') {
+    try {
+      const res = await fetch('/api/admin/contact-messages', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ id, status }),
+      });
+      if (res.ok) {
+        setContactMessages(prev => prev.map(m => m.id === id ? { ...m, status } : m));
+        setContactUnreadCount(prev => status === 'read' ? prev - 1 : prev + 1);
+        showToast(status === 'read' ? 'Marcat ca citit' : 'Marcat ca necitit');
+      }
+    } catch { showToast('Eroare', 'error'); }
+  }
+
+  async function sendContactReply(id: string) {
+    if (!contactReplyText.trim()) return;
+    setContactReplySending(true);
+    try {
+      const res = await fetch('/api/admin/contact-messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ id, reply: contactReplyText }),
+      });
+      if (res.ok) {
+        showToast('Răspuns trimis cu succes!');
+        setContactReplyId(null);
+        setContactReplyText('');
+        setContactMessages(prev => prev.map(m => m.id === id ? { ...m, status: 'replied', admin_reply: contactReplyText, replied_at: new Date().toISOString() } : m));
+        setContactUnreadCount(prev => Math.max(0, prev - 1));
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Eroare la trimitere', 'error');
+      }
+    } catch { showToast('Eroare la trimitere', 'error'); }
+    setContactReplySending(false);
   }
 
   async function sendNewsletter() {
@@ -521,9 +610,147 @@ export default function AdminDashboard() {
             >
               <Newspaper className="w-4 h-4" /> Newsletter
             </button>
+            <button
+              onClick={() => { setAdminSection('contact'); fetchContactMessages(); }}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                adminSection === 'contact'
+                  ? 'bg-anthracite-700 text-gold-400'
+                  : 'text-anthracite-400 hover:text-white'
+              }`}
+            >
+              <Mail className="w-4 h-4" /> Mesaje Contact
+              {contactUnreadCount > 0 && (
+                <span className="bg-amber-500 text-anthracite-950 text-xs font-bold px-1.5 py-0.5 rounded-full">{contactUnreadCount}</span>
+              )}
+            </button>
           </div>
 
-          {adminSection === 'newsletter' ? (
+          {adminSection === 'contact' ? (
+            /* Contact Messages Section */
+            <div>
+              {contactLoading ? (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <Loader2 className="w-8 h-8 text-gold-400 animate-spin mb-4" />
+                  <p className="text-anthracite-400 text-sm">Se încarcă mesajele...</p>
+                </div>
+              ) : contactMessages.length === 0 ? (
+                <div className="text-center py-20">
+                  <Mail className="w-16 h-16 text-anthracite-600 mx-auto mb-4" />
+                  <h2 className="text-xl font-semibold text-white mb-2">Niciun mesaj de contact</h2>
+                  <p className="text-anthracite-400 text-sm">Nu ai primit încă mesaje prin formularul de contact.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-anthracite-400 text-sm mb-4">{contactMessages.length} mesaje totale • {contactUnreadCount} necitite</p>
+                  {contactMessages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      id={`contact-msg-${msg.id}`}
+                      className={`bg-anthracite-800 border rounded-xl p-4 sm:p-6 transition-all duration-300 ${
+                        msg.status === 'unread'
+                          ? 'border-gold-400/50 bg-anthracite-800/80'
+                          : msg.status === 'replied'
+                          ? 'border-emerald-500/30'
+                          : 'border-anthracite-700'
+                      } ${highlightedMessageId === msg.id ? 'ring-2 ring-gold-400 ring-offset-2 ring-offset-anthracite-950' : ''}`}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-2 flex-wrap">
+                            <span className="font-semibold text-white">{msg.name}</span>
+                            <a href={`mailto:${msg.email}`} className="text-sm text-gold-400 hover:underline">{msg.email}</a>
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                              msg.status === 'unread'
+                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                                : msg.status === 'replied'
+                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                                : 'bg-anthracite-600/30 text-anthracite-400 border border-anthracite-600'
+                            }`}>
+                              {msg.status === 'unread' ? 'Necitit' : msg.status === 'replied' ? 'Răspuns' : 'Citit'}
+                            </span>
+                          </div>
+                          <p className="text-sm text-anthracite-400 mb-2">
+                            <strong className="text-anthracite-300">Subiect:</strong> {msg.subject}
+                          </p>
+                          <p className="text-sm text-anthracite-300 mb-1">
+                            <Clock className="w-3.5 h-3.5 inline mr-1" />
+                            {new Date(msg.created_at).toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' })}
+                          </p>
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          {msg.status === 'unread' ? (
+                            <button
+                              onClick={() => markContactRead(msg.id, 'read')}
+                              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-anthracite-700 text-anthracite-300 hover:text-white border border-anthracite-600 hover:border-anthracite-500 transition-colors"
+                            >
+                              <Eye className="w-3.5 h-3.5 inline mr-1" /> Marchează citit
+                            </button>
+                          ) : msg.status === 'read' ? (
+                            <button
+                              onClick={() => markContactRead(msg.id, 'unread')}
+                              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-anthracite-700 text-anthracite-300 hover:text-white border border-anthracite-600 hover:border-anthracite-500 transition-colors"
+                            >
+                              Marchează necitit
+                            </button>
+                          ) : null}
+                        </div>
+                      </div>
+                      {/* Full message */}
+                      <div className="mt-4 p-4 bg-anthracite-900/50 rounded-lg border border-anthracite-700/50">
+                        <p className="text-sm text-anthracite-200 whitespace-pre-wrap">{msg.message}</p>
+                      </div>
+                      {/* Admin reply if exists */}
+                      {msg.admin_reply && (
+                        <div className="mt-3 p-4 bg-emerald-500/5 rounded-lg border border-emerald-500/20">
+                          <p className="text-xs text-emerald-400 font-medium mb-1">Răspunsul tău ({msg.replied_at ? new Date(msg.replied_at).toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' }) : ''}):</p>
+                          <p className="text-sm text-anthracite-200 whitespace-pre-wrap">{msg.admin_reply}</p>
+                        </div>
+                      )}
+                      {/* Reply form */}
+                      {msg.status !== 'replied' && (
+                        <div className="mt-4">
+                          {contactReplyId === msg.id ? (
+                            <div className="space-y-3">
+                              <textarea
+                                value={contactReplyText}
+                                onChange={(e) => setContactReplyText(e.target.value)}
+                                placeholder="Scrie răspunsul tău aici..."
+                                className="w-full px-4 py-3 bg-anthracite-900 border border-anthracite-600 rounded-lg text-white text-sm placeholder-anthracite-500 focus:outline-none focus:border-gold-400 resize-none"
+                                rows={4}
+                              />
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => sendContactReply(msg.id)}
+                                  disabled={contactReplySending || !contactReplyText.trim()}
+                                  className="px-4 py-2 text-sm font-medium rounded-lg bg-gold-500 text-anthracite-950 hover:bg-gold-400 disabled:opacity-50 transition-colors flex items-center gap-2"
+                                >
+                                  <Send className="w-3.5 h-3.5" />
+                                  {contactReplySending ? 'Se trimite...' : 'Trimite răspuns'}
+                                </button>
+                                <button
+                                  onClick={() => { setContactReplyId(null); setContactReplyText(''); }}
+                                  className="px-4 py-2 text-sm font-medium rounded-lg border border-anthracite-600 text-anthracite-400 hover:text-white transition-colors"
+                                >
+                                  Anulează
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => { setContactReplyId(msg.id); setContactReplyText(''); }}
+                              className="px-4 py-2 text-sm font-medium rounded-lg border border-gold-400/30 text-gold-400 hover:bg-gold-400/10 transition-colors flex items-center gap-2"
+                            >
+                              <Send className="w-3.5 h-3.5" /> Răspunde
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : adminSection === 'newsletter' ? (
             /* Newsletter Section */
             <NewsletterSection
               stats={newsletterStats}
