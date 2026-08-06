@@ -38,7 +38,9 @@ interface ContactRequest {
   id: string;
   client_name: string;
   client_email: string;
+  client_phone: string | null;
   message: string;
+  product_id: string | null;
   status: string;
   created_at: string;
 }
@@ -62,6 +64,7 @@ export default function SupplierDashboard() {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyMessage, setReplyMessage] = useState('');
   const [replySending, setReplySending] = useState(false);
+  const [highlightedRequestId, setHighlightedRequestId] = useState<string | null>(null);
 
   // Chat states
   const [openChat, setOpenChat] = useState<string | null>(null);
@@ -124,6 +127,38 @@ export default function SupplierDashboard() {
     }
     fetchDashboardData();
   }, [router]);
+
+  // Handle hash-based navigation for notification deep linking
+  useEffect(() => {
+    function handleHash() {
+      const hash = window.location.hash;
+      if (hash.startsWith('#cereri')) {
+        // Extract request ID from hash like #cereri-uuid
+        const reqId = hash.replace('#cereri-', '').replace('#cereri', '');
+        if (reqId && reqId.length > 10) {
+          setHighlightedRequestId(reqId);
+          // Scroll to the specific request after data loads
+          setTimeout(() => {
+            const el = document.getElementById(`request-${reqId}`);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              el.classList.add('ring-2', 'ring-gold-400');
+              setTimeout(() => el.classList.remove('ring-2', 'ring-gold-400'), 3000);
+            }
+          }, 800);
+        } else {
+          // Just scroll to cereri section
+          setTimeout(() => {
+            const el = document.getElementById('cereri');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 500);
+        }
+      }
+    }
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
 
   useEffect(() => {
     async function fetchSlots() {
@@ -512,14 +547,20 @@ export default function SupplierDashboard() {
                   if (isNewA !== isNewB) return isNewA - isNewB;
                   return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
                 }).map((req) => (
-                  <div key={req.id} className={`p-3 rounded-lg ${req.status === 'sent' ? 'bg-red-500/5 border border-red-500/20' : 'bg-anthracite-800/50'}`}>
+                  <div key={req.id} id={`request-${req.id}`} className={`p-4 rounded-xl transition-all duration-300 ${req.status === 'sent' ? 'bg-red-500/5 border border-red-500/20' : req.status === 'replied' || req.status === 'completed' ? 'bg-anthracite-800/50 border border-emerald-500/20' : 'bg-anthracite-800/50 border border-anthracite-700'} ${highlightedRequestId === req.id ? 'ring-2 ring-gold-400 ring-offset-2 ring-offset-anthracite-950' : ''}`}>
                     <div className="flex items-start gap-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${req.status === 'sent' ? 'bg-red-500/10' : 'bg-gold-400/10'}`}>
                         <Mail className={`w-4 h-4 ${req.status === 'sent' ? 'text-red-400' : 'text-gold-400'}`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium text-white">{req.client_name}</p>
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-medium text-white">{req.client_name}</p>
+                            <a href={`mailto:${req.client_email}`} className="text-xs text-gold-400 hover:underline">{req.client_email}</a>
+                            {req.client_phone && (
+                              <span className="text-xs text-anthracite-400 flex items-center gap-1"><Phone className="w-3 h-3" />{req.client_phone}</span>
+                            )}
+                          </div>
                           <div className="flex items-center gap-2">
                             {req.status === 'sent' && (
                               <span className="text-xs bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-semibold animate-pulse">{t('requests.statusNew')}</span>
@@ -535,9 +576,18 @@ export default function SupplierDashboard() {
                             </span>
                           </div>
                         </div>
-                        <p className="text-xs text-anthracite-400 mt-0.5">{req.client_email}</p>
+                        <p className="text-xs text-anthracite-500 mt-1">
+                          {new Date(req.created_at).toLocaleString(dateLocale, { timeZone: 'Europe/Bucharest', hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short', year: 'numeric' })}
+                        </p>
+                        {req.product_id && (
+                          <p className="text-xs text-blue-400 mt-1 flex items-center gap-1">
+                            <Package className="w-3 h-3" /> Produs solicitat (ID: {req.product_id.substring(0, 8)}...)
+                          </p>
+                        )}
                         {req.message && (
-                          <p className="text-sm text-anthracite-300 mt-1 line-clamp-2">{req.message}</p>
+                          <div className="mt-3 p-3 bg-anthracite-900/50 rounded-lg border border-anthracite-700/50">
+                            <p className="text-sm text-anthracite-200 whitespace-pre-wrap">{req.message}</p>
+                          </div>
                         )}
                         {req.status !== 'replied' && req.status !== 'completed' && (
                           <button

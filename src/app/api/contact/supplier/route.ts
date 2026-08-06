@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     const session = getUserFromSession();
     const clientId = session?.userId || null;
 
-    await supabase.from('contact_requests').insert({
+    const { data: insertedRequest } = await supabase.from('contact_requests').insert({
       client_name: name,
       client_email: email,
       client_phone: phone || null,
@@ -123,7 +123,8 @@ export async function POST(request: NextRequest) {
       product_id: resolvedProductId,
       message: message,
       status: 'sent',
-    });
+    }).select('id').single();
+    const requestId = insertedRequest?.id || '';
 
     // Get product info if available
     let productName = '';
@@ -221,7 +222,7 @@ export async function POST(request: NextRequest) {
         type: 'new_request',
         title: `Cerere nouă de la ${name}`,
         message: productName ? `Produs solicitat: ${productName}` : (message ? message.substring(0, 100) : null),
-        link: '/supplier/dashboard#cereri',
+        link: `/supplier/dashboard#cereri-${requestId}`,
         is_read: false,
       });
     }
