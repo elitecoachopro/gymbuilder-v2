@@ -318,7 +318,7 @@ export default function ClientDashboard() {
         </section>
 
         {/* Contact Requests */}
-        <section className="mb-8">
+        <section id="cereri" className="mb-8">
           <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-blue-400" />
             Cereri de Ofertă

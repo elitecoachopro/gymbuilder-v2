@@ -111,9 +111,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create in-app notification for all admin users
+    // Save message to contact_messages table + create in-app notification
     try {
       const supabase = getSupabase();
+
+      // Save to contact_messages table
+      const { data: savedMsg, error: saveError } = await supabase
+        .from('contact_messages')
+        .insert({
+          name: name.trim(),
+          email: email.trim(),
+          subject: subject.trim(),
+          message: message.trim(),
+          status: 'unread',
+        })
+        .select('id')
+        .single();
+
+      if (saveError) {
+        console.error('Error saving contact message:', saveError);
+      }
+
+      // Create in-app notification for all admin users
       const { data: adminUsers } = await supabase
         .from('users')
         .select('id')
@@ -121,19 +140,20 @@ export async function POST(request: NextRequest) {
         .limit(5);
 
       if (adminUsers && adminUsers.length > 0) {
+        const messageId = savedMsg?.id || '';
         const notifications = adminUsers.map((admin: { id: string }) => ({
           user_id: admin.id,
           type: 'contact_message',
           title: `Mesaj contact: ${subject.trim().substring(0, 60)}`,
           message: `De la ${name.trim()} (${email.trim()}): ${message.trim().substring(0, 120)}`,
-          link: '/admin#contact',
+          link: `/admin#contact-${messageId}`,
           is_read: false,
         }));
         await supabase.from('notifications').insert(notifications);
       }
     } catch (notifErr) {
-      // Don't fail the request if notification insert fails
-      console.error('Admin notification insert error:', notifErr);
+      // Don't fail the request if notification/save fails
+      console.error('Admin notification/save error:', notifErr);
     }
 
     return NextResponse.json({ message: 'Mesajul a fost trimis cu succes!' });

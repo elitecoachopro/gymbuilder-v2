@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Bell, Check, CheckCheck, MessageSquare, Star, ShieldCheck, Package, X } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useClientTranslations } from '@/i18n/client';
 
 interface Notification {
@@ -17,6 +17,7 @@ interface Notification {
 
 export default function NotificationBell() {
   const { t, locale } = useClientTranslations('notifications');
+  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -92,6 +93,14 @@ export default function NotificationBell() {
       markAsRead(notification.id);
     }
     setIsOpen(false);
+    // Navigate programmatically after closing the dropdown
+    if (notification.link) {
+      // Use setTimeout to ensure the dropdown closes before navigation
+      // This prevents the mobile touch event issue where re-render unmounts the Link
+      setTimeout(() => {
+        router.push(notification.link!);
+      }, 50);
+    }
   };
 
   const getIcon = (type: string) => {
@@ -170,43 +179,41 @@ export default function NotificationBell() {
                 <p className="text-sm text-anthracite-400">{t('empty')}</p>
               </div>
             ) : (
-              notifications.map((notification) => {
-                const content = (
-                  <div
-                    className={`flex items-start gap-3 px-4 py-3 hover:bg-anthracite-700/50 transition-colors cursor-pointer border-b border-anthracite-700/50 last:border-0 ${
-                      !notification.is_read ? 'bg-anthracite-750/30' : ''
-                    }`}
-                    onClick={() => handleNotificationClick(notification)}
-                  >
-                    <div className="w-8 h-8 rounded-full bg-anthracite-700 flex items-center justify-center shrink-0 mt-0.5">
-                      {getIcon(notification.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className={`text-sm leading-tight ${!notification.is_read ? 'text-white font-medium' : 'text-anthracite-300'}`}>
-                          {notification.title}
-                        </p>
-                        {!notification.is_read && (
-                          <span className="w-2 h-2 bg-blue-400 rounded-full shrink-0 mt-1.5"></span>
-                        )}
-                      </div>
-                      {notification.message && (
-                        <p className="text-xs text-anthracite-400 mt-0.5 line-clamp-1">{notification.message}</p>
-                      )}
-                      <p className="text-xs text-anthracite-500 mt-1">{timeAgo(notification.created_at)}</p>
-                    </div>
+              notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`flex items-start gap-3 px-4 py-3 hover:bg-anthracite-700/50 transition-colors cursor-pointer border-b border-anthracite-700/50 last:border-0 ${
+                    !notification.is_read ? 'bg-anthracite-750/30' : ''
+                  }`}
+                  onClick={() => handleNotificationClick(notification)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleNotificationClick(notification);
+                    }
+                  }}
+                >
+                  <div className="w-8 h-8 rounded-full bg-anthracite-700 flex items-center justify-center shrink-0 mt-0.5">
+                    {getIcon(notification.type)}
                   </div>
-                );
-
-                if (notification.link) {
-                  return (
-                    <Link key={notification.id} href={notification.link}>
-                      {content}
-                    </Link>
-                  );
-                }
-                return <div key={notification.id}>{content}</div>;
-              })
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className={`text-sm leading-tight ${!notification.is_read ? 'text-white font-medium' : 'text-anthracite-300'}`}>
+                        {notification.title}
+                      </p>
+                      {!notification.is_read && (
+                        <span className="w-2 h-2 bg-blue-400 rounded-full shrink-0 mt-1.5"></span>
+                      )}
+                    </div>
+                    {notification.message && (
+                      <p className="text-xs text-anthracite-400 mt-0.5 line-clamp-1">{notification.message}</p>
+                    )}
+                    <p className="text-xs text-anthracite-500 mt-1">{timeAgo(notification.created_at)}</p>
+                  </div>
+                </div>
+              ))
             )}
           </div>
         </div>

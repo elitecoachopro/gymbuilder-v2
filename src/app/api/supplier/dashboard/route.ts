@@ -105,10 +105,10 @@ export async function GET(request: NextRequest) {
     // Get recent contact requests (last 5)
     const { data: recentRequests } = await supabase
       .from('contact_requests')
-      .select('id, client_name, client_email, message, status, created_at, viewed_at')
+      .select('id, client_name, client_email, client_phone, message, product_id, status, created_at, viewed_at')
       .eq('supplier_id', supplier.id)
       .order('created_at', { ascending: false })
-      .limit(5);
+      .limit(50);
 
     // Mark 'sent' requests as 'viewed' when supplier opens dashboard
     const unviewedIds = (recentRequests || [])

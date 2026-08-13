@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
         type: 'reply_received',
         title: `Răspuns de la ${supplierProfile.company_name}`,
         message: productName ? `Produs: ${productName}` : replyMessage.substring(0, 100),
-        link: '/client/dashboard',
+        link: '/client/dashboard#cereri',
         is_read: false,
       });
     }
