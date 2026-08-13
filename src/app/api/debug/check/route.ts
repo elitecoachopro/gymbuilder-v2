@@ -41,12 +41,38 @@ export async function GET(request: NextRequest) {
       dashboardRequests = { data: dashReqs, error: dashErr?.message };
     }
 
+    // Check what user/supplier is associated with contact@gymbuilder.app
+    const { data: userByEmail } = await supabase
+      .from('users')
+      .select('id, email, role, full_name')
+      .eq('email', 'contact@gymbuilder.app')
+      .single();
+
+    let supplierForUser = null;
+    if (userByEmail) {
+      const { data: sp } = await supabase
+        .from('supplier_profiles')
+        .select('id, company_name, status, user_id')
+        .eq('user_id', userByEmail.id)
+        .single();
+      supplierForUser = sp;
+    }
+
+    // Also list ALL supplier profiles
+    const { data: allSuppliers } = await supabase
+      .from('supplier_profiles')
+      .select('id, company_name, user_id, status')
+      .limit(10);
+
     return NextResponse.json({
       contact_requests: requests,
       reqError: reqError?.message,
       supplierProfile,
       notifications,
       dashboardRequests,
+      userByEmail,
+      supplierForUser,
+      allSuppliers,
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
