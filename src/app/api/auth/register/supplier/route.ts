@@ -35,12 +35,21 @@ export async function POST(request: NextRequest) {
       phone,
       description,
       plan,
+      verificationPhotos,
     } = body;
 
     // Validation
-    if (!email || !password || !firstName || !lastName || !companyName || !country || !city) {
+    if (!email || !password || !firstName || !lastName || !companyName || !country || !city || !phone) {
       return NextResponse.json(
-        { error: 'Toate câmpurile obligatorii trebuie completate.' },
+        { error: 'Toate câmpurile obligatorii trebuie completate (inclusiv telefon).' },
+        { status: 400 }
+      );
+    }
+
+    // Validate verification photos (min 3)
+    if (!verificationPhotos || !Array.isArray(verificationPhotos) || verificationPhotos.length < 3) {
+      return NextResponse.json(
+        { error: 'Trebuie să încărcați minim 3 poze de verificare (showroom/depozit).' },
         { status: 400 }
       );
     }
@@ -53,8 +62,9 @@ export async function POST(request: NextRequest) {
     const cleanCountry = sanitizeString(country).slice(0, 50);
     const cleanCity = sanitizeString(city).slice(0, 50);
     const cleanWebsite = website ? sanitizeUrl(website) : null;
-    const cleanPhone = phone ? sanitizePhone(phone).slice(0, 20) : null;
+    const cleanPhone = sanitizePhone(phone).slice(0, 20);
     const cleanDescription = description ? sanitizeString(description).slice(0, 1000) : null;
+    const cleanPhotos = verificationPhotos.slice(0, 10).map((url: string) => String(url).slice(0, 500));
 
     // Validate email
     if (!isValidEmail(cleanEmail)) {
@@ -148,6 +158,7 @@ export async function POST(request: NextRequest) {
         description: cleanDescription,
         status: 'pending',
         plan: selectedPlan,
+        verification_photos: cleanPhotos,
       });
 
     if (profileError) {
