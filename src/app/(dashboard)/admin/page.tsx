@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, Star, MessageSquare, LogOut, BadgeCheck, Send, Newspaper, Eye, Phone, MapPin, CreditCard, Clock } from 'lucide-react';
+import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, Star, MessageSquare, LogOut, BadgeCheck, Send, Newspaper, Eye, Phone, MapPin, CreditCard, Clock, Inbox } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import NotificationBell from '@/components/NotificationBell';
 
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
     }
   };
   const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
-  const [adminSection, setAdminSection] = useState<'suppliers' | 'reviews' | 'newsletter' | 'contact'>('suppliers');
+  const [adminSection, setAdminSection] = useState<'suppliers' | 'reviews' | 'newsletter' | 'contact' | 'cereri'>('suppliers');
   // Contact messages states
   const [contactMessages, setContactMessages] = useState<any[]>([]);
   const [contactLoading, setContactLoading] = useState(false);
@@ -73,6 +73,9 @@ export default function AdminDashboard() {
   const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
   const [contactUnreadCount, setContactUnreadCount] = useState(0);
   const [reviewsList, setReviewsList] = useState<ReviewItem[]>([]);
+  const [allRequests, setAllRequests] = useState<any[]>([]);
+  const [allRequestsLoading, setAllRequestsLoading] = useState(false);
+  const [allRequestsCount, setAllRequestsCount] = useState(0);
   const [reviewsPendingCount, setReviewsPendingCount] = useState(0);
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [reviewActionLoading, setReviewActionLoading] = useState<string | null>(null);
@@ -99,6 +102,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (adminSection === 'reviews') fetchReviews();
     if (adminSection === 'contact') fetchContactMessages();
+    if (adminSection === 'cereri') fetchAllRequests();
   }, [adminSection]);
 
   // Handle hash-based navigation for notifications (initial + hashchange)
@@ -246,6 +250,18 @@ export default function AdminDashboard() {
       }
     } catch { showToast('Eroare la trimitere', 'error'); }
     setContactReplySending(false);
+  }
+
+  async function fetchAllRequests() {
+    setAllRequestsLoading(true);
+    try {
+      const res = await fetch('/api/admin/contact-requests', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        setAllRequests(data.requests || []);
+        setAllRequestsCount((data.requests || []).filter((r: any) => r.status === 'sent').length);
+      }
+    } catch {} finally { setAllRequestsLoading(false); }
   }
 
   async function sendNewsletter() {
@@ -623,9 +639,68 @@ export default function AdminDashboard() {
                 <span className="bg-amber-500 text-anthracite-950 text-xs font-bold px-1.5 py-0.5 rounded-full">{contactUnreadCount}</span>
               )}
             </button>
+            <button
+              onClick={() => { setAdminSection('cereri'); fetchAllRequests(); }}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                adminSection === 'cereri'
+                  ? 'bg-anthracite-700 text-gold-400'
+                  : 'text-anthracite-400 hover:text-white'
+              }`}
+            >
+              <Inbox className="w-4 h-4" /> Cereri Furnizori
+              {allRequestsCount > 0 && (
+                <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">{allRequestsCount}</span>
+              )}
+            </button>
           </div>
 
-          {adminSection === 'contact' ? (
+          {adminSection === 'cereri' ? (
+            /* Cereri Furnizori Section - ALL contact_requests from all suppliers */
+            <div>
+              {allRequestsLoading ? (
+                <div className="flex flex-col items-center justify-center py-20">
+                  <Loader2 className="w-8 h-8 text-gold-400 animate-spin mb-4" />
+                  <p className="text-anthracite-400 text-sm">Se încarcă cererile...</p>
+                </div>
+              ) : allRequests.length === 0 ? (
+                <div className="text-center py-20">
+                  <Inbox className="w-16 h-16 text-anthracite-600 mx-auto mb-4" />
+                  <h2 className="text-xl font-semibold text-white mb-2">Nicio cerere</h2>
+                  <p className="text-anthracite-400 text-sm">Nu există cereri de ofertă încă.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-anthracite-400 text-sm mb-4">{allRequests.length} cereri totale • {allRequestsCount} noi</p>
+                  {allRequests.map((req: any) => (
+                    <div key={req.id} className={`bg-anthracite-800 border rounded-xl p-4 sm:p-6 ${req.status === 'sent' ? 'border-red-500/30' : req.status === 'replied' || req.status === 'completed' ? 'border-emerald-500/30' : 'border-anthracite-700'}`}>
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-2 flex-wrap">
+                            <span className="font-semibold text-white">{req.client_name}</span>
+                            <a href={`mailto:${req.client_email}`} className="text-sm text-gold-400 hover:underline">{req.client_email}</a>
+                            {req.client_phone && <span className="text-xs text-anthracite-400"><Phone className="w-3 h-3 inline mr-1" />{req.client_phone}</span>}
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${req.status === 'sent' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : req.status === 'replied' || req.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-blue-500/10 text-blue-400 border border-blue-500/30'}`}>
+                              {req.status === 'sent' ? 'Nou' : req.status === 'viewed' ? 'Văzut' : req.status === 'replied' ? 'Răspuns' : req.status}
+                            </span>
+                          </div>
+                          <p className="text-xs text-anthracite-400 mb-1">
+                            <strong className="text-anthracite-300">Furnizor:</strong> {req.supplier_name}
+                          </p>
+                          <p className="text-xs text-anthracite-500">
+                            <Clock className="w-3.5 h-3.5 inline mr-1" />
+                            {new Date(req.created_at).toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-3 p-3 bg-anthracite-900/50 rounded-lg border border-anthracite-700/50">
+                        <p className="text-sm text-anthracite-200 whitespace-pre-wrap">{req.message}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : adminSection === 'contact' ? (
             /* Contact Messages Section */
             <div>
               {contactLoading ? (
