@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, Star, MessageSquare, LogOut, BadgeCheck, Send, Newspaper, Eye, Phone, MapPin, CreditCard, Clock, Inbox } from 'lucide-react';
+import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell, Globe, Calendar, Mail, Building2, Dumbbell, Star, MessageSquare, LogOut, BadgeCheck, Send, Newspaper, Eye, Phone, MapPin, CreditCard, Clock, Inbox, Camera } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import NotificationBell from '@/components/NotificationBell';
 
@@ -21,6 +21,7 @@ interface Supplier {
   created_at: string;
   full_name: string;
   email: string;
+  verification_photos?: string[];
 }
 
 interface ReviewItem {
@@ -485,16 +486,43 @@ export default function AdminDashboard() {
               </div>
 
               {/* Description */}
-              {viewProfileModal.description && (
-                <div className="flex items-start gap-3">
-                  <MessageSquare className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs text-anthracite-400 uppercase tracking-wide">Descriere</p>
-                    <p className="text-sm text-anthracite-200 mt-1">{viewProfileModal.description}</p>
-                  </div>
-                </div>
+             {viewProfileModal.description && (
+               <div className="flex items-start gap-3">
+                 <MessageSquare className="w-5 h-5 text-gold-400 mt-0.5 flex-shrink-0" />
+                 <div>
+                   <p className="text-xs text-anthracite-400 uppercase tracking-wide">Descriere</p>
+                   <p className="text-sm text-anthracite-200 mt-1">{viewProfileModal.description}</p>
+                 </div>
+               </div>
               )}
             </div>
+
+            {/* Verification Photos */}
+            {viewProfileModal.verification_photos && viewProfileModal.verification_photos.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-anthracite-700">
+                <div className="flex items-center gap-2 mb-3">
+                  <Camera className="w-5 h-5 text-gold-400" />
+                  <p className="text-xs text-anthracite-400 uppercase tracking-wide">Poze de verificare ({viewProfileModal.verification_photos.length})</p>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {viewProfileModal.verification_photos.map((url, idx) => (
+                    <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="block aspect-square rounded-lg overflow-hidden border border-anthracite-700 hover:border-gold-400 transition-colors">
+                      <img src={url} alt={`Verificare ${idx + 1}`} className="w-full h-full object-cover" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* No verification photos warning */}
+            {(!viewProfileModal.verification_photos || viewProfileModal.verification_photos.length === 0) && viewProfileModal.status === 'pending' && (
+              <div className="mt-4 pt-4 border-t border-anthracite-700">
+                <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                  <Camera className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                  <p className="text-xs text-amber-400">Acest furnizor nu a încărcat poze de verificare (cont creat înainte de implementarea acestei funcții).</p>
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex gap-3 mt-6 pt-4 border-t border-anthracite-700">

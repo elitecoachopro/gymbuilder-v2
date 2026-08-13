@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
   // Get suppliers with the requested status (no join to avoid FK detection issues)
   const { data: suppliers, error } = await supabase
     .from('supplier_profiles')
-    .select('id, user_id, company_name, country, city, website, phone, description, status, plan, verified, created_at')
+    .select('id, user_id, company_name, country, city, website, phone, description, status, plan, verified, created_at, verification_photos')
     .eq('status', status)
     .order('created_at', { ascending: false });
 
