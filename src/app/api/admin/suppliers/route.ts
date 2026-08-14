@@ -65,7 +65,7 @@ async function verifyAdmin(request: NextRequest) {
     const payloadStr = Buffer.from(payloadB64, 'base64').toString();
     const payload = JSON.parse(payloadStr);
 
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || 'fallback-secret';
+    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY!;
     const expectedHmac = crypto.createHmac('sha256', secret).update(payloadStr).digest('hex');
     if (hmac !== expectedHmac) return null;
 

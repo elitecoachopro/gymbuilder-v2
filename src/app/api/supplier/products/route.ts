@@ -42,7 +42,7 @@ function verifySessionToken(token: string): { userId: string } | null {
     const [payloadB64, hmac] = token.split('.');
     if (!payloadB64 || !hmac) return null;
 
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || 'fallback-secret';
+    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY!;
     const payload = Buffer.from(payloadB64, 'base64').toString();
     const expectedHmac = crypto.createHmac('sha256', secret).update(payload).digest('hex');
 
