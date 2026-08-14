@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
     const condition = searchParams.get('condition');
     const priceMin = searchParams.get('price_min');
     const priceMax = searchParams.get('price_max');
+    const supplier = searchParams.get('supplier');
     const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
 
     const supabase = getSupabaseAdmin();
@@ -47,6 +48,10 @@ export async function GET(request: NextRequest) {
     if (search) {
       const safeSearch = sanitizePostgrestSearch(search);
       query = query.or(`name.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%`);
+    }
+
+    if (supplier) {
+      query = query.eq('supplier_id', supplier);
     }
 
     const { data: products, error } = await query;

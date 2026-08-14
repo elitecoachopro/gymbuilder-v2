@@ -42,22 +42,12 @@ interface Product {
 }
 
 // Fallback data when Supabase is not connected
-const fallbackProducts: Product[] = [
-  { id: 1, name: 'Life Fitness Integrity Series Treadmill', brand: 'Life Fitness', category: 'cardio', condition: 'new', price: 8500, supplier: 'FitPro Equipment' },
-  { id: 2, name: 'Technogym Selection Pro Chest Press', brand: 'Technogym', category: 'strength', condition: 'new', price: 4200, supplier: 'GymTech Solutions' },
-  { id: 3, name: 'Matrix Rower', brand: 'Matrix', category: 'cardio', condition: 'new', price: 2800, supplier: 'Nordic Fitness' },
-  { id: 4, name: 'Hammer Strength HD Elite Power Rack', brand: 'Hammer Strength', category: 'strength', condition: 'new', price: 3600, supplier: 'FitPro Equipment' },
-  { id: 5, name: 'Precor EFX 885 Elliptical', brand: 'Precor', category: 'cardio', condition: 'used', price: 3200, supplier: 'EuroGym Direct' },
-  { id: 6, name: 'Cybex VR3 Leg Press', brand: 'Cybex', category: 'strength', condition: 'new', price: 5100, supplier: 'Fitness Factory' },
-  { id: 7, name: 'TRX Suspension Training Set Pro', brand: 'TRX', category: 'functional', condition: 'new', price: 450, supplier: 'IronWorks RO' },
-  { id: 8, name: 'Concept2 RowErg', brand: 'Concept2', category: 'cardio', condition: 'new', price: 1200, supplier: 'Nordic Fitness' },
-  { id: 9, name: 'Eleiko IWF Competition Set', brand: 'Eleiko', category: 'strength', condition: 'new', price: 2800, supplier: 'EuroGym Direct' },
-];
 
 export default function ProductsPage() {
   const searchParams = useSearchParams();
   const urlCondition = searchParams?.get('condition') || 'all';
   const urlCategory = searchParams?.get('category') || 'all';
+  const urlSupplier = searchParams?.get('supplier') || '';
 
   const [activeCategory, setActiveCategory] = useState(urlCategory);
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,9 +58,8 @@ export default function ProductsPage() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [toast, setToast] = useState('');
   const [showContactModal, setShowContactModal] = useState<number | null>(null);
-  const [products, setProducts] = useState<Product[]>(fallbackProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [dataSource, setDataSource] = useState<'api' | 'fallback'>('fallback');
 
   // Advanced filters
   const [showFilters, setShowFilters] = useState(urlCondition !== 'all' || urlCategory !== 'all');
@@ -122,6 +111,7 @@ export default function ProductsPage() {
         if (conditionFilter !== 'all') params.set('condition', conditionFilter);
         if (priceMin) params.set('price_min', priceMin);
         if (priceMax) params.set('price_max', priceMax);
+        if (urlSupplier) params.set('supplier', urlSupplier);
 
         const res = await fetch(`/api/products?${params.toString()}`);
         if (res.ok) {
@@ -140,18 +130,14 @@ export default function ProductsPage() {
               supplierVerified: p.supplier?.verified || false,
             }));
             setProducts(mapped);
-            setDataSource('api');
           } else {
-            setProducts(fallbackProducts);
-            setDataSource('fallback');
+            setProducts([]);
           }
         } else {
-          setProducts(fallbackProducts);
-          setDataSource('fallback');
+          setProducts([]);
         }
       } catch {
-        setProducts(fallbackProducts);
-        setDataSource('fallback');
+        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -185,18 +171,9 @@ export default function ProductsPage() {
     setSearchQuery('');
   };
 
-  // Client-side filter + sort for fallback data
+  // Sort products
   const filteredProducts = useMemo(() => {
-    let result = dataSource === 'fallback'
-      ? products.filter((p) => {
-          const matchesCategory = activeCategory === 'all' || p.category === activeCategory;
-          const matchesSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase());
-          const matchesCondition = conditionFilter === 'all' || p.condition === conditionFilter;
-          const matchesPriceMin = !priceMin || p.price >= Number(priceMin);
-          const matchesPriceMax = !priceMax || p.price <= Number(priceMax);
-          return matchesCategory && matchesSearch && matchesCondition && matchesPriceMin && matchesPriceMax;
-        })
-      : products;
+    let result = [...products];
 
     // Sort
     if (sortBy === 'price_asc') {
@@ -208,7 +185,7 @@ export default function ProductsPage() {
     }
 
     return result;
-  }, [products, dataSource, activeCategory, searchQuery, conditionFilter, priceMin, priceMax, sortBy]);
+  }, [products, sortBy]);
 
   const conditionLabel = (c: string) => c === 'new' ? 'Nou' : c === 'used' ? 'Second-hand' : c;
 
@@ -510,7 +487,6 @@ export default function ProductsPage() {
                 <>
                   <span className="text-white font-semibold text-base">{filteredProducts.length}</span>{' '}
                   {filteredProducts.length === 1 ? 'produs găsit' : 'produse găsite'}
-                  {dataSource === 'api' && <span className="ml-2 text-emerald-400 text-xs">(date live)</span>}
                 </>
               )}
             </p>

@@ -48,9 +48,32 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // Enrich with product count per supplier
+    const enrichedSuppliers = [];
+    if (suppliers && suppliers.length > 0) {
+      const supplierIds = suppliers.map(s => s.id);
+      const { data: productCounts } = await supabase
+        .from('products')
+        .select('supplier_id')
+        .eq('status', 'active')
+        .in('supplier_id', supplierIds);
+
+      const countMap = new Map<string, number>();
+      (productCounts || []).forEach((p: any) => {
+        countMap.set(p.supplier_id, (countMap.get(p.supplier_id) || 0) + 1);
+      });
+
+      for (const supplier of suppliers) {
+        enrichedSuppliers.push({
+          ...supplier,
+          product_count: countMap.get(supplier.id) || 0,
+        });
+      }
+    }
+
     return NextResponse.json({
-      suppliers: suppliers || [],
-      count: suppliers?.length || 0,
+      suppliers: enrichedSuppliers,
+      count: enrichedSuppliers.length,
       source: 'supabase',
     });
   } catch (error) {
