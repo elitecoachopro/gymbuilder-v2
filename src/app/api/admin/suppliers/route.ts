@@ -65,7 +65,8 @@ async function verifyAdmin(request: NextRequest) {
     const payloadStr = Buffer.from(payloadB64, 'base64').toString();
     const payload = JSON.parse(payloadStr);
 
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!secret) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
     const expectedHmac = crypto.createHmac('sha256', secret).update(payloadStr).digest('hex');
     if (hmac !== expectedHmac) return null;
 

@@ -14,7 +14,8 @@ function getSupabaseAdmin() {
 
 function generateSessionToken(userId: string): string {
   const payload = JSON.stringify({ userId, exp: Date.now() + 7 * 24 * 60 * 60 * 1000 });
-  const secret = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!secret) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
   const hmac = crypto.createHmac('sha256', secret).update(payload).digest('hex');
   const token = Buffer.from(payload).toString('base64') + '.' + hmac;
   return token;

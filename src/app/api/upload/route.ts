@@ -18,7 +18,8 @@ function verifySession(request: NextRequest): string | null {
     const [payloadB64, hmac] = sessionToken.split('.');
     const payload = JSON.parse(Buffer.from(payloadB64, 'base64').toString());
     
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!secret) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
     const expectedHmac = crypto.createHmac('sha256', secret).update(JSON.stringify(payload)).digest('hex');
     if (hmac !== expectedHmac) return null;
     if (Date.now() > payload.exp) return null;
