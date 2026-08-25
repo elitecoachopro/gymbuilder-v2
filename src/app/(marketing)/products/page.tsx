@@ -68,6 +68,12 @@ export default function ProductsPage() {
   const [priceMax, setPriceMax] = useState('');
   const [sortBy, setSortBy] = useState('recommended');
 
+  const catalogTitle = conditionFilter === 'new'
+    ? 'Echipamente Noi'
+    : conditionFilter === 'used'
+      ? 'Echipamente Second-Hand'
+      : 'Echipamente';
+
   // Check if any filter is active
   const hasActiveFilters = useMemo(() => {
     return activeCategory !== 'all' || conditionFilter !== 'all' || priceMin !== '' || priceMax !== '';
@@ -268,7 +274,7 @@ export default function ProductsPage() {
       <section className="pt-24 pb-8 px-4">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Catalog <span className="gold-gradient">Echipamente</span>
+            Catalog <span className="gold-gradient">{catalogTitle}</span>
           </h1>
           <p className="text-anthracite-300 text-lg max-w-2xl">
             Echipamente fitness de la branduri premium, verificate și gata de livrare.
@@ -277,7 +283,7 @@ export default function ProductsPage() {
       </section>
 
       {/* Search & Filters Bar */}
-      <section className="py-6 px-4 border-b border-anthracite-800 sticky top-16 z-40 bg-anthracite-950/95 backdrop-blur-sm">
+      <section className="py-6 px-4 border-b border-anthracite-800 sticky top-20 z-40 bg-anthracite-950/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="relative flex-1" ref={searchRef}>

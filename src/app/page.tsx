@@ -104,7 +104,7 @@ export default function HomePage() {
                 </span>
               </Link>
 
-              {/* CTA 2 - Second-Hand */}
+              {/* CTA 2 - Echipamente Second-Hand */}
               <Link href="/products?condition=used" className="group bg-anthracite-800 border border-anthracite-700 rounded-2xl p-8 text-left hover:border-amber-500/40 transition-all duration-200">
                 <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-amber-500/20 transition-colors">
                   <RefreshCw className="w-6 h-6 text-amber-400" />

@@ -17,7 +17,8 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-4">{t('platform')}</h4>
             <ul className="space-y-3">
-              <li><Link href="/products" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">{t('equipment')}</Link></li>
+              <li><Link href="/products?condition=new" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">{t('newEquipment')}</Link></li>
+              <li><Link href="/products?condition=used" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">{t('usedEquipment')}</Link></li>
               <li><Link href="/suppliers" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">{t('suppliers')}</Link></li>
               <li><Link href="/pricing" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">{t('pricing')}</Link></li>
               <li><Link href="/consultation" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">{t('consultation')}</Link></li>

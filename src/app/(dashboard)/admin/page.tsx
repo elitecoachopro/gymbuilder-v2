@@ -564,7 +564,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Sidebar */}
-      <aside className="fixed left-0 top-16 bottom-0 w-64 bg-anthracite-900 border-r border-anthracite-800 p-6 hidden lg:block overflow-y-auto">
+      <aside className="fixed left-0 top-20 bottom-0 w-64 bg-anthracite-900 border-r border-anthracite-800 p-6 hidden lg:block overflow-y-auto">
 
         <nav className="space-y-1">
           {sidebarLinks.map((link) => (

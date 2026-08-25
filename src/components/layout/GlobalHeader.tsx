@@ -18,8 +18,8 @@ export default function GlobalHeader() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
-    { href: '/products?condition=new', label: t('equipment') },
-    { href: '/products?condition=used', label: 'Second-Hand' },
+    { href: '/products?condition=new', label: t('newEquipment') },
+    { href: '/products?condition=used', label: t('usedEquipment') },
     { href: '/consultation', label: t('consultation') },
     { href: '/blog', label: t('blog') },
     { href: '/contact', label: t('contact') },
@@ -75,26 +75,26 @@ export default function GlobalHeader() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-anthracite-950/90 backdrop-blur-xl border-b border-anthracite-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center flex-shrink-0 relative z-10">
             <Image
               src="/logo.png"
               alt="GymBuilder - Build Your Gym"
-              width={140}
-              height={61}
-              className="h-10 w-auto sm:h-11 md:h-12 object-contain"
+              width={184}
+              height={80}
+              className="h-14 w-auto sm:h-16 object-contain"
               priority
             />
           </Link>
 
           {/* Desktop Navigation - Center */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0 xl:gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-3 py-2 text-sm text-anthracite-300 hover:text-white hover:bg-anthracite-800/50 rounded-lg transition-colors font-medium"
+                className="px-2 xl:px-3 py-2 text-xs xl:text-sm whitespace-nowrap text-anthracite-300 hover:text-white hover:bg-anthracite-800/50 rounded-lg transition-colors font-medium"
               >
                 {link.label}
               </Link>
@@ -192,7 +192,7 @@ export default function GlobalHeader() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="lg:hidden bg-anthracite-900 border-b border-anthracite-700 max-h-[calc(100vh-4rem)] overflow-y-auto">
+        <div className="lg:hidden bg-anthracite-900 border-b border-anthracite-700 max-h-[calc(100vh-5rem)] overflow-y-auto">
           <div className="px-4 py-4 space-y-1">
             {navLinks.map((link) => (
               <Link
