@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Footer from '@/components/layout/Footer';
-import { Search, Dumbbell, Heart, SlidersHorizontal, Mail, Loader2, X, RotateCcw, ChevronDown, ChevronUp, GitCompareArrows } from 'lucide-react';
+import { Search, Dumbbell, Heart, SlidersHorizontal, Mail, Loader2, X, RotateCcw, ChevronDown, ChevronUp, GitCompareArrows, Building2, MapPin, BadgeCheck, ArrowRight } from 'lucide-react';
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useCompareStore, CompareProduct } from '@/store/compare';
 
@@ -41,6 +41,17 @@ interface Product {
   supplierVerified?: boolean;
 }
 
+interface ApprovedSupplier {
+  id: string;
+  company_name: string;
+  country?: string;
+  city?: string;
+  description?: string;
+  logo_url?: string;
+  verified?: boolean;
+  product_count: number;
+}
+
 // Fallback data when Supabase is not connected
 
 export default function ProductsPage() {
@@ -60,6 +71,8 @@ export default function ProductsPage() {
   const [showContactModal, setShowContactModal] = useState<number | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [approvedSuppliers, setApprovedSuppliers] = useState<ApprovedSupplier[]>([]);
+  const [loadingSuppliers, setLoadingSuppliers] = useState(true);
 
   // Advanced filters
   const [showFilters, setShowFilters] = useState(urlCondition !== 'all' || urlCategory !== 'all');
@@ -73,6 +86,27 @@ export default function ProductsPage() {
     : conditionFilter === 'used'
       ? 'Echipamente Second-Hand'
       : 'Echipamente';
+  const showSuppliersSection = conditionFilter !== 'used' && !urlSupplier;
+
+  useEffect(() => {
+    async function fetchApprovedSuppliers() {
+      try {
+        const res = await fetch('/api/suppliers?limit=12');
+        if (!res.ok) {
+          setApprovedSuppliers([]);
+          return;
+        }
+        const data = await res.json();
+        setApprovedSuppliers(data.suppliers || []);
+      } catch {
+        setApprovedSuppliers([]);
+      } finally {
+        setLoadingSuppliers(false);
+      }
+    }
+
+    fetchApprovedSuppliers();
+  }, []);
 
   // Check if any filter is active
   const hasActiveFilters = useMemo(() => {
@@ -152,7 +186,7 @@ export default function ProductsPage() {
     setLoading(true);
     const debounce = setTimeout(fetchProducts, 300);
     return () => clearTimeout(debounce);
-  }, [activeCategory, searchQuery, conditionFilter, priceMin, priceMax]);
+  }, [activeCategory, searchQuery, conditionFilter, priceMin, priceMax, urlSupplier]);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -281,6 +315,94 @@ export default function ProductsPage() {
           </p>
         </div>
       </section>
+
+      {/* Approved Suppliers — visible even before they publish products */}
+      {showSuppliersSection && (
+        <section className="px-4 pb-10">
+          <div className="max-w-7xl mx-auto rounded-3xl border border-gold-400/25 bg-gradient-to-br from-gold-400/10 via-anthracite-900 to-anthracite-900 p-5 sm:p-7 md:p-8 shadow-[0_20px_70px_rgba(0,0,0,0.28)]">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+              <div>
+                <div className="inline-flex items-center gap-2 text-gold-400 text-xs font-bold uppercase tracking-[0.18em] mb-2">
+                  <BadgeCheck className="w-4 h-4" /> Furnizori aprobați GymBuilder
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">Descoperă furnizorii de echipamente noi</h2>
+                <p className="text-anthracite-300 mt-2 max-w-2xl">
+                  Vezi direct companiile aprobate, profilul și datele lor de contact — chiar dacă încă își pregătesc catalogul de produse.
+                </p>
+              </div>
+              <Link
+                href="/suppliers"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-gold-400 hover:text-gold-300 transition-colors whitespace-nowrap"
+              >
+                Vezi toți furnizorii <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {loadingSuppliers ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[0, 1].map((item) => (
+                  <div key={item} className="h-44 rounded-2xl bg-anthracite-800/80 border border-anthracite-700 animate-pulse" />
+                ))}
+              </div>
+            ) : approvedSuppliers.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {approvedSuppliers.map((supplier) => (
+                  <article key={supplier.id} className="group rounded-2xl border border-anthracite-700 bg-anthracite-950/70 p-5 hover:border-gold-400/45 transition-colors flex flex-col">
+                    <div className="flex items-start gap-4">
+                      <div className="w-14 h-14 rounded-xl bg-anthracite-800 border border-anthracite-700 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {supplier.logo_url ? (
+                          <img src={supplier.logo_url} alt={`Logo ${supplier.company_name}`} className="w-full h-full object-contain p-1" />
+                        ) : (
+                          <Building2 className="w-7 h-7 text-gold-400" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start gap-2">
+                          <h3 className="font-bold text-white leading-snug group-hover:text-gold-400 transition-colors">{supplier.company_name}</h3>
+                          {supplier.verified && <BadgeCheck className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" aria-label="Furnizor verificat" />}
+                        </div>
+                        <p className="flex items-center gap-1.5 text-sm text-anthracite-400 mt-1">
+                          <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                          {[supplier.city, supplier.country].filter(Boolean).join(', ') || 'Locație disponibilă în profil'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-anthracite-300 mt-4 line-clamp-2 min-h-10">
+                      {supplier.description || 'Furnizor aprobat de echipamente profesionale pentru săli de fitness.'}
+                    </p>
+
+                    <div className="flex items-center justify-between gap-3 mt-5 pt-4 border-t border-anthracite-800">
+                      <span className="text-xs text-anthracite-400">
+                        <strong className="text-white">{supplier.product_count || 0}</strong> produse publicate
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/products?supplier=${supplier.id}&condition=new`}
+                          className="text-xs font-semibold text-anthracite-300 hover:text-white transition-colors"
+                        >
+                          Produse
+                        </Link>
+                        <Link
+                          href={`/suppliers/${supplier.id}`}
+                          className="inline-flex items-center gap-1.5 bg-gold-400 text-anthracite-950 px-3 py-2 rounded-lg text-xs font-bold hover:bg-gold-300 transition-colors"
+                        >
+                          Vezi profilul <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-anthracite-700 py-10 text-center">
+                <Building2 className="w-10 h-10 text-anthracite-600 mx-auto mb-3" />
+                <p className="text-anthracite-400">Furnizorii aprobați vor apărea aici.</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Search & Filters Bar */}
       <section className="py-6 px-4 border-b border-anthracite-800 sticky top-20 z-40 bg-anthracite-950/95 backdrop-blur-sm">
