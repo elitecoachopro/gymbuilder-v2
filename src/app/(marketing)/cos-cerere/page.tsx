@@ -1,21 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { formatCatalogPrice } from '@/lib/catalog-price';
+import { useClientLocale } from '@/i18n/client';
+import { useUiText } from '@/i18n/useUiText';
+
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/store/cart';
 import { ShoppingCart, Trash2, Send, Building2, Package, ArrowLeft, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 
 export default function CartPage() {
+  const ui = useUiText();
+  const locale = useClientLocale();
   const items = useCartStore((s) => s.items);
   const removeItem = useCartStore((s) => s.removeItem);
   const clearCart = useCartStore((s) => s.clearCart);
   const getGroupedBySupplier = useCartStore((s) => s.getGroupedBySupplier);
-  const totalItems = useCartStore((s) => s.totalItems);
 
   const [mounted, setMounted] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [sending, setSending] = useState(false);
   const [success, setSuccess] = useState(false);
+  const requestKeys = useRef<Record<string, string>>({});
+  const [sentCount, setSentCount] = useState(0);
   const [error, setError] = useState('');
 
   useEffect(() => { setMounted(true); }, []);
@@ -32,7 +39,7 @@ export default function CartPage() {
 
   const grouped = getGroupedBySupplier();
   const supplierCount = Object.keys(grouped).length;
-  const count = totalItems();
+  const count = items.reduce((total, item) => total + item.quantity, 0);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -51,35 +58,25 @@ export default function CartPage() {
     setSending(true);
 
     try {
-      // Send one request per supplier
-      const promises = Object.entries(grouped).map(([supplierId, group]) => {
-        const productNames = group.items.map(i => i.product.name).join(', ');
-        const productIds = group.items.map(i => i.product.id);
-        const fullMessage = `[Cerere multiplă - ${group.items.length} produs(e)]\n\nProduse solicitate: ${productNames}\n\n${form.message ? `Mesaj: ${form.message}` : ''}`;
-
-        return fetch('/api/contact/supplier', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: form.name,
-            email: form.email,
-            phone: form.phone || '',
-            message: fullMessage,
-            supplierId: supplierId,
-            productId: productIds[0], // Primary product
-          }),
-        });
-      });
-
-      const results = await Promise.all(promises);
-      const allOk = results.every(r => r.ok);
-
-      if (allOk) {
-        setSuccess(true);
-        clearCart();
-      } else {
-        setError('Unele cereri nu au putut fi trimise. Te rugăm să încerci din nou.');
+      let failed = 0;
+      let sent = 0;
+      for (const [supplierId, group] of Object.entries(grouped)) {
+        const signature = JSON.stringify({ supplierId, form, items: group.items });
+        const idempotencyKey = requestKeys.current[signature] ||= crypto.randomUUID();
+        const productNames = group.items.map(i => `${i.product.name} × ${i.quantity} (${formatCatalogPrice(i.product.price_eur, locale, i.product)})`).join(', ');
+        try {
+          const res = await fetch('/api/contact/supplier', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: form.name, email: form.email, phone: form.phone, message: `Produse solicitate: ${productNames}\n${form.message}`, supplierId, productId: group.items[0].product.product_id || group.items[0].product.id, idempotencyKey }),
+          });
+          if (!res.ok) { failed++; continue; }
+          sent++;
+          group.items.forEach(item => removeItem(item.product.id));
+        } catch { failed++; }
       }
+      setSentCount(previous => previous + sent);
+      if (failed) setError(`${sent} cereri salvate. ${failed} cereri nu au fost trimise; au rămas în coș pentru reîncercare.`);
+      else setSuccess(true);
     } catch {
       setError('Eroare la trimiterea cererilor. Verifică conexiunea la internet.');
     } finally {
@@ -93,22 +90,19 @@ export default function CartPage() {
         <div className="max-w-2xl mx-auto px-4 text-center">
           <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl p-12">
             <CheckCircle className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-white mb-3">Cererile au fost trimise cu succes!</h1>
+            <h1 className="text-2xl font-bold text-white mb-3">{ui("Cererile au fost înregistrate!")}</h1>
             <p className="text-anthracite-300 mb-2">
-              Am trimis <strong className="text-white">{supplierCount} cerere(i)</strong> către furnizori separați.
-            </p>
+              {ui("Am înregistrat ")}<strong className="text-white">{sentCount} {ui("cerere(i)")}</strong> {ui("către furnizori separați.")}</p>
             <p className="text-anthracite-400 text-sm mb-8">
-              Fiecare furnizor a primit lista produselor solicitate și mesajul tău. Vei fi contactat pe email la adresa {form.email}.
+              {ui("Cererile sunt disponibile furnizorilor în platformă. Expedierea notificării email nu garantează livrarea în inbox. Adresa ta de răspuns: ")}{form.email}.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/products" className="btn-primary inline-flex items-center gap-2">
                 <Package className="w-4 h-4" />
-                Continuă Explorarea
-              </Link>
+                {ui("Continuă Explorarea")}</Link>
               <Link href="/" className="btn-ghost inline-flex items-center gap-2">
                 <ArrowLeft className="w-4 h-4" />
-                Acasă
-              </Link>
+                {ui("Acasă")}</Link>
             </div>
           </div>
         </div>
@@ -124,12 +118,11 @@ export default function CartPage() {
           <div>
             <h1 className="text-2xl font-bold text-white flex items-center gap-3">
               <ShoppingCart className="w-7 h-7 text-gold-400" />
-              Coș de Cerere
-            </h1>
+              {ui("Coș de Cerere")}</h1>
             <p className="text-anthracite-400 text-sm mt-1">
-              {count > 0
+              {ui(count > 0
                 ? `${count} produs(e) de la ${supplierCount} furnizor(i)`
-                : 'Coșul tău este gol'}
+                : 'Coșul tău este gol')}
             </p>
           </div>
           {count > 0 && (
@@ -138,8 +131,7 @@ export default function CartPage() {
               className="text-sm text-anthracite-400 hover:text-red-400 transition-colors flex items-center gap-1"
             >
               <Trash2 className="w-4 h-4" />
-              Golește coșul
-            </button>
+              {ui("Golește coșul")}</button>
           )}
         </div>
 
@@ -147,14 +139,12 @@ export default function CartPage() {
           /* Empty State */
           <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl p-12 text-center">
             <ShoppingCart className="w-16 h-16 text-anthracite-600 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-white mb-2">Niciun produs în coș</h2>
+            <h2 className="text-xl font-semibold text-white mb-2">{ui("Niciun produs în coș")}</h2>
             <p className="text-anthracite-400 mb-6">
-              Adaugă produse din catalog pentru a trimite cereri de ofertă către mai mulți furnizori simultan.
-            </p>
+              {ui("Adaugă produse din catalog pentru a trimite cereri de ofertă către mai mulți furnizori simultan.")}</p>
             <Link href="/products" className="btn-primary inline-flex items-center gap-2">
               <Package className="w-4 h-4" />
-              Explorează Echipamente
-            </Link>
+              {ui("Explorează Echipamente")}</Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -169,8 +159,7 @@ export default function CartPage() {
                       {group.supplierName}
                     </Link>
                     <span className="text-xs text-anthracite-400 ml-auto">
-                      {group.items.length} produs(e)
-                    </span>
+                      {group.items.length} {ui("produs(e)")}</span>
                   </div>
 
                   {/* Products */}
@@ -190,29 +179,29 @@ export default function CartPage() {
 
                         {/* Info */}
                         <div className="flex-1 min-w-0">
-                          <Link href={`/products/${item.product.id}`} className="text-sm font-medium text-white hover:text-gold-400 transition-colors line-clamp-1">
+                          <Link href={`/products/${item.product.product_id || item.product.id}`} className="text-sm font-medium text-white hover:text-gold-400 transition-colors line-clamp-1">
                             {item.product.name}
                           </Link>
                           <div className="flex items-center gap-2 mt-1">
                             <span className={`text-xs px-2 py-0.5 rounded-full ${
                               item.product.condition === 'new' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
                             }`}>
-                              {item.product.condition === 'new' ? 'Nou' : 'SH'}
+                              {ui(item.product.condition === 'new' ? 'Nou' : 'SH')}
                             </span>
-                            <span className="text-xs text-anthracite-400 capitalize">{item.product.category}</span>
+                            <span className="text-xs text-anthracite-400 capitalize">{ui(item.product.category)}</span>
                           </div>
                         </div>
 
                         {/* Price */}
                         <span className="text-sm font-bold text-gold-400 whitespace-nowrap">
-                          €{Number(item.product.price_eur).toLocaleString()}
+                          {formatCatalogPrice(item.product.price_eur, locale, item.product)}
                         </span>
 
                         {/* Remove */}
                         <button
                           onClick={() => removeItem(item.product.id)}
                           className="p-2 text-anthracite-500 hover:text-red-400 transition-colors"
-                          title="Elimină din coș"
+                          title={ui("Elimină din coș")}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -225,28 +214,27 @@ export default function CartPage() {
 
             {/* Request Form */}
             <div className="lg:col-span-1">
-              <div className="bg-anthracite-900 border border-anthracite-700 rounded-xl p-6 sticky top-24">
-                <h2 className="text-lg font-bold text-white mb-1">Trimite Cererea</h2>
+              <div className="bg-anthracite-900 border border-anthracite-700 rounded-xl p-6 sticky top-[calc(var(--app-header-height)+1rem)]">
+                <h2 className="text-lg font-bold text-white mb-1">{ui("Trimite Cererea")}</h2>
                 <p className="text-xs text-anthracite-400 mb-5">
-                  Se va trimite câte o cerere separată către fiecare furnizor cu produsele lui.
-                </p>
+                  {ui("Se va trimite câte o cerere separată către fiecare furnizor cu produsele lui.")}</p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="text-xs font-medium text-anthracite-300 block mb-1">Nume *</label>
-                    <input
+                    <label htmlFor="field-marketingcoscerere-10465" className="text-xs font-medium text-anthracite-300 block mb-1">{ui("Nume *")}</label>
+                    <input id="field-marketingcoscerere-10465"
                       type="text"
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
                       className="w-full bg-anthracite-800 border border-anthracite-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-anthracite-500 focus:border-gold-400/50 focus:outline-none transition-colors"
-                      placeholder="Numele tău"
+                      placeholder={ui("Numele tău")}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-medium text-anthracite-300 block mb-1">Email *</label>
-                    <input
+                    <label htmlFor="field-marketingcoscerere-11124" className="text-xs font-medium text-anthracite-300 block mb-1">Email *</label>
+                    <input id="field-marketingcoscerere-11124"
                       type="email"
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -257,8 +245,8 @@ export default function CartPage() {
                   </div>
 
                   <div>
-                    <label className="text-xs font-medium text-anthracite-300 block mb-1">Telefon</label>
-                    <input
+                    <label htmlFor="field-marketingcoscerere-11793" className="text-xs font-medium text-anthracite-300 block mb-1">{ui("Telefon")}</label>
+                    <input id="field-marketingcoscerere-11793"
                       type="tel"
                       value={form.phone}
                       onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -268,20 +256,20 @@ export default function CartPage() {
                   </div>
 
                   <div>
-                    <label className="text-xs font-medium text-anthracite-300 block mb-1">Mesaj comun</label>
-                    <textarea
+                    <label htmlFor="field-marketingcoscerere-12425" className="text-xs font-medium text-anthracite-300 block mb-1">{ui("Mesaj comun")}</label>
+                    <textarea id="field-marketingcoscerere-12425"
                       value={form.message}
                       onChange={(e) => setForm({ ...form, message: e.target.value })}
                       className="w-full bg-anthracite-800 border border-anthracite-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder-anthracite-500 focus:border-gold-400/50 focus:outline-none transition-colors resize-none"
                       rows={3}
-                      placeholder="Detalii suplimentare (opțional)..."
+                      placeholder={ui("Detalii suplimentare (opțional)...")}
                     />
                   </div>
 
                   {error && (
                     <div className="flex items-center gap-2 text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
                       <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                      {error}
+                      {ui(error)}
                     </div>
                   )}
 
@@ -293,19 +281,17 @@ export default function CartPage() {
                     {sending ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Se trimit {supplierCount} cerere(i)...
-                      </>
+                        {ui("Se trimit ")}{supplierCount} {ui("cerere(i)...")}</>
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        Trimite Cererea ({supplierCount} furnizor{supplierCount > 1 ? 'i' : ''})
+                        {ui(`Trimite Cererea (${supplierCount} furnizor${supplierCount > 1 ? 'i' : ''})`)}
                       </>
                     )}
                   </button>
 
                   <p className="text-[11px] text-anthracite-500 text-center">
-                    Fiecare furnizor primește doar produsele lui + mesajul tău.
-                  </p>
+                    {ui("Fiecare furnizor primește doar produsele lui + mesajul tău.")}</p>
                 </form>
               </div>
             </div>

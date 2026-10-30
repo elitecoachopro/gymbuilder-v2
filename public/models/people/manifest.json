@@ -1,0 +1,104 @@
+[
+  {
+    "pose": "reception",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/mei-3d-person-receptionist-d36b82b9",
+    "height_m": 1.67,
+    "author": "Innerscene, adapted from MakeHuman CC0 assets",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sourceSha256": "04c4ec59f5704db616bd9955405ea8774e61e32ceb3973d13a75f9db14a50c3e",
+    "url": "/models/people/reception.glb",
+    "sha256": "cef82418a6d3b1e3fc6987159ef45aa0cc7de1ef2a43b2d72b4c4a19b73a24bf",
+    "bytes": 2538348,
+    "triangles": 42333,
+    "drawCalls": 8,
+    "texturePixels": 3538944,
+    "bounds": {
+      "min": [
+        -0.23984688520431519,
+        0,
+        -0.2301875501871109
+      ],
+      "max": [
+        0.23984688520431519,
+        1.6699491739273071,
+        0.2301875501871109
+      ]
+    },
+    "transforms": [
+      "uniform metre height, centre X/Z and floor Y=0",
+      "static geometry, simplified with relative error .0015",
+      "embedded skin/clothes maps <=1024, remaining maps <=512",
+      "opaque surfaces single-sided; preserve masked hair; MikkTSpace tangents baked",
+      "core GLB, no external textures or runtime decoder"
+    ]
+  },
+  {
+    "pose": "coach",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/jordan-3d-person-athlete-a0770454",
+    "height_m": 1.7,
+    "author": "Innerscene, adapted from MakeHuman CC0 assets",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sourceSha256": "a4f9919aee21ad0ad7097cb8311f7555ea8ef731e93c38808bfe5042a5f5b170",
+    "url": "/models/people/coach.glb",
+    "sha256": "f803f8857d8b3be9fb492d7ad3eafffe217af318edb34037dad51ea5a20fe545",
+    "bytes": 2418852,
+    "triangles": 41383,
+    "drawCalls": 8,
+    "texturePixels": 3538944,
+    "bounds": {
+      "min": [
+        -0.41392233967781067,
+        0,
+        -0.15048693120479584
+      ],
+      "max": [
+        0.41392233967781067,
+        1.7000000476837158,
+        0.15048693120479584
+      ]
+    },
+    "transforms": [
+      "uniform metre height, centre X/Z and floor Y=0",
+      "static geometry, simplified with relative error .0015",
+      "embedded skin/clothes maps <=1024, remaining maps <=512",
+      "opaque surfaces single-sided; preserve masked hair; MikkTSpace tangents baked",
+      "core GLB, no external textures or runtime decoder"
+    ]
+  },
+  {
+    "pose": "child",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/maya-3d-person-child-standing-bace98fd",
+    "height_m": 1.35,
+    "author": "Innerscene, adapted from MakeHuman CC0 assets",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sourceSha256": "86616920f6d52fa4a553de446f6448fcf298c53e53b537ec11834850646af7b5",
+    "url": "/models/people/child.glb",
+    "sha256": "a15fd4ec51b1118e0d2ff1d1e076a14fcb933d1053cba9d6af96ffd4c44c729c",
+    "bytes": 2755508,
+    "triangles": 44756,
+    "drawCalls": 8,
+    "texturePixels": 2752512,
+    "bounds": {
+      "min": [
+        -0.21403095126152039,
+        0,
+        -0.15471838414669037
+      ],
+      "max": [
+        0.21403095126152039,
+        1.350000023841858,
+        0.15471838414669037
+      ]
+    },
+    "transforms": [
+      "uniform metre height, centre X/Z and floor Y=0",
+      "static geometry, simplified with relative error .0015",
+      "embedded skin/clothes maps <=1024, remaining maps <=512",
+      "opaque surfaces single-sided; preserve masked hair; MikkTSpace tangents baked",
+      "core GLB, no external textures or runtime decoder"
+    ]
+  }
+]

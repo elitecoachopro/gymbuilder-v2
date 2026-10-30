@@ -1,0 +1,9 @@
+.home-sport .sport-hero-title {
+  font-size: clamp(3rem, 7.5vw, 6rem);
+  font-weight: 700;
+  line-height: .98;
+  text-wrap: balance;
+}
+
+.home-sport h3 { font-size: 1.75rem; line-height: 1.1; }
+.home-sport footer h4 { font-size: 1.25rem; }

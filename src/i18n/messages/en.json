@@ -41,7 +41,7 @@
     "anpcText": "In accordance with OUG 38/2015 regarding alternative dispute resolution, consumers may file complaints through the European ODR platform.",
     "anpcLink": "ODR Platform (ec.europa.eu)",
     "anpcSite": "ANPC (anpc.ro)",
-    "copyright": "© {year} GymBuilder. All rights reserved.",
+    "copyright": "© {year} Gym Builder. All rights reserved.",
     "tagline": "Romania's #1 platform for commercial fitness equipment",
     "equipment": "New Equipment",
     "newEquipment": "New Equipment",
@@ -75,11 +75,11 @@
     "ctaUsedDesc": "Verified and refurbished equipment at affordable prices. Save up to 60%.",
     "ctaUsedBtn": "VIEW SECOND-HAND EQUIPMENT",
     "ctaBuild": "Build Your Gym from Scratch",
-    "ctaBuildDesc": "Plan every zone of your gym. 10 categories by zones, from reception to spa area.",
+    "ctaBuildDesc": "Enter dimensions, place equipment in 2D and 3D and save your gym project.",
     "ctaBuildBtn": "PLAN YOUR GYM",
     "supplierLink": "Are you a supplier? Register for free",
     "consultationLink": "Personalized consultation — €99/session",
-    "aboutLink": "About GymBuilder",
+    "aboutLink": "About Gym Builder",
     "statsProducts": "Products",
     "statsSuppliers": "Suppliers",
     "statsBrands": "Brands",
@@ -88,7 +88,7 @@
     "noOffer": "No offers available at the moment",
     "seeOffer": "View Offer",
     "from": "from",
-    "anunturiZilei": "Daily Listings",
+    "anunturiZilei": "Offers of the week",
     "loadingAds": "Loading listings...",
     "noAds": "No ads available at the moment.",
     "details": "Details",
@@ -100,13 +100,13 @@
     "ctaUsedTitle": "Second-Hand Equipment",
     "ctaUsedButton": "VIEW SECOND-HAND EQUIPMENT",
     "ctaBuildTitle": "Build Your Gym from Scratch",
-    "ctaBuildButton": "PLAN YOUR GYM",
+    "ctaBuildButton": "Design your gym",
     "brands": "Partner Brands",
     "supplierCta": "Become a Supplier",
     "suppliersLabel": "Verified suppliers",
     "consultationCta": "Free Consultation",
     "aboutCta": "About Us",
-    "dailyAds": "Daily Ads",
+    "dailyAds": "Offers of the week",
     "dealBadge": "Deal of the Day",
     "dealOfDay": "Deal of the Day",
     "viewDeal": "View Deal",
@@ -115,10 +115,10 @@
     "products": "Products"
   },
   "about": {
-    "title": "About GymBuilder",
+    "title": "About Gym Builder",
     "subtitle": "The platform that connects gym owners with the best equipment suppliers in Europe.",
     "missionTitle": "Our Mission",
-    "missionText": "GymBuilder was created from a passion for fitness and the desire to simplify the complex process of equipping a gym. We connect gym owners with verified suppliers, offering transparency, comparison, and personalized support.",
+    "missionText": "Gym Builder was created from a passion for fitness and the desire to simplify the complex process of equipping a gym. We connect gym owners with verified suppliers, offering transparency, comparison, and personalized support.",
     "visionTitle": "Our Vision",
     "visionText": "To become the reference platform in Europe for commercial fitness equipment — a place where every gym owner finds exactly what they need, at the best price, from trusted suppliers.",
     "valuesTitle": "Our Values",
@@ -138,7 +138,7 @@
     "ctaConsultation": "Request Consultation",
     "backHome": "Back to homepage",
     "mainParagraph": "The platform that connects gym owners with the best equipment suppliers in Europe.",
-    "story1": "We started GymBuilder from the personal frustration of equipping a gym. The process was fragmented, lacking transparency, and time-consuming.",
+    "story1": "We started Gym Builder from the personal frustration of equipping a gym. The process was fragmented, lacking transparency, and time-consuming.",
     "story2": "We created a platform that brings all verified suppliers together in one place, offering direct comparison, transparent pricing, and personalized support.",
     "mission": "Our mission is to simplify the gym equipment process, providing access to quality equipment from verified suppliers across Europe."
   },
@@ -172,7 +172,7 @@
   "faq": {
     "backHome": "Back to homepage",
     "title": "Frequently Asked Questions",
-    "subtitle": "Answers to the most common questions about the GymBuilder platform.",
+    "subtitle": "Answers to the most common questions about the Gym Builder platform.",
     "categoryClients": "For Clients",
     "categorySuppliers": "For Suppliers",
     "categoryPayments": "Payments & Pricing",
@@ -186,7 +186,7 @@
   "howItWorks": {
     "backHome": "Back to homepage",
     "title": "How It Works",
-    "subtitle": "GymBuilder simplifies the process of equipping your gym. Here's how it works for each type of user.",
+    "subtitle": "Gym Builder simplifies the process of equipping your gym. Here's how it works for each type of user.",
     "clientsTitle": "For Clients",
     "clientsSubtitle": "Gym owners, managers, investors",
     "suppliersTitle": "For Suppliers",
@@ -197,18 +197,72 @@
     "clients": {
       "title": "For Clients",
       "subtitle": "Gym owners, managers, investors",
-      "cta": "Search Equipment"
+      "cta": "Search Equipment",
+      "steps": [
+        {
+          "title": "Browse without an account",
+          "description": "Open Equipment, choose new or used and filter category, market and price. Compare up to four products; published currencies are not automatically converted."
+        },
+        {
+          "title": "Check the product and supplier",
+          "description": "Open the product details for photos, specifications, variants and public contact details. Informational profiles are contacted directly, without an internal request."
+        },
+        {
+          "title": "Prepare your request",
+          "description": "For suppliers with an account, add products to My request or request a quote from the product page. Check the products and reply details. Unknown prices remain on request."
+        },
+        {
+          "title": "Follow the reply",
+          "description": "Your account contains requests, conversations, favourites and projects. Use pagination for history and Reload messages for new replies. Agree the purchase directly with the supplier."
+        }
+      ]
     },
     "suppliers": {
       "title": "For Suppliers",
       "subtitle": "Distributors, manufacturers, equipment importers",
-      "cta": "Register as Supplier"
+      "cta": "Register as Supplier",
+      "steps": [
+        {
+          "title": "Create your account and company",
+          "description": "Become a supplier: Account → Company → Verification. Passwords require 8–128 characters, uppercase, lowercase and a digit. Optional details are marked separately."
+        },
+        {
+          "title": "Confirm your email and await approval",
+          "description": "Upload at least three verification photos and finish registration. Confirm your email using the link; request another email if needed. Your company is reviewed before publication."
+        },
+        {
+          "title": "Publish your first product",
+          "description": "In Products → Add product, complete the listing and images. Limits follow your active plan; choosing a paid plan during registration is a request, not a payment."
+        },
+        {
+          "title": "Reply and develop your profile",
+          "description": "Open requests from the dashboard and reply in the conversation. Check your public profile and public contact email. For plans or promotions, see Pricing and contact Gym Builder; activation is confirmed separately."
+        }
+      ]
     },
     "build": {
       "title": "Build Your Gym from Scratch",
       "subtitle": "For those starting from zero",
       "cta1": "Configurator",
-      "cta2": "Consultation"
+      "cta2": "Consultation",
+      "steps": [
+        {
+          "title": "Define your space",
+          "description": "Open the configurator, start a project or Demo 300 and check the name, outline, dimensions, height and budget. Work in metres and EUR; model prices are indicative."
+        },
+        {
+          "title": "Edit and check both floors",
+          "description": "Configure walls, openings, obstacles and areas. Add library equipment and move or rotate numerically or visually. Use the floor selector and Undo/Redo."
+        },
+        {
+          "title": "Use AI only when you choose",
+          "description": "In AI, describe your requirements and read which data is sent. An account and consent are required. Review before applying; this is not architectural approval or a commercial quotation."
+        },
+        {
+          "title": "Save, recover and export",
+          "description": "Save to your account and reopen from My projects. Local drafts are separate and restored explicitly. JSON and equipment lists include the building; PNG/PDF cover the active floor. A graphics failure keeps the project in 2D."
+        }
+      ]
     },
     "ctaTitle": "Ready to start?",
     "ctaSubtitle": "Choose the right path for you and start now.",
@@ -235,7 +289,7 @@
     "analyticsScope": "Measuring site performance and traffic",
     "analyticsSession": "Session",
     "s2_3Title": "2.3 Marketing cookies",
-    "s2_3Text": "Currently, GymBuilder <strong class=\"text-white\">does not use marketing or advertising cookies</strong>. If we implement such cookies in the future (for retargeting, personalized ads, etc.), this policy will be updated and you will be notified through the consent banner.",
+    "s2_3Text": "Currently, Gym Builder <strong class=\"text-white\">does not use marketing or advertising cookies</strong>. If we implement such cookies in the future (for retargeting, personalized ads, etc.), this policy will be updated and you will be notified through the consent banner.",
     "s3Title": "3. How do you manage cookies?",
     "s3Intro": "You have several options for managing cookies:",
     "s3List": "<li><strong class=\"text-white\">Consent banner:</strong> On your first visit, you can choose between \"Accept all\" (also activates analytics cookies) or \"Essential only\" (blocks non-essential cookies).</li><li><strong class=\"text-white\">Browser settings:</strong> You can configure your browser to block or delete cookies. Consult your browser's documentation for specific instructions.</li><li><strong class=\"text-white\">Clearing consent:</strong> You can delete the site's local data (localStorage) from your browser settings to reset your cookie preference.</li>",
@@ -250,7 +304,7 @@
     "s7Title": "7. Policy updates",
     "s7Text": "This policy may be updated periodically to reflect changes in our practices or legal requirements. The date of the last update is displayed at the beginning of the page. We recommend that you check this page periodically.",
     "s8Title": "8. Contact",
-    "s8Text": "For any questions regarding the use of cookies on GymBuilder, you can contact us at:",
+    "s8Text": "For any questions regarding the use of cookies on Gym Builder, you can contact us at:",
     "address": "Address",
     "relatedPages": "Related pages:",
     "privacyLink": "Privacy Policy",
@@ -261,16 +315,16 @@
     "title": "Return / Cancellation Policy",
     "lastUpdated": "Last updated: July 18, 2026",
     "s1Title": "1. Scope of application",
-    "s1Intro": "This policy applies to all paid services offered through the GymBuilder platform, including:",
-    "s1List": "<li><strong class=\"text-white\">Promotion packages for suppliers</strong> (Professional, Enterprise)</li><li><strong class=\"text-white\">One-time promotions</strong> (Deal of the Day, Daily Listings)</li><li><strong class=\"text-white\">Consultation services</strong> for planning and equipping fitness facilities</li>",
-    "s1Note": "GymBuilder is a marketplace platform that facilitates the connection between equipment suppliers and current/future gym owners. Direct equipment transactions between suppliers and buyers are subject to each supplier's own policies.",
+    "s1Intro": "This policy applies to all paid services offered through the Gym Builder platform, including:",
+    "s1List": "<li><strong class=\"text-white\">Promotion packages for suppliers</strong> (Professional, Enterprise)</li><li><strong class=\"text-white\">One-time promotions</strong> (Deal of the Day, Offers of the week)</li><li><strong class=\"text-white\">Consultation services</strong> for planning and equipping fitness facilities</li>",
+    "s1Note": "Gym Builder is a marketplace platform that facilitates the connection between equipment suppliers and current/future gym owners. Direct equipment transactions between suppliers and buyers are subject to each supplier's own policies.",
     "s2Title": "2. Right of withdrawal (14 days)",
     "s2Text": "In accordance with <strong class=\"text-white\">OUG 34/2014</strong> on consumer rights in contracts concluded with professionals (transposition of Directive 2011/83/EU), you have the right to withdraw from the contract within <strong class=\"text-white\">14 calendar days</strong> from the date of purchase, without having to give a reason and without incurring costs other than those provided by law.",
     "s2BoxTitle": "The 14-day period starts from:",
     "s2BoxList": "<li>For promotion packages — from the date of payment confirmation</li><li>For one-time promotions — from the date of payment confirmation</li><li>For consultation — from the date of booking confirmation</li>",
     "s3Title": "3. Exceptions to the right of withdrawal",
     "s3Intro": "In accordance with Art. 16 of OUG 34/2014, the right of withdrawal <strong class=\"text-white\">does not apply</strong> in the following situations:",
-    "s3List": "<li><strong class=\"text-white\">Fully executed services</strong> — if the service has been fully performed and execution began with the consumer's prior express consent and acknowledgment that they lose their right of withdrawal once the contract is fully executed.</li><li><strong class=\"text-white\">Already published promotions</strong> — if the promotion (Deal of the Day, Daily Listing) has already been displayed on the platform according to the agreed schedule, the service is considered executed.</li><li><strong class=\"text-white\">Consultation performed</strong> — if the consultation session has taken place (fully or partially) with the consumer's consent.</li>",
+    "s3List": "<li><strong class=\"text-white\">Fully executed services</strong> — if the service has been fully performed and execution began with the consumer's prior express consent and acknowledgment that they lose their right of withdrawal once the contract is fully executed.</li><li><strong class=\"text-white\">Already published promotions</strong> — if the promotion (Deal of the Day, Weekly Offer) has already been displayed on the platform according to the agreed schedule, the service is considered executed.</li><li><strong class=\"text-white\">Consultation performed</strong> — if the consultation session has taken place (fully or partially) with the consumer's consent.</li>",
     "s3Important": "Important: When purchasing any service, you will be explicitly informed if execution begins within the withdrawal period and your express consent will be requested, in accordance with the law.",
     "s4Title": "4. Withdrawal procedure",
     "s4Intro": "To exercise your right of withdrawal, you must inform us by an unequivocal statement (e.g., email) of your decision to withdraw from the contract.",
@@ -284,7 +338,7 @@
     "s6List": "<li>Cancellation takes effect at the end of the current billing period</li><li>Package benefits remain active until the paid period expires</li><li>No pro-rata refunds are made for the remaining period of the current month</li><li>You can reactivate the subscription at any time</li>",
     "s7Title": "7. Standard withdrawal form",
     "s7Intro": "In accordance with the Annex to OUG 34/2014, you may use the following template (completing and submitting this form is not mandatory):",
-    "s7Form1": "To: GymBuilder — contact@gymbuilder.app",
+    "s7Form1": "To: Gym Builder — contact@gymbuilder.app",
     "s7Form2": "I/We [your name] hereby notify my/our withdrawal from the contract for the provision of the following service: [service description]",
     "s7Form3": "Order date: [date] / Receipt date: [date]",
     "s7Form4": "Consumer name: [...]",
@@ -320,17 +374,17 @@
     "titlePart2": "Conditions",
     "lastUpdated": "Last updated: January 2024",
     "s1Title": "1. Acceptance of Terms",
-    "s1Text": "By accessing and using the GymBuilder.app platform, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you do not have permission to access the service.",
+    "s1Text": "By accessing and using the Gym Builder platform, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you do not have permission to access the service.",
     "s2Title": "2. Service Description",
-    "s2Text": "GymBuilder is a B2B platform that connects fitness equipment suppliers with gym owners and sports centers. The platform offers product listing services, consultation, and transaction facilitation.",
+    "s2Text": "Gym Builder is a B2B platform that connects fitness equipment suppliers with gym owners and sports centers. The platform offers product listing services, consultation, and transaction facilitation.",
     "s3Title": "3. User Accounts",
     "s3Text": "To use certain features of the platform, you must create an account. You are responsible for maintaining the confidentiality of your account and password and for restricting access to your computer.",
     "s4Title": "4. Supplier Conditions",
-    "s4Text": "Suppliers who list products on the platform guarantee that they have the legal right to sell those products and that the information provided is correct and complete. GymBuilder reserves the right to verify and approve suppliers.",
+    "s4Text": "Suppliers who list products on the platform guarantee that they have the legal right to sell those products and that the information provided is correct and complete. Gym Builder reserves the right to verify and approve suppliers.",
     "s5Title": "5. Payments and Subscriptions",
     "s5Text": "Certain platform features require a paid subscription. Prices are displayed on the pricing page and may be changed with 30 days' notice.",
     "s6Title": "6. Limitation of Liability",
-    "s6Text": "GymBuilder is not responsible for direct transactions between suppliers and buyers. The platform serves only as an intermediary to facilitate business connections.",
+    "s6Text": "Gym Builder is not responsible for direct transactions between suppliers and buyers. The platform serves only as an intermediary to facilitate business connections.",
     "s7Title": "7. Contact",
     "s7Text": "For questions regarding these terms, you can contact us at:"
   },
@@ -367,8 +421,8 @@
     "connectionError": "Connection error. Check your internet connection.",
     "createClientAccount": "Create Client Account",
     "clientSubtitle": "Access the full equipment catalog.",
-    "firstName": "First Name",
-    "lastName": "Last Name",
+    "firstName": "First name",
+    "lastName": "Last name",
     "phoneLabel": "Phone",
     "passwordPlaceholder": "Minimum 8 characters",
     "confirmPassword": "Confirm password",
@@ -389,7 +443,7 @@
     "isSupplier": "Are you a supplier?",
     "supplierRegister": "Supplier Registration",
     "becomeSupplier": "Become a Supplier",
-    "supplierSubtitle": "Registration in 3 simple steps.",
+    "supplierSubtitle": "Registration in 4 simple steps.",
     "stepAccount": "Account",
     "stepAccountDesc": "Authentication details",
     "stepCompany": "Company",
@@ -436,7 +490,9 @@
     "requestNewLink": "Request a new link",
     "error": "Error",
     "token": "Token",
-    "verified": "Verified"
+    "verified": "Verified",
+    "resendVerification": "Resend verification email",
+    "paidPlanPending": "Your account starts on Free. Your selected paid plan is a request and requires separate activation."
   },
   "common": {
     "loading": "Loading...",
@@ -538,7 +594,8 @@
       "replyPlaceholder": "Write your reply...",
       "send": "Send",
       "cancel": "Cancel",
-      "replySent": "Reply sent successfully! The client has been notified by email.",
+      "replySent": "Reply saved. The email notification was sent; inbox delivery is not guaranteed.",
+      "replyRecordedNoEmail": "Reply saved in the conversation. The email notification could not be sent.",
       "replyError": "Error sending reply.",
       "networkError": "Network error.",
       "openChat": "Open conversation",
@@ -580,33 +637,37 @@
       "premium": "Premium",
       "promotion": "Promotion",
       "ofertaZilei": "Deal of the Day",
-      "ofertaDescription": "#1 spot on homepage — maximum visibility",
-      "ofertaPrice": "€25",
+      "ofertaDescription": "One promoted equipment listing for 24 hours.",
+      "ofertaPrice": "€20",
       "ofertaPriceUnit": "/24 hours",
       "ofertaFeature1": "Premium display on homepage (dedicated section)",
-      "ofertaFeature2": "\"Deal of the Day\" badge on product",
-      "ofertaFeature3": "Maximum visibility — first thing clients see",
+      "ofertaFeature2": "Dedicated premium placement on the homepage",
+      "ofertaFeature3": "Direct link to your equipment and contact details",
       "ofertaFeature4": "1 single spot available (exclusivity)",
-      "reserveOferta": "Reserve Deal of the Day — €25",
-      "anunturiZilei": "Daily Announcements",
-      "anunturiDescription": "Dedicated section on homepage — 7 days visibility",
-      "anunturiPrice": "€9",
-      "anunturiPriceUnit": "/spot /7 days",
-      "anunturiFeature1": "Display in \"Daily Announcements\" section on homepage",
-      "anunturiFeature2": "7 days continuous visibility",
-      "anunturiFeature3": "Direct link to your product",
-      "anunturiFeature4": "Maximum 5 spots (reduced competition)",
-      "reserveAnunt": "Reserve Announcement — €9/7 days",
+      "reserveOferta": "Request daily offer — €20 / 24 hours",
       "slotsAvailable": "Available spots:",
       "slotsChecking": "Checking...",
       "modalReserveOferta": "Reserve Deal of the Day",
-      "modalReserveAnunt": "Reserve Daily Announcement",
-      "modalOfertaDesc": "Contact us to reserve the premium spot on homepage (€25/24h).",
-      "modalAnuntDesc": "Contact us to reserve a spot in the Daily Announcements section (€9/spot/7 days).",
+      "modalOfertaDesc": "I would like the daily offer promotion: €20 for 24 hours in one exclusive placement. Please confirm availability, the period and payment before activation.",
       "email": "Email",
       "phone": "Phone",
       "phoneHours": "Monday - Friday, 9:00 - 18:00",
-      "paymentNote": "Payment is processed only after reservation confirmation. Stripe integration coming soon."
+      "paymentNote": "Promotion is a paid service separate from ordinary publication. The period and payment are confirmed with Gym Builder before activation. A request does not automatically reserve a placement or take payment.",
+      "weeklyOffers": "Offers of the week",
+      "weeklyDescription": "Promoted offers in a carousel for 7 days.",
+      "weeklyPrice": "€10",
+      "weeklyPriceUnit": "/offer /7 days",
+      "weeklyFeature1": "Display in the Offers of the week carousel",
+      "weeklyFeature2": "Promotion for 7 days from activation",
+      "weeklyFeature3": "Direct link to your product",
+      "weeklyFeature4": "Rotation and navigation through all active offers",
+      "reserveWeekly": "Request weekly promotion — €10 / 7 days",
+      "modalReserveWeekly": "Reserve a weekly offer",
+      "modalWeeklyDesc": "I would like a weekly offer promotion: €10 for 7 days in the carousel. Please confirm the period and payment before activation.",
+      "weeklyActive": "active offers in the carousel",
+      "availabilityUnknown": "Availability unconfirmed",
+      "modalReserveSuper": "Request Super price",
+      "modalSuperDesc": "12 EUR for 12 hours of promotion with a visible countdown. Choose a product and request confirmation of the period and payment."
     },
     "settings": {
       "title": "Account Settings",
@@ -752,6 +813,11 @@
     }
   },
   "newProduct": {
+    "approvalLoading": "Checking company approval and active plan…",
+    "approvalUnavailable": "Publication access could not be checked. Sign in as a supplier or try again.",
+    "approvalRequired": "Product publication becomes available after your company is approved. Check the status and messages in your dashboard before filling in a product listing.",
+    "approvalRetry": "Check again",
+    "backToDashboard": "Back to dashboard",
     "title": "Add New Product",
     "subtitle": "Fill in the product details to list it on the platform.",
     "productInfo": "Product Information",
@@ -769,7 +835,7 @@
     "description": "Description",
     "descriptionPlaceholder": "Describe the product: technical specs, condition, included accessories...",
     "images": "Product Images",
-    "imagesHint": "Add up to 6 images (max 5MB each). The first image will be the main one.",
+    "imagesHint": "Add up to {count} images (max 5MB each). The first image is the main image.",
     "addImage": "Add image",
     "primaryImage": "Primary",
     "cancel": "Cancel",
@@ -804,7 +870,10 @@
     "gallery360Add": "Add 360° images",
     "gallery360Count": "images",
     "gallery360Min": "Minimum 12 images required",
-    "gallery360Locked": "360° Gallery is available only for Professional and Enterprise plans. Upgrade to enable this feature."
+    "gallery360Locked": "360° Gallery is available only for Professional and Enterprise plans. Upgrade to enable this feature.",
+    "imagesUnlimitedHint": "Images without a plan limit (max 5MB each). The first image is the main image.",
+    "imageLimitError": "Your plan allows up to {count} images per product.",
+    "gallery360Max": "You can upload up to 36 images for the 360° gallery."
   },
   "notifications": {
     "title": "Notifications",

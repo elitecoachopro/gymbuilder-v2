@@ -1,0 +1,4 @@
+Innerscene, adapted from MakeHuman CC0 assets. Fictional characters; CC0-1.0. Source URLs, original and optimized hashes, metre bounds and transformations are in manifest.json.
+https://www.innerscene.com/tools/library/terms
+https://static.makehumancommunity.org/about/license.html
+https://creativecommons.org/publicdomain/zero/1.0/

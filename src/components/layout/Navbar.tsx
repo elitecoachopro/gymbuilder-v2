@@ -1,6 +1,9 @@
 'use client';
 
+import { useUiText } from '@/i18n/useUiText';
+
 import Link from 'next/link';
+import { clearEditorDrafts } from '@/lib/gym-editor-draft';
 import { useState, useEffect } from 'react';
 import { Menu, X, User, Dumbbell, LayoutDashboard, LogOut } from 'lucide-react';
 import CartIcon from '@/components/CartIcon';
@@ -19,6 +22,7 @@ interface SessionUser {
 }
 
 export default function Navbar() {
+  const ui = useUiText();
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<SessionUser | null>(null);
 
@@ -46,6 +50,7 @@ export default function Navbar() {
   async function handleLogout() {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
+      await clearEditorDrafts(user?.id ?? 'guest').catch(() => {});
       setUser(null);
       window.location.href = '/';
     } catch {}
@@ -59,7 +64,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-2 group">
             <Dumbbell className="w-8 h-8 text-gold-400 group-hover:rotate-12 transition-transform duration-300" />
             <span className="text-xl font-bold">
-              <span className="text-white">Gym</span>
+              <span className="text-white">Gym </span>
               <span className="text-gold-400">Builder</span>
             </span>
           </Link>
@@ -91,18 +96,15 @@ export default function Navbar() {
                   className="btn-ghost text-sm flex items-center gap-2 text-anthracite-400 hover:text-white"
                 >
                   <LogOut className="w-4 h-4" />
-                  Ieșire
-                </button>
+                  {ui("Ieșire")}</button>
               </>
             ) : (
               <>
                 <Link href="/login" className="btn-ghost text-sm flex items-center gap-2">
                   <User className="w-4 h-4" />
-                  Autentificare
-                </Link>
+                  {ui("Autentificare")}</Link>
                 <Link href="/register/supplier" className="btn-primary text-sm">
-                  Devino Furnizor
-                </Link>
+                  {ui("Devino Furnizor")}</Link>
               </>
             )}
           </div>
@@ -136,8 +138,7 @@ export default function Navbar() {
               className="block px-4 py-3 text-anthracite-200 hover:text-white hover:bg-anthracite-800 rounded-lg transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              🛒 Coș Cerere
-            </Link>
+              {ui("🛒 Coș Cerere")}</Link>
             <div className="pt-4 border-t border-anthracite-700 space-y-2">
               {user ? (
                 <>
@@ -153,17 +154,14 @@ export default function Navbar() {
                     onClick={() => { handleLogout(); setIsOpen(false); }}
                     className="block w-full text-left px-4 py-3 text-anthracite-400 hover:text-white hover:bg-anthracite-800 rounded-lg"
                   >
-                    Ieșire
-                  </button>
+                    {ui("Ieșire")}</button>
                 </>
               ) : (
                 <>
                   <Link href="/login" className="block px-4 py-3 text-anthracite-200 hover:text-white">
-                    Autentificare
-                  </Link>
+                    {ui("Autentificare")}</Link>
                   <Link href="/register/supplier" className="block btn-primary text-center text-sm">
-                    Devino Furnizor
-                  </Link>
+                    {ui("Devino Furnizor")}</Link>
                 </>
               )}
             </div>

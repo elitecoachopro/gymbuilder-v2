@@ -1,34 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { getSessionUser } from '@/lib/session-server';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
 function getSupabaseAdmin() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
 // Verify session token
-function verifySession(request: NextRequest): string | null {
-  const sessionToken = request.cookies.get('session_token')?.value;
-  if (!sessionToken) return null;
-
-  try {
-    const [payloadB64, hmac] = sessionToken.split('.');
-    const payload = JSON.parse(Buffer.from(payloadB64, 'base64').toString());
-    
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!secret) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
-    const expectedHmac = crypto.createHmac('sha256', secret).update(JSON.stringify(payload)).digest('hex');
-    if (hmac !== expectedHmac) return null;
-    if (Date.now() > payload.exp) return null;
-
-    return payload.userId;
-  } catch {
-    return null;
-  }
-}
+async function verifySession(_request?: unknown) { return (await getSessionUser())?.id ?? null; }
 
 // Allowed image types
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -67,22 +53,26 @@ function validateMagicBytes(buffer: Buffer): { valid: boolean; detectedType: str
 export async function POST(request: NextRequest) {
   try {
     // Verify authentication
-    const userId = verifySession(request);
+    const userId = await verifySession(request);
     if (!userId) {
-      return NextResponse.json({ error: 'Autentificare necesară.' }, { status: 401 });
+      return await localizedJson({ error: 'Autentificare necesară.' }, { status: 401 });
     }
 
+    const quota = await checkRateLimit(`image-upload:${userId}`, { maxRequests: 60, windowMs: 60000 });
+    if (!quota.allowed) return rateLimitResponse(quota.resetTime);
+    const dailyQuota = await checkRateLimit(`image-upload-day:${userId}`, { maxRequests: 500, windowMs: 86400000 });
+    if (!dailyQuota.allowed) return rateLimitResponse(dailyQuota.resetTime);
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
     const folder = (formData.get('folder') as string) || 'general';
 
-    if (!file) {
-      return NextResponse.json({ error: 'Niciun fișier selectat.' }, { status: 400 });
+    if (!(file instanceof File) || !['products', 'products-360', 'general'].includes(folder)) {
+      return await localizedJson({ error: 'Niciun fișier selectat.' }, { status: 400 });
     }
 
     // Validate file type
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json(
+      return await localizedJson(
         { error: 'Tip de fișier neacceptat. Acceptăm: JPG, PNG, WebP, GIF.' },
         { status: 400 }
       );
@@ -90,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
+      return await localizedJson(
         { error: 'Fișierul depășește limita de 5MB.' },
         { status: 400 }
       );
@@ -99,7 +89,7 @@ export async function POST(request: NextRequest) {
     const supabase = getSupabaseAdmin();
 
     // Generate unique filename
-    const ext = file.name.split('.').pop() || 'jpg';
+    const ext = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' } as Record<string, string>)[file.type];
     const uniqueName = `${folder}/${userId}/${Date.now()}-${crypto.randomBytes(8).toString('hex')}.${ext}`;
 
     // Convert file to buffer
@@ -108,15 +98,15 @@ export async function POST(request: NextRequest) {
 
     // Validate magic bytes (real file signature)
     const magicCheck = validateMagicBytes(buffer);
-    if (!magicCheck.valid) {
-      return NextResponse.json(
+    if (!magicCheck.valid || magicCheck.detectedType !== file.type) {
+      return await localizedJson(
         { error: 'Fișierul nu este o imagine validă. Semnătura binară nu corespunde unui format acceptat (JPEG, PNG, WebP, GIF).' },
         { status: 400 }
       );
     }
 
     // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('uploads')
       .upload(uniqueName, buffer, {
         contentType: file.type,
@@ -136,7 +126,7 @@ export async function POST(request: NextRequest) {
 
         if (!bucketError) {
           // Retry upload
-          const { data: retryData, error: retryError } = await supabase.storage
+          const { error: retryError } = await supabase.storage
             .from('uploads')
             .upload(uniqueName, buffer, {
               contentType: file.type,
@@ -144,14 +134,14 @@ export async function POST(request: NextRequest) {
             });
 
           if (retryError) {
-            return NextResponse.json(
+            return await localizedJson(
               { error: 'Eroare la încărcarea fișierului. Încearcă din nou.' },
               { status: 500 }
             );
           }
 
           const { data: urlData } = supabase.storage.from('uploads').getPublicUrl(uniqueName);
-          return NextResponse.json({
+          return await localizedJson({
             success: true,
             url: urlData.publicUrl,
             path: uniqueName,
@@ -159,7 +149,7 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      return NextResponse.json(
+      return await localizedJson(
         { error: 'Eroare la încărcarea fișierului. Încearcă din nou.' },
         { status: 500 }
       );
@@ -168,14 +158,14 @@ export async function POST(request: NextRequest) {
     // Get public URL
     const { data: urlData } = supabase.storage.from('uploads').getPublicUrl(uniqueName);
 
-    return NextResponse.json({
+    return await localizedJson({
       success: true,
       url: urlData.publicUrl,
       path: uniqueName,
     });
   } catch (error) {
     console.error('Upload API error:', error);
-    return NextResponse.json(
+    return await localizedJson(
       { error: 'Eroare internă la upload.' },
       { status: 500 }
     );

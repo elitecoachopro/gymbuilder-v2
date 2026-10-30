@@ -1,39 +1,27 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
-import * as crypto from 'crypto';
+import { translateUi } from '@/i18n/translate';
+import english from '@/i18n/ui.en.json';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { getSessionUser } from '@/lib/session-server';
+import { NextRequest } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
-function getUserFromSession(): { userId: string } | null {
-  const cookieStore = cookies();
-  const sessionToken = cookieStore.get('session_token')?.value;
-  if (!sessionToken) return null;
-  try {
-    const [payloadB64, signature] = sessionToken.split('.');
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || '';
-    const decodedPayload = Buffer.from(payloadB64, 'base64').toString();
-    const expected = crypto.createHmac('sha256', secret).update(decodedPayload).digest('hex');
-    if (signature !== expected) return null;
-    const data = JSON.parse(decodedPayload);
-    if (data.exp && data.exp < Date.now()) return null;
-    return { userId: data.userId };
-  } catch {
-    return null;
-  }
-}
+async function getUserFromSession(_request?: unknown) { return getSessionUser(); }
 
 // GET - Fetch notifications for the logged-in user
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const user = getUserFromSession();
+    const user = await getUserFromSession();
     if (!user) {
-      return NextResponse.json({ error: 'Neautorizat.' }, { status: 401 });
+      return await localizedJson({ error: 'Neautorizat.' }, { status: 401 });
     }
 
     const supabase = getSupabase();
@@ -48,7 +36,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Notifications fetch error:', error);
-      return NextResponse.json({ error: 'Eroare la încărcarea notificărilor.' }, { status: 500 });
+      return await localizedJson({ error: 'Eroare la încărcarea notificărilor.' }, { status: 500 });
     }
 
     // Get unread count
@@ -58,22 +46,23 @@ export async function GET(request: NextRequest) {
       .eq('user_id', user.userId)
       .eq('is_read', false);
 
-    return NextResponse.json({
-      notifications: notifications || [],
+    const locale = (await cookies()).get('locale')?.value || 'ro';
+    return await localizedJson({
+      notifications: (notifications || []).map(notification => ({ ...notification, title: translateUi(notification.title, locale, english), message: (notification.type === 'price_drop' || notification.type === 'new_request' && (notification.message.startsWith('Produs solicitat:') || notification.message === 'Cerere nouă')) ? translateUi(notification.message, locale, english) : notification.message })),
       unreadCount: unreadCount || 0,
     });
   } catch (err) {
     console.error('Notifications API error:', err);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă.' }, { status: 500 });
   }
 }
 
 // PATCH - Mark notification(s) as read
 export async function PATCH(request: NextRequest) {
   try {
-    const user = getUserFromSession();
+    const user = await getUserFromSession();
     if (!user) {
-      return NextResponse.json({ error: 'Neautorizat.' }, { status: 401 });
+      return await localizedJson({ error: 'Neautorizat.' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -81,25 +70,16 @@ export async function PATCH(request: NextRequest) {
 
     const supabase = getSupabase();
 
-    if (markAllRead) {
-      // Mark all as read
-      await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('user_id', user.userId)
-        .eq('is_read', false);
-    } else if (notificationId) {
-      // Mark single notification as read
-      await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('id', notificationId)
-        .eq('user_id', user.userId);
-    }
+    if (markAllRead !== true && (typeof notificationId !== 'string' || !/^[a-f0-9-]{36}$/i.test(notificationId))) return await localizedJson({ error: 'Date invalide.' }, { status: 400 });
+    let update = supabase.from('notifications').update({ is_read: true }).eq('user_id', user.id);
+    if (markAllRead === true) update = update.eq('is_read', false);
+    else update = update.eq('id', notificationId);
+    const { error } = await update;
+    if (error) return await localizedJson({ error: 'Eroare la actualizare.' }, { status: 500 });
 
-    return NextResponse.json({ success: true });
+    return await localizedJson({ success: true });
   } catch (err) {
     console.error('Notifications PATCH error:', err);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă.' }, { status: 500 });
   }
 }

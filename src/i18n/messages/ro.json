@@ -41,7 +41,7 @@
     "anpcText": "Conform OUG 38/2015 privind soluționarea alternativă a litigiilor, consumatorii pot depune plângeri prin platforma europeană SOL.",
     "anpcLink": "Platforma SOL (ec.europa.eu)",
     "anpcSite": "ANPC (anpc.ro)",
-    "copyright": "© {year} GymBuilder. Toate drepturile rezervate.",
+    "copyright": "© {year} Gym Builder. Toate drepturile rezervate.",
     "tagline": "Platforma #1 pentru echipamente de fitness comerciale din România",
     "equipment": "Echipamente Noi",
     "newEquipment": "Echipamente Noi",
@@ -75,11 +75,11 @@
     "ctaUsedDesc": "Echipamente verificate și recondiţionate la prețuri accesibile. Economisești până la 60%.",
     "ctaUsedBtn": "VEZI ECHIPAMENTE SECOND-HAND",
     "ctaBuild": "Construiește-ți Sala de la 0",
-    "ctaBuildDesc": "Planifică fiecare zonă a sălii tale. 10 categorii pe zone, de la recepție la zona spa.",
+    "ctaBuildDesc": "Introdu dimensiunile, amplasează echipamente în 2D și 3D și salvează proiectul sălii.",
     "ctaBuildBtn": "PLANIFICĂ SALA",
     "supplierLink": "Ești furnizor? Înregistrează-te gratuit",
     "consultationLink": "Consultanță personalizată — €99/sesiune",
-    "aboutLink": "Despre GymBuilder",
+    "aboutLink": "Despre Gym Builder",
     "statsProducts": "Produse",
     "statsSuppliers": "Furnizori",
     "statsBrands": "Branduri",
@@ -88,7 +88,7 @@
     "noOffer": "Nicio ofertă disponibilă momentan",
     "seeOffer": "Vezi Oferta",
     "from": "de la",
-    "anunturiZilei": "Anunțurile Zilei",
+    "anunturiZilei": "Ofertele săptămânii",
     "loadingAds": "Se încarcă anunțurile...",
     "noAds": "Niciun anunț disponibil momentan.",
     "details": "Detalii",
@@ -100,13 +100,13 @@
     "ctaUsedTitle": "Echipamente Second-Hand",
     "ctaUsedButton": "VEZI ECHIPAMENTE SECOND-HAND",
     "ctaBuildTitle": "Construiește-ți Sala de la 0",
-    "ctaBuildButton": "PLANIFICĂ SALA",
+    "ctaBuildButton": "Proiectează sala",
     "brands": "Branduri Partenere",
     "supplierCta": "Devino Furnizor",
     "suppliersLabel": "Furnizori verificați",
     "consultationCta": "Consultanță Gratuită",
     "aboutCta": "Despre Noi",
-    "dailyAds": "Anunțuri Zilnice",
+    "dailyAds": "Ofertele săptămânii",
     "dealBadge": "Oferta Zilei",
     "dealOfDay": "Oferta Zilei",
     "viewDeal": "Vezi Oferta",
@@ -115,10 +115,10 @@
     "products": "Produse"
   },
   "about": {
-    "title": "Despre GymBuilder",
+    "title": "Despre Gym Builder",
     "subtitle": "Platforma care conectează proprietarii de săli de fitness cu cei mai buni furnizori de echipamente din Europa.",
     "missionTitle": "Misiunea Noastră",
-    "missionText": "GymBuilder a fost creat din pasiunea pentru fitness și din dorința de a simplifica procesul complex de echipare a unei săli de fitness. Conectăm proprietarii de săli cu furnizori verificați, oferind transparență, comparație și suport personalizat.",
+    "missionText": "Gym Builder a fost creat din pasiunea pentru fitness și din dorința de a simplifica procesul complex de echipare a unei săli de fitness. Conectăm proprietarii de săli cu furnizori verificați, oferind transparență, comparație și suport personalizat.",
     "visionTitle": "Viziunea Noastră",
     "visionText": "Să devenim platforma de referință în Europa pentru echipamente de fitness comerciale — un loc unde fiecare proprietar de sală găsește exact ce are nevoie, la cel mai bun preț, de la furnizori de încredere.",
     "valuesTitle": "Valorile Noastre",
@@ -138,7 +138,7 @@
     "ctaConsultation": "Solicită Consultanță",
     "backHome": "Înapoi la homepage",
     "mainParagraph": "Platforma care conectează proprietarii de săli de fitness cu cei mai buni furnizori de echipamente din Europa.",
-    "story1": "Am pornit GymBuilder din frustrarea personală de a echipa o sală de fitness. Procesul era fragmentat, lipsit de transparență și consumator de timp.",
+    "story1": "Am pornit Gym Builder din frustrarea personală de a echipa o sală de fitness. Procesul era fragmentat, lipsit de transparență și consumator de timp.",
     "story2": "Am creat o platformă care reunește toți furnizorii verificați într-un singur loc, oferind comparație directă, prețuri transparente și suport personalizat.",
     "mission": "Misiunea noastră este să simplificăm procesul de echipare a sălilor de fitness, oferind acces la echipamente de calitate de la furnizori verificați din toată Europa."
   },
@@ -172,7 +172,7 @@
   "faq": {
     "backHome": "Înapoi la homepage",
     "title": "Întrebări Frecvente",
-    "subtitle": "Răspunsuri la cele mai comune întrebări despre platforma GymBuilder.",
+    "subtitle": "Răspunsuri la cele mai comune întrebări despre platforma Gym Builder.",
     "categoryClients": "Pentru Clienți",
     "categorySuppliers": "Pentru Furnizori",
     "categoryPayments": "Plăți și Prețuri",
@@ -186,7 +186,7 @@
   "howItWorks": {
     "backHome": "Înapoi la homepage",
     "title": "Cum Funcționează",
-    "subtitle": "GymBuilder simplifică procesul de echipare a sălii tale de fitness. Iată cum funcționează pentru fiecare tip de utilizator.",
+    "subtitle": "Gym Builder simplifică procesul de echipare a sălii tale de fitness. Iată cum funcționează pentru fiecare tip de utilizator.",
     "clientsTitle": "Pentru Clienți",
     "clientsSubtitle": "Proprietari de săli de fitness, manageri, investitori",
     "suppliersTitle": "Pentru Furnizori",
@@ -197,18 +197,72 @@
     "clients": {
       "title": "Pentru Clienți",
       "subtitle": "Proprietari de săli de fitness, manageri, investitori",
-      "cta": "Caută Echipamente"
+      "cta": "Caută Echipamente",
+      "steps": [
+        {
+          "title": "Caută fără cont",
+          "description": "Deschide Echipamente, alege nou sau second-hand și filtrează categoria, piața și prețul. Compară maximum patru produse; moneda publicată nu este convertită automat."
+        },
+        {
+          "title": "Verifică produsul și furnizorul",
+          "description": "Deschide fișa produsului: fotografii, specificații, variante și date publice de contact. Profilurile informative se contactează direct, fără cerere internă."
+        },
+        {
+          "title": "Pregătește cererea",
+          "description": "Pentru furnizorii cu cont, adaugă produsele în Cererea mea sau solicită o ofertă din fișă. Verifică produsele și datele de răspuns. Un preț necunoscut rămâne la cerere."
+        },
+        {
+          "title": "Urmărește răspunsul",
+          "description": "În cont găsești cererile, conversațiile, favoritele și proiectele. Folosește paginarea pentru istoric și Reîncarcă mesajele pentru răspunsuri noi. Achiziția se stabilește direct cu furnizorul."
+        }
+      ]
     },
     "suppliers": {
       "title": "Pentru Furnizori",
       "subtitle": "Distribuitori, producători, importatori de echipamente",
-      "cta": "Înregistrare Furnizor"
+      "cta": "Înregistrare Furnizor",
+      "steps": [
+        {
+          "title": "Creează contul și firma",
+          "description": "Devino furnizor: Cont → Firmă → Verificare. Parola cere 8–128 caractere, literă mare, literă mică și cifră. Datele opționale sunt marcate separat."
+        },
+        {
+          "title": "Confirmă emailul și așteaptă aprobarea",
+          "description": "Încarcă minimum trei fotografii de verificare și finalizează. Confirmă emailul din link; poți solicita retrimiterea dacă nu ajunge. Firma este verificată înainte de publicare."
+        },
+        {
+          "title": "Publică primul produs",
+          "description": "Din Produse → Adaugă produs completează fișa și imaginile. Limitele sunt cele ale planului activ; alegerea unui plan plătit la înregistrare este o solicitare, nu o plată."
+        },
+        {
+          "title": "Răspunde și dezvoltă profilul",
+          "description": "Deschide cererile din dashboard și răspunde în conversație. Verifică profilul public și emailul public de contact. Pentru plan sau promovare, consultă Prețuri și contactează Gym Builder; activarea se confirmă separat."
+        }
+      ]
     },
     "build": {
       "title": "Construiește-ți Sala de la 0",
       "subtitle": "Pentru cei care pornesc de la zero",
       "cta1": "Configurator",
-      "cta2": "Consultanță"
+      "cta2": "Consultanță",
+      "steps": [
+        {
+          "title": "Definește spațiul",
+          "description": "Deschide configuratorul, pornește un proiect sau Demo 300 și verifică numele, conturul, dimensiunile, înălțimea și bugetul. Lucrează în metri și EUR; prețurile machetelor sunt orientative."
+        },
+        {
+          "title": "Editează și verifică nivelurile",
+          "description": "Configurează pereții, deschiderile, obstacolele și zonele. Adaugă aparate din bibliotecă, mută și rotește numeric sau vizual. Folosește selectorul de nivel și Undo/Redo."
+        },
+        {
+          "title": "Folosește AI numai când dorești",
+          "description": "În AI, descrie cerințele și citește ce date sunt trimise. Este necesar contul și consimțământul. Verifică propunerea înainte de aplicare; nu este o validare arhitecturală sau o ofertă comercială."
+        },
+        {
+          "title": "Salvează, recuperează și exportă",
+          "description": "Salvează în cont și redeschide din Proiectele mele. Ciorna locală este separată și se recuperează explicit. JSON și lista includ clădirea; PNG/PDF sunt pentru nivelul activ. La eroare grafică proiectul rămâne în 2D."
+        }
+      ]
     },
     "ctaTitle": "Gata să începi?",
     "ctaSubtitle": "Alege calea potrivită pentru tine și începe acum.",
@@ -235,7 +289,7 @@
     "analyticsScope": "Măsurarea performanței și a traficului pe site",
     "analyticsSession": "Sesiune",
     "s2_3Title": "2.3 Cookie-uri de marketing",
-    "s2_3Text": "În prezent, GymBuilder <strong class=\"text-white\">nu utilizează cookie-uri de marketing sau publicitate</strong>. Dacă în viitor vom implementa astfel de cookie-uri (pentru retargetare, reclame personalizate etc.), această politică va fi actualizată și veți fi notificat prin banner-ul de consimțământ.",
+    "s2_3Text": "În prezent, Gym Builder <strong class=\"text-white\">nu utilizează cookie-uri de marketing sau publicitate</strong>. Dacă în viitor vom implementa astfel de cookie-uri (pentru retargetare, reclame personalizate etc.), această politică va fi actualizată și veți fi notificat prin banner-ul de consimțământ.",
     "s3Title": "3. Cum gestionați cookie-urile?",
     "s3Intro": "Aveți mai multe opțiuni pentru gestionarea cookie-urilor:",
     "s3List": "<li><strong class=\"text-white\">Banner-ul de consimțământ:</strong> La prima vizită, puteți alege între \"Acceptă toate\" (activează și cookie-urile de analiză) sau \"Doar esențiale\" (blochează cookie-urile non-esențiale).</li><li><strong class=\"text-white\">Setările browserului:</strong> Puteți configura browserul să blocheze sau să șteargă cookie-urile. Consultați documentația browserului dumneavoastră pentru instrucțiuni specifice.</li><li><strong class=\"text-white\">Ștergerea consimțământului:</strong> Puteți șterge datele locale ale site-ului (localStorage) din setările browserului pentru a reseta preferința de cookie-uri.</li>",
@@ -250,7 +304,7 @@
     "s7Title": "7. Actualizări ale politicii",
     "s7Text": "Această politică poate fi actualizată periodic pentru a reflecta modificări ale practicilor noastre sau ale cerințelor legale. Data ultimei actualizări este afișată la începutul paginii. Vă recomandăm să consultați periodic această pagină.",
     "s8Title": "8. Contact",
-    "s8Text": "Pentru orice întrebări legate de utilizarea cookie-urilor pe GymBuilder, ne puteți contacta la:",
+    "s8Text": "Pentru orice întrebări legate de utilizarea cookie-urilor pe Gym Builder, ne puteți contacta la:",
     "address": "Adresă",
     "relatedPages": "Pagini conexe:",
     "privacyLink": "Politica de Confidențialitate",
@@ -261,16 +315,16 @@
     "title": "Politica de Retur / Anulare",
     "lastUpdated": "Ultima actualizare: 18 iulie 2026",
     "s1Title": "1. Domeniul de aplicare",
-    "s1Intro": "Prezenta politică se aplică tuturor serviciilor plătite oferite prin platforma GymBuilder, inclusiv:",
-    "s1List": "<li><strong class=\"text-white\">Pachete de promovare pentru furnizori</strong> (Professional, Enterprise)</li><li><strong class=\"text-white\">Promovări punctuale</strong> (Oferta Zilei, Anunțurile Zilei)</li><li><strong class=\"text-white\">Servicii de consultanță</strong> pentru planificarea și echiparea sălilor de fitness</li>",
-    "s1Note": "GymBuilder este o platformă de tip marketplace care facilitează conexiunea între furnizori de echipamente și proprietari/viitori proprietari de săli de fitness. Tranzacțiile directe de echipamente între furnizori și cumpărători sunt supuse politicilor proprii ale fiecărui furnizor.",
+    "s1Intro": "Prezenta politică se aplică tuturor serviciilor plătite oferite prin platforma Gym Builder, inclusiv:",
+    "s1List": "<li><strong class=\"text-white\">Pachete de promovare pentru furnizori</strong> (Professional, Enterprise)</li><li><strong class=\"text-white\">Promovări punctuale</strong> (Oferta Zilei, Ofertele săptămânii)</li><li><strong class=\"text-white\">Servicii de consultanță</strong> pentru planificarea și echiparea sălilor de fitness</li>",
+    "s1Note": "Gym Builder este o platformă de tip marketplace care facilitează conexiunea între furnizori de echipamente și proprietari/viitori proprietari de săli de fitness. Tranzacțiile directe de echipamente între furnizori și cumpărători sunt supuse politicilor proprii ale fiecărui furnizor.",
     "s2Title": "2. Dreptul de retragere (14 zile)",
     "s2Text": "Conform <strong class=\"text-white\">OUG 34/2014</strong> privind drepturile consumatorilor în cadrul contractelor încheiate cu profesioniștii (transpunerea Directivei 2011/83/UE), aveți dreptul de a vă retrage din contract în termen de <strong class=\"text-white\">14 zile calendaristice</strong> de la data achiziției, fără a fi necesară invocarea unui motiv și fără a suporta alte costuri decât cele prevăzute de lege.",
     "s2BoxTitle": "Termenul de 14 zile începe să curgă:",
     "s2BoxList": "<li>Pentru pachete de promovare — de la data confirmării plății</li><li>Pentru promovări punctuale — de la data confirmării plății</li><li>Pentru consultanță — de la data confirmării rezervării</li>",
     "s3Title": "3. Excepții de la dreptul de retragere",
     "s3Intro": "Conform Art. 16 din OUG 34/2014, dreptul de retragere <strong class=\"text-white\">nu se aplică</strong> în următoarele situații:",
-    "s3List": "<li><strong class=\"text-white\">Servicii executate integral</strong> — dacă prestarea serviciului a fost finalizată și executarea a început cu acordul prealabil expres al consumatorului și cu confirmarea că acesta și-a pierdut dreptul de retragere odată ce contractul a fost executat integral.</li><li><strong class=\"text-white\">Promovări deja publicate</strong> — dacă promovarea (Oferta Zilei, Anunțul Zilei) a fost deja afișată pe platformă conform programului convenit, serviciul se consideră executat.</li><li><strong class=\"text-white\">Consultanță efectuată</strong> — dacă sesiunea de consultanță a avut loc (integral sau parțial) cu acordul consumatorului.</li>",
+    "s3List": "<li><strong class=\"text-white\">Servicii executate integral</strong> — dacă prestarea serviciului a fost finalizată și executarea a început cu acordul prealabil expres al consumatorului și cu confirmarea că acesta și-a pierdut dreptul de retragere odată ce contractul a fost executat integral.</li><li><strong class=\"text-white\">Promovări deja publicate</strong> — dacă promovarea (Oferta Zilei, Ofertele săptămânii) a fost deja afișată pe platformă conform programului convenit, serviciul se consideră executat.</li><li><strong class=\"text-white\">Consultanță efectuată</strong> — dacă sesiunea de consultanță a avut loc (integral sau parțial) cu acordul consumatorului.</li>",
     "s3Important": "Important: La achiziția oricărui serviciu, veți fi informat explicit dacă executarea începe în interiorul termenului de retragere și vi se va solicita acordul expres, conform legii.",
     "s4Title": "4. Procedura de retragere",
     "s4Intro": "Pentru a vă exercita dreptul de retragere, trebuie să ne informați printr-o declarație neechivocă (de exemplu, email) cu privire la decizia dumneavoastră de a vă retrage din contract.",
@@ -284,7 +338,7 @@
     "s6List": "<li>Anularea intră în vigoare la sfârșitul perioadei de facturare curente</li><li>Beneficiile pachetului rămân active până la expirarea perioadei plătite</li><li>Nu se efectuează rambursări pro-rata pentru perioada rămasă din luna curentă</li><li>Puteți reactiva abonamentul în orice moment</li>",
     "s7Title": "7. Formular-tip de retragere",
     "s7Intro": "Conform Anexei la OUG 34/2014, puteți utiliza următorul model (completarea și transmiterea acestui formular nu este obligatorie):",
-    "s7Form1": "Către: GymBuilder — contact@gymbuilder.app",
+    "s7Form1": "Către: Gym Builder — contact@gymbuilder.app",
     "s7Form2": "Subsemnatul/Subsemnata [numele dumneavoastră], notific prin prezenta retragerea mea din contractul privind prestarea următorului serviciu: [descrierea serviciului]",
     "s7Form3": "Data comenzii: [data] / Data primirii: [data]",
     "s7Form4": "Numele consumatorului: [...]",
@@ -320,17 +374,17 @@
     "titlePart2": "Condiții",
     "lastUpdated": "Ultima actualizare: Ianuarie 2024",
     "s1Title": "1. Acceptarea Termenilor",
-    "s1Text": "Prin accesarea și utilizarea platformei GymBuilder.app, acceptați să fiți obligat de acești Termeni și Condiții. Dacă nu sunteți de acord cu oricare parte a acestor termeni, nu aveți permisiunea de a accesa serviciul.",
+    "s1Text": "Prin accesarea și utilizarea platformei Gym Builder, acceptați să fiți obligat de acești Termeni și Condiții. Dacă nu sunteți de acord cu oricare parte a acestor termeni, nu aveți permisiunea de a accesa serviciul.",
     "s2Title": "2. Descrierea Serviciului",
-    "s2Text": "GymBuilder este o platformă B2B care conectează furnizori de echipamente fitness cu proprietari de săli de fitness și centre sportive. Platforma oferă servicii de listare produse, consultanță și facilitare tranzacții.",
+    "s2Text": "Gym Builder este o platformă B2B care conectează furnizori de echipamente fitness cu proprietari de săli de fitness și centre sportive. Platforma oferă servicii de listare produse, consultanță și facilitare tranzacții.",
     "s3Title": "3. Conturi de Utilizator",
     "s3Text": "Pentru a utiliza anumite funcționalități ale platformei, trebuie să vă creați un cont. Sunteți responsabil pentru menținerea confidențialității contului și parolei dvs. și pentru restricționarea accesului la computer.",
     "s4Title": "4. Condiții pentru Furnizori",
-    "s4Text": "Furnizorii care listează produse pe platformă garantează că au dreptul legal de a vinde produsele respective și că informațiile furnizate sunt corecte și complete. GymBuilder își rezervă dreptul de a verifica și aproba furnizorii.",
+    "s4Text": "Furnizorii care listează produse pe platformă garantează că au dreptul legal de a vinde produsele respective și că informațiile furnizate sunt corecte și complete. Gym Builder își rezervă dreptul de a verifica și aproba furnizorii.",
     "s5Title": "5. Plăți și Abonamente",
     "s5Text": "Anumite funcționalități ale platformei necesită un abonament plătit. Prețurile sunt afișate pe pagina de prețuri și pot fi modificate cu un preaviz de 30 de zile.",
     "s6Title": "6. Limitarea Răspunderii",
-    "s6Text": "GymBuilder nu este responsabil pentru tranzacțiile directe între furnizori și cumpărători. Platforma servește doar ca intermediar pentru facilitarea conexiunilor comerciale.",
+    "s6Text": "Gym Builder nu este responsabil pentru tranzacțiile directe între furnizori și cumpărători. Platforma servește doar ca intermediar pentru facilitarea conexiunilor comerciale.",
     "s7Title": "7. Contact",
     "s7Text": "Pentru întrebări legate de acești termeni, ne puteți contacta la:"
   },
@@ -367,8 +421,8 @@
     "connectionError": "Eroare de conexiune. Verifică conexiunea la internet.",
     "createClientAccount": "Creează Cont Client",
     "clientSubtitle": "Accesează catalogul complet de echipamente.",
-    "firstName": "Nume",
-    "lastName": "Prenume",
+    "firstName": "Prenume",
+    "lastName": "Nume",
     "phoneLabel": "Telefon",
     "passwordPlaceholder": "Minim 8 caractere",
     "confirmPassword": "Repetă parola",
@@ -389,7 +443,7 @@
     "isSupplier": "Ești furnizor?",
     "supplierRegister": "Înregistrare Furnizor",
     "becomeSupplier": "Devino Furnizor",
-    "supplierSubtitle": "Înregistrare în 3 pași simpli.",
+    "supplierSubtitle": "Înregistrare în 4 pași simpli.",
     "stepAccount": "Cont",
     "stepAccountDesc": "Date de autentificare",
     "stepCompany": "Companie",
@@ -436,7 +490,9 @@
     "requestNewLink": "Solicită un nou link",
     "error": "Eroare",
     "token": "Token",
-    "verified": "Verificat"
+    "verified": "Verificat",
+    "resendVerification": "Retrimite confirmarea emailului",
+    "paidPlanPending": "Contul porneste pe Free. Pachetul ales este o solicitare si necesita activare separata."
   },
   "common": {
     "loading": "Se încarcă...",
@@ -538,7 +594,8 @@
       "replyPlaceholder": "Scrie răspunsul tău...",
       "send": "Trimite",
       "cancel": "Anulează",
-      "replySent": "Răspuns trimis cu succes! Clientul a fost notificat pe email.",
+      "replySent": "Răspuns salvat. Notificarea email a fost expediată; livrarea în inbox nu este garantată.",
+      "replyRecordedNoEmail": "Răspuns salvat în conversație. Notificarea email nu a putut fi expediată.",
       "replyError": "Eroare la trimiterea răspunsului.",
       "networkError": "Eroare de rețea.",
       "openChat": "Deschide conversația",
@@ -580,33 +637,37 @@
       "premium": "Premium",
       "promotion": "Promovare",
       "ofertaZilei": "Oferta Zilei",
-      "ofertaDescription": "Locul #1 pe homepage — vizibilitate maximă",
-      "ofertaPrice": "€25",
+      "ofertaDescription": "Un singur echipament promovat, timp de 24 de ore.",
+      "ofertaPrice": "20 €",
       "ofertaPriceUnit": "/24 ore",
       "ofertaFeature1": "Afișaj premium pe homepage (secțiune dedicată)",
-      "ofertaFeature2": "Badge \"Oferta Zilei\" pe produs",
-      "ofertaFeature3": "Vizibilitate maximă — primul lucru văzut de clienți",
+      "ofertaFeature2": "Promovare premium dedicată pe pagina principală",
+      "ofertaFeature3": "Link direct către echipamentul și datele tale de contact",
       "ofertaFeature4": "1 singur loc disponibil (exclusivitate)",
-      "reserveOferta": "Rezervă Oferta Zilei — €25",
-      "anunturiZilei": "Anunțurile Zilei",
-      "anunturiDescription": "Secțiune dedicată pe homepage — 7 zile vizibilitate",
-      "anunturiPrice": "€9",
-      "anunturiPriceUnit": "/loc /7 zile",
-      "anunturiFeature1": "Afișaj în secțiunea \"Anunțurile Zilei\" pe homepage",
-      "anunturiFeature2": "Vizibilitate 7 zile continue",
-      "anunturiFeature3": "Link direct către produsul tău",
-      "anunturiFeature4": "Maxim 5 locuri (competiție redusă)",
-      "reserveAnunt": "Rezervă Anunț — €9/7 zile",
+      "reserveOferta": "Solicită Oferta zilei — 20 € / 24 ore",
       "slotsAvailable": "Locuri disponibile:",
       "slotsChecking": "Se verifică...",
       "modalReserveOferta": "Rezervă Oferta Zilei",
-      "modalReserveAnunt": "Rezervă Anunț Zilei",
-      "modalOfertaDesc": "Contactează-ne pentru a rezerva locul premium pe homepage (€25/24h).",
-      "modalAnuntDesc": "Contactează-ne pentru a rezerva un loc în secțiunea Anunțurile Zilei (€9/loc/7 zile).",
+      "modalOfertaDesc": "Doresc promovarea Oferta zilei: 20 € pentru 24 de ore, într-un singur loc exclusiv. Vă rog să confirmați disponibilitatea, perioada și plata înainte de activare.",
       "email": "Email",
       "phone": "Telefon",
       "phoneHours": "Luni - Vineri, 9:00 - 18:00",
-      "paymentNote": "Plata se procesează doar după confirmarea rezervării. Integrare Stripe în curând."
+      "paymentNote": "Promovarea este un serviciu plătit, separat de publicarea obișnuită. Perioada și plata se confirmă cu Gym Builder înainte de activare. Solicitarea nu rezervă automat locul și nu efectuează o plată.",
+      "weeklyOffers": "Ofertele săptămânii",
+      "weeklyDescription": "Oferte promovate într-un carusel, timp de 7 zile.",
+      "weeklyPrice": "10 €",
+      "weeklyPriceUnit": "/ofertă /7 zile",
+      "weeklyFeature1": "Afișare în caruselul Ofertele săptămânii",
+      "weeklyFeature2": "Promovare timp de 7 zile de la activare",
+      "weeklyFeature3": "Link direct către produsul tău",
+      "weeklyFeature4": "Rulare și navigare prin toate ofertele active",
+      "reserveWeekly": "Solicită promovare săptămânală — 10 € / 7 zile",
+      "modalReserveWeekly": "Rezervă o ofertă a săptămânii",
+      "modalWeeklyDesc": "Doresc promovarea în Ofertele săptămânii: 10 € pentru 7 zile în carusel. Vă rog să confirmați perioada și plata înainte de activare.",
+      "weeklyActive": "oferte active în carusel",
+      "availabilityUnknown": "Disponibilitate neconfirmată",
+      "modalReserveSuper": "Solicită Super preț",
+      "modalSuperDesc": "12 € pentru 12 ore de promovare, cu cronometru vizibil. Alege produsul și solicită confirmarea perioadei și plății."
     },
     "settings": {
       "title": "Setări Cont",
@@ -752,6 +813,11 @@
     }
   },
   "newProduct": {
+    "approvalLoading": "Verificăm aprobarea firmei și planul activ…",
+    "approvalUnavailable": "Nu putem verifica dreptul de publicare. Autentifică-te ca furnizor sau reîncearcă.",
+    "approvalRequired": "Publicarea produselor devine disponibilă după aprobarea firmei. Verifică starea și mesajele din dashboard înainte de a completa o fișă de produs.",
+    "approvalRetry": "Verifică din nou",
+    "backToDashboard": "Înapoi la dashboard",
     "title": "Adaugă Produs Nou",
     "subtitle": "Completează detaliile produsului pentru a-l lista pe platformă.",
     "productInfo": "Informații Produs",
@@ -769,7 +835,7 @@
     "description": "Descriere",
     "descriptionPlaceholder": "Descrie produsul: specificații tehnice, stare, accesorii incluse...",
     "images": "Imagini Produs",
-    "imagesHint": "Adaugă până la 6 imagini (max 5MB fiecare). Prima imagine va fi cea principală.",
+    "imagesHint": "Adaugă până la {count} imagini (max 5MB fiecare). Prima imagine va fi cea principală.",
     "addImage": "Adaugă imagine",
     "primaryImage": "Principală",
     "cancel": "Anulează",
@@ -804,7 +870,10 @@
     "gallery360Add": "Adaugă imagini 360°",
     "gallery360Count": "imagini",
     "gallery360Min": "Minim 12 imagini necesare",
-    "gallery360Locked": "Galeria 360° este disponibilă doar pentru planurile Professional și Enterprise. Upgrade-ează pentru a activa această funcție."
+    "gallery360Locked": "Galeria 360° este disponibilă doar pentru planurile Professional și Enterprise. Upgrade-ează pentru a activa această funcție.",
+    "imagesUnlimitedHint": "Imagini fără limită de pachet (max 5MB fiecare). Prima imagine va fi cea principală.",
+    "imageLimitError": "Pachetul permite maximum {count} imagini per produs.",
+    "gallery360Max": "Poți încărca maximum 36 de imagini pentru galeria 360°."
   },
   "notifications": {
     "title": "Notificări",

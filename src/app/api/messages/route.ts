@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { getSessionUser } from '@/lib/session-server';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
-import * as crypto from 'crypto';
-import { sanitizeString } from '@/lib/sanitize';
 
 // Escape HTML for safe insertion into email templates
 function escapeHtml(str: string): string {
@@ -16,29 +16,13 @@ function escapeHtml(str: string): string {
 }
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
-function getUserFromSession(): { userId: string } | null {
-  const cookieStore = cookies();
-  const sessionToken = cookieStore.get('session_token')?.value;
-  if (!sessionToken) return null;
-  try {
-    const [payloadB64, signature] = sessionToken.split('.');
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || '';
-    const decodedPayload = Buffer.from(payloadB64, 'base64').toString();
-    const expected = crypto.createHmac('sha256', secret).update(decodedPayload).digest('hex');
-    if (signature !== expected) return null;
-    const data = JSON.parse(decodedPayload);
-    if (data.exp && data.exp < Date.now()) return null;
-    return { userId: data.userId };
-  } catch {
-    return null;
-  }
-}
+async function getUserFromSession(_request?: unknown) { return getSessionUser(); }
 
 async function sendEmail(to: string, subject: string, html: string) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -51,7 +35,7 @@ async function sendEmail(to: string, subject: string, html: string) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'GymBuilder <noreply@gymbuilder.app>',
+        from: 'Gym Builder <noreply@gymbuilder.app>',
         to: [to],
         subject,
         html,
@@ -65,16 +49,16 @@ async function sendEmail(to: string, subject: string, html: string) {
 
 // GET - Fetch messages for a specific contact request
 export async function GET(request: NextRequest) {
-  const user = getUserFromSession();
+  const user = await getUserFromSession();
   if (!user) {
-    return NextResponse.json({ error: 'Neautorizat' }, { status: 401 });
+    return await localizedJson({ error: 'Neautorizat' }, { status: 401 });
   }
 
   const { searchParams } = new URL(request.url);
   const requestId = searchParams.get('request_id');
 
   if (!requestId) {
-    return NextResponse.json({ error: 'request_id obligatoriu' }, { status: 400 });
+    return await localizedJson({ error: 'request_id obligatoriu' }, { status: 400 });
   }
 
   const supabase = getSupabase();
@@ -87,7 +71,7 @@ export async function GET(request: NextRequest) {
     .single();
 
   if (!contactRequest) {
-    return NextResponse.json({ error: 'Cererea nu a fost găsită' }, { status: 404 });
+    return await localizedJson({ error: 'Cererea nu a fost găsită' }, { status: 404 });
   }
 
   // Check if user is the client
@@ -107,7 +91,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (!isClient && !isSupplier) {
-    return NextResponse.json({ error: 'Nu ai acces la această conversație' }, { status: 403 });
+    return await localizedJson({ error: 'Nu ai acces la această conversație' }, { status: 403 });
   }
 
   // Fetch messages
@@ -118,10 +102,10 @@ export async function GET(request: NextRequest) {
     .order('created_at', { ascending: true });
 
   if (error) {
-    return NextResponse.json({ error: 'Eroare la încărcarea mesajelor' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare la încărcarea mesajelor' }, { status: 500 });
   }
 
-  return NextResponse.json({
+  return await localizedJson({
     messages: messages || [],
     userRole: isClient ? 'client' : 'supplier',
   });
@@ -129,22 +113,22 @@ export async function GET(request: NextRequest) {
 
 // POST - Send a new message in a contact request conversation
 export async function POST(request: NextRequest) {
-  const user = getUserFromSession();
+  const user = await getUserFromSession();
   if (!user) {
-    return NextResponse.json({ error: 'Neautorizat' }, { status: 401 });
+    return await localizedJson({ error: 'Neautorizat' }, { status: 401 });
   }
 
   const body = await request.json();
   const { request_id, content } = body;
 
-  if (!request_id || !content || !content.trim()) {
-    return NextResponse.json({ error: 'request_id și content obligatorii' }, { status: 400 });
+  if (typeof request_id !== 'string' || typeof content !== 'string' || !content.trim() || content.length > 5000) {
+    return await localizedJson({ error: 'request_id și content obligatorii' }, { status: 400 });
   }
 
   // Sanitize content before saving
-  const sanitizedContent = sanitizeString(content.trim());
+  const sanitizedContent = content.trim();
   if (!sanitizedContent) {
-    return NextResponse.json({ error: 'Conținutul mesajului este invalid' }, { status: 400 });
+    return await localizedJson({ error: 'Conținutul mesajului este invalid' }, { status: 400 });
   }
 
   const supabase = getSupabase();
@@ -157,13 +141,13 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (!contactRequest) {
-    return NextResponse.json({ error: 'Cererea nu a fost găsită' }, { status: 404 });
+    return await localizedJson({ error: 'Cererea nu a fost găsită' }, { status: 404 });
   }
 
   // Determine sender role and verify access
   const isClient = contactRequest.client_id === user.userId;
   let isSupplier = false;
-  let supplierProfile: any = null;
+  let supplierProfile: Pick<Database['public']['Tables']['supplier_profiles']['Row'], 'id' | 'company_name' | 'user_id'> | null = null;
 
   if (!isClient) {
     const { data: sp } = await supabase
@@ -178,56 +162,36 @@ export async function POST(request: NextRequest) {
   }
 
   if (!isClient && !isSupplier) {
-    return NextResponse.json({ error: 'Nu ai acces la această conversație' }, { status: 403 });
+    return await localizedJson({ error: 'Nu ai acces la această conversație' }, { status: 403 });
   }
 
   // Get sender info
   let senderName = '';
-  let senderType: 'client' | 'supplier' = 'client';
-  let senderEmail = '';
 
   if (isClient) {
-    senderType = 'client';
     senderName = contactRequest.client_name;
-    senderEmail = contactRequest.client_email;
-    // Get user email from users table
+    // Get the current sender name from users
     const { data: userData } = await supabase
       .from('users')
-      .select('email, full_name')
+      .select('full_name')
       .eq('id', user.userId)
       .single();
     if (userData) {
       senderName = userData.full_name || contactRequest.client_name;
-      senderEmail = userData.email;
     }
   } else {
-    senderType = 'supplier';
-    senderName = supplierProfile.company_name;
-    // Get supplier user email
-    const { data: userData } = await supabase
-      .from('users')
-      .select('email')
-      .eq('id', user.userId)
-      .single();
-    if (userData) senderEmail = userData.email;
+    senderName = supplierProfile?.company_name || user.full_name;
   }
 
   // Insert message
   const { data: newMessage, error } = await supabase
-    .from('messages')
-    .insert({
-      request_id,
-      sender_type: senderType,
-      sender_name: senderName,
-      sender_email: senderEmail,
-      content: sanitizedContent,
-    })
+    .rpc('send_request_message', { p_request_id: request_id, p_user_id: user.id, p_content: sanitizedContent })
     .select('id, sender_type, sender_name, content, created_at')
     .single();
 
   if (error) {
     console.error('Message insert error:', error);
-    return NextResponse.json({ error: 'Eroare la trimiterea mesajului' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare la trimiterea mesajului' }, { status: 500 });
   }
 
   // Get product name if available
@@ -252,14 +216,14 @@ export async function POST(request: NextRequest) {
       .eq('id', contactRequest.supplier_id)
       .single();
 
-    if (supplierData) {
+    if (supplierData?.user_id) {
       // In-app notification
       await supabase.from('notifications').insert({
         user_id: supplierData.user_id,
         type: 'new_message',
         title: `Mesaj nou de la ${senderName}`,
         message: productName ? `Produs: ${productName} — "${sanitizedContent.substring(0, 80)}"` : sanitizedContent.substring(0, 100),
-        link: '/supplier/dashboard#cereri',
+        link: `/supplier/dashboard?chat=${request_id}#cereri`,
         is_read: false,
       });
 
@@ -273,11 +237,11 @@ export async function POST(request: NextRequest) {
       if (supplierUser) {
         await sendEmail(
           supplierUser.email,
-          `Mesaj nou pe GymBuilder de la ${senderName}`,
+          `Mesaj nou pe Gym Builder de la ${senderName}`,
           `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #1a1a1a; color: #ffffff;">
             <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #f5c542; font-size: 28px; margin: 0;">GymBuilder</h1>
+              <h1 style="color: #f5c542; font-size: 28px; margin: 0;">Gym Builder</h1>
             </div>
             <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
               <h2 style="color: #60a5fa; margin-top: 0;">💬 Mesaj nou!</h2>
@@ -288,13 +252,13 @@ export async function POST(request: NextRequest) {
                 <p style="color: #d1d5db; margin: 0; font-size: 14px; white-space: pre-wrap;">${escapeHtml(sanitizedContent)}</p>
               </div>
               <div style="text-align: center; margin-top: 24px;">
-                <a href="${appUrl}/supplier/dashboard#cereri" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
-                  Răspunde pe GymBuilder
+                <a href="${appUrl}/supplier/dashboard?chat=${request_id}#cereri" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
+                  Răspunde pe Gym Builder
                 </a>
               </div>
             </div>
             <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 24px;">
-              © ${new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
+              © ${new Date().getFullYear()} Gym Builder. Toate drepturile rezervate.
             </p>
           </div>
           `
@@ -310,18 +274,18 @@ export async function POST(request: NextRequest) {
         type: 'new_message',
         title: `Mesaj nou de la ${senderName}`,
         message: productName ? `Produs: ${productName} — "${sanitizedContent.substring(0, 80)}"` : sanitizedContent.substring(0, 100),
-        link: '/client/dashboard#cereri',
+        link: `/client/dashboard?chat=${request_id}#cereri`,
         is_read: false,
       });
 
       // Email notification to client
       await sendEmail(
         contactRequest.client_email,
-        `Mesaj nou pe GymBuilder de la ${senderName}`,
+        `Mesaj nou pe Gym Builder de la ${senderName}`,
         `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #1a1a1a; color: #ffffff;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #f5c542; font-size: 28px; margin: 0;">GymBuilder</h1>
+            <h1 style="color: #f5c542; font-size: 28px; margin: 0;">Gym Builder</h1>
           </div>
           <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
             <h2 style="color: #60a5fa; margin-top: 0;">💬 Mesaj nou!</h2>
@@ -332,13 +296,13 @@ export async function POST(request: NextRequest) {
               <p style="color: #d1d5db; margin: 0; font-size: 14px; white-space: pre-wrap;">${escapeHtml(sanitizedContent)}</p>
             </div>
             <div style="text-align: center; margin-top: 24px;">
-              <a href="${appUrl}/client/dashboard" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
-                Răspunde pe GymBuilder
+              <a href="${appUrl}/client/dashboard?chat=${request_id}#cereri" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
+                Răspunde pe Gym Builder
               </a>
             </div>
           </div>
           <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 24px;">
-            © ${new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
+            © ${new Date().getFullYear()} Gym Builder. Toate drepturile rezervate.
           </p>
         </div>
         `
@@ -346,19 +310,5 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Update contact request status if it was 'sent' or 'viewed'
-  const { data: currentStatus } = await supabase
-    .from('contact_requests')
-    .select('status')
-    .eq('id', request_id)
-    .single();
-
-  if (currentStatus && (currentStatus.status === 'sent' || currentStatus.status === 'viewed')) {
-    await supabase
-      .from('contact_requests')
-      .update({ status: 'replied', updated_at: new Date().toISOString() })
-      .eq('id', request_id);
-  }
-
-  return NextResponse.json({ message: newMessage });
+  return await localizedJson({ message: newMessage });
 }

@@ -1,11 +1,28 @@
 'use client';
 
+import { useUiText } from '@/i18n/useUiText';
+
+import type { Product as ProductRow, SupplierProfile, Brand } from '@/types/database';
 import Link from 'next/link';
+import ProductPhoto from '@/components/ProductPhoto';
 import { useSearchParams } from 'next/navigation';
 import Footer from '@/components/layout/Footer';
-import { Search, Dumbbell, Heart, SlidersHorizontal, Mail, Loader2, X, RotateCcw, ChevronDown, ChevronUp, GitCompareArrows, Building2, MapPin, BadgeCheck, ArrowRight } from 'lucide-react';
+import MarketNavigation from '@/components/MarketNavigation';
+import BuyingGuide from '@/components/BuyingGuide';
+import SupplierSourceDetails, { type SupplierSourceInfo } from '@/components/SupplierSourceDetails';
+import { formatCatalogPrice, type PublishedPrice } from '@/lib/catalog-price';
+import { useClientLocale } from '@/i18n/client';
+import SupplierContactLinks from '@/components/SupplierContactLinks';
+import { isMarket, marketName } from '@/lib/markets';
+import { Search, Dumbbell, Heart, SlidersHorizontal, Loader2, X, RotateCcw, ChevronDown, ChevronUp, GitCompareArrows, Building2, MapPin, BadgeCheck, ArrowRight } from 'lucide-react';
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useAuthStore } from '@/store/auth';
 import { useCompareStore, CompareProduct } from '@/store/compare';
+
+type CatalogProduct = Pick<ProductRow, 'id' | 'supplier_id' | 'name' | 'category' | 'condition' | 'price_eur' | 'listed_price_amount' | 'listed_price_currency' | 'description'> & {
+  images: string[] | null; brand: Pick<Brand, 'name' | 'country'> | null;
+  supplier: Pick<SupplierProfile, 'company_name' | 'verified' | 'country' | 'phone' | 'website' | 'contact_email' | 'listing_source_url' | 'listing_checked_at' | 'catalog_url'> | null;
+};
 
 const categories = [
   { slug: 'all', name: 'Toate' },
@@ -28,25 +45,34 @@ const categoryDisplayMap: Record<string, string> = {
   reception: 'Recepție',
 };
 
-interface Product {
-  id: number;
+interface Product extends PublishedPrice {
+  id: string;
+  supplierId: string;
   name: string;
   brand: string;
   category: string;
   condition: string;
-  price: number;
-  description?: string;
-  images?: string[];
+  price: number | null;
+  description?: string | null;
+  images?: string[] | null;
   supplier: string;
   supplierVerified?: boolean;
+  supplierCountry?: string;
+  brandCountry?: string | null;
+  supplierPhone?: string | null;
+  supplierEmail?: string | null;
+  supplierWebsite?: string | null;
 }
 
-interface ApprovedSupplier {
+interface ApprovedSupplier extends SupplierSourceInfo {
   id: string;
   company_name: string;
   country?: string;
+  contact_email?: string | null;
+  phone?: string | null;
+  website?: string | null;
   city?: string;
-  description?: string;
+  description?: string | null;
   logo_url?: string;
   verified?: boolean;
   product_count: number;
@@ -55,58 +81,100 @@ interface ApprovedSupplier {
 // Fallback data when Supabase is not connected
 
 export default function ProductsPage() {
+  const ui = useUiText();
+  const locale = useClientLocale();
   const searchParams = useSearchParams();
+  const queryString = searchParams?.toString() || '';
+  const ownQuery = useRef<string | null>(null);
+  const externalQuery = useRef<string | null>(null);
   const urlCondition = searchParams?.get('condition') || 'all';
   const urlCategory = searchParams?.get('category') || 'all';
   const urlSupplier = searchParams?.get('supplier') || '';
+  const urlMarket = searchParams?.get('market') || '';
+  const market = isMarket(urlMarket) ? urlMarket : '';
+  const selectedMarketName = marketName(market);
 
   const [activeCategory, setActiveCategory] = useState(urlCategory);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams?.get('search') || '');
   const [suggestions, setSuggestions] = useState<{type: string; id: string; text: string; subtitle?: string; image?: string | null}[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
-  const [favorites, setFavorites] = useState<number[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [toast, setToast] = useState('');
-  const [showContactModal, setShowContactModal] = useState<number | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [approvedSuppliers, setApprovedSuppliers] = useState<ApprovedSupplier[]>([]);
   const [loadingSuppliers, setLoadingSuppliers] = useState(true);
 
+  const user = useAuthStore(s => s.user);
+  const [fetchError, setFetchError] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [pages, setPages] = useState(1);
+  useEffect(() => {
+    if (!user) { setFavorites([]); return; }
+    let active = true;
+    fetch('/api/client/favorites').then(async res => { if (!res.ok) return; const data = await res.json(); if (active) setFavorites(data.ids || []); }).catch(() => {});
+    return () => { active = false; };
+  }, [user]);
+
   // Advanced filters
   const [showFilters, setShowFilters] = useState(urlCondition !== 'all' || urlCategory !== 'all');
   const [conditionFilter, setConditionFilter] = useState(urlCondition);
-  const [priceMin, setPriceMin] = useState('');
-  const [priceMax, setPriceMax] = useState('');
-  const [sortBy, setSortBy] = useState('recommended');
+  const [priceMin, setPriceMin] = useState(searchParams?.get('price_min') || '');
+  const [priceMax, setPriceMax] = useState(searchParams?.get('price_max') || '');
+  const [sortBy, setSortBy] = useState(searchParams?.get('sort') || 'recommended');
+
+  useEffect(() => {
+    if (ownQuery.current === queryString) { ownQuery.current = null; return; }
+    externalQuery.current = queryString;
+    const params = new URLSearchParams(queryString);
+    setActiveCategory(params.get('category') || 'all'); setConditionFilter(params.get('condition') || 'all');
+    setSearchQuery(params.get('search') || ''); setPriceMin(params.get('price_min') || ''); setPriceMax(params.get('price_max') || '');
+    setSortBy(params.get('sort') || 'recommended'); setPage(1);
+  }, [queryString]);
+  useEffect(() => {
+    const filters = { category: activeCategory === 'all' ? '' : activeCategory, condition: conditionFilter === 'all' ? '' : conditionFilter, search: searchQuery, price_min: priceMin, price_max: priceMax, sort: sortBy === 'recommended' ? '' : sortBy };
+    if (externalQuery.current !== null) {
+      const source = new URLSearchParams(externalQuery.current);
+      if (Object.entries(filters).every(([key, value]) => value === (['category', 'condition'].includes(key) && source.get(key) === 'all' || key === 'sort' && source.get(key) === 'recommended' ? '' : source.get(key) || ''))) externalQuery.current = null;
+      return;
+    }
+    const params = new URLSearchParams(queryString);
+    Object.entries(filters).forEach(([key, value]) => value ? params.set(key, value) : params.delete(key));
+    const next = params.toString();
+    if (next !== queryString) { ownQuery.current = next; window.history.replaceState(null, '', next ? `/products?${next}` : '/products'); }
+  }, [queryString, activeCategory, conditionFilter, searchQuery, priceMin, priceMax, sortBy]);
 
   const catalogTitle = conditionFilter === 'new'
     ? 'Echipamente Noi'
     : conditionFilter === 'used'
       ? 'Echipamente Second-Hand'
       : 'Echipamente';
-  const showSuppliersSection = conditionFilter !== 'used' && !urlSupplier;
+  const showSuppliersSection = conditionFilter !== 'used' && (!!market || !urlSupplier);
 
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchApprovedSuppliers() {
+      setLoadingSuppliers(true);
+      setApprovedSuppliers([]);
       try {
-        const res = await fetch('/api/suppliers?limit=12');
-        if (!res.ok) {
-          setApprovedSuppliers([]);
-          return;
-        }
+        const params = new URLSearchParams({ limit: '12' });
+        if (market) params.set('market', market);
+        const res = await fetch(`/api/suppliers?${params}`, { signal: controller.signal });
+        if (!res.ok) throw new Error('suppliers');
         const data = await res.json();
-        setApprovedSuppliers(data.suppliers || []);
+        if (!controller.signal.aborted) setApprovedSuppliers(data.suppliers || []);
       } catch {
-        setApprovedSuppliers([]);
+        if (!controller.signal.aborted) setApprovedSuppliers([]);
       } finally {
-        setLoadingSuppliers(false);
+        if (!controller.signal.aborted) setLoadingSuppliers(false);
       }
     }
-
     fetchApprovedSuppliers();
-  }, []);
+    return () => controller.abort();
+  }, [market]);
 
   // Check if any filter is active
   const hasActiveFilters = useMemo(() => {
@@ -114,17 +182,21 @@ export default function ProductsPage() {
   }, [activeCategory, conditionFilter, priceMin, priceMax]);
 
   // Autocomplete - fetch suggestions on input change
+  const suggestionsAbort = useRef<AbortController | null>(null);
   const fetchSuggestions = useCallback(async (q: string) => {
+    suggestionsAbort.current?.abort();
+    const controller = new AbortController(); suggestionsAbort.current = controller;
     if (q.length < 2) { setSuggestions([]); setShowSuggestions(false); return; }
     try {
-      const res = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(q)}`);
+      const res = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(q)}`, { signal: controller.signal });
       const data = await res.json();
       setSuggestions(data.suggestions || []);
       setShowSuggestions((data.suggestions || []).length > 0);
-    } catch { setSuggestions([]); }
+    } catch { if (!controller.signal.aborted) setSuggestions([]); }
   }, []);
 
   const handleSearchInput = (value: string) => {
+    setPage(1);
     setSearchQuery(value);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => fetchSuggestions(value), 250);
@@ -141,67 +213,82 @@ export default function ProductsPage() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  useEffect(() => { setPage(1); }, [activeCategory, searchQuery, conditionFilter, priceMin, priceMax, urlSupplier, sortBy, market]);
+
   // Fetch products from API
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchProducts() {
+      setFetchError('');
       try {
-        const params = new URLSearchParams();
+        const params = new URLSearchParams({ page: String(page), sort: sortBy });
         if (activeCategory !== 'all') params.set('category', activeCategory);
         if (searchQuery) params.set('search', searchQuery);
         if (conditionFilter !== 'all') params.set('condition', conditionFilter);
         if (priceMin) params.set('price_min', priceMin);
         if (priceMax) params.set('price_max', priceMax);
         if (urlSupplier) params.set('supplier', urlSupplier);
+        if (market) params.set('market', market);
 
-        const res = await fetch(`/api/products?${params.toString()}`);
+        const res = await fetch(`/api/products?${params.toString()}`, { signal: controller.signal });
         if (res.ok) {
           const data = await res.json();
+          setPages(data.pages || 1);
+          setTotalCount(data.count || 0);
           if (data.products && data.products.length > 0) {
-            const mapped = data.products.map((p: any) => ({
+            const mapped = data.products.map((p: CatalogProduct) => ({
               id: p.id,
+              supplierId: p.supplier_id,
               name: p.name,
-              brand: p.brand?.name || p.brand || '',
+              brand: p.brand?.name || '',
               category: p.category,
               condition: p.condition,
-              price: Number(p.price_eur),
+              price: p.price_eur === null ? null : Number(p.price_eur),
+              listed_price_amount: p.listed_price_amount,
+              listed_price_currency: p.listed_price_currency,
               description: p.description,
               images: p.images,
-              supplier: p.supplier?.company_name || p.supplier_profiles?.company_name || 'Furnizor GymBuilder',
+              supplier: p.supplier?.company_name || 'Furnizor Gym Builder',
               supplierVerified: p.supplier?.verified || false,
+              supplierCountry: p.supplier?.country,
+              brandCountry: p.brand?.country,
+              supplierPhone: p.supplier?.phone,
+              supplierEmail: p.supplier?.contact_email,
+              supplierWebsite: p.supplier?.website,
             }));
             setProducts(mapped);
           } else {
             setProducts([]);
           }
-        } else {
-          setProducts([]);
-        }
-      } catch {
-        setProducts([]);
+        } else { const data = await res.json(); throw new Error(data.error || 'Eroare la încărcarea produselor.'); }
+      } catch (error) {
+        if (!controller.signal.aborted) { setProducts([]); setTotalCount(0); setPages(1); setFetchError(error instanceof Error ? error.message : 'Eroare de conexiune.'); }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
     setLoading(true);
     const debounce = setTimeout(fetchProducts, 300);
-    return () => clearTimeout(debounce);
-  }, [activeCategory, searchQuery, conditionFilter, priceMin, priceMax, urlSupplier]);
+    return () => { clearTimeout(debounce); controller.abort(); };
+  }, [activeCategory, searchQuery, conditionFilter, priceMin, priceMax, urlSupplier, page, sortBy, market]);
 
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(''), 3000);
   };
 
-  const toggleFavorite = (productId: number) => {
-    if (favorites.includes(productId)) {
-      setFavorites(favorites.filter(id => id !== productId));
-      showToast('Eliminat din favorite');
-    } else {
-      setFavorites([...favorites, productId]);
-      showToast('Adăugat la favorite ❤️');
-    }
+  const toggleFavorite = async (productId: string) => {
+    if (!user) { showToast('Autentifică-te pentru a salva favoritele.'); return; }
+    try {
+      const res = await fetch('/api/client/favorites', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: productId }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Eroare la salvarea favoritelor.');
+      setFavorites(current => data.favorited ? Array.from(new Set([...current, productId])) : current.filter(id => id !== productId));
+      showToast(data.message);
+    } catch (error) { showToast(error instanceof Error ? error.message : 'Eroare de rețea.'); }
   };
+
 
   const resetFilters = () => {
     setActiveCategory('all');
@@ -209,23 +296,12 @@ export default function ProductsPage() {
     setPriceMin('');
     setPriceMax('');
     setSearchQuery('');
+    setSortBy('recommended');
+    ownQuery.current = null; externalQuery.current = null;
+    window.history.replaceState(null, '', '/products');
   };
 
-  // Sort products
-  const filteredProducts = useMemo(() => {
-    let result = [...products];
-
-    // Sort
-    if (sortBy === 'price_asc') {
-      result = [...result].sort((a, b) => a.price - b.price);
-    } else if (sortBy === 'price_desc') {
-      result = [...result].sort((a, b) => b.price - a.price);
-    } else if (sortBy === 'newest') {
-      result = [...result].reverse();
-    }
-
-    return result;
-  }, [products, sortBy]);
+  const filteredProducts = products;
 
   const conditionLabel = (c: string) => c === 'new' ? 'Nou' : c === 'used' ? 'Second-hand' : c;
 
@@ -249,7 +325,7 @@ export default function ProductsPage() {
         condition: product.condition,
         brand: product.brand,
         supplier: product.supplier,
-        images: product.images,
+        images: product.images || [],
       };
       const added = addToCompare(cp);
       if (!added) showToast('Maxim 4 produse pentru comparație');
@@ -261,60 +337,24 @@ export default function ProductsPage() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed top-20 right-4 z-50 bg-anthracite-800 border border-gold-400/30 text-gold-400 px-4 py-3 rounded-lg shadow-lg text-sm">
-          {toast}
-        </div>
-      )}
-
-      {/* Contact Modal */}
-      {showContactModal !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-          <div className="glass-card p-8 max-w-md w-full relative">
-            <button
-              onClick={() => setShowContactModal(null)}
-              className="absolute top-4 right-4 text-anthracite-400 hover:text-white text-xl"
-            >
-              &times;
-            </button>
-            <h3 className="text-xl font-bold text-white mb-2">Cerere Ofertă</h3>
-            <p className="text-sm text-anthracite-400 mb-6">
-              Solicită ofertă pentru: {products.find(p => p.id === showContactModal)?.name}
-            </p>
-            <form onSubmit={(e) => { e.preventDefault(); showToast('Cerere de ofertă trimisă cu succes!'); setShowContactModal(null); }} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Nume *</label>
-                <input type="text" className="input-field" placeholder="Numele tău" required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Email *</label>
-                <input type="email" className="input-field" placeholder="email@exemplu.com" required />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Cantitate</label>
-                <input type="number" className="input-field" placeholder="1" min="1" defaultValue={1} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Mesaj</label>
-                <textarea className="input-field min-h-[80px] resize-y" placeholder="Detalii suplimentare..." />
-              </div>
-              <button type="submit" className="btn-primary w-full py-3">
-                Trimite Cererea de Ofertă
-              </button>
-            </form>
-          </div>
+        <div className="fixed top-[calc(var(--app-header-height)+1rem)] right-4 z-50 bg-anthracite-800 border border-gold-400/30 text-gold-400 px-4 py-3 rounded-lg shadow-lg text-sm">
+          {ui(toast)}
         </div>
       )}
 
       <section className="pt-24 pb-8 px-4">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Catalog <span className="gold-gradient">{catalogTitle}</span>
+            Catalog <span className="gold-gradient">{conditionFilter === 'used' && selectedMarketName ? `${ui(catalogTitle)} · ${ui(selectedMarketName)}` : ui(selectedMarketName || catalogTitle)}</span>
           </h1>
           <p className="text-anthracite-300 text-lg max-w-2xl">
-            Echipamente fitness de la branduri premium, verificate și gata de livrare.
-          </p>
+            {ui("Fotografii, specificații și date de contact pentru echipamente fitness. Discută achiziția direct cu furnizorul.")}</p>
         </div>
       </section>
+
+      <div className="max-w-7xl mx-auto px-4 pb-10">
+        <MarketNavigation condition={conditionFilter} selected={market} />
+      </div>
 
       {/* Approved Suppliers — visible even before they publish products */}
       {showSuppliersSection && (
@@ -323,18 +363,16 @@ export default function ProductsPage() {
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
               <div>
                 <div className="inline-flex items-center gap-2 text-gold-400 text-xs font-bold uppercase tracking-[0.18em] mb-2">
-                  <BadgeCheck className="w-4 h-4" /> Furnizori aprobați GymBuilder
-                </div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-white">Descoperă furnizorii de echipamente noi</h2>
+                  <BadgeCheck className="w-4 h-4" /> {ui("Furnizori de echipamente")}</div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">{ui("Descoperă furnizorii de echipamente")}</h2>
                 <p className="text-anthracite-300 mt-2 max-w-2xl">
-                  Vezi direct companiile aprobate, profilul și datele lor de contact — chiar dacă încă își pregătesc catalogul de produse.
-                </p>
+                  {ui("Explorează furnizorii, cataloagele și datele lor de contact. Profilurile documentate din surse publice sunt marcate separat.")}</p>
               </div>
               <Link
-                href="/suppliers"
+                href={market ? `/suppliers?market=${market}` : "/suppliers"}
                 className="inline-flex items-center gap-2 text-sm font-semibold text-gold-400 hover:text-gold-300 transition-colors whitespace-nowrap"
               >
-                Vezi toți furnizorii <ArrowRight className="w-4 h-4" />
+                {ui("Vezi toți furnizorii ")}<ArrowRight className="w-4 h-4" />
               </Link>
             </div>
 
@@ -351,7 +389,7 @@ export default function ProductsPage() {
                     <div className="flex items-start gap-4">
                       <div className="w-14 h-14 rounded-xl bg-anthracite-800 border border-anthracite-700 flex items-center justify-center overflow-hidden flex-shrink-0">
                         {supplier.logo_url ? (
-                          <img src={supplier.logo_url} alt={`Logo ${supplier.company_name}`} className="w-full h-full object-contain p-1" />
+                          <img src={supplier.logo_url} alt={ui(`Logo ${supplier.company_name}`)} className="w-full h-full object-contain p-1" />
                         ) : (
                           <Building2 className="w-7 h-7 text-gold-400" />
                         )}
@@ -363,31 +401,32 @@ export default function ProductsPage() {
                         </div>
                         <p className="flex items-center gap-1.5 text-sm text-anthracite-400 mt-1">
                           <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
-                          {[supplier.city, supplier.country].filter(Boolean).join(', ') || 'Locație disponibilă în profil'}
+                          {[supplier.city, supplier.country].filter(Boolean).join(', ') || ui('Locație disponibilă în profil')}
                         </p>
                       </div>
                     </div>
 
                     <p className="text-sm text-anthracite-300 mt-4 line-clamp-2 min-h-10">
-                      {supplier.description || 'Furnizor aprobat de echipamente profesionale pentru săli de fitness.'}
+                      {supplier.description || ui('Furnizor aprobat de echipamente profesionale pentru săli de fitness.')}
                     </p>
+
+                    <div className="mt-4"><SupplierSourceDetails supplier={supplier} /></div>
+                    <div className="mt-4"><SupplierContactLinks supplierId={supplier.id} phone={supplier.phone} website={supplier.website} email={supplier.contact_email} /></div>
 
                     <div className="flex items-center justify-between gap-3 mt-5 pt-4 border-t border-anthracite-800">
                       <span className="text-xs text-anthracite-400">
-                        <strong className="text-white">{supplier.product_count || 0}</strong> produse publicate
-                      </span>
+                        <strong className="text-white">{supplier.product_count || 0}</strong> {ui("produse publicate")}</span>
                       <div className="flex items-center gap-2">
                         <Link
-                          href={`/products?supplier=${supplier.id}&condition=new`}
+                          href={`/products?supplier=${supplier.id}${market ? `&market=${market}` : ""}`}
                           className="text-xs font-semibold text-anthracite-300 hover:text-white transition-colors"
                         >
-                          Produse
-                        </Link>
+                          {ui("Produse")}</Link>
                         <Link
                           href={`/suppliers/${supplier.id}`}
                           className="inline-flex items-center gap-1.5 bg-gold-400 text-anthracite-950 px-3 py-2 rounded-lg text-xs font-bold hover:bg-gold-300 transition-colors"
                         >
-                          Vezi profilul <ArrowRight className="w-3.5 h-3.5" />
+                          {ui("Vezi profilul ")}<ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>
                     </div>
@@ -397,7 +436,7 @@ export default function ProductsPage() {
             ) : (
               <div className="rounded-2xl border border-dashed border-anthracite-700 py-10 text-center">
                 <Building2 className="w-10 h-10 text-anthracite-600 mx-auto mb-3" />
-                <p className="text-anthracite-400">Furnizorii aprobați vor apărea aici.</p>
+                <p className="text-anthracite-400">{ui("Furnizorii aprobați vor apărea aici.")}</p>
               </div>
             )}
           </div>
@@ -405,14 +444,14 @@ export default function ProductsPage() {
       )}
 
       {/* Search & Filters Bar */}
-      <section className="py-6 px-4 border-b border-anthracite-800 sticky top-20 z-40 bg-anthracite-950/95 backdrop-blur-sm">
+      <section className="py-6 px-4 border-b border-anthracite-800 sticky top-[var(--app-header-height)] z-40 bg-anthracite-950/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="relative flex-1" ref={searchRef}>
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-anthracite-400 z-10" />
               <input
                 type="text"
-                placeholder="Caută echipamente, branduri..."
+                aria-label={ui("Caută echipamente și branduri")} placeholder={ui("Caută echipamente, branduri...")}
                 className="input-field pl-12"
                 value={searchQuery}
                 onChange={(e) => handleSearchInput(e.target.value)}
@@ -423,8 +462,8 @@ export default function ProductsPage() {
                   {suggestions.map((s, i) => (
                     <Link
                       key={`${s.type}-${s.id}-${i}`}
-                      href={s.type === 'product' ? `/products/${s.id}` : s.type === 'supplier' ? `/suppliers/${s.id}` : `/products?category=${s.id}`}
-                      onClick={() => { setShowSuggestions(false); setSearchQuery(s.text); }}
+                      href={s.type === 'product' ? `/products/${s.id}` : s.type === 'supplier' ? `/suppliers/${s.id}` : s.type === 'category' ? `/products?category=${s.id}` : `/products?search=${encodeURIComponent(s.text)}`}
+                      onClick={() => { setShowSuggestions(false); }}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-anthracite-800 transition-colors border-b border-anthracite-800 last:border-0"
                     >
                       {s.image ? (
@@ -439,7 +478,7 @@ export default function ProductsPage() {
                         {s.subtitle && <p className="text-anthracite-400 text-sm truncate">{s.subtitle}</p>}
                       </div>
                       <span className="text-xs text-anthracite-500 capitalize flex-shrink-0">
-                        {s.type === 'product' ? 'Produs' : s.type === 'supplier' ? 'Furnizor' : s.type === 'brand' ? 'Brand' : 'Categorie'}
+                        {ui(s.type === 'product' ? 'Produs' : s.type === 'supplier' ? 'Furnizor' : s.type === 'brand' ? 'Brand' : 'Categorie')}
                       </span>
                     </Link>
                   ))}
@@ -451,8 +490,7 @@ export default function ProductsPage() {
               className={`btn-secondary flex items-center gap-2 ${showFilters ? 'border-gold-400 text-gold-400' : ''}`}
             >
               <SlidersHorizontal className="w-4 h-4" />
-              Filtre Avansate
-              {hasActiveFilters && (
+              {ui("Filtre Avansate")}{hasActiveFilters && (
                 <span className="w-2 h-2 bg-gold-400 rounded-full" />
               )}
               {showFilters ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -464,14 +502,14 @@ export default function ProductsPage() {
             {categories.map((cat) => (
               <button
                 key={cat.slug}
-                onClick={() => setActiveCategory(cat.slug)}
+                onClick={() => { setPage(1); setActiveCategory(cat.slug); }}
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                   activeCategory === cat.slug
                     ? 'bg-gold-400 text-anthracite-950'
                     : 'border border-anthracite-600 text-anthracite-300 hover:border-gold-400 hover:text-gold-400'
                 }`}
               >
-                {cat.name}
+                {ui(cat.name)}
               </button>
             ))}
           </div>
@@ -485,9 +523,8 @@ export default function ProductsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Condition Filter */}
               <div>
-                <label className="block text-xs font-medium text-anthracite-400 uppercase tracking-wider mb-2">
-                  Stare
-                </label>
+                <p className="block text-xs font-medium text-anthracite-400 uppercase tracking-wider mb-2">
+                  {ui("Stare")}</p>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setConditionFilter('all')}
@@ -497,8 +534,7 @@ export default function ProductsPage() {
                         : 'bg-anthracite-800 text-anthracite-300 border border-anthracite-700 hover:border-anthracite-500'
                     }`}
                   >
-                    Toate
-                  </button>
+                    {ui("Toate")}</button>
                   <button
                     onClick={() => setConditionFilter('new')}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -507,8 +543,7 @@ export default function ProductsPage() {
                         : 'bg-anthracite-800 text-anthracite-300 border border-anthracite-700 hover:border-anthracite-500'
                     }`}
                   >
-                    Nou
-                  </button>
+                    {ui("Nou")}</button>
                   <button
                     onClick={() => setConditionFilter('used')}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -524,15 +559,14 @@ export default function ProductsPage() {
 
               {/* Price Range */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-medium text-anthracite-400 uppercase tracking-wider mb-2">
-                  Interval Preț (EUR)
-                </label>
+                <label htmlFor="field-marketingproducts-26187" className="block text-xs font-medium text-anthracite-400 uppercase tracking-wider mb-2">
+                  {ui("Interval Preț (EUR)")}</label>
                 <div className="flex items-center gap-3">
                   <div className="relative flex-1">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-anthracite-500 text-sm">&euro;</span>
-                    <input
+                    <input id="field-marketingproducts-26187"
                       type="number"
-                      placeholder="Min"
+                      aria-label={ui("Preț minim EUR")} placeholder="Min"
                       className="input-field pl-8 text-sm"
                       value={priceMin}
                       onChange={(e) => setPriceMin(e.target.value)}
@@ -544,7 +578,7 @@ export default function ProductsPage() {
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-anthracite-500 text-sm">&euro;</span>
                     <input
                       type="number"
-                      placeholder="Max"
+                      aria-label={ui("Preț maxim EUR")} placeholder="Max"
                       className="input-field pl-8 text-sm"
                       value={priceMax}
                       onChange={(e) => setPriceMax(e.target.value)}
@@ -562,8 +596,7 @@ export default function ProductsPage() {
                     className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-anthracite-800 border border-anthracite-700 text-anthracite-300 hover:text-white hover:border-anthracite-500 text-sm font-medium transition-colors w-full justify-center"
                   >
                     <RotateCcw className="w-4 h-4" />
-                    Resetează Filtre
-                  </button>
+                    {ui("Resetează Filtre")}</button>
                 )}
               </div>
             </div>
@@ -571,29 +604,29 @@ export default function ProductsPage() {
             {/* Active filters summary */}
             {hasActiveFilters && (
               <div className="flex items-center gap-2 mt-4 flex-wrap">
-                <span className="text-xs text-anthracite-500">Filtre active:</span>
+                <span className="text-xs text-anthracite-500">{ui("Filtre active:")}</span>
                 {activeCategory !== 'all' && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gold-400/10 text-gold-400 text-xs">
-                    {categoryDisplayMap[activeCategory] || activeCategory}
-                    <button onClick={() => setActiveCategory('all')} className="hover:text-white"><X className="w-3 h-3" /></button>
+                    {ui(categoryDisplayMap[activeCategory] || activeCategory)}
+                    <button aria-label={ui("Elimină filtrul")} onClick={() => setActiveCategory('all')} className="hover:text-white"><X className="w-3 h-3" /></button>
                   </span>
                 )}
                 {conditionFilter !== 'all' && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gold-400/10 text-gold-400 text-xs">
-                    {conditionFilter === 'new' ? 'Nou' : 'Second-hand'}
-                    <button onClick={() => setConditionFilter('all')} className="hover:text-white"><X className="w-3 h-3" /></button>
+                    {ui(conditionFilter === 'new' ? 'Nou' : 'Second-hand')}
+                    <button aria-label={ui("Elimină filtrul")} onClick={() => setConditionFilter('all')} className="hover:text-white"><X className="w-3 h-3" /></button>
                   </span>
                 )}
                 {priceMin && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gold-400/10 text-gold-400 text-xs">
                     Min: &euro;{priceMin}
-                    <button onClick={() => setPriceMin('')} className="hover:text-white"><X className="w-3 h-3" /></button>
+                    <button aria-label={ui("Elimină filtrul")} onClick={() => setPriceMin('')} className="hover:text-white"><X className="w-3 h-3" /></button>
                   </span>
                 )}
                 {priceMax && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gold-400/10 text-gold-400 text-xs">
                     Max: &euro;{priceMax}
-                    <button onClick={() => setPriceMax('')} className="hover:text-white"><X className="w-3 h-3" /></button>
+                    <button aria-label={ui("Elimină filtrul")} onClick={() => setPriceMax('')} className="hover:text-white"><X className="w-3 h-3" /></button>
                   </span>
                 )}
               </div>
@@ -609,24 +642,23 @@ export default function ProductsPage() {
             <p className="text-anthracite-400 text-sm">
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> Se caută...
-                </span>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> {ui("Se caută...")}</span>
               ) : (
                 <>
-                  <span className="text-white font-semibold text-base">{filteredProducts.length}</span>{' '}
-                  {filteredProducts.length === 1 ? 'produs găsit' : 'produse găsite'}
+                  <span className="text-white font-semibold text-base">{totalCount}</span>{ui(' ')}
+                  {ui(totalCount === 1 ? 'produs găsit' : 'produse găsite')}
                 </>
               )}
             </p>
             <select
               className="bg-anthracite-800 border border-anthracite-600 rounded-lg px-3 py-2 text-sm text-anthracite-200"
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => { setPage(1); setSortBy(e.target.value); }}
             >
-              <option value="recommended">Sortare: Recomandate</option>
-              <option value="price_asc">Preț: Crescător</option>
-              <option value="price_desc">Preț: Descrescător</option>
-              <option value="newest">Cele mai noi</option>
+              <option value="recommended">{ui("Sortare: Recomandate")}</option>
+              <option value="price_asc">{ui("Preț: Crescător")}</option>
+              <option value="price_desc">{ui("Preț: Descrescător")}</option>
+              <option value="newest">{ui("Cele mai noi")}</option>
             </select>
           </div>
 
@@ -634,18 +666,17 @@ export default function ProductsPage() {
             <div className="flex items-center justify-center py-20">
               <Loader2 className="w-8 h-8 text-gold-400 animate-spin" />
             </div>
-          ) : filteredProducts.length === 0 ? (
+          ) : fetchError ? <p role="alert" className="text-red-400 py-8">{ui(fetchError)}</p> : filteredProducts.length === 0 ? (
             <div className="text-center py-16">
               <Dumbbell className="w-12 h-12 text-anthracite-600 mx-auto mb-4" />
-              <p className="text-anthracite-400 mb-4">Nu s-au găsit produse cu aceste filtre.</p>
+              <p className="text-anthracite-400 mb-4">{ui("Nu s-au găsit produse cu aceste filtre.")}</p>
               {hasActiveFilters && (
                 <button
                   onClick={resetFilters}
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gold-400/10 text-gold-400 text-sm font-medium hover:bg-gold-400/20 transition-colors"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  Resetează Filtre
-                </button>
+                  {ui("Resetează Filtre")}</button>
               )}
             </div>
           ) : (
@@ -653,50 +684,50 @@ export default function ProductsPage() {
               {filteredProducts.map((product) => (
                 <div key={product.id} className="card-hover group flex flex-col">
                   {/* Image */}
-                  <Link href={`/products/${product.id}`} className="block">
                   <div className="relative h-52 bg-anthracite-700 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
-                    {product.images && product.images[0] ? (
-                      <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <Dumbbell className="w-16 h-16 text-anthracite-500" />
-                    )}
+                    <ProductPhoto productId={product.id} productName={product.name} images={product.images || []} className="h-full" />
                     <button
-                      onClick={(e) => { e.preventDefault(); toggleFavorite(product.id); }}
+                      aria-label={ui(favorites.includes(product.id) ? "Elimină din favorite" : "Adaugă la favorite")} aria-pressed={favorites.includes(product.id)} onClick={(e) => { e.preventDefault(); toggleFavorite(product.id); }}
                       className="absolute top-3 right-3 w-8 h-8 bg-anthracite-800/80 rounded-full flex items-center justify-center hover:bg-anthracite-700 transition-all"
                     >
                       <Heart className={`w-4 h-4 transition-colors ${
                         favorites.includes(product.id) ? 'text-red-400 fill-red-400' : 'text-anthracite-300 hover:text-red-400'
                       }`} />
                     </button>
-                    <span className={`absolute top-3 left-3 px-2 py-0.5 rounded text-xs font-medium ${
+                    <span className={`pointer-events-none absolute top-3 left-3 px-2 py-0.5 rounded text-xs font-medium ${
                       product.condition === 'new' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
                     }`}>
-                      {conditionLabel(product.condition)}
+                      {ui(conditionLabel(product.condition))}
                     </span>
                   </div>
 
                   {/* Info */}
+                  <Link href={`/products/${product.id}`} className="block flex-1">
                   <div className="space-y-2 flex-1">
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-gold-400 font-medium">{product.brand}</span>
                       <span className="text-xs text-anthracite-500">&middot;</span>
-                      <span className="text-xs text-anthracite-400">{categoryDisplayMap[product.category] || product.category}</span>
+                      <span className="text-xs text-anthracite-400">{ui(categoryDisplayMap[product.category] || product.category)}</span>
                     </div>
                     <h3 className="text-white font-semibold line-clamp-2 group-hover:text-gold-400 transition-colors">
                       {product.name}
                     </h3>
                     <p className="text-xs text-anthracite-500 flex items-center gap-1">
-                      de la {product.supplier}
+                      {ui("de la ")}{product.supplier}
                       {product.supplierVerified && (
-                        <svg className="w-3 h-3 text-blue-400" fill="currentColor" viewBox="0 0 24 24" aria-label="Furnizor Verificat"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                        <svg className="w-3 h-3 text-blue-400" fill="currentColor" viewBox="0 0 24 24" aria-label={ui("Furnizor Verificat")}><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                       )}
                     </p>
+                    <p className="text-xs text-anthracite-300">{ui('Țara furnizorului')}: {product.supplierCountry || ui('Nespecificată')}</p>
+                    {product.brandCountry && <p className="text-xs text-anthracite-300">{ui('Țara mărcii')}: {product.brandCountry}</p>}
                   </div>
                   </Link>
 
+                  <div className="mt-4"><SupplierContactLinks supplierId={product.supplierId} phone={product.supplierPhone} website={product.supplierWebsite} email={product.supplierEmail} /></div>
+
                   {/* Price + Actions */}
                   <div className="flex flex-wrap items-center justify-between gap-2 pt-4 mt-3 border-t border-anthracite-700">
-                    <span className="text-xl font-bold text-gold-400">&euro;{product.price.toLocaleString()}</span>
+                    <span className="text-xl font-bold text-gold-400">{formatCatalogPrice(product.price, locale, product)}</span>
                     <div className="flex items-center gap-2">
                       {/* Compare checkbox */}
                       {compareMounted && (
@@ -707,18 +738,13 @@ export default function ProductsPage() {
                               ? 'bg-blue-500/10 text-blue-400 border-blue-500/30'
                               : 'bg-anthracite-800 text-anthracite-400 border-anthracite-700 hover:border-anthracite-500 hover:text-anthracite-200'
                           }`}
-                          title={isInCompare(product.id) ? 'Elimină din comparație' : 'Adaugă la comparație'}
+                          title={ui(isInCompare(product.id) ? 'Elimină din comparație' : 'Adaugă la comparație')}
                         >
                           <GitCompareArrows className="w-3.5 h-3.5" />
-                          {isInCompare(product.id) ? '✓' : ''}
+                          {ui(isInCompare(product.id) ? '✓' : '')}
                         </button>
                       )}
-                      <button
-                        onClick={() => setShowContactModal(product.id)}
-                        className="px-3 py-2 bg-gold-400/10 rounded-lg flex items-center gap-1.5 hover:bg-gold-400 hover:text-anthracite-950 text-gold-400 transition-colors text-sm font-medium"
-                      >
-                        <Mail className="w-3.5 h-3.5" /> Ofertă
-                      </button>
+
                     </div>
                   </div>
                 </div>
@@ -735,13 +761,12 @@ export default function ProductsPage() {
             <div className="flex items-center gap-3">
               <GitCompareArrows className="w-5 h-5 text-blue-400" />
               <span className="text-sm text-anthracite-300">
-                <span className="text-white font-semibold">{compareItems.length}</span>/4 produse selectate
-              </span>
+                <span className="text-white font-semibold">{compareItems.length}</span>{ui("/4 produse selectate")}</span>
               <div className="hidden sm:flex items-center gap-2 ml-2">
                 {compareItems.map((item) => (
                   <div key={String(item.id)} className="flex items-center gap-1.5 bg-anthracite-800 border border-anthracite-700 rounded-lg px-2.5 py-1">
                     <span className="text-xs text-anthracite-200 max-w-[120px] truncate">{item.name}</span>
-                    <button
+                    <button aria-label={ui("Elimină din comparație")}
                       onClick={() => removeFromCompare(item.id)}
                       className="text-anthracite-500 hover:text-red-400 transition-colors"
                     >
@@ -756,8 +781,7 @@ export default function ProductsPage() {
                 onClick={() => useCompareStore.getState().clearAll()}
                 className="text-xs text-anthracite-400 hover:text-white transition-colors"
               >
-                Șterge tot
-              </button>
+                {ui("Șterge tot")}</button>
               <Link
                 href={`/compare?ids=${compareItems.map(i => i.id).join(',')}`}
                 className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ${
@@ -767,13 +791,14 @@ export default function ProductsPage() {
                 }`}
               >
                 <GitCompareArrows className="w-4 h-4" />
-                Compară Acum
-              </Link>
+                {ui("Compară Acum")}</Link>
             </div>
           </div>
         </div>
       )}
 
+      {pages > 1 && <nav aria-label="Paginare catalog" className="flex justify-center items-center gap-4 py-8"><button className="btn-secondary" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>{ui("Înapoi")}</button><span>{page} / {pages}</span><button className="btn-secondary" disabled={page >= pages} onClick={() => setPage(p => p + 1)}>{ui("Înainte")}</button></nav>}
+      <div className="max-w-7xl mx-auto px-4 pb-12"><BuyingGuide /></div>
       <Footer />
     </main>
   );

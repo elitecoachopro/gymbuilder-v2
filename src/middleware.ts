@@ -1,8 +1,16 @@
 import { NextResponse } from 'next/server';
+import { contentSecurityPolicy } from './lib/model-texture-policy';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  let supabaseOrigin = '';
+  try { const origin = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || '').origin; if (origin !== 'null') supabaseOrigin = ` ${origin}`; } catch {}
+
+  const devSocket = new URL(request.url);
+  devSocket.protocol = devSocket.protocol === 'https:' ? 'wss:' : 'ws:';
+  const devConnections = isDevelopment ? ` ${devSocket.origin}` : '';
 
   // Add security headers
   response.headers.set('X-Content-Type-Options', 'nosniff');
@@ -11,7 +19,7 @@ export function middleware(request: NextRequest) {
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://*.supabase.co data:; connect-src 'self' https://*.supabase.co"
+    contentSecurityPolicy({ isDevelopment, supabaseOrigin, devConnections })
   );
 
   return response;

@@ -1,0 +1,2259 @@
+{
+  "date": "2026-10-30",
+  "release": "/tmp/gymbuilder-home-offers-20261030-app",
+  "changedFromPreviousLive": [
+    "src/app/page.tsx"
+  ],
+  "files": [
+    {
+      "path": ".vercel/project.json",
+      "bytes": 118,
+      "sha256": "4cf88694970e55055ce1f47e737b59f9f6ad04b9fa3b966d5bad50833e9d2f21"
+    },
+    {
+      "path": ".vercelignore",
+      "bytes": 260,
+      "sha256": "93b9cb694dacc84abac586bbaeaef8a724b8d6e96bb7480d723714f7af2dafe9"
+    },
+    {
+      "path": "assets/gym-cad-sources.json",
+      "bytes": 1054,
+      "sha256": "88b6898ded3823021769cf96466bbeeb3bc6e7b088a2c6a181ea6e6502def221"
+    },
+    {
+      "path": "assets/gym-design-references.json",
+      "bytes": 1306,
+      "sha256": "cc0c256f44fb3b5084f8dd8ccf81193971658cddeb3a15c02d78d693c7e76ef8"
+    },
+    {
+      "path": "assets/gym-people-sources.json",
+      "bytes": 1225,
+      "sha256": "8c90b3704c6bdbae501cd103c9d26d065cdc212447e26dc26f466ae0d323bb78"
+    },
+    {
+      "path": "assets/gym-pilot-rights.json",
+      "bytes": 3097,
+      "sha256": "db695b119f8f1e1cfe819a52532b0278c32c3ef5147bd31f928270b8df701e35"
+    },
+    {
+      "path": "assets/gym-real-sources.json",
+      "bytes": 4670,
+      "sha256": "02a4aeb762d5f50ee665cb4bf603d037e15307c648bc41ad111a551006d975c3"
+    },
+    {
+      "path": "eslint.config.mjs",
+      "bytes": 1027,
+      "sha256": "e1f5caf499f12f3f38cc947b2e037b2f68a178bb4c20f29afb3dfbccd14c103a"
+    },
+    {
+      "path": "messages/en.json",
+      "bytes": 48731,
+      "sha256": "c4953ad74f288e67b3bd44cff665dfd2d1d4afed3fa62a1bd92dbb9a5a9d8664"
+    },
+    {
+      "path": "messages/ro.json",
+      "bytes": 52671,
+      "sha256": "ba5f9ae43f710236b81cdb6fcc05a8dc808e3dbc9180357792530d62b10b1c22"
+    },
+    {
+      "path": "next-env.d.ts",
+      "bytes": 328,
+      "sha256": "e3e5602345bcf00c3181dac2a498f4ba395cd6813f8cff09e8a4604379e008f0"
+    },
+    {
+      "path": "next.config.mjs",
+      "bytes": 411,
+      "sha256": "484b11b9b4a36d7a9c931c14a107f7296a8e85adec718bd351c23c4eba25923d"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 286657,
+      "sha256": "c4fdc0ddf71fe818ddebcb27453dbf83907f6a91b17bbddc7c39dd2ecbc59b4a"
+    },
+    {
+      "path": "package.json",
+      "bytes": 2280,
+      "sha256": "276acb4e3639b0b70307e3a75de38fd83061660ecab7041c4baae539c27045c0"
+    },
+    {
+      "path": "postcss.config.mjs",
+      "bytes": 146,
+      "sha256": "3aac0d047d7dd505eea362c918e2ddd0436428682c5de5cb18feda70d46aa5cb"
+    },
+    {
+      "path": "public/demos/imperial-gym-demo.jpg",
+      "bytes": 43811,
+      "sha256": "97f1ff8c7ec2e5ce1c28ab4eb3040823110c3cd1068c3ec6412795a30d802780"
+    },
+    {
+      "path": "public/demos/imperial-gym-demo.mp4",
+      "bytes": 10411814,
+      "sha256": "4c11a709d5603a147ef3f449dc853b151d5851b9054f8839a2e361fd2fc8f2a0"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v2.jpg",
+      "bytes": 47430,
+      "sha256": "21336d0f014808fc0302bda99f1f447e319dc004c3c50f524a4c5de12a40e6f7"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v2.mp4",
+      "bytes": 12505290,
+      "sha256": "841d956d92cf875579c953ae383857c3f58de12bb0eded904fe3e51595a773c5"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v2.webm",
+      "bytes": 28830689,
+      "sha256": "8d6097b0525c7899bfb388bee02917f4bd974453db7e33da4658eff1a182306b"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v3.jpg",
+      "bytes": 59042,
+      "sha256": "d3527bcfbff5ccb9bd805809292e4e0c8af93dc60f4e6bc7ebb459ce5d49f254"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v3.mp4",
+      "bytes": 17266798,
+      "sha256": "dfcce4a4a91f16416d27b48776aaaed96f831e3c7f7c67c2e1825c671219fb27"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v3.webm",
+      "bytes": 30700997,
+      "sha256": "1941b0c0bda5aaaac1ac4b8e951691f2e6e011df13b2d7a9cf72ab9397535cc3"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v4.jpg",
+      "bytes": 85117,
+      "sha256": "3cc16f8f7f0b7f386dcc52d5ff1d2dd805a515289489d1d4f1a10a4bdb6452f4"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v4.mp4",
+      "bytes": 54179213,
+      "sha256": "4ea3798b2eb1b5c212fc09ce15e816cbd2d724425f763ee62ae0b664ffb355f8"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v4.webm",
+      "bytes": 45940428,
+      "sha256": "b1bc8da4291f5683afa03d244d1fdb34a37ee3241b707181827bbf0343c2763c"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v5.jpg",
+      "bytes": 76815,
+      "sha256": "9d05c10a74b2ee91de01376fad6154c53878526d6e77ea2ca1ccbb3ba31bd2d9"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v5.mp4",
+      "bytes": 40106376,
+      "sha256": "403a52c7242d36f5ac211b68c9253583ee5a63ede6192952f06797c555c02cc4"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v5.webm",
+      "bytes": 44705581,
+      "sha256": "2d726a7389fd5bf7f3a72ff9b303b81509aae8d7bb92c34715fef99850d871c6"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v6.jpg",
+      "bytes": 89317,
+      "sha256": "79c1a8730e72c3df724c99958d33ee9d0f00fb9c783c96e09664c6496c6922df"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v6.mp4",
+      "bytes": 37359162,
+      "sha256": "95583dcb10ce247168f65cf995f6d2fe1be53dc9597aa748803931eb2d4ab12b"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v6.webm",
+      "bytes": 45716581,
+      "sha256": "f986043bbae72727fd727a449679cd49c086cf782ed5349e43dcdaba90a8d297"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v7.jpg",
+      "bytes": 71577,
+      "sha256": "9775204094dc7981d68e7aa46e054c465dcf3ff7384aa0f8e9d8a4860203565b"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v7.mp4",
+      "bytes": 39301279,
+      "sha256": "e781b1f0757a5af999e78aab5160be7aa1a7728fdb1feea8e8814938e8a8060e"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v7.webm",
+      "bytes": 45902898,
+      "sha256": "bd0c9a44f7e1fcbcce879449044790307a0ae4d13b0f4f742ba534fae8d54160"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v8.jpg",
+      "bytes": 84385,
+      "sha256": "3b43810d4ec7f45b0dfea64714aa38d6aae362d2a58a87bebac59fa2994e592f"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v8.mp4",
+      "bytes": 51539345,
+      "sha256": "2c2ed8c37f1f44fd0dc2bc1a1da9b2e560ea1ac7db78c84a6e6e099a707541a2"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v8.webm",
+      "bytes": 57298120,
+      "sha256": "f371c0a38a4ea9eb1ca554da907ba7ed6eaf9c764c993b349606153cef4f6d6d"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v9.jpg",
+      "bytes": 213817,
+      "sha256": "68fc6e7ebd343fc02f65230c500dad1e7020084fe059cc8d834df536851f63f9"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v9.mp4",
+      "bytes": 46940279,
+      "sha256": "9e0cd02a29b0bc3decb564b57d42ad7a97f70769800c3d6bc4460a1acda56fd1"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour-v9.webm",
+      "bytes": 58072143,
+      "sha256": "9be9c2966bd382aeb24c36538166eabf5f19f4d161d1cb37d05e2c807ad7c7a5"
+    },
+    {
+      "path": "public/demos/imperial-gym-tour.html",
+      "bytes": 6393,
+      "sha256": "40b90bfdf00f88641e1fb98b406cb31fdd2aaa83db7c0109ebf48132d4dddfc8"
+    },
+    {
+      "path": "public/design/fonts/barlow-condensed-LICENSE.txt",
+      "bytes": 6167,
+      "sha256": "046ee27d8bddc6b6ee08eee53c96dbf3ec1f6df561644e018507dd8ffcb11d31"
+    },
+    {
+      "path": "public/design/fonts/barlow-condensed-latin-700-normal.woff2",
+      "bytes": 22444,
+      "sha256": "3787a5a419171630e6890cfa47c4da067474d005cd0ff8dc11ec090fdc3ee2b8"
+    },
+    {
+      "path": "public/design/fonts/barlow-condensed-latin-ext-700-normal.woff2",
+      "bytes": 14640,
+      "sha256": "9d351bd9222bfab90f943850f8039aa73cdb40e0a6cfe4127308a48bef59d5f5"
+    },
+    {
+      "path": "public/design/fonts/inter-LICENSE.txt",
+      "bytes": 4477,
+      "sha256": "3b0a5fca3d17942cde889069889dedbbbd075e9b599968c82a95f4d944e9b345"
+    },
+    {
+      "path": "public/design/fonts/inter-latin-ext-wght-normal.woff2",
+      "bytes": 85068,
+      "sha256": "34b9c504cab7a73e37b746343a449132e56cf7b5481af2cb81dc74dcff25c956"
+    },
+    {
+      "path": "public/design/fonts/inter-latin-wght-normal.woff2",
+      "bytes": 48256,
+      "sha256": "3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62"
+    },
+    {
+      "path": "public/design/fonts/manrope-LICENSE.txt",
+      "bytes": 4383,
+      "sha256": "d826ab6583b12c26807d8716a545bdbbb672df04f48608a364ba9efdbe501c30"
+    },
+    {
+      "path": "public/design/fonts/manrope-latin-ext-wght-normal.woff2",
+      "bytes": 15120,
+      "sha256": "3911b66d9f2e005a4b989223405d0e5032619c668597ba467cc76a23c8fffcfb"
+    },
+    {
+      "path": "public/design/fonts/manrope-latin-wght-normal.woff2",
+      "bytes": 24836,
+      "sha256": "a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972"
+    },
+    {
+      "path": "public/design/fonts/space-grotesk-LICENSE.txt",
+      "bytes": 4401,
+      "sha256": "18a4de52385f6b988782639d5d0cc1326e5a8c2de9a7f01d7b20d9aedcc60943"
+    },
+    {
+      "path": "public/design/fonts/space-grotesk-latin-ext-wght-normal.woff2",
+      "bytes": 18940,
+      "sha256": "952dddb45d2f96f71cbf3b7f510b24379afc3c89ea02fcf89d377b45d62c0166"
+    },
+    {
+      "path": "public/design/fonts/space-grotesk-latin-wght-normal.woff2",
+      "bytes": 22288,
+      "sha256": "0640890476fc1198ab4de571fb658de443c4d85b66466ec09534a8737ab1ce9d"
+    },
+    {
+      "path": "public/design/gym-builder.html",
+      "bytes": 18930,
+      "sha256": "0d509a9c33b4697e36d068df3584987cdb940d79e6090642589ace7450866316"
+    },
+    {
+      "path": "public/equipment/asia/dhz-u2004c-1.jpg",
+      "bytes": 1078309,
+      "sha256": "5cc036f13b44822d1a149ee23edefb46d20224d0ecca01ec8c31be41a5dbce79"
+    },
+    {
+      "path": "public/equipment/asia/dhz-u2021c-1.jpg",
+      "bytes": 1205578,
+      "sha256": "6cf083de5a1d57a770d1852e8ff63be46c8a3077cf4e72a38b9a86c1e17de8e6"
+    },
+    {
+      "path": "public/equipment/asia/dhz-u2073c-1.jpg",
+      "bytes": 1330397,
+      "sha256": "a47cc4522208cb5aa33e32fa1620d6a890596740fe599017362ade4d6d581a7f"
+    },
+    {
+      "path": "public/equipment/asia/dhz4-1.jpg",
+      "bytes": 1333641,
+      "sha256": "07e97b7ee49780ce0536c8f65f06242dc77420b18619db27eaba6db97b391c00"
+    },
+    {
+      "path": "public/equipment/asia/dhz5-1.jpg",
+      "bytes": 1217291,
+      "sha256": "816b6afcd40b52fb767fcc0db909391358b972699885fca993e3053d4cb0e36a"
+    },
+    {
+      "path": "public/equipment/asia/imp4-1.jpg",
+      "bytes": 122689,
+      "sha256": "8a9e16234eea44ff8f361c4a76ace6ff073cfc8d571347ded8309633065be6be"
+    },
+    {
+      "path": "public/equipment/asia/imp5-1.png",
+      "bytes": 2331340,
+      "sha256": "201218e2c96f3efa6c028a4015f6cfa60aafbc44a56a6640c4696b822b958cdb"
+    },
+    {
+      "path": "public/equipment/asia/impulse-ecp721-1.png",
+      "bytes": 2312452,
+      "sha256": "dbf7f8e19ab527bdeeecc499f913d4e52aad5f899e3ee0b5c385c5417d30ee56"
+    },
+    {
+      "path": "public/equipment/asia/impulse-ecp721-2.png",
+      "bytes": 31997,
+      "sha256": "7684d077abfd5fab7d701228bdbcb25b7050cea95ec9891e12b2cc90521f4bf3"
+    },
+    {
+      "path": "public/equipment/asia/impulse-lcs201-1.png",
+      "bytes": 6732548,
+      "sha256": "3c61f3df7f3d328cd598bdef500815b61144e9a7562fc5181e90b5183f82879b"
+    },
+    {
+      "path": "public/equipment/asia/impulse-lcs201-2.png",
+      "bytes": 34516,
+      "sha256": "d15d4ab231700b1894cb51e3c289c150910d318e1f2d5f4cf607610114deda0e"
+    },
+    {
+      "path": "public/equipment/asia/impulse-logo.png",
+      "bytes": 8722,
+      "sha256": "7382111df5c4d549125382749256df3077bfd7f8f5434786506e97a82e189674"
+    },
+    {
+      "path": "public/equipment/asia/impulse-xsc500-1.png",
+      "bytes": 235142,
+      "sha256": "647b393bb83bb5afb8c0c6823251e8619d0411d8f06b14c2458498303d6ff343"
+    },
+    {
+      "path": "public/equipment/asia/impulse-xsc500-2.png",
+      "bytes": 169350,
+      "sha256": "7f19b769ba701b3b28eb949d054cb71f7ea5da4adcb581ff5e6becaf419da98c"
+    },
+    {
+      "path": "public/equipment/asia/sa4-1.jpg",
+      "bytes": 49582,
+      "sha256": "2c1b6deb0b68b0d88c891c5788816f04896fb9d8bb6b9c5ac3f1ba4d99b02a56"
+    },
+    {
+      "path": "public/equipment/asia/sa5-1.jpg",
+      "bytes": 51072,
+      "sha256": "0a9aba8b925378666c7aa6db96c9b3cc97dde846efedb7db6550a2dcb6a11827"
+    },
+    {
+      "path": "public/equipment/asia/shua-b9100e-1.png",
+      "bytes": 176820,
+      "sha256": "f2b661077c0517eeba6f20fd2708e44f3df3a67d5eec5882c106051b602997bd"
+    },
+    {
+      "path": "public/equipment/asia/shua-b9100e-2.png",
+      "bytes": 144252,
+      "sha256": "25593af5d09e66a452da2cb23f614bdb17325739ed7d065617143616defd70dd"
+    },
+    {
+      "path": "public/equipment/asia/shua-b9100u-1.png",
+      "bytes": 97903,
+      "sha256": "d15da47857192e905b71715fe0c07c7afeda96e372c001edad039cb710b23123"
+    },
+    {
+      "path": "public/equipment/asia/shua-b9100u-2.png",
+      "bytes": 92578,
+      "sha256": "ff5fb62acadc6934a3d203bade96264989efb7768900ec4ecca5efadb66f55f6"
+    },
+    {
+      "path": "public/equipment/asia/shua-logo.png",
+      "bytes": 1905,
+      "sha256": "51623dbfe624d95e320e05af21f11235fafd5b204c0242c87f7dcc5f63607673"
+    },
+    {
+      "path": "public/equipment/asia/shua-t9100-1.webp",
+      "bytes": 96540,
+      "sha256": "c5315be50573f3651b4776a5bdad401e3eb3b50851099aea4ab491fccaaf9437"
+    },
+    {
+      "path": "public/equipment/asia/shua-t9100-2.webp",
+      "bytes": 86704,
+      "sha256": "d33848e849f75f56dd9917186cc079cc6414e4be6040de018d49ef91d731b0a2"
+    },
+    {
+      "path": "public/equipment/asia/shua4-1.png",
+      "bytes": 117029,
+      "sha256": "05c6658e937418def1d46cf3cd425aff2bf92575213cfd674f7c68f80218c14f"
+    },
+    {
+      "path": "public/equipment/asia/shua5-1.png",
+      "bytes": 69217,
+      "sha256": "312c6edd2cde2bad7112f4d5d4f9679f64b240c8479441354b19aa4c7eecbe10"
+    },
+    {
+      "path": "public/equipment/asia/sportsart-c565u-1.png",
+      "bytes": 14707,
+      "sha256": "a7c8b698911bde189bfb69961dd9fff6f5bce84f8e27e4b4a543c0c6a3d4297d"
+    },
+    {
+      "path": "public/equipment/asia/sportsart-n915-1.png",
+      "bytes": 33347,
+      "sha256": "e91bb489dbe17d7a43db304ec3c8274293f53371b256c20983bad1180492ccbb"
+    },
+    {
+      "path": "public/equipment/asia/sportsart-t661-1.png",
+      "bytes": 20803,
+      "sha256": "1dc03a375c66ff1f852f121e3aa3a6dd880f6dad7630c7279f9e52337d3635ed"
+    },
+    {
+      "path": "public/equipment/rest-of-world/bh1-1.jpg",
+      "bytes": 42707,
+      "sha256": "cd65622e2149f2b929fe415d234bfdf600b1e88e38baa3e12e4b24c972ab0665"
+    },
+    {
+      "path": "public/equipment/rest-of-world/bh2-1.png",
+      "bytes": 185284,
+      "sha256": "226392c1202e36527e248cbc33208ba83cd1450974ddb32f20616b00acf58934"
+    },
+    {
+      "path": "public/equipment/rest-of-world/bh3-1.png",
+      "bytes": 56787,
+      "sha256": "49e540b5623aabe30dfe2989d766993282fcc5187856089f5eada50cf973bb17"
+    },
+    {
+      "path": "public/equipment/rest-of-world/bh4-1.png",
+      "bytes": 160732,
+      "sha256": "bb1c5f6bf816dc63a5233cc0c9653698bb8ada95fceec7fae1e2a05f13a5ae8c"
+    },
+    {
+      "path": "public/equipment/rest-of-world/bh5-1.png",
+      "bytes": 49088,
+      "sha256": "bdcad5e2ff5d3b48d828a37d5d0f2b3b7561d8e69aef2ab7785291150dbf4d15"
+    },
+    {
+      "path": "public/equipment/rest-of-world/c1-1.png",
+      "bytes": 52575,
+      "sha256": "b9dc9de3abed0d553aea963b6272ce94b726da4962ecd059974a95243197cebb"
+    },
+    {
+      "path": "public/equipment/rest-of-world/c2-1.png",
+      "bytes": 256916,
+      "sha256": "68d117f52f5dbae32f238d35dd22651232364838243ba2376eb9196792c5e93b"
+    },
+    {
+      "path": "public/equipment/rest-of-world/c3-1.png",
+      "bytes": 580593,
+      "sha256": "6eb7ba62a7514703a91c0b6f8144732f305a2de307377756a73236183ec8883b"
+    },
+    {
+      "path": "public/equipment/rest-of-world/concept5-1.jpg",
+      "bytes": 15625,
+      "sha256": "b8b56f579e87e3f6a995794c0ac2e00b3d0d406326e39967a56050bedba9eae0"
+    },
+    {
+      "path": "public/equipment/rest-of-world/conceptcat-1.png",
+      "bytes": 542555,
+      "sha256": "22c8f117e89613ef57a2dfe7b8ccb7f0c0b5ec45d98548024833c30e276cb200"
+    },
+    {
+      "path": "public/equipment/rest-of-world/rogue1-1.png",
+      "bytes": 80472,
+      "sha256": "fbe00934f9f00e766a1ea786839cdbe56a6767b608285e28578c14d8ccd027e0"
+    },
+    {
+      "path": "public/equipment/rest-of-world/rogue2-1.png",
+      "bytes": 33131,
+      "sha256": "f44b50f86a0221838f3c36f4bdbd3d2e9c37483b8c2bc71aae359dfaa9729442"
+    },
+    {
+      "path": "public/equipment/rest-of-world/rogue3-1.png",
+      "bytes": 161610,
+      "sha256": "3ed980cf013c3599e4115c048baba36c107e088a8231ddec45988a2b628e585c"
+    },
+    {
+      "path": "public/equipment/rest-of-world/rogue4-1.png",
+      "bytes": 106842,
+      "sha256": "67ec64966be6911fe3ba976b045cd7517ee40372ecbac8377ceba9f992d613e8"
+    },
+    {
+      "path": "public/equipment/rest-of-world/rogue5-1.png",
+      "bytes": 119215,
+      "sha256": "5e5a7670a6449942f283b36aabd9fb01ad27f306bd86b6ec1178c92f88a7643c"
+    },
+    {
+      "path": "public/equipment/romania/fit1-1.jpg",
+      "bytes": 61702,
+      "sha256": "529ad85281de910d87f2608554441470729763958632b1a8647f3b33a426a45e"
+    },
+    {
+      "path": "public/equipment/romania/fit2-1.jpg",
+      "bytes": 48056,
+      "sha256": "e924075879755cd1feebc247b006f21bc1f92bd656aa45aa8b6e81796944648b"
+    },
+    {
+      "path": "public/equipment/romania/fit3-1.jpg",
+      "bytes": 52256,
+      "sha256": "dd22026c53becc36329fcb76459d84a4ee8efb201f8bc1b67860bff26568ce7f"
+    },
+    {
+      "path": "public/equipment/romania/fit4-1.jpg",
+      "bytes": 38354,
+      "sha256": "a7d7486dca8660b6cf706c0daec23b4c56d379446ccafa8a1d3c6ae9262e7aea"
+    },
+    {
+      "path": "public/equipment/romania/fit5-1.jpg",
+      "bytes": 72218,
+      "sha256": "e7a7c3a13c83eb9110479ca3a8b9368d999523e6204868c247fdcbd36025b904"
+    },
+    {
+      "path": "public/equipment/romania/in2-1.jpg",
+      "bytes": 24957,
+      "sha256": "32f745c327735e0f2e0f9a762f5837010409f76d158db17708b1cc62c6538fe9"
+    },
+    {
+      "path": "public/equipment/romania/in3-1.jpg",
+      "bytes": 32729,
+      "sha256": "664634ada10003a73772474643b0410f53500bfea0abf670a05ce24303722a19"
+    },
+    {
+      "path": "public/equipment/romania/in4-1.jpg",
+      "bytes": 23071,
+      "sha256": "add8dfd78108f6dd0a6c0109e727b814d0bb3ff9780ed60d77a17344c51a69a1"
+    },
+    {
+      "path": "public/equipment/romania/in5-1.jpg",
+      "bytes": 22050,
+      "sha256": "b8a6b53534b37c4360df092d136022cff3df45752a0b34d039e3e1c82073741c"
+    },
+    {
+      "path": "public/equipment/romania/in6-1.jpg",
+      "bytes": 28370,
+      "sha256": "ee1bc5901634783478c879e226ed23e4a92d6671717d9afbcc159e5cddac2b9a"
+    },
+    {
+      "path": "public/equipment/romania/sport1-1.jpg",
+      "bytes": 87736,
+      "sha256": "1edd036dd249a799bb52374b6b039175f595b635c04538712a1ae082f9a62159"
+    },
+    {
+      "path": "public/equipment/romania/sport3-1.jpg",
+      "bytes": 208235,
+      "sha256": "7e47888c024a45d3723b7cabd0f25ab987672ecd8e79e67817422dd56c3239b9"
+    },
+    {
+      "path": "public/equipment/romania/sport4-1.jpg",
+      "bytes": 258300,
+      "sha256": "ff457efcb2814f654c6a200db0ef2e83f43915829e897e701b146640a6753d2d"
+    },
+    {
+      "path": "public/equipment/romania/sport5-1.jpg",
+      "bytes": 202633,
+      "sha256": "40576acad40f37c2f8503ab46519427e464f01b5e7011f38229c6d303b8a4911"
+    },
+    {
+      "path": "public/equipment/romania/sport6-1.jpg",
+      "bytes": 25725,
+      "sha256": "f7e5b32ed5596dceb18c4b495c75d23ff1527758b5f7dec18cc783ba5ddf3436"
+    },
+    {
+      "path": "public/equipment/second-hand/shes1.jpg",
+      "bytes": 26943,
+      "sha256": "7540d2aa8a5d866abcce26f9af398f293170d9794e4d187b9a86d95244562349"
+    },
+    {
+      "path": "public/equipment/second-hand/shes2.png",
+      "bytes": 137481,
+      "sha256": "e5a63b2c5a60d31f774330ff5ab803dbec0f212e7ca9b92d42d0ae140995063a"
+    },
+    {
+      "path": "public/equipment/second-hand/shes4.png",
+      "bytes": 66596,
+      "sha256": "d7b4acaa806cca59f1d75d77766c568f155d9b0955c2b151be33a92ad3e9e8f6"
+    },
+    {
+      "path": "public/equipment/second-hand/shro1.jpg",
+      "bytes": 308144,
+      "sha256": "ef7c6f0d5249af35519a5d004cd8bdaf80c863d555a0c95abc9e08d75c680c32"
+    },
+    {
+      "path": "public/equipment/second-hand/shro2.jpg",
+      "bytes": 144972,
+      "sha256": "62ffb4a0109fe74ecf716b461e89ea80a244ee7664e68286eb75c6a3d6baea27"
+    },
+    {
+      "path": "public/equipment/second-hand/shro3.jpg",
+      "bytes": 134591,
+      "sha256": "a49aadf99d101296b4f843bda43cca58611564bb9ab6ba5707e85abd057215c1"
+    },
+    {
+      "path": "public/equipment/second-hand/shsg3.png",
+      "bytes": 102763,
+      "sha256": "96029dfc10a14126bf82d85fc84287dac022b650a788ccde0ff389d67c36c70c"
+    },
+    {
+      "path": "public/equipment/second-hand/shsg4.jpg",
+      "bytes": 31252,
+      "sha256": "d8200687ad8b6724e95bbab20d560742d930238ca6b4b09af89dee8cf37225a8"
+    },
+    {
+      "path": "public/equipment/second-hand/shsg5.png",
+      "bytes": 79498,
+      "sha256": "4cf8b60e80b78166209fe1c983a8d9a4fa76fc9f0256cc731437f10d6bf1622c"
+    },
+    {
+      "path": "public/gym-builder-sport-wordmark.svg",
+      "bytes": 384,
+      "sha256": "6cf88edb7d1b1660d922dc6ac805f15644dd52f4ce5c97607b9e63cf3488401b"
+    },
+    {
+      "path": "public/gym-builder-wordmark.svg",
+      "bytes": 384,
+      "sha256": "762d4794e94854e9da62ccaa53ad543ce28b7f893852d4d76d2259d049a5373a"
+    },
+    {
+      "path": "public/imperial-gym-wordmark.svg",
+      "bytes": 386,
+      "sha256": "61d2f9037a0c599057ac05fc54077aaaf4fcdc2663c785dc4005010471d4453d"
+    },
+    {
+      "path": "public/logo-bold-v2.png",
+      "bytes": 353517,
+      "sha256": "bcffaad1091cf2562ec9a6ab475ca5a8e1f152abd101184e7ed8d7583d267b4a"
+    },
+    {
+      "path": "public/logo.png",
+      "bytes": 138688,
+      "sha256": "afdfe8670f5eeac9b5a30575a0151985bd3bc78b558f0ca900ab93f77017c7f2"
+    },
+    {
+      "path": "public/models/gym/detailed/LICENSE.txt",
+      "bytes": 308,
+      "sha256": "73ac5dc9205004de6194c006ddfd857e7e5ce28088a390cb192e1150b9e023b7"
+    },
+    {
+      "path": "public/models/gym/detailed/manifest.json",
+      "bytes": 10762,
+      "sha256": "f3fab2cb566a7b98c5eaa2c8399033981c385c444a11fd79306e855bdf309782"
+    },
+    {
+      "path": "public/models/gym/detailed/real_adjustable_bench.glb",
+      "bytes": 1159500,
+      "sha256": "c000db13ab9c4c1b3be0b0d0f92ef380083ecb448c66b0b11aea3dbd84d26c9f"
+    },
+    {
+      "path": "public/models/gym/detailed/real_cable_crossover.glb",
+      "bytes": 2155276,
+      "sha256": "4d5c06c16d717220fbe750720f9c52bed2bf9d9a2f3b56eb905543e0aad6f3bb"
+    },
+    {
+      "path": "public/models/gym/detailed/real_multigym.glb",
+      "bytes": 2226544,
+      "sha256": "2f4f6dcc342298875ad04efa1b09c935e7caa35e9c8789c5b9a8f53d782ecf29"
+    },
+    {
+      "path": "public/models/gym/detailed/real_power_rack.glb",
+      "bytes": 1849032,
+      "sha256": "a8dcd878106865b92aa49509cfd4656a619b98262da0ae938d00d409e22e6a76"
+    },
+    {
+      "path": "public/models/gym/detailed/real_rower.glb",
+      "bytes": 1521140,
+      "sha256": "edcf49dd4d92aa6943bb3131dfd2663d09c101c4e7cf7bdab93cded04242f7c5"
+    },
+    {
+      "path": "public/models/gym/detailed/real_spin_bike.glb",
+      "bytes": 1341636,
+      "sha256": "eadc1f428166ca1bc641a776796db2e1bc004fd81221d1d2018f6d2d92c26474"
+    },
+    {
+      "path": "public/models/gym/innerscene/LICENSE.txt",
+      "bytes": 1413,
+      "sha256": "6df9421bd681ea2b12ad8e46fa7db19b188d6392759f6901011823e8a8522559"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad/cad_adjustable_bench.step",
+      "bytes": 360758,
+      "sha256": "d514857d133f8e7dd6b85d6127d020b9586c1d3b3ce4465b86e6d99bd72dbc97"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad/cad_dumbbell_rack.step",
+      "bytes": 534703,
+      "sha256": "6d5473da9fd5f7eb19f6fd4c265be4ecf43f3a9435df5496e9662ec5a3c072ea"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad/cad_elliptical.step",
+      "bytes": 529049,
+      "sha256": "791d2cafcafc46711a844bfa4910fcafe3632ff616fd87fcfc0c2f96eaa1cca3"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad/cad_exercise_bike.step",
+      "bytes": 507401,
+      "sha256": "5decbe15297fd7057ad1339768746f55dadbfc61131fe320f9fe549802caf8db"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad/cad_leg_press.step",
+      "bytes": 491470,
+      "sha256": "aded29e15759eefb7f68b67c5f9ac05857808aa6f523b05455c265c67a517003"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad/cad_squat_rack.step",
+      "bytes": 520359,
+      "sha256": "461ce91f0b0dd48599a74a0ac60e8a13b833853b859bed7a131b6c78aae40a64"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad/cad_treadmill.step",
+      "bytes": 443554,
+      "sha256": "2abee38e5e03684a1f597b2985802990f40202bf5f8ef09bda60529bc4558c13"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad_adjustable_bench.glb",
+      "bytes": 59236,
+      "sha256": "2c7c68e64c66102b751eef27ec0f0cad5667eaa38f0fb641412182ae23f7b35f"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad_dumbbell_rack.glb",
+      "bytes": 379048,
+      "sha256": "94e54ed705a6b5f187b65c554bfadac27514010b4e912a2897de2ba817804c00"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad_elliptical.glb",
+      "bytes": 172872,
+      "sha256": "7abe669f8e280b8d96f0072672c68a4b876991506e7ed7310e3dea996933bafb"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad_exercise_bike.glb",
+      "bytes": 141428,
+      "sha256": "dbd6057e2554e6b22bb0324b1ef110966759a642daee07000eddadf4acbc6d2e"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad_leg_press.glb",
+      "bytes": 199536,
+      "sha256": "a23c4b34d951b2f37543690969311dd6a486f58f04c387be99540c3ec5aa6aef"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad_squat_rack.glb",
+      "bytes": 536912,
+      "sha256": "71be2e84a62a7a203d90f5a9c0a4ea201e755b526a2a1ca10b7198d20c36e9c4"
+    },
+    {
+      "path": "public/models/gym/innerscene/cad_treadmill.glb",
+      "bytes": 83360,
+      "sha256": "450c26e3104cd15b17d4dee992305a6207c4acba16994cf730b4da78359e8ae4"
+    },
+    {
+      "path": "public/models/gym/innerscene/manifest.json",
+      "bytes": 11176,
+      "sha256": "4013e302dbf6b619d6502b4bad4af7d3a3c401f4815fa9e2c6dec191c83300b4"
+    },
+    {
+      "path": "public/models/gym/pilot/LICENSE.txt",
+      "bytes": 241,
+      "sha256": "baabcc6af957f0eabbca80ebe04acf9ace7078078b0c946228cf45a0bbe42396"
+    },
+    {
+      "path": "public/models/gym/pilot/cad_dumbbell_rack.glb",
+      "bytes": 393044,
+      "sha256": "8043c07fe30937aac0cc3e4a02db425ad40836fe6c14018c79057ec07988d95d"
+    },
+    {
+      "path": "public/models/gym/pilot/cad_elliptical.glb",
+      "bytes": 176000,
+      "sha256": "184dd58e7f144d3890f8579d230fc2ce013e86badd4ad043ef53f12c1f42015d"
+    },
+    {
+      "path": "public/models/gym/pilot/cad_leg_press.glb",
+      "bytes": 258096,
+      "sha256": "ddb1d0e9e66e0b5c373dc189c627e5eb57c19a3a1b9519db5e360da14bfe793d"
+    },
+    {
+      "path": "public/models/gym/pilot/cad_treadmill.glb",
+      "bytes": 109216,
+      "sha256": "ed832b1c6f8f86977af031f1d68b697a200ca75a2c49ca4066547107d85d35a3"
+    },
+    {
+      "path": "public/models/gym/pilot/manifest.json",
+      "bytes": 20316,
+      "sha256": "fa6e7ccc8c70dac346fa209fb6c62c74c7de2121597ccd8adf5c14df2b5ab38e"
+    },
+    {
+      "path": "public/models/gym/pilot/real_adjustable_bench.glb",
+      "bytes": 1284824,
+      "sha256": "0212585d3cb1bca11e6dc34343e0e191337714130795703660424ffbe5e64bd3"
+    },
+    {
+      "path": "public/models/gym/pilot/real_cable_crossover.glb",
+      "bytes": 2575144,
+      "sha256": "7eaeefa7e29a6cdb6df887c042b5b9fd724f9567fe9c80b33a1bb9c26b305a01"
+    },
+    {
+      "path": "public/models/gym/pilot/real_multigym.glb",
+      "bytes": 2521060,
+      "sha256": "72229800d23e7e453140bab9d23cf95297da73208c22925c031c0bb284f32f4d"
+    },
+    {
+      "path": "public/models/gym/pilot/real_power_rack.glb",
+      "bytes": 2498148,
+      "sha256": "dc396beb1e1ef62892fea2fe57d3aba347b8e5582183b3fbc8a2f4af0a809e45"
+    },
+    {
+      "path": "public/models/gym/pilot/real_rower.glb",
+      "bytes": 1557216,
+      "sha256": "6ea9b4cff1da3cf3307fac5d19b9c739902654b879c93f147cdfa5b0b4bd2990"
+    },
+    {
+      "path": "public/models/gym/pilot/real_spin_bike.glb",
+      "bytes": 1433560,
+      "sha256": "66fa395a3ff8968d0145557cdd4387a56fa92ca242da778e9ddb93fdcde3f464"
+    },
+    {
+      "path": "public/models/gym/precise/LICENSE.txt",
+      "bytes": 308,
+      "sha256": "73ac5dc9205004de6194c006ddfd857e7e5ce28088a390cb192e1150b9e023b7"
+    },
+    {
+      "path": "public/models/gym/precise/manifest.json",
+      "bytes": 10760,
+      "sha256": "2a5bec9ea5a1a6eeeb62381efc7cb782ed38988d8a15dd0f54ec751cd380ddc2"
+    },
+    {
+      "path": "public/models/gym/precise/real_adjustable_bench.glb",
+      "bytes": 1185616,
+      "sha256": "638b150e4bd71a7452cefbdceb85c305ccd1f0c473b398f629cd359059ace994"
+    },
+    {
+      "path": "public/models/gym/precise/real_cable_crossover.glb",
+      "bytes": 2452080,
+      "sha256": "afc896c8f8984fa7cdbd73145dd9be624d544eb5ac74fc9e0e1892df203e9268"
+    },
+    {
+      "path": "public/models/gym/precise/real_multigym.glb",
+      "bytes": 2410548,
+      "sha256": "985d4ef13d5af3d3522321df77a5fdca9aa503f3d78f5e603fb33c3a08b47b4e"
+    },
+    {
+      "path": "public/models/gym/precise/real_power_rack.glb",
+      "bytes": 2303492,
+      "sha256": "2ae47f49c15332df647da49a1e1b744a64a5d5cf03b38ec08b906fb7c32dac36"
+    },
+    {
+      "path": "public/models/gym/precise/real_rower.glb",
+      "bytes": 1561336,
+      "sha256": "f26df7770bd38e734d6a00d31c3195b4f869aa98e92a9f8a64fde72417077d57"
+    },
+    {
+      "path": "public/models/gym/precise/real_spin_bike.glb",
+      "bytes": 1365076,
+      "sha256": "4c9e246cac9bcd5b307b6b0632be2c8d8371170d2cadcb1b333d63ed99aed633"
+    },
+    {
+      "path": "public/models/people/LICENSE.txt",
+      "bytes": 332,
+      "sha256": "7ec48fca9d230361547d230487293affc95d33d006b15e724fc5ff72afeae070"
+    },
+    {
+      "path": "public/models/people/athlete-manifest.json",
+      "bytes": 2461,
+      "sha256": "e3824f4d4e422f984a96989b80bd7a7dc6dc4a39e70ac13d874ed9afb6cc550d"
+    },
+    {
+      "path": "public/models/people/athlete.glb",
+      "bytes": 2354976,
+      "sha256": "c142a49e4871ede719a7c922558cbf6b38b95630f19861560cf7f8536d6bc383"
+    },
+    {
+      "path": "public/models/people/child.glb",
+      "bytes": 2755508,
+      "sha256": "a15fd4ec51b1118e0d2ff1d1e076a14fcb933d1053cba9d6af96ffd4c44c729c"
+    },
+    {
+      "path": "public/models/people/coach.glb",
+      "bytes": 2418852,
+      "sha256": "f803f8857d8b3be9fb492d7ad3eafffe217af318edb34037dad51ea5a20fe545"
+    },
+    {
+      "path": "public/models/people/manifest.json",
+      "bytes": 3620,
+      "sha256": "296b42bf5757ce33e6786eac209b638fbd653b5ba72d869bc4e7991016d495a8"
+    },
+    {
+      "path": "public/models/people/reception.glb",
+      "bytes": 2538348,
+      "sha256": "cef82418a6d3b1e3fc6987159ef45aa0cc7de1ef2a43b2d72b4c4a19b73a24bf"
+    },
+    {
+      "path": "public/textures/gym/reference/rubber-normal.png",
+      "bytes": 288088,
+      "sha256": "cafb0ae4a5a3963eeadd427f7672f61512389205fe65a5f06ccdf8a490c406db"
+    },
+    {
+      "path": "public/textures/gym/reference/sources.json",
+      "bytes": 755,
+      "sha256": "9a6cb981ce77f7491c6fa9df762a918fe2f9d06d1f4eb56b9f5fee7be19c6ec5"
+    },
+    {
+      "path": "public/textures/gym/reference/upholstery-normal.png",
+      "bytes": 513951,
+      "sha256": "a8fea99837c71906d6d1647fdc5874d3f9c94ac61d234b12fbcd3cd74a9a6430"
+    },
+    {
+      "path": "public/textures/wood-floor/bumpMap.jpg",
+      "bytes": 66764,
+      "sha256": "e3674f564bf23632e69cc4d8c805d34cbc5c5cb1a02a1dbec88ab02e097de047"
+    },
+    {
+      "path": "public/textures/wood-floor/manifest.json",
+      "bytes": 1423,
+      "sha256": "756bc9d3aaed27ca7ef859f5836aa42e9e2022cc0137f4199f758b0e0ec1ef1e"
+    },
+    {
+      "path": "public/textures/wood-floor/map.jpg",
+      "bytes": 47676,
+      "sha256": "8362d26bd9f0b9a29433a017f6d42c36cc1f29e181c2a6d3b87dd179e74d7433"
+    },
+    {
+      "path": "public/textures/wood-floor/roughnessMap.jpg",
+      "bytes": 31525,
+      "sha256": "dadb2159c4e313a2952cc63cdd803af84c46addb8955d80a88776935e09a6324"
+    },
+    {
+      "path": "scripts/lib/gym-pilot-record.mjs",
+      "bytes": 1547,
+      "sha256": "aa353d76298c498c6eefff444d9fe9c71a01c51f3ede9ef52c4bd048feb44e4d"
+    },
+    {
+      "path": "scripts/verify-gym-pilot.mjs",
+      "bytes": 1624,
+      "sha256": "ce77022b6e7cea5430ff4fa2dfb93574195ebcc06390d6b902f876cd6e4bdc1e"
+    },
+    {
+      "path": "src/app/(auth)/forgot-password/page.tsx",
+      "bytes": 4488,
+      "sha256": "1cad5bdcca347cf289ef45efe60cf931f34d75b7dc3b599a1730f9d3c291bcfa"
+    },
+    {
+      "path": "src/app/(auth)/layout.tsx",
+      "bytes": 116,
+      "sha256": "446c03f5945e8d33ed666cbe524d3d14c14aed1ffa68fd69366ee6321559bf0d"
+    },
+    {
+      "path": "src/app/(auth)/login/page.tsx",
+      "bytes": 8076,
+      "sha256": "7e7353a2b9b67bed0a84b91138d8dbb8a231d6252413e70171bcfc24196b33c3"
+    },
+    {
+      "path": "src/app/(auth)/register/client/page.tsx",
+      "bytes": 10431,
+      "sha256": "f93ffdc98b95633e31716ecfca28ac5392eb7d6e8616815bc8083e8331bef0fa"
+    },
+    {
+      "path": "src/app/(auth)/register/supplier/page.tsx",
+      "bytes": 33664,
+      "sha256": "f36a2ad5ea96b5a7cadc86e7262c83b20d5fc5b5702ecbbf8fdb13300a2715a2"
+    },
+    {
+      "path": "src/app/(auth)/reset-password/page.tsx",
+      "bytes": 7018,
+      "sha256": "404e49c563a5bf3e6662cec715299a1515280eeb7b4569abfa4523aab2b40dd9"
+    },
+    {
+      "path": "src/app/(dashboard)/admin/page.tsx",
+      "bytes": 439,
+      "sha256": "b4f6f30e34a3f9cee8e2e6c1ccda577e1ae455f8931655e7d71d590c1dc673a6"
+    },
+    {
+      "path": "src/app/(dashboard)/client/configurator/page.tsx",
+      "bytes": 131,
+      "sha256": "cc22de5fa0933c5d101f4e43f776778fb275fae7b8db113aa048a82e9163fd9b"
+    },
+    {
+      "path": "src/app/(dashboard)/client/dashboard/page.tsx",
+      "bytes": 25034,
+      "sha256": "1806f73500f29e1d78a9f2fe583573f19d282c598b8aef9eacee26e4032f911f"
+    },
+    {
+      "path": "src/app/(dashboard)/configurator/classic/page.tsx",
+      "bytes": 52087,
+      "sha256": "4380b1057a097f07be9dcc1b8c1e35ef3ba1a0641c0da9d2435ef3547bffde0c"
+    },
+    {
+      "path": "src/app/(dashboard)/configurator/page.tsx",
+      "bytes": 142,
+      "sha256": "0867d03965639f20b365614e6bddd7a128dfd49f5c47b3a4fb23e2705fa3bff1"
+    },
+    {
+      "path": "src/app/(dashboard)/configurator/studio/page.tsx",
+      "bytes": 136,
+      "sha256": "e81e889a54a90faa6b03b9a3005c92f86a89cdf7fa6ac0b545667bc32a2556c4"
+    },
+    {
+      "path": "src/app/(dashboard)/layout.tsx",
+      "bytes": 121,
+      "sha256": "e9782c483651a54c8300745dfe6ef511a08f3b90fa596d5298b9d546818278eb"
+    },
+    {
+      "path": "src/app/(dashboard)/supplier/dashboard/page.tsx",
+      "bytes": 51287,
+      "sha256": "3d56da708412dc22ebc861aaee5a30bc467750daec9af658d5bc27ca0a43d6ef"
+    },
+    {
+      "path": "src/app/(dashboard)/supplier/products/new/page.tsx",
+      "bytes": 22333,
+      "sha256": "5df26fbf25ca2821df02e5b8a1525de6a2396caf917f7500cd007d9900d2066e"
+    },
+    {
+      "path": "src/app/(dashboard)/supplier/products/page.tsx",
+      "bytes": 43556,
+      "sha256": "5b82579203c88c8d20c2f2102facef48d2cec11dfd8f74d27b6c7cf2593a7c35"
+    },
+    {
+      "path": "src/app/(marketing)/about/page.tsx",
+      "bytes": 1283,
+      "sha256": "d645dc5537e570259c000c85a25659682a483a35f0f746a7632d8f3123252e83"
+    },
+    {
+      "path": "src/app/(marketing)/blog/page.tsx",
+      "bytes": 2290,
+      "sha256": "788da527d99ce13308ea600164a371324b5b378918e32a4c081415f3314bd45e"
+    },
+    {
+      "path": "src/app/(marketing)/compare/page.tsx",
+      "bytes": 15755,
+      "sha256": "fbaba205f00d539a49c998b5b247adb2b170cf0f48f489fe5731a714e4ea24f3"
+    },
+    {
+      "path": "src/app/(marketing)/construieste-sala/[category]/page.tsx",
+      "bytes": 566,
+      "sha256": "3b2f6bcc281af13f4fce1337d95ebbedbb50cc6e4839c31757b75914af705a74"
+    },
+    {
+      "path": "src/app/(marketing)/construieste-sala/page.tsx",
+      "bytes": 139,
+      "sha256": "f168a5f3cab05f18c21fb346cf09e1a2e7c523444a92f659616eb71807e72e3d"
+    },
+    {
+      "path": "src/app/(marketing)/consultation/page.tsx",
+      "bytes": 12983,
+      "sha256": "d36ca785e1405ea1eea7f3fa545da23ff07935ad98812a2b28535cb3eb857494"
+    },
+    {
+      "path": "src/app/(marketing)/contact/page.tsx",
+      "bytes": 11233,
+      "sha256": "9085fd9d8cef5ea2a4c4c2f84076bfecd6c6e5999d0a85de99447aa3791ee2cf"
+    },
+    {
+      "path": "src/app/(marketing)/cookie-policy/page.tsx",
+      "bytes": 6585,
+      "sha256": "c8426b783d885c14420e09f4c72f8da935123e183d72c579d0fe408ac6a997dd"
+    },
+    {
+      "path": "src/app/(marketing)/cos-cerere/page.tsx",
+      "bytes": 15240,
+      "sha256": "313f88868ceea81e4325c2104da868180c63cef89dd48f923c4101f38be9da19"
+    },
+    {
+      "path": "src/app/(marketing)/cum-functioneaza/page.tsx",
+      "bytes": 7361,
+      "sha256": "9bc8eca9fd95b06e59d24b519ed77eccb589a0a9bbd288bc12b5307f2a8d8c5c"
+    },
+    {
+      "path": "src/app/(marketing)/delete-account/page.tsx",
+      "bytes": 4222,
+      "sha256": "76a833a8df4800a619917d55ddd00d72b8a0ae195071f99b2f518dd41713bf48"
+    },
+    {
+      "path": "src/app/(marketing)/estimator-buget/page.tsx",
+      "bytes": 18933,
+      "sha256": "1269a254a7c5901c81721f1c771462cd0baf2dd6ca2388dad4532a4754c6cc46"
+    },
+    {
+      "path": "src/app/(marketing)/faq/page.tsx",
+      "bytes": 5056,
+      "sha256": "a8107aeb1e39628cead4de402e6d6ab2b905f2d58a4c02ff9b752456a0ab3fb1"
+    },
+    {
+      "path": "src/app/(marketing)/layout.tsx",
+      "bytes": 121,
+      "sha256": "f0f9c583dd415de71c93b74bf2e527d6cc7bcd1f8d273f263e036d32c1b6efe7"
+    },
+    {
+      "path": "src/app/(marketing)/mobile/promotions/page.tsx",
+      "bytes": 8685,
+      "sha256": "be6e6e619512325590450ab32a5e3e8a7031cbfadd28c364039643ce17c7c5d9"
+    },
+    {
+      "path": "src/app/(marketing)/pricing/page.tsx",
+      "bytes": 7496,
+      "sha256": "80e2740a0765def57b48e5c2a1861d9e62ab6d34a5f9a7af9bd4b7b6f65f2da5"
+    },
+    {
+      "path": "src/app/(marketing)/privacy/page.tsx",
+      "bytes": 4226,
+      "sha256": "67caeb6571a75e0f15c976a76627958581ce254622e70cf2637d2a3f3074de82"
+    },
+    {
+      "path": "src/app/(marketing)/products/[id]/layout.tsx",
+      "bytes": 2474,
+      "sha256": "099813ea9c9df73f6fe985c64bab41d48789b425117753eb318a5896a7373462"
+    },
+    {
+      "path": "src/app/(marketing)/products/[id]/page.tsx",
+      "bytes": 34468,
+      "sha256": "5a060fa7eae69afd1e7c36d0857459c0d11d78b1b472a1c12c5591bf7c9dec59"
+    },
+    {
+      "path": "src/app/(marketing)/products/page.tsx",
+      "bytes": 42410,
+      "sha256": "f3c935268d1aa724ed96ff2d0305fef95c5441df531bd4e7d9296ca30374b5e3"
+    },
+    {
+      "path": "src/app/(marketing)/report/page.tsx",
+      "bytes": 4346,
+      "sha256": "766c6bc1aa9918e7792b68a18d17c5de1e3eec41e0a23340bf0e66d44e4e88f1"
+    },
+    {
+      "path": "src/app/(marketing)/return-policy/page.tsx",
+      "bytes": 6649,
+      "sha256": "381589662a5408a73be57a4213caa00b15a697a40da4a6ae7f5a915259cf9791"
+    },
+    {
+      "path": "src/app/(marketing)/suppliers/[id]/layout.tsx",
+      "bytes": 2316,
+      "sha256": "38e425c68316991611c7694417c7ea2d612a0d49fc488fa0581fb02e9ca5521b"
+    },
+    {
+      "path": "src/app/(marketing)/suppliers/[id]/page.tsx",
+      "bytes": 30399,
+      "sha256": "3b758280da9ec27b7e28bbd5c962bd5259c66d975286e09d0e5138bfd06e45cd"
+    },
+    {
+      "path": "src/app/(marketing)/suppliers/page.tsx",
+      "bytes": 13305,
+      "sha256": "ea0d50545b975acabeb7ba90f968ded1f1d571ad44ccc775010711381a5e0402"
+    },
+    {
+      "path": "src/app/(marketing)/terms/page.tsx",
+      "bytes": 1838,
+      "sha256": "3f18e03bee5778723f9b5df7059cafc232c29060ab1952559d99720e30691811"
+    },
+    {
+      "path": "src/app/(marketing)/unsubscribe/page.tsx",
+      "bytes": 3352,
+      "sha256": "84f4d0593bd1d84b8b1819e4f5a014f6a2346817824488e40a28cf713810135c"
+    },
+    {
+      "path": "src/app/api/account/delete-request/route.ts",
+      "bytes": 3283,
+      "sha256": "0dd63d14fdf7693c5a32cec34a20b0841707ae952309de01651173b0fdd45d83"
+    },
+    {
+      "path": "src/app/api/admin/contact-messages/route.ts",
+      "bytes": 6144,
+      "sha256": "a8a115fc7465350e7ece88b77382be99f2205dab233124e81983b8226b6e610a"
+    },
+    {
+      "path": "src/app/api/admin/contact-requests/route.ts",
+      "bytes": 3082,
+      "sha256": "d62b0db979b5579cac8e26d6388b7a55abf48ef57f1667355c23cc5377110191"
+    },
+    {
+      "path": "src/app/api/admin/newsletter/route.ts",
+      "bytes": 5675,
+      "sha256": "df86d8bd790f3bdbb7c45f23878cb1a55e4b92e673aee463de40da81a7804f44"
+    },
+    {
+      "path": "src/app/api/admin/reviews/route.ts",
+      "bytes": 3487,
+      "sha256": "a6db59050a2d319671929869d2eb784ec4aff67eb728bf1b2e0a1e0ce873b1d5"
+    },
+    {
+      "path": "src/app/api/admin/suppliers/route.ts",
+      "bytes": 11267,
+      "sha256": "30ed129d69322670b23de6cc3d5a58b6912a60247b21aaef22b1536003eb9ed8"
+    },
+    {
+      "path": "src/app/api/auth/forgot-password/route.ts",
+      "bytes": 3154,
+      "sha256": "dae73031c71176b1377baf5cc22f44bf89c307f627e83d78cbc67ee828a1e308"
+    },
+    {
+      "path": "src/app/api/auth/login/route.ts",
+      "bytes": 4185,
+      "sha256": "9a7a0e9f407d5f481ee07115c09e929a196fd56c411c37bd9f2e31b069fb11d8"
+    },
+    {
+      "path": "src/app/api/auth/logout/route.ts",
+      "bytes": 463,
+      "sha256": "785048283583e998dc99db97f6ec7f57ae51dd223f559530c12f11878fc67c47"
+    },
+    {
+      "path": "src/app/api/auth/me/route.ts",
+      "bytes": 314,
+      "sha256": "9b5ad557ad981dc43e55e4c9a298f5088220caa79fffd4af45773486a2275571"
+    },
+    {
+      "path": "src/app/api/auth/register/client/route.ts",
+      "bytes": 4349,
+      "sha256": "672d0c396dc695f1c6e52bad8ff2258edf8e604c833c173f2595457dc525ef0f"
+    },
+    {
+      "path": "src/app/api/auth/register/supplier/route.ts",
+      "bytes": 8915,
+      "sha256": "68ccb673d7738e4584f4391a97833985cdfd2efd91540860b95cdeb866f2692e"
+    },
+    {
+      "path": "src/app/api/auth/resend-verification/route.ts",
+      "bytes": 2521,
+      "sha256": "23197f45c3a75e37f2159a6588f6dd92f7ede90f40719210f1ff2a8a9230e26a"
+    },
+    {
+      "path": "src/app/api/auth/reset-password/route.ts",
+      "bytes": 3001,
+      "sha256": "fed9bb836ec0557cd2ca6fcc9b70d7f910d80600125baf0e9031282e0774b175"
+    },
+    {
+      "path": "src/app/api/auth/verify-email/route.ts",
+      "bytes": 1290,
+      "sha256": "9ee4937409ad069514280c556a4b8e3639c00e59a1c746012b4bde474775e656"
+    },
+    {
+      "path": "src/app/api/budget-estimates/route.ts",
+      "bytes": 3044,
+      "sha256": "88eb0fb3480b564d892fd7d0e50dee92f1b7e2efbfdf940c15d0779c2b217284"
+    },
+    {
+      "path": "src/app/api/client/dashboard/route.ts",
+      "bytes": 5566,
+      "sha256": "2b351941e40938cbd03879d61d3703a218cff404f29ed0d875683f35a6df3859"
+    },
+    {
+      "path": "src/app/api/client/favorites/route.ts",
+      "bytes": 2597,
+      "sha256": "fbfe9b7ece535fb9b2ad461f021666be70c3d9e213f692262f0599f21fba376f"
+    },
+    {
+      "path": "src/app/api/client/gym-projects/route.ts",
+      "bytes": 62,
+      "sha256": "e634baefa93a34c5c89cab1a5a6c361beca58844a6e5c2bd4ee90338ddfee9c1"
+    },
+    {
+      "path": "src/app/api/configurator/ai/route.ts",
+      "bytes": 3027,
+      "sha256": "9c4b3dd565ed15aad4b2241037409ff22417ed08fb5ba9ce73ce6966034730b4"
+    },
+    {
+      "path": "src/app/api/consultation/route.ts",
+      "bytes": 8291,
+      "sha256": "b3f2975b5eeaeb57024aad59de320a48281e493af15cc3a45a81cf7b615aa541"
+    },
+    {
+      "path": "src/app/api/contact/reply/route.ts",
+      "bytes": 6773,
+      "sha256": "e2e94887d3bc2fd5eb5b526ea6976ebf8adda59b3f053dec70c2d60f9d0e8c67"
+    },
+    {
+      "path": "src/app/api/contact/route.ts",
+      "bytes": 5744,
+      "sha256": "6e822cd6117a9174c2e566f763bd3399f4d09d65d797e0e92c2bcca39b6bebb4"
+    },
+    {
+      "path": "src/app/api/contact/supplier/route.ts",
+      "bytes": 11602,
+      "sha256": "7332bb45c746b3f2f422f5ca9b04829853d70e2d92a5a381caa0f223b6411d2a"
+    },
+    {
+      "path": "src/app/api/gym-projects/route.ts",
+      "bytes": 5032,
+      "sha256": "2766a9049e679b832bd4f1fc9db7327c32dd12e0a2a8dd585d479ba59e6d66ae"
+    },
+    {
+      "path": "src/app/api/health/route.ts",
+      "bytes": 2324,
+      "sha256": "552c76a4129f27be3a2fbae1d806e0fb2af66cd80cee6cc706c02beb2828cd87"
+    },
+    {
+      "path": "src/app/api/locale/route.ts",
+      "bytes": 523,
+      "sha256": "2e79031a67cfa203020cd2c32940704638aa2dc9d7279b5237d807ea5617d6e6"
+    },
+    {
+      "path": "src/app/api/messages/route.ts",
+      "bytes": 11735,
+      "sha256": "015fcb6f0f262f888f957b82fefa260f6a957e7fbed0392e5385db9fb9863660"
+    },
+    {
+      "path": "src/app/api/mobile/billing/catalog/route.ts",
+      "bytes": 836,
+      "sha256": "86afbcd3c5c3d5280a845a326f8e46c0b7614868c4dea133449277716d70377b"
+    },
+    {
+      "path": "src/app/api/mobile/billing/intents/route.ts",
+      "bytes": 1659,
+      "sha256": "684c1a495e5d2f306567882c0de1b2fff03cac147bb79733e15db46aaa70a330"
+    },
+    {
+      "path": "src/app/api/mobile/billing/notifications/apple/route.ts",
+      "bytes": 2385,
+      "sha256": "f68e68e3b76ff6aae00268624dd3a0db595dedb84980f8f88a25d06618e3905e"
+    },
+    {
+      "path": "src/app/api/mobile/billing/notifications/google/route.ts",
+      "bytes": 2375,
+      "sha256": "c80af1f2d35cf5e66559658afde450e5b0532f98d8e63998d320ee98caa39262"
+    },
+    {
+      "path": "src/app/api/mobile/billing/products/route.ts",
+      "bytes": 1106,
+      "sha256": "6a5472d891f8958cfb1d865e8e799e3ed84d81a8cecc42b36f0579d296be3cf1"
+    },
+    {
+      "path": "src/app/api/mobile/billing/verify/route.ts",
+      "bytes": 2484,
+      "sha256": "3b30e2f8fd187bd3c3cf144b3c822300081bdcef92a18606b5b03a94db9ec048"
+    },
+    {
+      "path": "src/app/api/newsletter/subscribe/route.ts",
+      "bytes": 2455,
+      "sha256": "8fd5f95a8c2ade9da62e0ea3483903e219b4ca01705d0e4a233ba2013408b34e"
+    },
+    {
+      "path": "src/app/api/newsletter/unsubscribe/route.ts",
+      "bytes": 1235,
+      "sha256": "27c5913b1924e5f4f4d070cdbee37918db5d8c85a17893e68a8d2509b55cdae3"
+    },
+    {
+      "path": "src/app/api/notifications/route.ts",
+      "bytes": 3432,
+      "sha256": "ac95bd33db32e61a72a61c98e110db6136f9f5c32c2d1fae6d5696aec205ef49"
+    },
+    {
+      "path": "src/app/api/products/[id]/route.ts",
+      "bytes": 3478,
+      "sha256": "906596496972cf9f916cca698b42488c2fc91fc922194b986f8b320315546289"
+    },
+    {
+      "path": "src/app/api/products/count/route.ts",
+      "bytes": 448,
+      "sha256": "7089cdbdb1956bfdc9fb616b4565e3abcd7ad6dd8176ceef88e3336bcc9bf0ec"
+    },
+    {
+      "path": "src/app/api/products/route.ts",
+      "bytes": 5305,
+      "sha256": "5beb1f49de7b1eec1da7fb206320dd8eeb1b73be8fa0fac2147e37566eaa688d"
+    },
+    {
+      "path": "src/app/api/products/views/route.ts",
+      "bytes": 1955,
+      "sha256": "9374b5dedc14b88fa65557ea464af422fed7a5db82dc47f9b2f457b10036673e"
+    },
+    {
+      "path": "src/app/api/promotions/route.ts",
+      "bytes": 3392,
+      "sha256": "52a79c8535facef999a34c497e2899e9bc3266e3d855d7a120ac39ad1758256d"
+    },
+    {
+      "path": "src/app/api/reviews/route.ts",
+      "bytes": 5698,
+      "sha256": "4102fadd707182fbebf10fe7aaa1566835708fb8851f0ddde4780efdcf39b1d8"
+    },
+    {
+      "path": "src/app/api/search/autocomplete/route.ts",
+      "bytes": 5557,
+      "sha256": "8359ceb03ed478f95c94ffbd998887a06cdb96beef7206d9b15600c57005dd6f"
+    },
+    {
+      "path": "src/app/api/search/route.ts",
+      "bytes": 8137,
+      "sha256": "91de28e14680f921c851cbcb759960da5be671503a05e52bb7f0fffcd4795696"
+    },
+    {
+      "path": "src/app/api/stats/route.ts",
+      "bytes": 1038,
+      "sha256": "db378ee68c76c801f558553c858d8d07c8fccc3e91251d2b0983ac090bee0ea5"
+    },
+    {
+      "path": "src/app/api/supplier/analytics/route.ts",
+      "bytes": 1244,
+      "sha256": "7b741c879ceffbcc7ba6101bca5f72f1e9cb9037df0868fdc1f96fc6616cfba9"
+    },
+    {
+      "path": "src/app/api/supplier/dashboard/route.ts",
+      "bytes": 6742,
+      "sha256": "f2fbe0a14ecca90f2f88e5ff2d91dcb2275b05cd385ea343bcf16b4887f782eb"
+    },
+    {
+      "path": "src/app/api/supplier/gallery/route.ts",
+      "bytes": 8987,
+      "sha256": "3b7cfe1aa78e820d3f5c11c5ec86d9e7246f743ac9cc84e08775fbefc6ee64fa"
+    },
+    {
+      "path": "src/app/api/supplier/products/import/route.ts",
+      "bytes": 9206,
+      "sha256": "93888909137d2c02b4893170e02335640dab378794b12ea0455d996bcc77a1e5"
+    },
+    {
+      "path": "src/app/api/supplier/products/route.ts",
+      "bytes": 16920,
+      "sha256": "367b669066b1ab7484fb53a973d2648933629d0f2b599d2d04787c3d07c8fadd"
+    },
+    {
+      "path": "src/app/api/supplier/products/variants/route.ts",
+      "bytes": 8172,
+      "sha256": "9cd226d545d120233578811a1be61bae827d06ce07b689c7c6ef895240796bcb"
+    },
+    {
+      "path": "src/app/api/suppliers/[id]/route.ts",
+      "bytes": 2365,
+      "sha256": "b02ec8b367a4bcfd5cb410f1c95d8802f97a8da9d903224e67ff6b0818d3fd39"
+    },
+    {
+      "path": "src/app/api/suppliers/route.ts",
+      "bytes": 3473,
+      "sha256": "ce05e04896826945dcb5f2999cfb41e1655eb7146adecebbe36fd23500c50f1f"
+    },
+    {
+      "path": "src/app/api/upload/registration/route.ts",
+      "bytes": 3673,
+      "sha256": "677f753d8e9fea92d0c549f23509666eedab2cff8631be0965f90db5cfffdfef"
+    },
+    {
+      "path": "src/app/api/upload/registration/session/route.ts",
+      "bytes": 3221,
+      "sha256": "10fa2e0d823e9119a26c09cbda699d47f7ce6287ebc32fced04d18790eb9fbc2"
+    },
+    {
+      "path": "src/app/api/upload/route.ts",
+      "bytes": 6301,
+      "sha256": "6b694c0b65d92833f079dd8ade16705f181141efa1e55425e44b9c096802a99d"
+    },
+    {
+      "path": "src/app/globals.css",
+      "bytes": 4223,
+      "sha256": "3e42f83489d7e19802c99694723f1fca064d82723081b7f237f75ecfe04befb5"
+    },
+    {
+      "path": "src/app/home-sport.css",
+      "bytes": 239,
+      "sha256": "f4120a44f9f9fff27f5bf548c2c18a09fed05a5490ee21043590ff998ac214b8"
+    },
+    {
+      "path": "src/app/layout.tsx",
+      "bytes": 2096,
+      "sha256": "ffd52894820257904546bcdd03ed5fb34c6fd073562d07b0b7d47957a70b14b9"
+    },
+    {
+      "path": "src/app/not-found.tsx",
+      "bytes": 699,
+      "sha256": "a820035386904dd1b85f69445b272094608b0b48a00405e2f474f1d9f111ba85"
+    },
+    {
+      "path": "src/app/page.tsx",
+      "bytes": 9267,
+      "sha256": "3484cc3f60fd18cfee0d1c1202114ad26266417bfe8751ddb926255b22cfac47"
+    },
+    {
+      "path": "src/components/AiDataConsent.tsx",
+      "bytes": 1531,
+      "sha256": "6a914eafb5526f5613ee34cb1f5b08104bbf3fae1d121cc8d27526875e113fc8"
+    },
+    {
+      "path": "src/components/BuildDirectory.tsx",
+      "bytes": 9059,
+      "sha256": "9bcac34b1acfdd37dff1c51a5c449a69d535462e8bd83e3a671021d22eff37dd"
+    },
+    {
+      "path": "src/components/BuyingGuide.tsx",
+      "bytes": 1572,
+      "sha256": "81b11a951a4411c23500a9a85171cce6a330cc86d233304357a677aaf490e644"
+    },
+    {
+      "path": "src/components/CartIcon.tsx",
+      "bytes": 1112,
+      "sha256": "13bf2012b451a2cde7677e8283ca89fd5d5ee3041a258324260674d34e8cc143"
+    },
+    {
+      "path": "src/components/CookieConsent.tsx",
+      "bytes": 2941,
+      "sha256": "462a7bb0079faa4c46f8215b5924ef4b00114824d38cb90bd7effc3b3519185b"
+    },
+    {
+      "path": "src/components/FloatingChatButton.tsx",
+      "bytes": 13936,
+      "sha256": "1bbe38621b69b0c67abba516713f6d91851647b03b88817fa49d2c2bbaa684da"
+    },
+    {
+      "path": "src/components/GymDesignAssistant.tsx",
+      "bytes": 12414,
+      "sha256": "84a373fdac16ed1cfda7f6c9d1cb6c84a111d28c9aff6c0d602491fb07fae9d7"
+    },
+    {
+      "path": "src/components/GymEquipmentModel.tsx",
+      "bytes": 7272,
+      "sha256": "17d559e544dc82d7bbea57adc069f3a54dfdb681d6f907a39d0f324e54628620"
+    },
+    {
+      "path": "src/components/GymScene3D.tsx",
+      "bytes": 10696,
+      "sha256": "6638c6dc3ed24cc723c0b8876e29b963092bb6ce608a650c3ca58b135360c38a"
+    },
+    {
+      "path": "src/components/LanguageSwitcher.tsx",
+      "bytes": 3636,
+      "sha256": "0af8f41912a67127a080f6aca8cb77cde0810545e5c9cd6655314c3e068f6d38"
+    },
+    {
+      "path": "src/components/MarketNavigation.tsx",
+      "bytes": 2617,
+      "sha256": "bf052a81d6839ec1feaf71c5afe67a6a9342915af68cbac5058e36e0c1909757"
+    },
+    {
+      "path": "src/components/Modal.tsx",
+      "bytes": 788,
+      "sha256": "cd527cbaff98eff24adf92e404715e1440e6eab4a3a170ef60c242e356562a99"
+    },
+    {
+      "path": "src/components/MyGymProjects.tsx",
+      "bytes": 1971,
+      "sha256": "d4d13dabdafd31b7a51385595ce8ddea4af2f90b609aa5fb7a9cd019d5746e1f"
+    },
+    {
+      "path": "src/components/NotificationBell.tsx",
+      "bytes": 9840,
+      "sha256": "5452525246bbc75e63f887b990a348c851b10bab267fef31efd6af9bb74b9312"
+    },
+    {
+      "path": "src/components/ProductPhoto.tsx",
+      "bytes": 7116,
+      "sha256": "5465109a36f8c7e84dcf0a4576e1e4329a04a9f9058f3465b0c24f2f46c413c6"
+    },
+    {
+      "path": "src/components/PromotedOffers.tsx",
+      "bytes": 16065,
+      "sha256": "5c6949b260034394ef32487f56c258c18ad9acd86af14180dbb0458df93bf157"
+    },
+    {
+      "path": "src/components/ReportContentLink.tsx",
+      "bytes": 578,
+      "sha256": "611037ea2dd834d335b5d34850f6449e03117da47896d6f1a740b5b823699a60"
+    },
+    {
+      "path": "src/components/RequestChat.tsx",
+      "bytes": 5237,
+      "sha256": "9b8ef5cf584c6d6ab092e83ccaed506bcb3221bbf601939b81136fe85e61344b"
+    },
+    {
+      "path": "src/components/SearchWidget.tsx",
+      "bytes": 4824,
+      "sha256": "35dd6d00967a212dbb5fcc86f3b57a95be6eac1c8329b59093efd0dfe107262c"
+    },
+    {
+      "path": "src/components/SuperPricePromotion.tsx",
+      "bytes": 5907,
+      "sha256": "dfd15a67d22c3e1e4aa3e2fbf86f4a03a06c9f9a4f034eba52616fd545b3dc87"
+    },
+    {
+      "path": "src/components/SupplierContactLinks.tsx",
+      "bytes": 2146,
+      "sha256": "618acacb533130eb107f7a59bf502737f3c9a6b8ddf1ecfcce3641db8fc0870a"
+    },
+    {
+      "path": "src/components/SupplierPublicContactEmail.tsx",
+      "bytes": 3056,
+      "sha256": "fc186ebb0b1fff68eb8f9fb1d9e81b3fe02208342cb8e3a8147b78fbc3d61105"
+    },
+    {
+      "path": "src/components/SupplierSourceDetails.tsx",
+      "bytes": 1624,
+      "sha256": "5196882f74b72e489d5ed5cb104059ad4b72d4c5dc32eada609f4d19bcd492d8"
+    },
+    {
+      "path": "src/components/VerificationResult.tsx",
+      "bytes": 1575,
+      "sha256": "e137f9f87b96b3757e58aa3cc00ce2a685bbc8b0e885208c89b22578bde3a95e"
+    },
+    {
+      "path": "src/components/Viewer360.tsx",
+      "bytes": 9379,
+      "sha256": "e9309f0106f534c6a97dd9b6150a26ce5dd0a2a3152b3194a85b89d82ea39eb1"
+    },
+    {
+      "path": "src/components/admin/AdminDashboard.tsx",
+      "bytes": 66372,
+      "sha256": "00f4aa1a295a73888452b24c4fc4f92f8cf8cffcf0e1d8aab7433e6a40a7cf06"
+    },
+    {
+      "path": "src/components/layout/Footer.tsx",
+      "bytes": 9887,
+      "sha256": "16d4f13d5b903a57db5d9343e5d76f6e0793f3fa0ff0bc5abb923864624acfa9"
+    },
+    {
+      "path": "src/components/layout/GlobalHeader.tsx",
+      "bytes": 15458,
+      "sha256": "aa7b4d58da71387040d26765f40f463de94d49ccd9b82ffd3885f68d9496dd7f"
+    },
+    {
+      "path": "src/components/layout/Navbar.tsx",
+      "bytes": 6201,
+      "sha256": "8453154114daca99cc5f4fa994d0e1002b9cb55f3350d418dfaa48bd3873d31e"
+    },
+    {
+      "path": "src/components/studio/AiProposalReview.tsx",
+      "bytes": 5593,
+      "sha256": "c78bfe10f0544a2aca9220ef34bc3ae9f4b24da65b436f4ff21767aa161b6247"
+    },
+    {
+      "path": "src/components/studio/CardioEquipment.tsx",
+      "bytes": 737,
+      "sha256": "ea916607cee5e17fe91579f222ed7021ef4d27188cf969ae0fc8b67b643ddc11"
+    },
+    {
+      "path": "src/components/studio/CeilingLighting.tsx",
+      "bytes": 1695,
+      "sha256": "f92b0b1cb074bfddfbd48cb11c6c5f5d9c828dba3de288f23498f9625e0213b1"
+    },
+    {
+      "path": "src/components/studio/DaylightArchitecture.tsx",
+      "bytes": 3585,
+      "sha256": "b85397fee4fd5e1a8c940fc7e62c2564faa86172d108cfac6c710427fd0595dc"
+    },
+    {
+      "path": "src/components/studio/DetailedAthlete.tsx",
+      "bytes": 1381,
+      "sha256": "375ba538bcaf637f9f8eb26da478a52ccfbf7756ab8ae1f7da59cf2e6619c1ec"
+    },
+    {
+      "path": "src/components/studio/DetailedPerson.tsx",
+      "bytes": 1142,
+      "sha256": "3496df1575413c5cff5ba5731ee204013add04f5d4d584453124ce559d7437fb"
+    },
+    {
+      "path": "src/components/studio/EquipmentModel.tsx",
+      "bytes": 11976,
+      "sha256": "22776ef34d0e03e1ad29cf15d1c45b95c95b7a39b7cbdc8077e311cee777b9fc"
+    },
+    {
+      "path": "src/components/studio/EquipmentParts.tsx",
+      "bytes": 5546,
+      "sha256": "0259f39359f581b6d8ebf1eb63de09c831b106bc6173496b2dc9b71f78a9517e"
+    },
+    {
+      "path": "src/components/studio/EquipmentPlanningDetails.tsx",
+      "bytes": 3267,
+      "sha256": "2b81d66055ebacd40f06d1639c4d11f48986899946e591f704f9610e9f502432"
+    },
+    {
+      "path": "src/components/studio/FitnessPeople.tsx",
+      "bytes": 3880,
+      "sha256": "a044f93f92724b765774fd05ea9645384553d52f05b148783d73b4347b98174d"
+    },
+    {
+      "path": "src/components/studio/ImportedEquipmentModel.tsx",
+      "bytes": 6632,
+      "sha256": "3e39a410d88977272ba4a543882b91e44a3dd5677c35c2658288232b9c27fef7"
+    },
+    {
+      "path": "src/components/studio/ReferenceEquipmentModel.tsx",
+      "bytes": 865,
+      "sha256": "6dddc95a58bcd62310fb345cf0e0ff63d93e75cf359f79cf5d6d012dae63cc35"
+    },
+    {
+      "path": "src/components/studio/RoomAtmosphere.tsx",
+      "bytes": 7754,
+      "sha256": "5d9557d9f13ec78f140a3fdbfd7ca374b51eba4e571cb546bfef76c54fff757e"
+    },
+    {
+      "path": "src/components/studio/SledTrack.tsx",
+      "bytes": 1667,
+      "sha256": "72f414dac097c98e875dbcce2092593bdb7919bc04883a8e697a4f3e88ccc5e5"
+    },
+    {
+      "path": "src/components/studio/SpaceDimensions.tsx",
+      "bytes": 1915,
+      "sha256": "a1b77beab0d7d2fd04803230fd04502385329f148374dd49135a8a816fce0ac7"
+    },
+    {
+      "path": "src/components/studio/SpacePlan.tsx",
+      "bytes": 17457,
+      "sha256": "6953b3377f6d783c29c7bc0307688b50d9ab4494ec7b245137950ab9e9a3b4af"
+    },
+    {
+      "path": "src/components/studio/SpaceScene.tsx",
+      "bytes": 17175,
+      "sha256": "372c0788357512ffa5ff7fc764ae694eed4f3982449dc1ce252ac2bee0b6ba3d"
+    },
+    {
+      "path": "src/components/studio/StairArchitecture.tsx",
+      "bytes": 3409,
+      "sha256": "03478a270dfbd209349431388db95e16e5a9fbd23e6188428cc3acf8e35de68b"
+    },
+    {
+      "path": "src/components/studio/StrengthEquipment.tsx",
+      "bytes": 2510,
+      "sha256": "143240c087694f3281f63496deb3d43d2be3045abde3cfea74a1d90a3ea90f7f"
+    },
+    {
+      "path": "src/components/studio/StrengthInterior.tsx",
+      "bytes": 2599,
+      "sha256": "b23da8da1838816f52563aa2ea7deba6602b6fe4d73ef8ae9baace1b70d8aaf9"
+    },
+    {
+      "path": "src/components/studio/StructureInspector.tsx",
+      "bytes": 4375,
+      "sha256": "e8c0dc48d08f910fcdef31401f2dbf5f383b05c473959dd9b1796c2b95fb1750"
+    },
+    {
+      "path": "src/components/studio/StudioLighting.tsx",
+      "bytes": 4026,
+      "sha256": "c5270ac9e2f41f5ea6d3adaec3ba586daed702a686366cdcb28c1bc0010b9a45"
+    },
+    {
+      "path": "src/components/studio/StudioWorkbench.tsx",
+      "bytes": 80147,
+      "sha256": "5e1a3a101289954aff5518390fecf42e45b2735b6e25acdd802e44636d8b791a"
+    },
+    {
+      "path": "src/components/studio/SurfaceMaterials.tsx",
+      "bytes": 4326,
+      "sha256": "21c156263980e1404ef38d7e1efa7decd67753f5333de7f13a98cde18b30be85"
+    },
+    {
+      "path": "src/components/studio/useEditorDraft.ts",
+      "bytes": 5510,
+      "sha256": "fe5337213d4382504a80a509500cdee8dda03453be480159bab7e11527e67866"
+    },
+    {
+      "path": "src/components/ui/Badge.tsx",
+      "bytes": 817,
+      "sha256": "7c172eb9f83bb9f8770787acc4eaef5d8462dc75567086497efa4cadde7ce085"
+    },
+    {
+      "path": "src/components/ui/Button.tsx",
+      "bytes": 1880,
+      "sha256": "2cee3e470bc5eb621240385409048a3d91456ecf346fcdb48802ad80bb3935e0"
+    },
+    {
+      "path": "src/components/ui/Card.tsx",
+      "bytes": 1191,
+      "sha256": "fa0e49ea68f4727dd66c70908b27a9621e14c85d2390ff98f7688ddc6a5bbcc3"
+    },
+    {
+      "path": "src/components/ui/Input.tsx",
+      "bytes": 925,
+      "sha256": "b16f55e527cce58bd2cad4aa968d5a7b505f2018220c8abcd4b5dab7c147da1a"
+    },
+    {
+      "path": "src/data/build-directory.json",
+      "bytes": 22505,
+      "sha256": "ee5fb6e6e54990c42b9a6cd7d2d8695da1708f5ab85a9334b64a4e55ffd0d99c"
+    },
+    {
+      "path": "src/i18n/LocaleProvider.tsx",
+      "bytes": 968,
+      "sha256": "63795ef090fad389d36de218940af7eedbe9dbe6c916e3c1908aa5b65f678819"
+    },
+    {
+      "path": "src/i18n/client.ts",
+      "bytes": 1279,
+      "sha256": "7c46b21c12264af1a8ec4ede257920a16d1e03dc58b1abed2365f689eafb0a9b"
+    },
+    {
+      "path": "src/i18n/messages/en.json",
+      "bytes": 48731,
+      "sha256": "c4953ad74f288e67b3bd44cff665dfd2d1d4afed3fa62a1bd92dbb9a5a9d8664"
+    },
+    {
+      "path": "src/i18n/messages/ro.json",
+      "bytes": 52671,
+      "sha256": "ba5f9ae43f710236b81cdb6fcc05a8dc808e3dbc9180357792530d62b10b1c22"
+    },
+    {
+      "path": "src/i18n/request.ts",
+      "bytes": 603,
+      "sha256": "d9e3f2aad56e077a59f4c27665abafc8830f5845e50c958762977e4480dec678"
+    },
+    {
+      "path": "src/i18n/translate.ts",
+      "bytes": 3371,
+      "sha256": "c28af2a72af2e2d7ff75f7e4a35f3109431686674f9859d391108551e87e8083"
+    },
+    {
+      "path": "src/i18n/ui.en.json",
+      "bytes": 123640,
+      "sha256": "a0c52f074faa5ad2d29b9cb0c52c5d69554eed549b0e3e0a903e2f586d99eae2"
+    },
+    {
+      "path": "src/i18n/useUiText.ts",
+      "bytes": 421,
+      "sha256": "79c34ef0069cc8ca63b39ccbcaaf6ac0b506e9e50a0313366e2b78bf91cf3ba9"
+    },
+    {
+      "path": "src/lib/build-directory.ts",
+      "bytes": 1101,
+      "sha256": "f79457b536e3afe19600c000f54e6679962e1621922e1a15f941c972f6de79f2"
+    },
+    {
+      "path": "src/lib/catalog-price.ts",
+      "bytes": 813,
+      "sha256": "5555f6d6c4f5c76446ebc1c1525fb8816549773beb71e0c76307ffec49c1d9ba"
+    },
+    {
+      "path": "src/lib/contact-sender.ts",
+      "bytes": 612,
+      "sha256": "df78e47a096e7f54e14f3d2e10a611d0f7f0be6f6aef556129c93f557a0c5787"
+    },
+    {
+      "path": "src/lib/csrf-client.ts",
+      "bytes": 2044,
+      "sha256": "535c3f47fbfd8498ed9d342039e1333ed0dc912577fadf779820986abcb1d110"
+    },
+    {
+      "path": "src/lib/csrf.ts",
+      "bytes": 3089,
+      "sha256": "eb69aa3daf42591ec759a3611ee9e2ad3781c8f2220bbdfd786ff059cebe00d8"
+    },
+    {
+      "path": "src/lib/csv.ts",
+      "bytes": 1764,
+      "sha256": "7f83c4f648b16ad9bf7cbc909c3bc20c617b22e53d893e94e72b988c3a7ddd05"
+    },
+    {
+      "path": "src/lib/database-values.ts",
+      "bytes": 376,
+      "sha256": "2c27ae391da6671f9017fecc3ca28e7307f5ccee958d67d6de78e8661d2cd306"
+    },
+    {
+      "path": "src/lib/email.ts",
+      "bytes": 5397,
+      "sha256": "090abfcc7e7833fe815b397c6022e1142bb53703024b932073ae89c4ffa4ae62"
+    },
+    {
+      "path": "src/lib/error-message.ts",
+      "bytes": 333,
+      "sha256": "791bc7ca3b3d5c309929d5f9c405894d66550f1a6c91b5609b8d4e037a582c8a"
+    },
+    {
+      "path": "src/lib/file-selection.ts",
+      "bytes": 281,
+      "sha256": "98f198b6136a871c495a8a57114c895e96a93ea64f22d46b21c17fd1517ae801"
+    },
+    {
+      "path": "src/lib/gym-ai-context.ts",
+      "bytes": 3140,
+      "sha256": "855a4048f17c510a91586528cdffc5d17b6ff54bae7bc92a43551772a6328a62"
+    },
+    {
+      "path": "src/lib/gym-ai-proposal.ts",
+      "bytes": 3419,
+      "sha256": "53bfa21d99068bbed42bed3a5c44d8e10dc9fe34c21032e20114e7a53e4a944e"
+    },
+    {
+      "path": "src/lib/gym-ai.ts",
+      "bytes": 6955,
+      "sha256": "31006f51ecbc6eab6987df738d1c20f91e9c95020079360d07dc473512d06d56"
+    },
+    {
+      "path": "src/lib/gym-athlete-motion.ts",
+      "bytes": 4672,
+      "sha256": "ab3743640209ab0f8ff0ae42162d70c7fa88246360aef8d242b37c189d7b9986"
+    },
+    {
+      "path": "src/lib/gym-building.ts",
+      "bytes": 3512,
+      "sha256": "56ec654f08dd1f03a5a424f91a9ccf83fd33fdf7423d9f2157818217adef8fe6"
+    },
+    {
+      "path": "src/lib/gym-camera.ts",
+      "bytes": 582,
+      "sha256": "e6026e92960718ab93dcff7a5f7808d8faf60d67ceebbe7d0984f7a7141b22e1"
+    },
+    {
+      "path": "src/lib/gym-cardio-model.ts",
+      "bytes": 4869,
+      "sha256": "d519f78439915a44f43a011d3e5c4cf6995bee0c2647b3830870ecc197655cad"
+    },
+    {
+      "path": "src/lib/gym-catalog.ts",
+      "bytes": 6453,
+      "sha256": "f3918d11365d8bfe717b11dd82666ddc42b3ed7a2baa6080064c91e07ffcf31b"
+    },
+    {
+      "path": "src/lib/gym-classes-floor.ts",
+      "bytes": 2406,
+      "sha256": "0efc3222dd7bd479205e5f843e2f0ccac9e8bcb120bdf04a7f44132e1b5a0134"
+    },
+    {
+      "path": "src/lib/gym-daylight.ts",
+      "bytes": 2173,
+      "sha256": "ec55f0a824ef1e19f472e8df5e8e379b43cc449ba40c83637e4f2482952c4fbe"
+    },
+    {
+      "path": "src/lib/gym-editor-draft.ts",
+      "bytes": 5313,
+      "sha256": "2aac6389ad3d011ea30dbd9840bcec6f4c3b45d8c90e5f2f84eb67092a2235af"
+    },
+    {
+      "path": "src/lib/gym-editor-history.ts",
+      "bytes": 1808,
+      "sha256": "da1f9d3fafc86fe7100f1e846e4e6af894dbf9202c7167feadeb5fb010920e45"
+    },
+    {
+      "path": "src/lib/gym-equipment-clearance.ts",
+      "bytes": 1892,
+      "sha256": "59d9549d7301eff398f3d6f013891ca49f7fb49527d9f0a992859a52bfa8205e"
+    },
+    {
+      "path": "src/lib/gym-equipment-pilot-space.ts",
+      "bytes": 997,
+      "sha256": "de9a160a42786f06b9f2982dfc478ff53b0762d6bc753700b8089db8ecaa236e"
+    },
+    {
+      "path": "src/lib/gym-equipment-pilot.ts",
+      "bytes": 2066,
+      "sha256": "4cb5295956d1db64cb2ff7e514854724f23639bd1c78d6c98436e2069d5115c0"
+    },
+    {
+      "path": "src/lib/gym-equipment-usage.ts",
+      "bytes": 1107,
+      "sha256": "e7bc34f86aa8fcb44c9c6ffcb3be27dac3175201c056421109e74499bc6297d6"
+    },
+    {
+      "path": "src/lib/gym-floor-photography.ts",
+      "bytes": 1611,
+      "sha256": "21dbcaf1b2724c9afa3a63648590551e4e14a581abe8707c29bfa19cc8758538"
+    },
+    {
+      "path": "src/lib/gym-graphics.ts",
+      "bytes": 1306,
+      "sha256": "1648956a9eeb3d9696ebd4127f8b93ec829cc3341196388b8fa714cfabe772a4"
+    },
+    {
+      "path": "src/lib/gym-imported-equipment.ts",
+      "bytes": 4947,
+      "sha256": "f8879c0728f899cf952ab85878128aa912040df69449d2a1b1e3af2202dc0436"
+    },
+    {
+      "path": "src/lib/gym-interior.ts",
+      "bytes": 3682,
+      "sha256": "8c6c345d69ea125020f3cf36a7eb4c2a9db4f7d98f6f5caba1704cf4d857e536"
+    },
+    {
+      "path": "src/lib/gym-layout.ts",
+      "bytes": 6041,
+      "sha256": "d53368fc0c990f395c5f6e810236d597c8feac716c32dabb1689a56e331ab28f"
+    },
+    {
+      "path": "src/lib/gym-login-handoff.ts",
+      "bytes": 1941,
+      "sha256": "8ced773e38becdea9e4947aaffba28f5c302b67134279c55cc88b1b0b742e227"
+    },
+    {
+      "path": "src/lib/gym-model-assembly.ts",
+      "bytes": 2597,
+      "sha256": "a626d4b5d281cac3584e60063a53abc4d45452a58cf3a8a11d57101feca3a2f6"
+    },
+    {
+      "path": "src/lib/gym-pbr-textures.ts",
+      "bytes": 4041,
+      "sha256": "3ea71743c85637d517a4302cb10a0f2a9624bbdb26d0dd797e66c8442f93c196"
+    },
+    {
+      "path": "src/lib/gym-people-assets.ts",
+      "bytes": 662,
+      "sha256": "c09dd43712bef439476351916c5b48df4cfb6b2de4c8cbc5f5112ea4eaaeb1ff"
+    },
+    {
+      "path": "src/lib/gym-people-geometry.ts",
+      "bytes": 8058,
+      "sha256": "7bc3d71697db33d294046f943a6cac22ca49d38e09ccf86f1e7eaf56e04252ab"
+    },
+    {
+      "path": "src/lib/gym-plate-strength.ts",
+      "bytes": 1907,
+      "sha256": "2e930a46c6026b1430d2bac15b255cf30a555b294c291348a7db366304575a73"
+    },
+    {
+      "path": "src/lib/gym-presentation.ts",
+      "bytes": 4604,
+      "sha256": "2ad16e11643a8208af4076286de8586e75989c33b53d1c0b6d2c175976facc66"
+    },
+    {
+      "path": "src/lib/gym-real-equipment.ts",
+      "bytes": 3831,
+      "sha256": "77bb8f2d74e9d539eae40bee267cd257bc7c38ba8e0d4babd77ad2d08ef4494a"
+    },
+    {
+      "path": "src/lib/gym-reference-assets.ts",
+      "bytes": 1600,
+      "sha256": "cbef9effa053567d9d27342c08c9b47ed930e9ce01e8de69984f504a3c6674db"
+    },
+    {
+      "path": "src/lib/gym-reference-camera.ts",
+      "bytes": 1185,
+      "sha256": "dad5e7b1f1ef6a9aed9d75049d0c6f4352800e5ef64b20d941089d93c6045df6"
+    },
+    {
+      "path": "src/lib/gym-reference-identity.ts",
+      "bytes": 718,
+      "sha256": "14c74852b3608b7d32d71ac5e2ac8d57938038eb67ff90f9658fce7ac07b2867"
+    },
+    {
+      "path": "src/lib/gym-reference-models.d.ts",
+      "bytes": 420,
+      "sha256": "3e471f2f592fded8a230148cf9bf22812c070f53d380dbea2ff41b1d20d5058f"
+    },
+    {
+      "path": "src/lib/gym-reference-models.js",
+      "bytes": 13859,
+      "sha256": "ee8b69bdcba1d0651d67f611943d86dd82ef89bf0c9b6dfbcb33c9bcc54be2fa"
+    },
+    {
+      "path": "src/lib/gym-reference-surfaces.ts",
+      "bytes": 974,
+      "sha256": "336dd8c3182e0bb7bf27ef9a2915fc1b1342589e242cd369d9f0cec9ea7694ba"
+    },
+    {
+      "path": "src/lib/gym-room-shape.ts",
+      "bytes": 604,
+      "sha256": "fee12bf43fe728595e0821c2b120e99e893450081757609e412c6b132a857825"
+    },
+    {
+      "path": "src/lib/gym-space-edit.ts",
+      "bytes": 4076,
+      "sha256": "c329980ed7ca1243c12b35ee1d30a89da23babe477cd28bbc0ef3e3381d25efd"
+    },
+    {
+      "path": "src/lib/gym-space.ts",
+      "bytes": 18414,
+      "sha256": "b7d7295060cce7de11f73063242287dc6b49bc83f6a969348e2a0f0fb38a42c3"
+    },
+    {
+      "path": "src/lib/gym-strength-catalog.ts",
+      "bytes": 1980,
+      "sha256": "cb0f431a2a4151fc4a7065d53c1bc71277c1e499e3eb8069497be9309896aa1c"
+    },
+    {
+      "path": "src/lib/gym-strength-interior.ts",
+      "bytes": 2750,
+      "sha256": "5b909c64c12c19d8ab8c0d1ace0f11f862cab52f73284afaada7b27f28b87d35"
+    },
+    {
+      "path": "src/lib/gym-strength-model.ts",
+      "bytes": 15395,
+      "sha256": "2a827c0890feb1f4fa8da8352636715f77d3a9cd3d055ebcfdf825f41974ee13"
+    },
+    {
+      "path": "src/lib/gym-studio.ts",
+      "bytes": 7646,
+      "sha256": "372147682d8aec44c3971272583cd9985f0ccc63348024b350f2d401c4cef0a3"
+    },
+    {
+      "path": "src/lib/gym-surface.ts",
+      "bytes": 1092,
+      "sha256": "030c5c86897bb2d4f9422708858d26da2c1dba7712ff0d56d8c85731d6eeed5d"
+    },
+    {
+      "path": "src/lib/gym-visualization.ts",
+      "bytes": 3007,
+      "sha256": "7ac146ce9557943269d9425500b72b1252d805a9b273075583918a59e7e1051f"
+    },
+    {
+      "path": "src/lib/gym-zoning.ts",
+      "bytes": 10340,
+      "sha256": "cf7d47fe35cebeec48b1ecaf152cd8f8dc52844b92207fc8f2cee30c7ca2af47"
+    },
+    {
+      "path": "src/lib/journeys.ts",
+      "bytes": 1239,
+      "sha256": "e6e415aaa4ce7f067f4c3437cd868dff3eb47bda0298d2b7361ee8e91c84c8d8"
+    },
+    {
+      "path": "src/lib/json-response.ts",
+      "bytes": 951,
+      "sha256": "bf46cb18d9b3b3223c045fe1176ebbb69e765350f8bae4f6805c90e8411f8997"
+    },
+    {
+      "path": "src/lib/logout-client.ts",
+      "bytes": 291,
+      "sha256": "ac63a824b288786d0240b2298ca176a78c9b2e9f5a45dcbcc026f77b34bcaff0"
+    },
+    {
+      "path": "src/lib/markets.ts",
+      "bytes": 712,
+      "sha256": "28f2d1f7d833f194183c03781777743811f9d88441400a276fb9606873324c39"
+    },
+    {
+      "path": "src/lib/mobile/billing-config.ts",
+      "bytes": 1631,
+      "sha256": "2714bd9b239b5fc954adcfb70e8b6120f9441187911a3fa664cd52416fae60a8"
+    },
+    {
+      "path": "src/lib/mobile/billing-contract.ts",
+      "bytes": 1482,
+      "sha256": "2934fe6800efc69de8ffb06fb0e60e8bf671f75f739e4436ebdc0c330688b480"
+    },
+    {
+      "path": "src/lib/mobile/billing-server.ts",
+      "bytes": 923,
+      "sha256": "da42f0dbd79aeb8da6e13464234ed443da35e0927f48c35f63d012c9b976d052"
+    },
+    {
+      "path": "src/lib/mobile/billing-verifier.ts",
+      "bytes": 3157,
+      "sha256": "6398ee775228bdd403a5e9ef903506e33729f010f51e15b63467c666ae2265ea"
+    },
+    {
+      "path": "src/lib/model-texture-policy.ts",
+      "bytes": 625,
+      "sha256": "91f0cfc95dd6847956f72a5794b01045e1e479f523f081727495f73622024145"
+    },
+    {
+      "path": "src/lib/newsletter-server.ts",
+      "bytes": 826,
+      "sha256": "1b6aa46c3f8e4ea5a890be34432f48630630902e9c6e0b62444e87fda244dc06"
+    },
+    {
+      "path": "src/lib/newsletter-token.ts",
+      "bytes": 595,
+      "sha256": "06d1b5bf62607e7a581789e85078980bd63a4ad1781d24d5eac78b6bddbb16b0"
+    },
+    {
+      "path": "src/lib/password.ts",
+      "bytes": 1045,
+      "sha256": "a3561580b5c4484ccda20329e91d7cb50868bdcd6b0188d70c35bd67aed57a28"
+    },
+    {
+      "path": "src/lib/plans.ts",
+      "bytes": 248,
+      "sha256": "3666fd90f46f0cbaf4ec316621c937d4a3a8c581dd23b42413712562e4b6e7d1"
+    },
+    {
+      "path": "src/lib/product-image-upload.ts",
+      "bytes": 1370,
+      "sha256": "8a3e12315b831f54c520d6dafb89817eedbd75c9b9d7932cc1ea057904002652"
+    },
+    {
+      "path": "src/lib/promotions.ts",
+      "bytes": 1135,
+      "sha256": "245b1e28e25397a383c71d1cf9c50d4c9544b7b9191b451501142592ce286708"
+    },
+    {
+      "path": "src/lib/rate-limit.ts",
+      "bytes": 2509,
+      "sha256": "93a475367531514cc7eb455277072f5dcfa75fd22059dcac12c3d0c1d3ebedf1"
+    },
+    {
+      "path": "src/lib/registration-upload-server.ts",
+      "bytes": 1032,
+      "sha256": "e7f660a0be2198d72c35d67e15e0af104cd970284db765de610754132d9e78bf"
+    },
+    {
+      "path": "src/lib/sanitize.ts",
+      "bytes": 5342,
+      "sha256": "af18b9650a7fbbce3c217a7d9a407bbc3bfa4b643f83e5f40dcae3dea1b6c95c"
+    },
+    {
+      "path": "src/lib/session-server.ts",
+      "bytes": 1271,
+      "sha256": "7d6fc1d50c67ea63a4f0d7937e51b545470277a872abb2e2cef8c311de01b3c8"
+    },
+    {
+      "path": "src/lib/session.ts",
+      "bytes": 1480,
+      "sha256": "3a22d8f0f40d39215d4bf189c374b1b874871b02791d3fa2c06cf70eca7e927e"
+    },
+    {
+      "path": "src/lib/supabase.ts",
+      "bytes": 570,
+      "sha256": "564f887b3aa6f2d06a3a9a153a71fa58bc2938a938865aa8ffe92cce4d1e0634"
+    },
+    {
+      "path": "src/lib/supplier-contact.ts",
+      "bytes": 1359,
+      "sha256": "a99204dd6d6a877f74e31ba9d753774b07fb507ad11d219d2ffa8640f65787d0"
+    },
+    {
+      "path": "src/lib/supplier-countries.ts",
+      "bytes": 1190,
+      "sha256": "9a69ee6cef0429e06a2b254693fecde866a5440e273fd57274d5eead1db22b2f"
+    },
+    {
+      "path": "src/lib/supplier-decision.ts",
+      "bytes": 887,
+      "sha256": "c0bd3704924805f81eb51a0a49764bfe0a9692a16f19daf75f79694072b98caf"
+    },
+    {
+      "path": "src/lib/utils.ts",
+      "bytes": 736,
+      "sha256": "e5c27b36b491061738f3e856a057de36dccdf66dfe15cd5460d9fcd609adb4fa"
+    },
+    {
+      "path": "src/lib/validation.ts",
+      "bytes": 2497,
+      "sha256": "0b3c54a3d4866aa2c003c1f562ce97b9080bec1ac3479735c144780a04c51574"
+    },
+    {
+      "path": "src/middleware.ts",
+      "bytes": 1302,
+      "sha256": "4f592d56490d7d3cfc08719496198e76f4ab1527530727086548bd4675269393"
+    },
+    {
+      "path": "src/pages/_document.tsx",
+      "bytes": 316,
+      "sha256": "419c090d0b34567f8a70acbdd259f3e49ea5a58b6e6115321516b668d73c7016"
+    },
+    {
+      "path": "src/pages/_error.tsx",
+      "bytes": 1230,
+      "sha256": "0299dea93ea02ea026ae32df9bdf3eefbee86efdc30db209c5ce2752c8d713a7"
+    },
+    {
+      "path": "src/store/auth.ts",
+      "bytes": 899,
+      "sha256": "10f4abe79d717d7eb9c83949e77ed32c3d5fd3ac64beaff4cc0f8628f1f9d487"
+    },
+    {
+      "path": "src/store/cart.ts",
+      "bytes": 2310,
+      "sha256": "67f7367ab99ce686b8c2d3d1ad04ad9c0e90a62e5fe89289f0414ac19fddaaaf"
+    },
+    {
+      "path": "src/store/compare.ts",
+      "bytes": 1206,
+      "sha256": "f0e4304383281f0950cf565193d54f1d57432614aaffd623422fabbff4bfa9c1"
+    },
+    {
+      "path": "src/types/database.generated.ts",
+      "bytes": 44346,
+      "sha256": "6480ce2856fef9fca6ca54875779976133dd7d2b5c08c715c9d8d0ed4b19f1db"
+    },
+    {
+      "path": "src/types/database.ts",
+      "bytes": 759,
+      "sha256": "92dcc005f7b21a4d1b87dd3717c8a5610a674800628cf444b5c54e9900718015"
+    },
+    {
+      "path": "tailwind.config.ts",
+      "bytes": 1832,
+      "sha256": "a4802b58f282f9c554fa74523e231ce5bf829c7968bc3f3a4b4729a15c635869"
+    },
+    {
+      "path": "tsconfig.json",
+      "bytes": 724,
+      "sha256": "9ccb5023563b571ff82d3d5d39c4ff82851bc61e7c99cae16eb3b0d171929484"
+    }
+  ]
+}

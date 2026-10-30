@@ -1,0 +1,10 @@
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+DO $$ BEGIN IF NOT EXISTS(SELECT FROM pg_roles WHERE rolname='anon') THEN CREATE ROLE anon; END IF; IF NOT EXISTS(SELECT FROM pg_roles WHERE rolname='authenticated') THEN CREATE ROLE authenticated; END IF; IF NOT EXISTS(SELECT FROM pg_roles WHERE rolname='service_role') THEN CREATE ROLE service_role; END IF; END $$;
+CREATE TYPE public.promotion_type AS ENUM('oferta_zilei','anunturile_zilei','super_pret');
+CREATE TABLE public.users(id uuid PRIMARY KEY);
+CREATE TABLE public.supplier_profiles(id uuid PRIMARY KEY,user_id uuid REFERENCES public.users,status text);
+CREATE TABLE public.products(id uuid PRIMARY KEY,supplier_id uuid REFERENCES public.supplier_profiles,name text,description text,price_eur numeric,images text[],status text);
+CREATE TABLE public.promotions(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),supplier_id uuid REFERENCES public.supplier_profiles,product_id uuid REFERENCES public.products,title text,description text,type promotion_type,price_eur numeric,image_url text,starts_at timestamptz,ends_at timestamptz,status text,EXCLUDE USING gist(tstzrange(starts_at,ends_at,'[)') WITH &&) WHERE(type='oferta_zilei' AND status IN ('pending','active')));
+INSERT INTO public.users VALUES('00000000-0000-4000-8000-000000000001');
+INSERT INTO public.supplier_profiles VALUES('00000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000001','approved');
+INSERT INTO public.products VALUES('00000000-0000-4000-8000-000000000003','00000000-0000-4000-8000-000000000002','Fixture product','Fixture only',1234,ARRAY['https://example.test/image.png'],'active');

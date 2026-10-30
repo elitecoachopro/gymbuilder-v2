@@ -1,8 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { validUnsubscribeToken } from '@/lib/newsletter-token';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
@@ -11,10 +14,10 @@ function getSupabase() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email } = body;
+    const { email, token } = body;
 
-    if (!email) {
-      return NextResponse.json({ error: 'Email obligatoriu.' }, { status: 400 });
+    if (typeof email !== 'string' || !validUnsubscribeToken(email, token)) {
+      return await localizedJson({ error: 'Email obligatoriu.' }, { status: 403 });
     }
 
     const supabase = getSupabase();
@@ -25,11 +28,11 @@ export async function POST(request: NextRequest) {
       .eq('email', email.trim().toLowerCase());
 
     if (error) {
-      return NextResponse.json({ error: 'Eroare la dezabonare.' }, { status: 500 });
+      return await localizedJson({ error: 'Eroare la dezabonare.' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true });
+    return await localizedJson({ success: true });
   } catch {
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă.' }, { status: 500 });
   }
 }

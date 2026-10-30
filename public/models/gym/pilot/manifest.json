@@ -1,0 +1,692 @@
+[
+  {
+    "id": "cad_treadmill",
+    "url": "/models/gym/pilot/cad_treadmill.glb",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/treadmill-gym-equipment-f58c0bc4",
+    "license": "CC0-1.0",
+    "author": "Innerscene",
+    "sourceAsset": "/models/gym/innerscene/cad_treadmill.glb",
+    "sourceSha256": "450c26e3104cd15b17d4dee992305a6207c4acba16994cf730b4da78359e8ae4",
+    "sha256": "ed832b1c6f8f86977af031f1d68b697a200ca75a2c49ca4066547107d85d35a3",
+    "bytes": 109216,
+    "triangles": 984,
+    "drawCalls": 10,
+    "sourceTriangles": 984,
+    "sourceDrawCalls": 28,
+    "sourceBounds": {
+      "min": [
+        -0.9750000238418579,
+        0,
+        -0.4449999928474426
+      ],
+      "max": [
+        0.9750000238418579,
+        1.409999966621399,
+        0.4449999928474426
+      ]
+    },
+    "bounds": {
+      "min": [
+        -0.9750000238418579,
+        0,
+        -0.4449999928474426
+      ],
+      "max": [
+        0.9750000238418579,
+        1.409999966621399,
+        0.4449999928474426
+      ]
+    },
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "transforms": [
+      "geometry and metre proportions retained",
+      "authored 128px embedded normal maps",
+      "MikkTSpace tangents",
+      "join identical finishes; preserve printed decals and surface roles"
+    ],
+    "modelDimensions": {
+      "length_m": 1.9500000476837158,
+      "width_m": 0.8899999856948853,
+      "height_m": 1.409999966621399
+    },
+    "catalogueDimensions": {
+      "length_m": 1.95,
+      "width_m": 0.89,
+      "height_m": 1.41
+    },
+    "dimensionBasis": "measured-model-bounds",
+    "manufacturerCertified": false,
+    "rightsReview": {
+      "id": "cad_treadmill",
+      "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/treadmill-gym-equipment-f58c0bc4",
+      "license": "CC0-1.0",
+      "status": "verified-cc0",
+      "checkedOn": "2026-10-26",
+      "termsUrl": "https://www.innerscene.com/tools/library/terms"
+    }
+  },
+  {
+    "id": "real_spin_bike",
+    "url": "/models/gym/pilot/real_spin_bike.glb",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/indoor-spin-bike-with-front-flywheel-2bb33e74",
+    "license": "CC0-1.0",
+    "author": "Innerscene",
+    "sourceAsset": "/models/gym/precise/real_spin_bike.glb",
+    "sourceSha256": "4c9e246cac9bcd5b307b6b0632be2c8d8371170d2cadcb1b333d63ed99aed633",
+    "sha256": "66fa395a3ff8968d0145557cdd4387a56fa92ca242da778e9ddb93fdcde3f464",
+    "bytes": 1433560,
+    "triangles": 13075,
+    "drawCalls": 15,
+    "sourceTriangles": 13075,
+    "sourceDrawCalls": 15,
+    "sourceBounds": {
+      "min": [
+        -0.5612990260124207,
+        0,
+        -0.27950000762939464
+      ],
+      "max": [
+        0.5612990260124207,
+        1.1489827632904053,
+        0.27950000762939464
+      ]
+    },
+    "bounds": {
+      "min": [
+        -0.5612990260124207,
+        0,
+        -0.27950000762939464
+      ],
+      "max": [
+        0.5612990260124207,
+        1.1489827632904053,
+        0.27950000762939464
+      ]
+    },
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "transforms": [
+      "geometry and metre proportions retained",
+      "authored 128px embedded normal maps",
+      "MikkTSpace tangents",
+      "join identical finishes; preserve printed decals and surface roles"
+    ],
+    "modelDimensions": {
+      "length_m": 1.1225980520248413,
+      "width_m": 0.5590000152587893,
+      "height_m": 1.1489827632904053
+    },
+    "catalogueDimensions": {
+      "length_m": 1.123,
+      "width_m": 0.56,
+      "height_m": 1.149
+    },
+    "dimensionBasis": "measured-model-bounds",
+    "manufacturerCertified": false,
+    "rightsReview": {
+      "id": "real_spin_bike",
+      "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/indoor-spin-bike-with-front-flywheel-2bb33e74",
+      "license": "CC0-1.0",
+      "status": "verified-cc0",
+      "checkedOn": "2026-10-26",
+      "termsUrl": "https://www.innerscene.com/tools/library/terms"
+    }
+  },
+  {
+    "id": "cad_elliptical",
+    "url": "/models/gym/pilot/cad_elliptical.glb",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/elliptical-gym-equipment-4457b0ef",
+    "license": "CC0-1.0",
+    "author": "Innerscene",
+    "sourceAsset": "/models/gym/innerscene/cad_elliptical.glb",
+    "sourceSha256": "7abe669f8e280b8d96f0072672c68a4b876991506e7ed7310e3dea996933bafb",
+    "sha256": "184dd58e7f144d3890f8579d230fc2ce013e86badd4ad043ef53f12c1f42015d",
+    "bytes": 176000,
+    "triangles": 2836,
+    "drawCalls": 12,
+    "sourceTriangles": 2836,
+    "sourceDrawCalls": 34,
+    "sourceBounds": {
+      "min": [
+        -0.6526674628257751,
+        0,
+        -0.3400000035762787
+      ],
+      "max": [
+        0.6526674628257751,
+        1.6755878925323486,
+        0.3400000035762787
+      ]
+    },
+    "bounds": {
+      "min": [
+        -0.6526674628257751,
+        0,
+        -0.3400000035762787
+      ],
+      "max": [
+        0.6526674628257751,
+        1.6755878925323486,
+        0.3400000035762787
+      ]
+    },
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "transforms": [
+      "geometry and metre proportions retained",
+      "authored 128px embedded normal maps",
+      "MikkTSpace tangents",
+      "join identical finishes; preserve printed decals and surface roles"
+    ],
+    "modelDimensions": {
+      "length_m": 1.3053349256515503,
+      "width_m": 0.6800000071525574,
+      "height_m": 1.6755878925323486
+    },
+    "catalogueDimensions": {
+      "length_m": 1.306,
+      "width_m": 0.68,
+      "height_m": 1.676
+    },
+    "dimensionBasis": "measured-model-bounds",
+    "manufacturerCertified": false,
+    "rightsReview": {
+      "id": "cad_elliptical",
+      "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/elliptical-gym-equipment-4457b0ef",
+      "license": "CC0-1.0",
+      "status": "verified-cc0",
+      "checkedOn": "2026-10-26",
+      "termsUrl": "https://www.innerscene.com/tools/library/terms"
+    }
+  },
+  {
+    "id": "real_rower",
+    "url": "/models/gym/pilot/real_rower.glb",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/indoor-rowing-machine-air-flywheel-26c74213",
+    "license": "CC0-1.0",
+    "author": "Innerscene",
+    "sourceAsset": "/models/gym/precise/real_rower.glb",
+    "sourceSha256": "f26df7770bd38e734d6a00d31c3195b4f869aa98e92a9f8a64fde72417077d57",
+    "sha256": "6ea9b4cff1da3cf3307fac5d19b9c739902654b879c93f147cdfa5b0b4bd2990",
+    "bytes": 1557216,
+    "triangles": 13122,
+    "drawCalls": 18,
+    "sourceTriangles": 13122,
+    "sourceDrawCalls": 18,
+    "sourceBounds": {
+      "min": [
+        -1.2057499885559082,
+        0,
+        -0.2859589159488678
+      ],
+      "max": [
+        1.2057499885559082,
+        0.9824092984199524,
+        0.2859589159488678
+      ]
+    },
+    "bounds": {
+      "min": [
+        -1.2057499885559082,
+        0,
+        -0.2859589159488678
+      ],
+      "max": [
+        1.2057499885559082,
+        0.9824092984199524,
+        0.2859589159488678
+      ]
+    },
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "transforms": [
+      "geometry and metre proportions retained",
+      "authored 128px embedded normal maps",
+      "MikkTSpace tangents",
+      "join identical finishes; preserve printed decals and surface roles"
+    ],
+    "modelDimensions": {
+      "length_m": 2.4114999771118164,
+      "width_m": 0.5719178318977356,
+      "height_m": 0.9824092984199524
+    },
+    "catalogueDimensions": {
+      "length_m": 2.412,
+      "width_m": 0.572,
+      "height_m": 0.983
+    },
+    "dimensionBasis": "measured-model-bounds",
+    "manufacturerCertified": false,
+    "rightsReview": {
+      "id": "real_rower",
+      "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/indoor-rowing-machine-air-flywheel-26c74213",
+      "license": "CC0-1.0",
+      "status": "verified-cc0",
+      "checkedOn": "2026-10-26",
+      "termsUrl": "https://www.innerscene.com/tools/library/terms"
+    }
+  },
+  {
+    "id": "real_power_rack",
+    "url": "/models/gym/pilot/real_power_rack.glb",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/power-rack-with-barbell-bumper-plates-and-strap-safeties-840f5472",
+    "license": "CC0-1.0",
+    "author": "Innerscene",
+    "sourceAsset": "/models/gym/precise/real_power_rack.glb",
+    "sourceSha256": "2ae47f49c15332df647da49a1e1b744a64a5d5cf03b38ec08b906fb7c32dac36",
+    "sha256": "dc396beb1e1ef62892fea2fe57d3aba347b8e5582183b3fbc8a2f4af0a809e45",
+    "bytes": 2498148,
+    "triangles": 36674,
+    "drawCalls": 11,
+    "sourceTriangles": 36674,
+    "sourceDrawCalls": 11,
+    "sourceBounds": {
+      "min": [
+        -0.7044999599456788,
+        0,
+        -1.100000023841858
+      ],
+      "max": [
+        0.7044999599456788,
+        2.2904999256134033,
+        1.100000023841858
+      ]
+    },
+    "bounds": {
+      "min": [
+        -0.7044999599456788,
+        0,
+        -1.100000023841858
+      ],
+      "max": [
+        0.7044999599456788,
+        2.2904999256134033,
+        1.100000023841858
+      ]
+    },
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "transforms": [
+      "geometry and metre proportions retained",
+      "authored 128px embedded normal maps",
+      "MikkTSpace tangents",
+      "join identical finishes; preserve printed decals and surface roles"
+    ],
+    "modelDimensions": {
+      "length_m": 1.4089999198913576,
+      "width_m": 2.200000047683716,
+      "height_m": 2.2904999256134033
+    },
+    "catalogueDimensions": {
+      "length_m": 1.409,
+      "width_m": 2.201,
+      "height_m": 2.291
+    },
+    "dimensionBasis": "measured-model-bounds",
+    "manufacturerCertified": false,
+    "rightsReview": {
+      "id": "real_power_rack",
+      "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/power-rack-with-barbell-bumper-plates-and-strap-safeties-840f5472",
+      "license": "CC0-1.0",
+      "status": "verified-cc0",
+      "checkedOn": "2026-10-26",
+      "termsUrl": "https://www.innerscene.com/tools/library/terms"
+    }
+  },
+  {
+    "id": "real_adjustable_bench",
+    "url": "/models/gym/pilot/real_adjustable_bench.glb",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/adjustable-workout-bench-flat-incline-decline-ff66ec07",
+    "license": "CC0-1.0",
+    "author": "Innerscene",
+    "sourceAsset": "/models/gym/precise/real_adjustable_bench.glb",
+    "sourceSha256": "638b150e4bd71a7452cefbdceb85c305ccd1f0c473b398f629cd359059ace994",
+    "sha256": "0212585d3cb1bca11e6dc34343e0e191337714130795703660424ffbe5e64bd3",
+    "bytes": 1284824,
+    "triangles": 10136,
+    "drawCalls": 11,
+    "sourceTriangles": 10136,
+    "sourceDrawCalls": 11,
+    "sourceBounds": {
+      "min": [
+        -0.694855660200119,
+        0,
+        -0.304500013589859
+      ],
+      "max": [
+        0.694855660200119,
+        0.4440000057220459,
+        0.304500013589859
+      ]
+    },
+    "bounds": {
+      "min": [
+        -0.694855660200119,
+        0,
+        -0.304500013589859
+      ],
+      "max": [
+        0.694855660200119,
+        0.4440000057220459,
+        0.304500013589859
+      ]
+    },
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "transforms": [
+      "geometry and metre proportions retained",
+      "authored 128px embedded normal maps",
+      "MikkTSpace tangents",
+      "join identical finishes; preserve printed decals and surface roles"
+    ],
+    "modelDimensions": {
+      "length_m": 1.389711320400238,
+      "width_m": 0.609000027179718,
+      "height_m": 0.4440000057220459
+    },
+    "catalogueDimensions": {
+      "length_m": 1.39,
+      "width_m": 0.61,
+      "height_m": 0.445
+    },
+    "dimensionBasis": "measured-model-bounds",
+    "manufacturerCertified": false,
+    "rightsReview": {
+      "id": "real_adjustable_bench",
+      "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/adjustable-workout-bench-flat-incline-decline-ff66ec07",
+      "license": "CC0-1.0",
+      "status": "verified-cc0",
+      "checkedOn": "2026-10-26",
+      "termsUrl": "https://www.innerscene.com/tools/library/terms"
+    }
+  },
+  {
+    "id": "cad_dumbbell_rack",
+    "url": "/models/gym/pilot/cad_dumbbell_rack.glb",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/dumbbell-rack-with-dumbbells-gym-equipment-9079ce82",
+    "license": "CC0-1.0",
+    "author": "Innerscene",
+    "sourceAsset": "/models/gym/innerscene/cad_dumbbell_rack.glb",
+    "sourceSha256": "94e54ed705a6b5f187b65c554bfadac27514010b4e912a2897de2ba817804c00",
+    "sha256": "8043c07fe30937aac0cc3e4a02db425ad40836fe6c14018c79057ec07988d95d",
+    "bytes": 393044,
+    "triangles": 7080,
+    "drawCalls": 7,
+    "sourceTriangles": 7080,
+    "sourceDrawCalls": 50,
+    "sourceBounds": {
+      "min": [
+        -0.2874999940395355,
+        0,
+        -0.7549999952316284
+      ],
+      "max": [
+        0.2874999940395355,
+        0.8914999961853027,
+        0.7549999952316284
+      ]
+    },
+    "bounds": {
+      "min": [
+        -0.2874999940395355,
+        0,
+        -0.7549999952316284
+      ],
+      "max": [
+        0.2874999940395355,
+        0.8914999961853027,
+        0.7549999952316284
+      ]
+    },
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "transforms": [
+      "geometry and metre proportions retained",
+      "authored 128px embedded normal maps",
+      "MikkTSpace tangents",
+      "join identical finishes; preserve printed decals and surface roles"
+    ],
+    "modelDimensions": {
+      "length_m": 0.574999988079071,
+      "width_m": 1.5099999904632568,
+      "height_m": 0.8914999961853027
+    },
+    "catalogueDimensions": {
+      "length_m": 0.575,
+      "width_m": 1.51,
+      "height_m": 0.892
+    },
+    "dimensionBasis": "measured-model-bounds",
+    "manufacturerCertified": false,
+    "rightsReview": {
+      "id": "cad_dumbbell_rack",
+      "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/dumbbell-rack-with-dumbbells-gym-equipment-9079ce82",
+      "license": "CC0-1.0",
+      "status": "verified-cc0",
+      "checkedOn": "2026-10-26",
+      "termsUrl": "https://www.innerscene.com/tools/library/terms"
+    }
+  },
+  {
+    "id": "cad_leg_press",
+    "url": "/models/gym/pilot/cad_leg_press.glb",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/leg-press-gym-equipment-75e948fb",
+    "license": "CC0-1.0",
+    "author": "Innerscene",
+    "sourceAsset": "/models/gym/innerscene/cad_leg_press.glb",
+    "sourceSha256": "a23c4b34d951b2f37543690969311dd6a486f58f04c387be99540c3ec5aa6aef",
+    "sha256": "ddb1d0e9e66e0b5c373dc189c627e5eb57c19a3a1b9519db5e360da14bfe793d",
+    "bytes": 258096,
+    "triangles": 3480,
+    "drawCalls": 11,
+    "sourceTriangles": 3480,
+    "sourceDrawCalls": 33,
+    "sourceBounds": {
+      "min": [
+        -1.0556504726409912,
+        0,
+        -0.7099999785423279
+      ],
+      "max": [
+        1.0556504726409912,
+        1.5009405612945557,
+        0.7099999785423279
+      ]
+    },
+    "bounds": {
+      "min": [
+        -1.0556504726409912,
+        0,
+        -0.7099999785423279
+      ],
+      "max": [
+        1.0556504726409912,
+        1.5009405612945557,
+        0.7099999785423279
+      ]
+    },
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "transforms": [
+      "geometry and metre proportions retained",
+      "authored 128px embedded normal maps",
+      "MikkTSpace tangents",
+      "join identical finishes; preserve printed decals and surface roles"
+    ],
+    "modelDimensions": {
+      "length_m": 2.1113009452819824,
+      "width_m": 1.4199999570846558,
+      "height_m": 1.5009405612945557
+    },
+    "catalogueDimensions": {
+      "length_m": 2.112,
+      "width_m": 1.42,
+      "height_m": 1.501
+    },
+    "dimensionBasis": "measured-model-bounds",
+    "manufacturerCertified": false,
+    "rightsReview": {
+      "id": "cad_leg_press",
+      "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/leg-press-gym-equipment-75e948fb",
+      "license": "CC0-1.0",
+      "status": "verified-cc0",
+      "checkedOn": "2026-10-26",
+      "termsUrl": "https://www.innerscene.com/tools/library/terms"
+    }
+  },
+  {
+    "id": "real_cable_crossover",
+    "url": "/models/gym/pilot/real_cable_crossover.glb",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/cable-crossover-gym-machine-with-twin-weight-stacks-b49bb811",
+    "license": "CC0-1.0",
+    "author": "Innerscene",
+    "sourceAsset": "/models/gym/precise/real_cable_crossover.glb",
+    "sourceSha256": "afc896c8f8984fa7cdbd73145dd9be624d544eb5ac74fc9e0e1892df203e9268",
+    "sha256": "7eaeefa7e29a6cdb6df887c042b5b9fd724f9567fe9c80b33a1bb9c26b305a01",
+    "bytes": 2575144,
+    "triangles": 30743,
+    "drawCalls": 14,
+    "sourceTriangles": 30743,
+    "sourceDrawCalls": 14,
+    "sourceBounds": {
+      "min": [
+        -0.5182499885559085,
+        0,
+        -1.784500002861023
+      ],
+      "max": [
+        0.5182499885559085,
+        2.2543673515319824,
+        1.784500002861023
+      ]
+    },
+    "bounds": {
+      "min": [
+        -0.5182499885559085,
+        0,
+        -1.784500002861023
+      ],
+      "max": [
+        0.5182499885559085,
+        2.2543673515319824,
+        1.784500002861023
+      ]
+    },
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "transforms": [
+      "geometry and metre proportions retained",
+      "authored 128px embedded normal maps",
+      "MikkTSpace tangents",
+      "join identical finishes; preserve printed decals and surface roles"
+    ],
+    "modelDimensions": {
+      "length_m": 1.036499977111817,
+      "width_m": 3.569000005722046,
+      "height_m": 2.2543673515319824
+    },
+    "catalogueDimensions": {
+      "length_m": 1.037,
+      "width_m": 3.57,
+      "height_m": 2.255
+    },
+    "dimensionBasis": "measured-model-bounds",
+    "manufacturerCertified": false,
+    "rightsReview": {
+      "id": "real_cable_crossover",
+      "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/cable-crossover-gym-machine-with-twin-weight-stacks-b49bb811",
+      "license": "CC0-1.0",
+      "status": "verified-cc0",
+      "checkedOn": "2026-10-26",
+      "termsUrl": "https://www.innerscene.com/tools/library/terms"
+    }
+  },
+  {
+    "id": "real_multigym",
+    "url": "/models/gym/pilot/real_multigym.glb",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/home-multigym-with-90-kg-weight-stack-press-arms-lat-pulldow-562d8bde",
+    "license": "CC0-1.0",
+    "author": "Innerscene",
+    "sourceAsset": "/models/gym/precise/real_multigym.glb",
+    "sourceSha256": "985d4ef13d5af3d3522321df77a5fdca9aa503f3d78f5e603fb33c3a08b47b4e",
+    "sha256": "72229800d23e7e453140bab9d23cf95297da73208c22925c031c0bb284f32f4d",
+    "bytes": 2521060,
+    "triangles": 28549,
+    "drawCalls": 16,
+    "sourceTriangles": 28549,
+    "sourceDrawCalls": 16,
+    "sourceBounds": {
+      "min": [
+        -0.8522500097751617,
+        0,
+        -0.6098235845565796
+      ],
+      "max": [
+        0.8522500097751619,
+        2.1506998538970947,
+        0.6098235845565796
+      ]
+    },
+    "bounds": {
+      "min": [
+        -0.8522500097751617,
+        0,
+        -0.6098235845565796
+      ],
+      "max": [
+        0.8522500097751619,
+        2.1506998538970947,
+        0.6098235845565796
+      ]
+    },
+    "validation": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "transforms": [
+      "geometry and metre proportions retained",
+      "authored 128px embedded normal maps",
+      "MikkTSpace tangents",
+      "join identical finishes; preserve printed decals and surface roles"
+    ],
+    "modelDimensions": {
+      "length_m": 1.7045000195503235,
+      "width_m": 1.2196471691131592,
+      "height_m": 2.1506998538970947
+    },
+    "catalogueDimensions": {
+      "length_m": 1.705,
+      "width_m": 1.22,
+      "height_m": 2.151
+    },
+    "dimensionBasis": "measured-model-bounds",
+    "manufacturerCertified": false,
+    "rightsReview": {
+      "id": "real_multigym",
+      "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/home-multigym-with-90-kg-weight-stack-press-arms-lat-pulldow-562d8bde",
+      "license": "CC0-1.0",
+      "status": "verified-cc0",
+      "checkedOn": "2026-10-26",
+      "termsUrl": "https://www.innerscene.com/tools/library/terms"
+    }
+  }
+]

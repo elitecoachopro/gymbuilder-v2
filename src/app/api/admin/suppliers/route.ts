@@ -1,6 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { registrationBucket } from '@/lib/registration-upload-server';
+import { getSessionUser } from '@/lib/session-server';
+import { sendSupplierEmail, supplierDecisionResult } from '@/lib/supplier-decision';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import crypto from 'crypto';
 
 function escapeHtml(str: string): string {
   if (!str) return '';
@@ -13,106 +17,43 @@ function escapeHtml(str: string): string {
 }
 
 function getSupabaseAdmin() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
-// Send email via Resend
-async function sendEmail(to: string, subject: string, html: string) {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.error('RESEND_API_KEY not configured');
-    return false;
-  }
-
-  try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'GymBuilder <noreply@gymbuilder.app>',
-        to: [to],
-        subject,
-        html,
-      }),
-    });
-
-    if (!res.ok) {
-      const err = await res.text();
-      console.error('Resend error:', err);
-      return false;
-    }
-    return true;
-  } catch (err) {
-    console.error('Email send error:', err);
-    return false;
-  }
-}
-
 // Verify session token and check admin role
-async function verifyAdmin(request: NextRequest) {
-  const sessionToken = request.cookies.get('session_token')?.value;
-  if (!sessionToken) return null;
-
-  try {
-    const [payloadB64, hmac] = sessionToken.split('.');
-    if (!payloadB64 || !hmac) return null;
-    const payloadStr = Buffer.from(payloadB64, 'base64').toString();
-    const payload = JSON.parse(payloadStr);
-
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!secret) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
-    const expectedHmac = crypto.createHmac('sha256', secret).update(payloadStr).digest('hex');
-    if (hmac !== expectedHmac) return null;
-
-    if (Date.now() > payload.exp) return null;
-
-    const supabase = getSupabaseAdmin();
-    const { data: user } = await supabase
-      .from('users')
-      .select('id, role')
-      .eq('id', payload.userId)
-      .single();
-
-    if (!user || user.role !== 'admin') return null;
-    return user;
-  } catch {
-    return null;
-  }
-}
+async function verifyAdmin(_request?: unknown) { const user = await getSessionUser(); return user?.role === 'admin' ? user : null; }
 
 // GET: List suppliers by status + count pending
 export async function GET(request: NextRequest) {
   const admin = await verifyAdmin(request);
   if (!admin) {
-    return NextResponse.json({ error: 'Acces interzis.' }, { status: 403 });
+    return await localizedJson({ error: 'Acces interzis.' }, { status: 403 });
   }
 
   const supabase = getSupabaseAdmin();
   const { searchParams } = new URL(request.url);
   const status = searchParams.get('status') || 'pending';
 
+  if (!['pending', 'approved', 'rejected'].includes(status)) return await localizedJson({ error: 'Date invalide.' }, { status: 400 });
   // Get suppliers with the requested status (no join to avoid FK detection issues)
   const { data: suppliers, error } = await supabase
     .from('supplier_profiles')
-    .select('id, user_id, company_name, country, city, website, phone, description, status, plan, verified, created_at, verification_photos')
-    .eq('status', status)
+    .select('id, user_id, company_name, country, city, website, phone, description, status, plan, verified, created_at, verification_photos, requested_plan')
+    .eq('status', status as Database['public']['Enums']['supplier_status'])
     .order('created_at', { ascending: false });
 
   if (error) {
     console.error('Admin suppliers fetch error:', error);
-    return NextResponse.json({ error: 'Eroare la incarcarea furnizorilor.', debug: error.message }, { status: 500 });
+    return await localizedJson({ error: 'Eroare la incarcarea furnizorilor.', debug: error.message }, { status: 500 });
   }
 
   // Enrich with user info via separate query
   const enrichedSuppliers = [];
   if (suppliers && suppliers.length > 0) {
-    const userIds = suppliers.map(s => s.user_id);
+    const userIds = suppliers.map(s => s.user_id).filter((id): id is string => !!id);
     const { data: users } = await supabase
       .from('users')
       .select('id, full_name, email')
@@ -121,9 +62,16 @@ export async function GET(request: NextRequest) {
     const userMap = new Map((users || []).map(u => [u.id, u]));
 
     for (const supplier of suppliers) {
-      const user = userMap.get(supplier.user_id);
+      const user = userMap.get(supplier.user_id || '');
+      const paths = Array.isArray(supplier.verification_photos) ? supplier.verification_photos.filter((path: unknown): path is string => typeof path === 'string') : [];
+      const verificationPhotos = await Promise.all(paths.map(async (path: string) => {
+        if (/^https?:\/\//.test(path)) return path;
+        const { data } = await supabase.storage.from(registrationBucket).createSignedUrl(path, 3600);
+        return data?.signedUrl || null;
+      }));
       enrichedSuppliers.push({
         ...supplier,
+        verification_photos: verificationPhotos.filter(Boolean),
         full_name: user?.full_name || 'N/A',
         email: user?.email || 'N/A',
       });
@@ -136,7 +84,7 @@ export async function GET(request: NextRequest) {
     .select('id', { count: 'exact', head: true })
     .eq('status', 'pending');
 
-  return NextResponse.json({
+  return await localizedJson({
     suppliers: enrichedSuppliers,
     pendingCount: pendingCount || 0,
   });
@@ -146,7 +94,7 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const admin = await verifyAdmin(request);
   if (!admin) {
-    return NextResponse.json({ error: 'Acces interzis.' }, { status: 403 });
+    return await localizedJson({ error: 'Acces interzis.' }, { status: 403 });
   }
 
   try {
@@ -154,7 +102,7 @@ export async function PATCH(request: NextRequest) {
     const { supplierId, action, reason } = body;
 
     if (!supplierId || !['approve', 'reject', 'verify', 'unverify'].includes(action)) {
-      return NextResponse.json(
+      return await localizedJson(
         { error: 'Parametri invalizi. Trebuie supplierId si action (approve/reject/verify/unverify).' },
         { status: 400 }
       );
@@ -171,10 +119,10 @@ export async function PATCH(request: NextRequest) {
         .single();
 
       if (error) {
-        return NextResponse.json({ error: 'Eroare la actualizare.' }, { status: 500 });
+        return await localizedJson({ error: 'Eroare la actualizare.' }, { status: 500 });
       }
 
-      return NextResponse.json({
+      return await localizedJson({
         success: true,
         message: action === 'verify'
           ? `Furnizorul "${data.company_name}" a fost marcat ca verificat.`
@@ -194,15 +142,15 @@ export async function PATCH(request: NextRequest) {
       .single();
 
     if (!supplierInfo) {
-      return NextResponse.json({ error: 'Furnizor negasit.' }, { status: 404 });
+      return await localizedJson({ error: 'Furnizor negasit.' }, { status: 404 });
     }
 
     // Get user email via separate query (avoids join issues)
-    const { data: userData } = await supabase
+    const { data: userData } = supplierInfo.user_id ? await supabase
       .from('users')
       .select('full_name, email')
       .eq('id', supplierInfo.user_id)
-      .single();
+      .single() : { data: null };
 
     // Update status
     const { data, error } = await supabase
@@ -214,7 +162,7 @@ export async function PATCH(request: NextRequest) {
 
     if (error) {
       console.error('Admin supplier update error:', error);
-      return NextResponse.json({ error: 'Eroare la actualizarea statusului.' }, { status: 500 });
+      return await localizedJson({ error: 'Eroare la actualizarea statusului.' }, { status: 500 });
     }
 
     // Send email notification
@@ -223,20 +171,21 @@ export async function PATCH(request: NextRequest) {
     const companyName = supplierInfo.company_name;
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gymbuilder.app';
 
+    let emailSent = false;
     if (userEmail) {
       if (action === 'approve') {
-        await sendEmail(
+        emailSent = await sendSupplierEmail(
           userEmail,
-          'Contul tau GymBuilder a fost aprobat',
+          'Contul tau Gym Builder a fost aprobat',
           `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #1a1a1a; color: #ffffff;">
             <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #f5c542; font-size: 28px; margin: 0;">GymBuilder</h1>
+              <h1 style="color: #f5c542; font-size: 28px; margin: 0;">Gym Builder</h1>
             </div>
             <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
               <h2 style="color: #4ade80; margin-top: 0;">Felicitari, ${escapeHtml(userName)}!</h2>
               <p style="color: #d1d5db; line-height: 1.6;">
-                Contul tau de furnizor <strong style="color: #f5c542;">${escapeHtml(companyName)}</strong> a fost aprobat cu succes pe platforma GymBuilder.
+                Contul tau de furnizor <strong style="color: #f5c542;">${escapeHtml(companyName)}</strong> a fost aprobat cu succes pe platforma Gym Builder.
               </p>
               <p style="color: #d1d5db; line-height: 1.6;">Acum poti:</p>
               <ul style="color: #d1d5db; line-height: 2;">
@@ -251,19 +200,20 @@ export async function PATCH(request: NextRequest) {
               </div>
             </div>
             <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 24px;">
-              &copy; ${new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
+              &copy; ${new Date().getFullYear()} Gym Builder. Toate drepturile rezervate.
             </p>
           </div>
-          `
+          `,
+          process.env.RESEND_API_KEY
         );
       } else {
-        await sendEmail(
+        emailSent = await sendSupplierEmail(
           userEmail,
           'Cererea ta a fost respinsa',
           `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #1a1a1a; color: #ffffff;">
             <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #f5c542; font-size: 28px; margin: 0;">GymBuilder</h1>
+              <h1 style="color: #f5c542; font-size: 28px; margin: 0;">Gym Builder</h1>
             </div>
             <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
               <h2 style="color: #f87171; margin-top: 0;">Cererea ta a fost respinsa</h2>
@@ -286,10 +236,11 @@ export async function PATCH(request: NextRequest) {
               </div>
             </div>
             <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 24px;">
-              &copy; ${new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
+              &copy; ${new Date().getFullYear()} Gym Builder. Toate drepturile rezervate.
             </p>
           </div>
-          `
+          `,
+          process.env.RESEND_API_KEY
         );
       }
     }
@@ -300,17 +251,13 @@ export async function PATCH(request: NextRequest) {
       .select('id', { count: 'exact', head: true })
       .eq('status', 'pending');
 
-    return NextResponse.json({
-      success: true,
-      message: action === 'approve'
-        ? `Furnizorul "${data.company_name}" a fost aprobat. Email trimis.`
-        : `Furnizorul "${data.company_name}" a fost respins. Email trimis.`,
+    return await localizedJson({
+      ...supplierDecisionResult(data.company_name, action, emailSent),
       supplier: data,
       pendingCount: pendingCount || 0,
-      emailSent: !!userEmail,
     });
   } catch (error) {
     console.error('Admin PATCH error:', error);
-    return NextResponse.json({ error: 'Eroare interna.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare interna.' }, { status: 500 });
   }
 }

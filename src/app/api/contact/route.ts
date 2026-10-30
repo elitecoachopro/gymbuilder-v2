@@ -1,4 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
@@ -13,7 +16,7 @@ function escapeHtml(str: string): string {
 }
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
@@ -23,47 +26,36 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limiting: 5 requests per minute per IP
     const ip = getClientIP(request);
-    const result = checkRateLimit(`contact:${ip}`, { maxRequests: 5, windowMs: 60000 });
+    const result = await checkRateLimit(`contact:${ip}`, { maxRequests: 5, windowMs: 60000 });
     if (!result.allowed) {
       return rateLimitResponse(result.resetTime);
     }
 
-    const body = await request.json();
-    const { name, email, subject, message } = body;
-
-    // Validation
-    if (!name?.trim() || !email?.trim() || !subject?.trim() || !message?.trim()) {
-      return NextResponse.json(
-        { error: 'Toate câmpurile sunt obligatorii.' },
-        { status: 400 }
-      );
+    const parsed = z.object({ name: z.string().trim().min(2).max(100), email: z.string().trim().email().max(254).transform(value => value.toLowerCase()), subject: z.string().trim().min(1).max(200), message: z.string().trim().min(1).max(5000), idempotencyKey: z.string().uuid().optional() }).safeParse(await request.json());
+    if (!parsed.success) return await localizedJson({ error: 'Datele cererii sunt invalide.' }, { status: 400 });
+    const { name, email, subject, message, idempotencyKey } = parsed.data;
+    const supabase = getSupabase();
+    if (idempotencyKey) {
+      const { data: existing } = await supabase.from('contact_messages').select('id,email').eq('idempotency_key', idempotencyKey).maybeSingle();
+      if (existing) return existing.email === email ? await localizedJson({ success: true, requestId: existing.id, message: 'Mesajul a fost înregistrat.' }) : await localizedJson({ error: 'Identificator de cerere deja folosit.' }, { status: 409 });
     }
-
-    if (name.length > 100 || email.length > 100 || subject.length > 200 || message.length > 5000) {
-      return NextResponse.json(
-        { error: 'Unul sau mai multe câmpuri depășesc lungimea maximă permisă.' },
-        { status: 400 }
-      );
+    const { data: savedMsg, error: saveError } = await supabase.from('contact_messages').insert({ name, email, subject, message, status: 'unread', idempotency_key: idempotencyKey }).select('id').single();
+    if (saveError?.code === '23505' && idempotencyKey) {
+      const { data: existing } = await supabase.from('contact_messages').select('id').eq('idempotency_key', idempotencyKey).eq('email', email).maybeSingle();
+      if (existing) return await localizedJson({ success: true, requestId: existing.id, message: 'Mesajul a fost înregistrat.' });
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Adresa de email nu este validă.' },
-        { status: 400 }
-      );
+    if (saveError || !savedMsg) return await localizedJson({ error: 'Cererea nu a putut fi salvata. Incearca din nou.' }, { status: 500 });
+    const { data: admins } = await supabase.from('users').select('id').eq('role', 'admin');
+    if (admins?.length) {
+      const { error } = await supabase.from('notifications').insert(admins.map(admin => ({ user_id: admin.id, type: 'contact_message', title: `Mesaj contact: ${subject.slice(0,60)}`, message: `De la ${name} (${email}): ${message.slice(0,120)}`, link: '/admin?tab=contact', is_read: false })));
+      if (error) console.error('Contact notification could not be saved');
     }
 
     // Send email via Resend
     const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-      console.error('RESEND_API_KEY not configured');
-      return NextResponse.json(
-        { error: 'Serviciul de email nu este configurat.' },
-        { status: 500 }
-      );
-    }
-
+    if (!apiKey) return await localizedJson({ success: true, requestId: savedMsg.id, emailSent: false, message: 'Mesajul a fost înregistrat.' });
+    let emailSent = false;
+    try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -71,7 +63,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'GymBuilder Contact <noreply@gymbuilder.app>',
+        from: 'Gym Builder Contact <noreply@gymbuilder.app>',
         to: ['contact@gymbuilder.app'],
         reply_to: email.trim(),
         subject: `[Contact] ${escapeHtml(subject.trim())}`,
@@ -102,64 +94,12 @@ export async function POST(request: NextRequest) {
       }),
     });
 
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      console.error('Resend API error:', errorData);
-      return NextResponse.json(
-        { error: 'Eroare la trimiterea mesajului. Încearcă din nou.' },
-        { status: 500 }
-      );
-    }
-
-    // Save message to contact_messages table + create in-app notification
-    try {
-      const supabase = getSupabase();
-
-      // Save to contact_messages table
-      const { data: savedMsg, error: saveError } = await supabase
-        .from('contact_messages')
-        .insert({
-          name: name.trim(),
-          email: email.trim(),
-          subject: subject.trim(),
-          message: message.trim(),
-          status: 'unread',
-        })
-        .select('id')
-        .single();
-
-      if (saveError) {
-        console.error('Error saving contact message:', saveError);
-      }
-
-      // Create in-app notification for all admin users
-      const { data: adminUsers } = await supabase
-        .from('users')
-        .select('id')
-        .eq('role', 'admin')
-        .limit(5);
-
-      if (adminUsers && adminUsers.length > 0) {
-        const messageId = savedMsg?.id || '';
-        const notifications = adminUsers.map((admin: { id: string }) => ({
-          user_id: admin.id,
-          type: 'contact_message',
-          title: `Mesaj contact: ${subject.trim().substring(0, 60)}`,
-          message: `De la ${name.trim()} (${email.trim()}): ${message.trim().substring(0, 120)}`,
-          link: `/admin#contact-${messageId}`,
-          is_read: false,
-        }));
-        await supabase.from('notifications').insert(notifications);
-      }
-    } catch (notifErr) {
-      // Don't fail the request if notification/save fails
-      console.error('Admin notification/save error:', notifErr);
-    }
-
-    return NextResponse.json({ message: 'Mesajul a fost trimis cu succes!' });
+    emailSent = res.ok;
+    } catch { console.error('Contact email delivery unavailable'); }
+    return await localizedJson({ success: true, requestId: savedMsg.id, emailSent, message: 'Mesajul a fost înregistrat.' });
   } catch (error) {
     console.error('Contact form error:', error);
-    return NextResponse.json(
+    return await localizedJson(
       { error: 'Eroare internă. Încearcă din nou.' },
       { status: 500 }
     );

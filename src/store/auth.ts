@@ -1,6 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
+import { clearEditorDrafts } from '@/lib/gym-editor-draft';
 
 export interface SessionUser {
   id: string;
@@ -15,15 +16,16 @@ interface AuthState {
   isLoading: boolean;
   setUser: (user: SessionUser | null) => void;
   setLoading: (loading: boolean) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   isLoading: true,
   setUser: (user) => set({ user, isLoading: false }),
   setLoading: (isLoading) => set({ isLoading }),
-  logout: () => {
+  logout: async () => {
+    await clearEditorDrafts(get().user?.id ?? 'guest').catch(() => {});
     if (typeof window !== 'undefined') {
       localStorage.removeItem('session_token');
     }

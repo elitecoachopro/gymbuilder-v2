@@ -1,8 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { firstImage } from '@/lib/database-values';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
@@ -111,23 +114,23 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type') || 'all'; // 'all', 'products', 'suppliers'
 
     if (!query || query.length < 2) {
-      return NextResponse.json({ results: [], total: 0 });
+      return await localizedJson({ results: [], total: 0 });
     }
 
     const supabase = getSupabase();
-    const results: any[] = [];
+    const results: Array<{ type: 'product' | 'supplier'; id: string; name: string; image: string | null; score: number; category?: string; brand?: string | null; supplier?: string | null; price_eur?: number | null; listed_price_amount?: number | null; listed_price_currency?: string | null; condition?: string; description?: string | null; location?: string }> = [];
 
     if (type === 'all' || type === 'products') {
       // Fetch products with broad search
       const { data: products } = await supabase
         .from('products')
-        .select('id, name, category, brand_id, condition, price_eur, description, images, supplier_id, status')
-        .eq('status', 'active')
+        .select('id, name, category, brand_id, condition, price_eur, listed_price_amount, listed_price_currency, description, images, supplier_id, status, supplier_profiles!inner(status)')
+        .in('status', ['active', 'featured']).eq('supplier_profiles.status', 'approved')
         .limit(200);
 
       if (products && products.length > 0) {
         // Get brand names
-        const brandIds = Array.from(new Set(products.map(p => p.brand_id).filter(Boolean)));
+        const brandIds = Array.from(new Set(products.map(p => p.brand_id).filter((id): id is string => typeof id === 'string')));
         let brandMap = new Map<string, string>();
         if (brandIds.length > 0) {
           const { data: brands } = await supabase
@@ -150,7 +153,7 @@ export async function GET(request: NextRequest) {
 
         // Score and filter products
         for (const product of products) {
-          const brandName = brandMap.get(product.brand_id) || null;
+          const brandName = brandMap.get(product.brand_id || '') || null;
           const supplierName = supplierMap.get(product.supplier_id) || null;
 
           const score = calculateRelevance(query, {
@@ -170,8 +173,10 @@ export async function GET(request: NextRequest) {
               brand: brandName,
               supplier: supplierName,
               price_eur: product.price_eur,
+              listed_price_amount: product.listed_price_amount,
+              listed_price_currency: product.listed_price_currency,
               condition: product.condition,
-              image: product.images?.[0] || null,
+              image: firstImage(product.images),
               score,
             });
           }
@@ -215,12 +220,12 @@ export async function GET(request: NextRequest) {
     // Sort by relevance score (highest first)
     results.sort((a, b) => b.score - a.score);
 
-    return NextResponse.json({
+    return await localizedJson({
       results: results.slice(0, limit),
       total: results.length,
     });
   } catch (error) {
     console.error('Search API error:', error);
-    return NextResponse.json({ results: [], total: 0 }, { status: 500 });
+    return await localizedJson({ results: [], total: 0 }, { status: 500 });
   }
 }

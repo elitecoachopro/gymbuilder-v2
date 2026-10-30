@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { localizedJson } from '@/lib/json-response';
 import { cookies } from 'next/headers';
 
-export async function POST(request: NextRequest) {
-  const cookieStore = cookies();
+export async function POST() {
+  const cookieStore = await cookies();
   cookieStore.delete('session_token');
   
-  const response = NextResponse.json({ success: true });
+  const response = await localizedJson({ success: true });
   response.cookies.set('session_token', '', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

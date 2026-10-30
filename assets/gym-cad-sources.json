@@ -1,0 +1,58 @@
+[
+  [
+    "cad_treadmill",
+    "treadmill-gym-equipment-f58c0bc4",
+    "Bandă alergare CAD",
+    "Treadmill CAD",
+    "cardio",
+    3500
+  ],
+  [
+    "cad_exercise_bike",
+    "exercise-bike-gym-equipment-bef7223c",
+    "Bicicletă fitness CAD",
+    "Exercise bike CAD",
+    "cardio",
+    1100
+  ],
+  [
+    "cad_elliptical",
+    "elliptical-gym-equipment-4457b0ef",
+    "Eliptică CAD",
+    "Elliptical CAD",
+    "cardio",
+    2400
+  ],
+  [
+    "cad_squat_rack",
+    "squat-rack-gym-equipment-c1888dee",
+    "Rack squat CAD",
+    "Squat rack CAD",
+    "greutati",
+    1800
+  ],
+  [
+    "cad_adjustable_bench",
+    "adjustable-bench-gym-equipment-ec77d95e",
+    "Bancă reglabilă CAD",
+    "Adjustable bench CAD",
+    "greutati",
+    450
+  ],
+  [
+    "cad_dumbbell_rack",
+    "dumbbell-rack-with-dumbbells-gym-equipment-9079ce82",
+    "Suport gantere CAD",
+    "Dumbbell rack CAD",
+    "greutati",
+    2100
+  ],
+  [
+    "cad_leg_press",
+    "leg-press-gym-equipment-75e948fb",
+    "Presă picioare CAD",
+    "Leg press CAD",
+    "aparate",
+    3200
+  ]
+]

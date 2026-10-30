@@ -1,54 +1,42 @@
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import crypto from 'crypto';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { getSessionUser } from '@/lib/session-server';
 import { createClient } from '@supabase/supabase-js';
+import { sanitizeString } from '@/lib/sanitize';
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'contact@gymbuilder.app';
 
-function getUserFromSession(): { userId: string; email?: string; role?: string } | null {
-  const cookieStore = cookies();
-  const sessionToken = cookieStore.get('session_token')?.value;
-  if (!sessionToken) return null;
-  try {
-    const [payloadB64, signature] = sessionToken.split('.');
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || '';
-    const decodedPayload = Buffer.from(payloadB64, 'base64').toString();
-    const expected = crypto.createHmac('sha256', secret).update(decodedPayload).digest('hex');
-    if (signature !== expected) return null;
-    const data = JSON.parse(decodedPayload);
-    if (data.exp && data.exp < Date.now()) return null;
-    return { userId: data.userId, email: data.email, role: data.role };
-  } catch {
-    return null;
-  }
-}
+async function getUserFromSession(_request?: unknown) { return getSessionUser(); }
 
 export async function POST(request: Request) {
   try {
-    const user = getUserFromSession();
+    const user = await getUserFromSession();
     if (!user) {
-      return NextResponse.json({ error: 'Neautorizat' }, { status: 401 });
+      return await localizedJson({ error: 'Neautorizat' }, { status: 401 });
     }
 
-    const { reason } = await request.json().catch(() => ({ reason: '' }));
+    const body = await request.json().catch(() => null);
+    const reason = body?.reason ?? '';
+    if (!body || typeof reason !== 'string' || reason.length > 2000) {
+      return await localizedJson({ error: 'Motiv invalid (maxim 2000 de caractere).' }, { status: 400 });
+    }
 
-    // Try to log the deletion request in the database (works even if table doesn't exist)
-    try {
-      const supabaseAdmin = createClient(
+    // Success requires a durable request, even when email delivery is unavailable.
+      const supabaseAdmin = createClient<Database>(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
       );
-      await supabaseAdmin
+      const { error: persistenceError } = await supabaseAdmin
         .from('account_deletion_requests')
         .insert({
           user_id: user.userId,
-          user_email: user.email || 'unknown',
-          user_role: user.role || 'unknown',
-          reason: reason || null,
+          user_email: user.email,
+          user_role: user.role,
+          reason: reason.trim() || null,
           status: 'pending',
         });
-    } catch (dbError) {
-      console.error('Error logging deletion request (non-blocking):', dbError);
+    if (persistenceError) {
+      return await localizedJson({ error: 'Cererea nu a putut fi inregistrata. Incearca din nou.' }, { status: 500 });
     }
 
     // Send notification email to admin via Resend
@@ -62,7 +50,7 @@ export async function POST(request: Request) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'GymBuilder <noreply@gymbuilder.app>',
+            from: 'Gym Builder <noreply@gymbuilder.app>',
             to: [ADMIN_EMAIL],
             subject: `[GDPR] Cerere ștergere cont - ${user.email || user.userId}`,
             html: `
@@ -70,7 +58,7 @@ export async function POST(request: Request) {
               <p><strong>Email utilizator:</strong> ${user.email || 'N/A'}</p>
               <p><strong>ID utilizator:</strong> ${user.userId}</p>
               <p><strong>Rol:</strong> ${user.role || 'N/A'}</p>
-              <p><strong>Motiv:</strong> ${reason || 'Nu a fost specificat'}</p>
+              <p><strong>Motiv:</strong> ${sanitizeString(reason) || 'Nu a fost specificat'}</p>
               <p><strong>Data cererii:</strong> ${new Date().toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' })}</p>
               <hr />
               <p><em>Conform GDPR Art. 17, această cerere trebuie procesată în maxim 30 de zile.</em></p>
@@ -82,11 +70,11 @@ export async function POST(request: Request) {
       console.error('Email notification failed (deletion request still logged):', emailError);
     }
 
-    return NextResponse.json({
-      message: 'Cererea de ștergere a fost înregistrată. Vei primi o confirmare pe email în maxim 30 de zile.',
+    return await localizedJson({
+      message: 'Cererea de ștergere a fost înregistrată pentru procesare de către echipă.',
     });
   } catch (error) {
     console.error('Account deletion request error:', error);
-    return NextResponse.json({ error: 'Eroare internă' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă' }, { status: 500 });
   }
 }

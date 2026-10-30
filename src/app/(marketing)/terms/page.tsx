@@ -1,9 +1,12 @@
 'use client';
 
+import { useUiText } from '@/i18n/useUiText';
+
 import Footer from '@/components/layout/Footer';
 import { useClientTranslations } from '@/i18n/client';
 
 export default function TermsPage() {
+  const ui = useUiText();
   const { t } = useClientTranslations('terms');
 
   return (
@@ -38,7 +41,7 @@ export default function TermsPage() {
 
             <h2 className="text-xl font-semibold text-white mt-8">{t('s7Title')}</h2>
             <p>
-              {t('s7Text')}{' '}
+              {t('s7Text')}{ui(' ')}
               <a href="mailto:contact@gymbuilder.app" className="text-gold-400 hover:text-gold-300"> contact@gymbuilder.app</a>
             </p>
           </div>

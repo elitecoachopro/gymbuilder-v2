@@ -1,15 +1,26 @@
 'use client';
 
+import Modal from '@/components/Modal';
+import SupplierPublicContactEmail from '@/components/SupplierPublicContactEmail';
+import SuperPricePromotion, { SuperPriceRequest } from '@/components/SuperPricePromotion';
+import type { PromotionAvailability } from '@/lib/promotions';
+import { loginHref } from '@/lib/journeys';
+import { logoutClient } from '@/lib/logout-client';
+import { useSearchParams } from 'next/navigation';
+import { useUiText } from '@/i18n/useUiText';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Dumbbell, Package, Eye, TrendingUp, Plus, Edit, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox, Send, Loader2, MessageSquare, ImagePlus, Trash2, Camera, ArrowUpRight, ArrowDownRight, Minus, ChevronDown, ChevronUp, LayoutGrid } from 'lucide-react';
+import { Package, TrendingUp, Plus, BarChart3, Megaphone, Star, LogOut, X, CheckCircle2, Crown, Zap, Mail, Phone, PackagePlus, Inbox, Send, Loader2, MessageSquare, ImagePlus, Trash2, Camera, ArrowUpRight, ArrowDownRight, Minus, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import RequestChat from '@/components/RequestChat';
 import NotificationBell from '@/components/NotificationBell';
 import { useClientTranslations } from '@/i18n/client';
 
 interface SupplierData {
   id: string;
   companyName: string;
+  contactEmail: string | null;
   status: string;
   plan: string;
   planExpiresAt: string | null;
@@ -45,19 +56,22 @@ interface ContactRequest {
   created_at: string;
 }
 
-interface SlotsData {
-  ofertaZilei: { total: number; occupied: number; available: number };
-  anunturiZilei: { total: number; occupied: number; available: number };
+interface ProductAnalytics {
+  product_id: string; product_name: string; product_image: string | null; price_eur: number; status: string;
+  views_total: number; views_current_month: number; views_previous_month: number; views_change_percent: number | null;
+  requests_total: number; requests_current_month: number; requests_previous_month: number; requests_change_percent: number | null;
 }
 
+
 export default function SupplierDashboard() {
+  const ui = useUiText();
   const router = useRouter();
   const { t, locale } = useClientTranslations('supplierDashboard');
   const [toast, setToast] = useState('');
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
-  const [contactType, setContactType] = useState<'oferta' | 'anunt'>('oferta');
-  const [slots, setSlots] = useState<SlotsData | null>(null);
+  const [contactType, setContactType] = useState<'oferta' | 'weekly' | 'super'>('oferta');
+  const [slots, setSlots] = useState<PromotionAvailability | null>(null);
   const [slotsLoading, setSlotsLoading] = useState(true);
 
   // Reply states
@@ -67,10 +81,12 @@ export default function SupplierDashboard() {
   const [highlightedRequestId, setHighlightedRequestId] = useState<string | null>(null);
 
   // Chat states
-  const [openChat, setOpenChat] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const [openChat, setOpenChat] = useState<string | null>(searchParams?.get('chat') || null);
+  useEffect(() => { setOpenChat(searchParams?.get('chat') || null); }, [searchParams]);
 
   // Analytics states
-  const [analyticsData, setAnalyticsData] = useState<any[]>([]);
+  const [analyticsData, setAnalyticsData] = useState<ProductAnalytics[]>([]);
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
 
   // Gallery states
@@ -97,36 +113,40 @@ export default function SupplierDashboard() {
   ];
 
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchDashboardData() {
       try {
-        const res = await fetch('/api/supplier/dashboard');
+        const res = await fetch(`/api/supplier/dashboard?chat=${encodeURIComponent(searchParams?.get('chat') || '')}`, { signal: controller.signal });
+        if (controller.signal.aborted) return;
         if (res.status === 401) {
-          router.push('/login');
+          router.push(loginHref(`/supplier/dashboard${searchParams?.get('chat') ? `?chat=${encodeURIComponent(searchParams.get('chat')!)}` : ''}`));
           return;
         }
         if (res.status === 404) {
           setError(t('errors.noProfile'));
-          setLoading(false);
+          if (!controller.signal.aborted) setLoading(false);
           return;
         }
         if (!res.ok) {
           setError(t('errors.loadError'));
-          setLoading(false);
+          if (!controller.signal.aborted) setLoading(false);
           return;
         }
         const data = await res.json();
+        if (controller.signal.aborted) return;
         setSupplier(data.supplier);
         setStats(data.stats);
         setRecentProducts(data.recentProducts || []);
         setRecentRequests(data.recentRequests || []);
       } catch {
-        setError(t('errors.connectionError'));
+        if (!controller.signal.aborted) setError(t('errors.connectionError'));
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
     fetchDashboardData();
-  }, [router]);
+    return () => controller.abort();
+  }, [router, t, searchParams]);
 
   // Handle hash-based navigation for notification deep linking
   useEffect(() => {
@@ -206,7 +226,8 @@ export default function SupplierDashboard() {
   }, []);
 
   const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.currentTarget.files?.[0];
+    e.currentTarget.value = '';
     if (!file) return;
     if (galleryImages.length >= 10) { showToast(t('gallery.limitReached')); return; }
     setGalleryUploading(true);
@@ -226,7 +247,6 @@ export default function SupplierDashboard() {
       }
     } catch { showToast(t('gallery.uploadError')); }
     finally { setGalleryUploading(false); }
-    e.target.value = '';
   };
 
   const handleGalleryDelete = async (imageId: string) => {
@@ -248,17 +268,18 @@ export default function SupplierDashboard() {
   const handleLogout = async () => {
     setLogoutLoading(true);
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await logoutClient();
       router.push('/login');
-    } catch {
-      router.push('/login');
-    }
+    } catch { window.alert(ui('Deconectarea nu a reușit. Încearcă din nou.')); } finally { setLogoutLoading(false); }
   };
 
-  const openContactModal = (type: 'oferta' | 'anunt') => {
+  const openContactModal = (type: 'oferta' | 'weekly' | 'super') => {
     setContactType(type);
     setShowContactModal(true);
   };
+
+  const contactTitle = contactType === 'super' ? t('promotions.modalReserveSuper') : contactType === 'oferta' ? t('promotions.modalReserveOferta') : t('promotions.modalReserveWeekly');
+  const contactDescription = contactType === 'super' ? t('promotions.modalSuperDesc') : contactType === 'oferta' ? t('promotions.modalOfertaDesc') : t('promotions.modalWeeklyDesc');
 
   const dateLocale = locale === 'en' ? 'en-GB' : 'ro-RO';
 
@@ -283,7 +304,7 @@ export default function SupplierDashboard() {
             <X className="w-8 h-8 text-red-400" />
           </div>
           <h2 className="text-xl font-bold text-white mb-2">{t('errors.title')}</h2>
-          <p className="text-anthracite-400 mb-6">{error}</p>
+          <p className="text-anthracite-400 mb-6">{ui(error)}</p>
           <Link href="/" className="btn-primary">{t('errors.backHome')}</Link>
         </div>
       </main>
@@ -295,15 +316,15 @@ export default function SupplierDashboard() {
       {/* Toast */}
       {toast && (
         <div className="fixed top-4 right-4 z-50 bg-anthracite-800 border border-gold-400/30 text-gold-400 px-4 py-3 rounded-lg shadow-lg text-sm animate-fade-in">
-          {toast}
+          {ui(toast)}
         </div>
       )}
 
       {/* Contact Modal */}
       {showContactModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <Modal onClose={() => setShowContactModal(false)} label={ui("Contact")}>
           <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl p-8 max-w-md w-full relative">
-            <button
+            <button aria-label={ui("Închide")}
               onClick={() => setShowContactModal(false)}
               className="absolute top-4 right-4 text-anthracite-400 hover:text-white"
             >
@@ -315,16 +336,17 @@ export default function SupplierDashboard() {
                 {contactType === 'oferta' ? <Crown className="w-7 h-7 text-gold-400" /> : <Zap className="w-7 h-7 text-gold-400" />}
               </div>
               <h3 className="text-xl font-bold text-white">
-                {contactType === 'oferta' ? t('promotions.modalReserveOferta') : t('promotions.modalReserveAnunt')}
+                {ui(contactTitle)}
               </h3>
               <p className="text-anthracite-400 text-sm mt-2">
-                {contactType === 'oferta' ? t('promotions.modalOfertaDesc') : t('promotions.modalAnuntDesc')}
+                {ui(contactDescription)}
               </p>
             </div>
 
             <div className="space-y-4">
+              {contactType === 'super' ? <SuperPriceRequest /> : <>
               <a
-                href="mailto:contact@gymbuilder.app?subject=Rezervare%20Promovare%20-%20GymBuilder"
+                href={`mailto:contact@gymbuilder.app?subject=${encodeURIComponent(contactTitle)}&body=${encodeURIComponent(contactDescription)}`}
                 className="flex items-center gap-3 w-full px-4 py-3 bg-gold-400/10 border border-gold-400/30 rounded-xl text-gold-400 hover:bg-gold-400/20 transition-colors"
               >
                 <Mail className="w-5 h-5" />
@@ -333,6 +355,8 @@ export default function SupplierDashboard() {
                   <p className="text-xs text-anthracite-400">contact@gymbuilder.app</p>
                 </div>
               </a>
+
+              </>}
 
               <a
                 href="tel:+40743891218"
@@ -350,11 +374,11 @@ export default function SupplierDashboard() {
               {t('promotions.paymentNote')}
             </p>
           </div>
-        </div>
+        </Modal>
       )}
 
       {/* Sidebar */}
-      <aside className="fixed left-0 top-20 bottom-0 w-64 bg-anthracite-900 border-r border-anthracite-800 p-6 hidden lg:block overflow-y-auto">
+      <aside className="fixed left-0 top-[var(--app-header-height)] bottom-0 w-64 bg-anthracite-900 border-r border-anthracite-800 p-6 hidden lg:block overflow-y-auto">
 
         <nav className="space-y-1">
           {sidebarLinks.map((link) => (
@@ -389,7 +413,7 @@ export default function SupplierDashboard() {
         <div className="mt-6">
           <div className="bg-gold-400/5 border border-gold-400/20 rounded-xl p-4">
             <p className="text-xs text-gold-400 font-medium mb-1">
-              {t('sidebar.plan')}: {supplier?.plan === 'free' ? t('sidebar.planFree') : supplier?.plan === 'professional' ? t('sidebar.planProfessional') : supplier?.plan || t('sidebar.planFree')}
+              {t('sidebar.plan')}: {ui(supplier?.plan === 'free' ? t('sidebar.planFree') : supplier?.plan === 'professional' ? t('sidebar.planProfessional') : supplier?.plan || t('sidebar.planFree'))}
             </p>
             <p className="text-xs text-anthracite-400">
               {stats?.activeProducts || 0} {t('sidebar.activeProducts')}
@@ -405,9 +429,9 @@ export default function SupplierDashboard() {
             <div>
               <h1 className="text-2xl font-bold text-white">{t('sidebar.dashboard')}</h1>
               <p className="text-anthracite-400 text-sm mt-1">
-                {supplier?.companyName || t('supplier')} &middot;{' '}
+                {supplier?.companyName || t('supplier')} &middot;{ui(' ')}
                 <span className={`${supplier?.status === 'approved' ? 'text-emerald-400' : supplier?.status === 'pending' ? 'text-yellow-400' : 'text-red-400'}`}>
-                  {supplier?.status === 'approved' ? t('status.approved') : supplier?.status === 'pending' ? t('status.pending') : t('status.rejected')}
+                  {ui(supplier?.status === 'approved' ? t('status.approved') : supplier?.status === 'pending' ? t('status.pending') : t('status.rejected'))}
                 </span>
               </p>
             </div>
@@ -422,7 +446,7 @@ export default function SupplierDashboard() {
                 className="flex items-center gap-2 px-4 py-2 rounded-lg border border-anthracite-700 text-anthracite-300 hover:text-red-400 hover:border-red-400/30 text-sm font-medium transition-colors disabled:opacity-50"
               >
                 <LogOut className="w-4 h-4" />
-                {logoutLoading ? t('loggingOut') : 'Logout'}
+                {ui(logoutLoading ? t('loggingOut') : 'Logout')}
               </button>
             </div>
           </div>
@@ -466,10 +490,10 @@ export default function SupplierDashboard() {
                 </div>
               </div>
               <div className="text-2xl font-bold text-white">
-                {stats?.reviewCount ? `${stats.avgRating}` : '—'}
+                {ui(stats?.reviewCount ? `${stats.avgRating}` : '—')}
               </div>
               <div className="text-xs text-anthracite-400 mt-1">
-                {t('stats.avgRating')} {stats?.reviewCount ? `(${stats.reviewCount} ${t('stats.reviews')})` : `(0 ${t('stats.reviews')})`}
+                {t('stats.avgRating')} {ui(stats?.reviewCount ? `(${stats.reviewCount} ${t('stats.reviews')})` : `(0 ${t('stats.reviews')})`)}
               </div>
             </div>
           </div>
@@ -514,7 +538,7 @@ export default function SupplierDashboard() {
                     {recentProducts.map((product) => (
                       <tr key={product.id} className="hover:bg-anthracite-800/50">
                         <td className="py-3 text-sm text-white font-medium">{product.name}</td>
-                        <td className="py-3 text-sm text-anthracite-300 capitalize">{product.category}</td>
+                        <td className="py-3 text-sm text-anthracite-300 capitalize">{ui(product.category)}</td>
                         <td className="py-3 text-sm text-gold-400 font-medium">&euro;{Number(product.price_eur).toLocaleString()}</td>
                         <td className="py-3">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -522,11 +546,11 @@ export default function SupplierDashboard() {
                             product.status === 'featured' ? 'bg-gold-400/10 text-gold-400' :
                             'bg-anthracite-700 text-anthracite-400'
                           }`}>
-                            {product.status === 'active' ? t('products.statusActive') : product.status === 'featured' ? t('products.statusFeatured') : t('products.statusInactive')}
+                            {ui(product.status === 'active' ? t('products.statusActive') : product.status === 'featured' ? t('products.statusFeatured') : t('products.statusInactive'))}
                           </span>
                         </td>
                         <td className="py-3 text-sm text-anthracite-400">
-                          {new Date(product.created_at).toLocaleDateString(dateLocale)}
+                          {ui(new Date(product.created_at).toLocaleDateString(dateLocale))}
                         </td>
                       </tr>
                     ))}
@@ -572,7 +596,7 @@ export default function SupplierDashboard() {
                               <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">{t('requests.statusReplied')}</span>
                             )}
                             <span className="text-xs text-anthracite-500">
-                              {new Date(req.created_at).toLocaleDateString(dateLocale)}
+                              {ui(new Date(req.created_at).toLocaleDateString(dateLocale))}
                             </span>
                           </div>
                         </div>
@@ -581,7 +605,7 @@ export default function SupplierDashboard() {
                         </p>
                         {req.product_id && (
                           <p className="text-xs text-blue-400 mt-1 flex items-center gap-1">
-                            <Package className="w-3 h-3" /> Produs solicitat (ID: {req.product_id.substring(0, 8)}...)
+                            <Package className="w-3 h-3" /> {ui("Produs solicitat (ID: ")}{ui(req.product_id.substring(0, 8))}...)
                           </p>
                         )}
                         {req.message && (
@@ -604,7 +628,7 @@ export default function SupplierDashboard() {
                         <textarea
                           className="w-full bg-anthracite-900 border border-anthracite-600 rounded-lg px-3 py-2 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 resize-none"
                           rows={3}
-                          placeholder={t('requests.replyPlaceholder')}
+                          placeholder={ui(t('requests.replyPlaceholder'))}
                           value={replyMessage}
                           onChange={(e) => setReplyMessage(e.target.value)}
                           disabled={replySending}
@@ -620,13 +644,13 @@ export default function SupplierDashboard() {
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({ requestId: req.id, replyMessage: replyMessage.trim() }),
                                 });
+                                const data = await res.json();
                                 if (res.ok) {
-                                  setToast(t('requests.replySent'));
+                                  setToast(t(data.emailSent ? 'requests.replySent' : 'requests.replyRecordedNoEmail'));
                                   setReplyingTo(null);
                                   setReplyMessage('');
                                   setRecentRequests(prev => prev.map(r => r.id === req.id ? { ...r, status: 'replied' } : r));
                                 } else {
-                                  const data = await res.json();
                                   setToast(data.error || t('requests.replyError'));
                                 }
                               } catch {
@@ -657,11 +681,11 @@ export default function SupplierDashboard() {
                         className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
                       >
                         <MessageSquare className="w-3 h-3" />
-                        {openChat === req.id ? t('chat.hideConversation') : t('chat.openConversation')}
+                        {ui(openChat === req.id ? t('chat.hideConversation') : t('chat.openConversation'))}
                         {openChat === req.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                       </button>
                       {openChat === req.id && (
-                        <SupplierChatBox requestId={req.id} locale={locale} />
+                        <RequestChat requestId={req.id} userRole="supplier" />
                       )}
                     </div>
                   </div>
@@ -760,10 +784,10 @@ export default function SupplierDashboard() {
                 <span className="text-sm text-anthracite-400">({galleryImages.length}/10)</span>
               </div>
               {galleryImages.length < 10 && (
-                <label className="cursor-pointer flex items-center gap-2 px-3 py-2 bg-gold-500/10 border border-gold-500/30 rounded-lg text-gold-400 text-sm hover:bg-gold-500/20 transition-colors">
+                <label className="relative cursor-pointer min-h-11 flex items-center gap-2 px-3 py-2 bg-gold-500/10 border border-gold-500/30 rounded-lg text-gold-400 text-sm hover:bg-gold-500/20 transition-colors">
                   <ImagePlus className="w-4 h-4" />
-                  {galleryUploading ? t('gallery.uploading') : t('gallery.addImage')}
-                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={handleGalleryUpload} disabled={galleryUploading} />
+                  {ui(galleryUploading ? t('gallery.uploading') : t('gallery.addImage'))}
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" aria-label={t('gallery.addImage')} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer focus:opacity-10" onChange={handleGalleryUpload} disabled={galleryUploading} />
                 </label>
               )}
             </div>
@@ -781,8 +805,8 @@ export default function SupplierDashboard() {
                 {galleryImages.map((img) => (
                   <div key={img.id} className="relative group rounded-lg overflow-hidden border border-anthracite-700 aspect-square">
                     <img src={img.image_url} alt={img.caption || 'Galerie'} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <button onClick={() => handleGalleryDelete(img.id)} className="p-2 bg-red-500/80 rounded-full text-white hover:bg-red-600 transition-colors">
+                    <div className="absolute top-1 right-1 flex items-center justify-center">
+                      <button aria-label={ui("Șterge imaginea")} onClick={() => handleGalleryDelete(img.id)} className="min-h-11 min-w-11 flex items-center justify-center bg-red-500/80 rounded-full text-white hover:bg-red-600 transition-colors">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -804,7 +828,8 @@ export default function SupplierDashboard() {
               <h2 className="text-xl font-bold text-white">{t('promotions.title')}</h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <SuperPricePromotion onRequest={() => openContactModal('super')} />
               {/* Oferta Zilei Card */}
               <div className="bg-gradient-to-br from-gold-400/5 to-anthracite-900 border border-gold-400/30 rounded-2xl p-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gold-400/5 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -849,9 +874,9 @@ export default function SupplierDashboard() {
                       <span className="text-xs text-anthracite-500">{t('promotions.slotsChecking')}</span>
                     ) : (
                       <span className={`text-sm font-bold ${
-                        (slots?.ofertaZilei.available ?? 1) > 0 ? 'text-emerald-400' : 'text-red-400'
+                        (slots?.ofertaZilei.available ?? 0) > 0 ? 'text-emerald-400' : 'text-red-400'
                       }`}>
-                        {slots?.ofertaZilei.available ?? 1} / {slots?.ofertaZilei.total ?? 1}
+                        {slots ? `${slots.ofertaZilei.available} / ${slots.ofertaZilei.total}` : t('promotions.availabilityUnknown')}
                       </span>
                     )}
                   </div>
@@ -865,7 +890,6 @@ export default function SupplierDashboard() {
                 </div>
               </div>
 
-              {/* Anunțurile Zilei Card */}
               <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl p-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gold-400/3 rounded-full -translate-y-1/2 translate-x-1/2" />
                 
@@ -875,52 +899,42 @@ export default function SupplierDashboard() {
                     <span className="text-xs font-semibold text-anthracite-300 uppercase tracking-wider">{t('promotions.promotion')}</span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-white mb-1">{t('promotions.anunturiZilei')}</h3>
-                  <p className="text-anthracite-400 text-sm mb-4">{t('promotions.anunturiDescription')}</p>
+                  <h3 className="text-lg font-bold text-white mb-1">{t('promotions.weeklyOffers')}</h3>
+                  <p className="text-anthracite-400 text-sm mb-4">{t('promotions.weeklyDescription')}</p>
 
                   <div className="flex items-baseline gap-1 mb-4">
-                    <span className="text-3xl font-bold text-gold-400">{t('promotions.anunturiPrice')}</span>
-                    <span className="text-anthracite-400 text-sm">{t('promotions.anunturiPriceUnit')}</span>
+                    <span className="text-3xl font-bold text-gold-400">{t('promotions.weeklyPrice')}</span>
+                    <span className="text-anthracite-400 text-sm">{t('promotions.weeklyPriceUnit')}</span>
                   </div>
 
                   <ul className="space-y-2 mb-5">
                     <li className="flex items-center gap-2 text-sm text-anthracite-200">
                       <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
-                      {t('promotions.anunturiFeature1')}
+                      {t('promotions.weeklyFeature1')}
                     </li>
                     <li className="flex items-center gap-2 text-sm text-anthracite-200">
                       <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
-                      {t('promotions.anunturiFeature2')}
+                      {t('promotions.weeklyFeature2')}
                     </li>
                     <li className="flex items-center gap-2 text-sm text-anthracite-200">
                       <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
-                      {t('promotions.anunturiFeature3')}
+                      {t('promotions.weeklyFeature3')}
                     </li>
                     <li className="flex items-center gap-2 text-sm text-anthracite-200">
                       <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
-                      {t('promotions.anunturiFeature4')}
+                      {t('promotions.weeklyFeature4')}
                     </li>
                   </ul>
 
-                  {/* Available slots indicator */}
-                  <div className="flex items-center justify-between mb-4 bg-anthracite-800/60 rounded-lg px-3 py-2">
-                    <span className="text-xs text-anthracite-400">{t('promotions.slotsAvailable')}</span>
-                    {slotsLoading ? (
-                      <span className="text-xs text-anthracite-500">{t('promotions.slotsChecking')}</span>
-                    ) : (
-                      <span className={`text-sm font-bold ${
-                        (slots?.anunturiZilei.available ?? 5) > 0 ? 'text-emerald-400' : 'text-red-400'
-                      }`}>
-                        {slots?.anunturiZilei.available ?? 5} / {slots?.anunturiZilei.total ?? 5}
-                      </span>
-                    )}
-                  </div>
+                  <p className="mb-4 rounded-lg bg-anthracite-800/60 px-3 py-3 text-sm text-anthracite-200">
+                    {slotsLoading ? t('promotions.slotsChecking') : slots ? `${slots.oferteleSaptamanii.occupied} ${t('promotions.weeklyActive')}` : t('promotions.availabilityUnknown')}
+                  </p>
 
                   <button
-                    onClick={() => openContactModal('anunt')}
+                    onClick={() => openContactModal('weekly')}
                     className="w-full py-3 bg-anthracite-800 border border-gold-400/30 text-gold-400 font-semibold rounded-xl hover:bg-gold-400/10 transition-colors text-sm"
                   >
-                    {t('promotions.reserveAnunt')}
+                    {t('promotions.reserveWeekly')}
                   </button>
                 </div>
               </div>
@@ -931,6 +945,7 @@ export default function SupplierDashboard() {
         {/* Setări Cont */}
         <section className="mt-10 bg-anthracite-900 border border-anthracite-800 rounded-2xl p-6">
           <h3 className="text-lg font-bold text-white mb-4">{t('settings.title')}</h3>
+          <SupplierPublicContactEmail initialEmail={supplier?.contactEmail ?? null} />
           <div className="border border-red-500/20 bg-red-500/5 rounded-xl p-5">
             <h4 className="text-sm font-semibold text-red-400 mb-2">{t('settings.deleteAccount')}</h4>
             <p className="text-anthracite-400 text-xs leading-relaxed mb-4">
@@ -960,6 +975,7 @@ export default function SupplierDashboard() {
             >
               {t('settings.deleteButton')}
             </button>
+            <Link href="/delete-account" className="mt-3 flex min-h-11 items-center text-sm text-gold-400 underline">{ui('Șterge contul Gym Builder')}</Link>
           </div>
         </section>
       </div>
@@ -967,103 +983,3 @@ export default function SupplierDashboard() {
   );
 }
 
-// SupplierChatBox component for inline messaging
-function SupplierChatBox({ requestId, locale }: { requestId: string; locale: string }) {
-  const { t } = useClientTranslations('supplierDashboard');
-  const [messages, setMessages] = useState<{ id: string; sender_type: string; sender_name: string; content: string; created_at: string }[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [newMessage, setNewMessage] = useState('');
-  const [sending, setSending] = useState(false);
-
-  useEffect(() => {
-    fetchMessages();
-  }, [requestId]);
-
-  async function fetchMessages() {
-    try {
-      const res = await fetch(`/api/messages?request_id=${requestId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(data.messages || []);
-      }
-    } catch {} finally { setLoading(false); }
-  }
-
-  async function handleSend() {
-    if (!newMessage.trim() || sending) return;
-    setSending(true);
-    try {
-      const res = await fetch('/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ request_id: requestId, content: newMessage.trim() }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(prev => [...prev, data.message]);
-        setNewMessage('');
-      }
-    } catch {} finally { setSending(false); }
-  }
-
-  const dateLocale = locale === 'en' ? 'en-GB' : 'ro-RO';
-
-  if (loading) {
-    return (
-      <div className="mt-3 flex items-center gap-2 text-xs text-anthracite-400">
-        <Loader2 className="w-3 h-3 animate-spin" /> {t('chat.loadingMessages')}
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-3 border border-anthracite-700 rounded-lg overflow-hidden">
-      {/* Messages list */}
-      <div className="max-h-64 overflow-y-auto p-3 space-y-2 bg-anthracite-900/50">
-        {messages.length === 0 ? (
-          <p className="text-xs text-anthracite-500 text-center py-4">{t('chat.noMessages')}</p>
-        ) : (
-          messages.map((msg) => {
-            const isOwn = msg.sender_type === 'supplier';
-            return (
-              <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[75%] rounded-lg px-3 py-2 ${
-                  isOwn
-                    ? 'bg-gold-400/10 border border-gold-400/30'
-                    : 'bg-anthracite-700 border border-anthracite-600'
-                }`}>
-                  <p className={`text-[10px] font-medium mb-0.5 ${isOwn ? 'text-gold-400' : 'text-blue-400'}`}>
-                    {msg.sender_name}
-                  </p>
-                  <p className="text-sm text-white whitespace-pre-wrap">{msg.content}</p>
-                  <p className="text-[10px] text-anthracite-500 mt-1">
-                    {new Date(msg.created_at).toLocaleString(dateLocale, { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-      {/* Composer */}
-      <div className="flex items-center gap-2 p-2 border-t border-anthracite-700 bg-anthracite-800">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-          placeholder={t('chat.placeholder')}
-          className="flex-1 bg-anthracite-900 border border-anthracite-600 rounded-lg px-3 py-2 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400"
-          disabled={sending}
-        />
-        <button
-          onClick={handleSend}
-          disabled={sending || !newMessage.trim()}
-          className="bg-gold-400 text-anthracite-950 p-2 rounded-lg hover:bg-gold-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-        </button>
-      </div>
-    </div>
-  );
-}

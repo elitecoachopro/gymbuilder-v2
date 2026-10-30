@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { getSessionUser } from '@/lib/session-server';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
-import * as crypto from 'crypto';
+import { randomUUID } from 'node:crypto';
 
 // Validate file by checking magic bytes (binary signature)
 function validateMagicBytes(buffer: Buffer): { valid: boolean; detectedType: string | null } {
@@ -25,34 +27,13 @@ function validateMagicBytes(buffer: Buffer): { valid: boolean; detectedType: str
 }
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
-function getUserFromSession(): { userId: string } | null {
-  const cookieStore = cookies();
-  const sessionToken = cookieStore.get('session_token')?.value;
-
-  if (!sessionToken) return null;
-
-  try {
-    const [payloadB64, signature] = sessionToken.split('.');
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || '';
-    const decodedPayload = Buffer.from(payloadB64, 'base64').toString();
-    const expected = crypto.createHmac('sha256', secret).update(decodedPayload).digest('hex');
-
-    if (signature !== expected) return null;
-
-    const data = JSON.parse(decodedPayload);
-    if (data.exp && data.exp < Date.now()) return null;
-
-    return { userId: data.userId };
-  } catch {
-    return null;
-  }
-}
+async function getUserFromSession(_request?: unknown) { return getSessionUser(); }
 
 // GET - list gallery images for a supplier
 export async function GET(request: NextRequest) {
@@ -63,6 +44,12 @@ export async function GET(request: NextRequest) {
 
   // If supplier_id provided, return public gallery for that supplier
   if (supplierId) {
+    const { data: profile } = await supabase.from('supplier_profiles').select('status, user_id').eq('id', supplierId).maybeSingle();
+    if (!profile) return await localizedJson({ error: 'Furnizor negasit.' }, { status: 404 });
+    if (profile.status !== 'approved') {
+      const user = await getSessionUser();
+      if (!user || (user.id !== profile.user_id && user.role !== 'admin')) return await localizedJson({ error: 'Furnizor negasit.' }, { status: 404 });
+    }
     const { data, error } = await supabase
       .from('supplier_gallery')
       .select('id, image_url, caption, created_at')
@@ -70,16 +57,16 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: 'Eroare la încărcarea galeriei' }, { status: 500 });
+      return await localizedJson({ error: 'Eroare la încărcarea galeriei' }, { status: 500 });
     }
 
-    return NextResponse.json({ images: data || [] });
+    return await localizedJson({ images: data || [] });
   }
 
   // Otherwise, return gallery for logged-in supplier
-  const session = getUserFromSession();
+  const session = await getUserFromSession();
   if (!session) {
-    return NextResponse.json({ error: 'Neautorizat' }, { status: 401 });
+    return await localizedJson({ error: 'Neautorizat' }, { status: 401 });
   }
 
   const { data: supplier } = await supabase
@@ -89,7 +76,7 @@ export async function GET(request: NextRequest) {
     .single();
 
   if (!supplier) {
-    return NextResponse.json({ error: 'Profil furnizor negăsit' }, { status: 404 });
+    return await localizedJson({ error: 'Profil furnizor negăsit' }, { status: 404 });
   }
 
   const { data, error } = await supabase
@@ -99,17 +86,17 @@ export async function GET(request: NextRequest) {
     .order('created_at', { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: 'Eroare la încărcarea galeriei' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare la încărcarea galeriei' }, { status: 500 });
   }
 
-  return NextResponse.json({ images: data || [] });
+  return await localizedJson({ images: data || [] });
 }
 
 // POST - upload a new gallery image
 export async function POST(request: NextRequest) {
-  const session = getUserFromSession();
+  const session = await getUserFromSession();
   if (!session) {
-    return NextResponse.json({ error: 'Neautorizat' }, { status: 401 });
+    return await localizedJson({ error: 'Neautorizat' }, { status: 401 });
   }
 
   const supabase = getSupabase();
@@ -121,7 +108,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (!supplier) {
-    return NextResponse.json({ error: 'Profil furnizor negăsit' }, { status: 404 });
+    return await localizedJson({ error: 'Profil furnizor negăsit' }, { status: 404 });
   }
 
   // Check current count (max 10)
@@ -131,44 +118,44 @@ export async function POST(request: NextRequest) {
     .eq('supplier_id', supplier.id);
 
   if ((count || 0) >= 10) {
-    return NextResponse.json({ error: 'Limita de 10 imagini a fost atinsă' }, { status: 400 });
+    return await localizedJson({ error: 'Limita de 10 imagini a fost atinsă' }, { status: 400 });
   }
 
   // Handle file upload
   const formData = await request.formData();
   const file = formData.get('file') as File | null;
   const caption = (formData.get('caption') as string) || '';
+  if (typeof caption !== 'string') return await localizedJson({ error: 'Descriere invalida.' }, { status: 400 });
 
   if (!file) {
-    return NextResponse.json({ error: 'Niciun fișier selectat' }, { status: 400 });
+    return await localizedJson({ error: 'Niciun fișier selectat' }, { status: 400 });
   }
 
   // Validate file type
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   if (!allowedTypes.includes(file.type)) {
-    return NextResponse.json({ error: 'Format invalid. Acceptăm: JPG, PNG, WebP, GIF' }, { status: 400 });
+    return await localizedJson({ error: 'Format invalid. Acceptăm: JPG, PNG, WebP, GIF' }, { status: 400 });
   }
 
   // Validate file size (max 5MB)
   if (file.size > 5 * 1024 * 1024) {
-    return NextResponse.json({ error: 'Fișierul depășește 5MB' }, { status: 400 });
+    return await localizedJson({ error: 'Fișierul depășește 5MB' }, { status: 400 });
   }
 
   // Upload to Supabase Storage
-  const fileExt = file.name.split('.').pop() || 'jpg';
-  const fileName = `gallery/${supplier.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${fileExt}`;
-
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
   // Validate magic bytes (real file signature)
   const magicCheck = validateMagicBytes(buffer);
-  if (!magicCheck.valid) {
-    return NextResponse.json(
+  if (!magicCheck.valid || magicCheck.detectedType !== file.type) {
+    return await localizedJson(
       { error: 'Fișierul nu este o imagine validă. Semnătura binară nu corespunde unui format acceptat (JPEG, PNG, WebP, GIF).' },
       { status: 400 }
     );
   }
+  const extension = ({ 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' } as Record<string, string>)[file.type];
+  const fileName = `gallery/${supplier.id}/${randomUUID()}.${extension}`;
 
   const { error: uploadError } = await supabase.storage
     .from('supplier-assets')
@@ -178,7 +165,7 @@ export async function POST(request: NextRequest) {
     });
 
   if (uploadError) {
-    return NextResponse.json({ error: 'Eroare la upload: ' + uploadError.message }, { status: 500 });
+    return await localizedJson({ error: 'Eroare la upload: ' + uploadError.message }, { status: 500 });
   }
 
   // Get public URL
@@ -200,24 +187,25 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (insertError) {
-    return NextResponse.json({ error: 'Eroare la salvare: ' + insertError.message }, { status: 500 });
+    await supabase.storage.from('supplier-assets').remove([fileName]);
+    return await localizedJson({ error: 'Eroare la salvare: ' + insertError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ image: inserted }, { status: 201 });
+  return await localizedJson({ image: inserted }, { status: 201 });
 }
 
 // DELETE - remove a gallery image
 export async function DELETE(request: NextRequest) {
-  const session = getUserFromSession();
+  const session = await getUserFromSession();
   if (!session) {
-    return NextResponse.json({ error: 'Neautorizat' }, { status: 401 });
+    return await localizedJson({ error: 'Neautorizat' }, { status: 401 });
   }
 
   const { searchParams } = new URL(request.url);
   const imageId = searchParams.get('id');
 
   if (!imageId) {
-    return NextResponse.json({ error: 'ID imagine lipsă' }, { status: 400 });
+    return await localizedJson({ error: 'ID imagine lipsă' }, { status: 400 });
   }
 
   const supabase = getSupabase();
@@ -229,7 +217,7 @@ export async function DELETE(request: NextRequest) {
     .single();
 
   if (!supplier) {
-    return NextResponse.json({ error: 'Profil furnizor negăsit' }, { status: 404 });
+    return await localizedJson({ error: 'Profil furnizor negăsit' }, { status: 404 });
   }
 
   // Verify ownership
@@ -241,14 +229,21 @@ export async function DELETE(request: NextRequest) {
     .single();
 
   if (!image) {
-    return NextResponse.json({ error: 'Imagine negăsită' }, { status: 404 });
+    return await localizedJson({ error: 'Imagine negăsită' }, { status: 404 });
   }
 
-  // Delete from database
-  await supabase
+  const url = new URL(image.image_url);
+  const storageOrigin = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).origin;
+  const objectPath = decodeURIComponent(url.pathname.split('/storage/v1/object/public/supplier-assets/')[1] || '');
+  if (url.origin === storageOrigin && objectPath.startsWith(`gallery/${supplier.id}/`)) {
+    const { error: storageError } = await supabase.storage.from('supplier-assets').remove([objectPath]);
+    if (storageError) return await localizedJson({ error: 'Fisierul nu a putut fi sters.' }, { status: 500 });
+  }
+  const { error: deleteError } = await supabase
     .from('supplier_gallery')
     .delete()
     .eq('id', imageId);
+  if (deleteError) return await localizedJson({ error: 'Imaginea nu a putut fi stearsa.' }, { status: 500 });
 
-  return NextResponse.json({ success: true });
+  return await localizedJson({ success: true });
 }

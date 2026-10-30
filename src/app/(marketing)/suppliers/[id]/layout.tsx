@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
 
 function getSupabase() {
@@ -9,13 +10,14 @@ function getSupabase() {
 }
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
   children: React.ReactNode;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const english = (await cookies()).get('locale')?.value === 'en';
   const supabase = getSupabase();
-  const { id } = params;
+  const { id } = await params;
 
   const { data: supplier } = await supabase
     .from('supplier_profiles')
@@ -26,15 +28,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!supplier) {
     return {
-      title: 'Furnizor negăsit | GymBuilder',
-      description: 'Furnizorul căutat nu a fost găsit pe GymBuilder.',
+      title: english ? 'Supplier not found | Gym Builder' : 'Furnizor negăsit | Gym Builder',
+      description: english ? 'This supplier was not found on Gym Builder.' : 'Furnizorul căutat nu a fost găsit pe Gym Builder.',
     };
   }
 
-  const title = `${supplier.company_name} - Furnizor echipamente fitness | GymBuilder`;
+  const title = `${supplier.company_name} - ${english ? "Fitness equipment supplier" : "Furnizor echipamente fitness"} | Gym Builder`;
   const description = supplier.description
     ? supplier.description.substring(0, 155) + (supplier.description.length > 155 ? '...' : '')
-    : `${supplier.company_name} - furnizor de echipamente fitness din ${supplier.city || supplier.country} pe GymBuilder.`;
+    : `${supplier.company_name} - ${english ? "fitness equipment supplier from" : "furnizor de echipamente fitness din"} ${supplier.city || supplier.country} ${english ? "on" : "pe"} Gym Builder.`;
   const imageUrl = supplier.logo_url || null;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gymbuilder.app';
 
@@ -45,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       url: `${appUrl}/suppliers/${id}`,
-      siteName: 'GymBuilder',
+      siteName: 'Gym Builder',
       type: 'website',
       ...(imageUrl && {
         images: [

@@ -1,5 +1,7 @@
 'use client';
 
+import { useUiText } from '@/i18n/useUiText';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
@@ -15,6 +17,7 @@ export function getCookieConsent(): CookieConsentValue {
 }
 
 export default function CookieConsent() {
+  const ui = useUiText();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -46,14 +49,12 @@ export default function CookieConsent() {
           {/* Text */}
           <div className="flex-1">
             <p className="text-white text-sm leading-relaxed">
-              Folosim cookie-uri pentru a asigura funcționarea corectă a site-ului și, cu acordul tău, pentru analiză și îmbunătățirea experienței.
-              Cookie-urile non-esențiale nu se activează fără consimțământul tău explicit.{' '}
+              {ui("Folosim cookie-uri pentru a asigura funcționarea corectă a site-ului și, cu acordul tău, pentru analiză și îmbunătățirea experienței. Cookie-urile non-esențiale nu se activează fără consimțământul tău explicit.")}{ui(' ')}
               <Link
                 href="/cookie-policy"
                 className="text-gold-400 hover:text-gold-300 underline underline-offset-2 transition-colors"
               >
-                Detalii complete
-              </Link>
+                {ui("Detalii complete")}</Link>
             </p>
           </div>
           {/* Buttons */}
@@ -62,14 +63,12 @@ export default function CookieConsent() {
               onClick={handleEssentialOnly}
               className="px-5 py-2.5 text-sm font-medium text-anthracite-300 border border-anthracite-600 rounded-lg hover:border-anthracite-500 hover:text-white transition-colors"
             >
-              Doar esențiale
-            </button>
+              {ui("Doar esențiale")}</button>
             <button
               onClick={handleAcceptAll}
               className="px-5 py-2.5 text-sm font-bold bg-gold-400 text-anthracite-950 rounded-lg hover:bg-gold-300 transition-colors"
             >
-              Acceptă toate
-            </button>
+              {ui("Acceptă toate")}</button>
           </div>
         </div>
       </div>

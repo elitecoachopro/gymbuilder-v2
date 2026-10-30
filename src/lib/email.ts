@@ -1,21 +1,23 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
-const FROM_EMAIL = 'GymBuilder <noreply@gymbuilder.app>';
+const FROM_EMAIL = 'Gym Builder <contact@gymbuilder.app>';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://gymbuilder-v2.vercel.app';
 
 export async function sendVerificationEmail(email: string, token: string, name: string) {
   const verifyUrl = `${APP_URL}/api/auth/verify-email?token=${token}`;
 
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await getResend().emails.send({
     from: FROM_EMAIL,
     to: email,
-    subject: 'Confirmă adresa de email - GymBuilder',
+    subject: 'Confirmă adresa de email - Gym Builder',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1a1a1a; color: #ffffff; padding: 40px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #f5c518; margin: 0;">GymBuilder</h1>
+          <h1 style="color: #f5c518; margin: 0;">Gym Builder</h1>
         </div>
         <h2 style="color: #ffffff; margin-bottom: 20px;">Bine ai venit, ${name}!</h2>
         <p style="color: #cccccc; line-height: 1.6;">
@@ -27,7 +29,7 @@ export async function sendVerificationEmail(email: string, token: string, name: 
           </a>
         </div>
         <p style="color: #999999; font-size: 12px; margin-top: 30px;">
-          Dacă nu ai creat un cont pe GymBuilder, poți ignora acest email.
+          Dacă nu ai creat un cont pe Gym Builder, poți ignora acest email.
         </p>
         <p style="color: #999999; font-size: 12px;">
           Link-ul expiră în 24 de ore.
@@ -47,14 +49,14 @@ export async function sendVerificationEmail(email: string, token: string, name: 
 export async function sendPasswordResetEmail(email: string, token: string, name: string) {
   const resetUrl = `${APP_URL}/reset-password?token=${token}`;
 
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await getResend().emails.send({
     from: FROM_EMAIL,
     to: email,
-    subject: 'Resetare parolă - GymBuilder',
+    subject: 'Resetare parolă - Gym Builder',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1a1a1a; color: #ffffff; padding: 40px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #f5c518; margin: 0;">GymBuilder</h1>
+          <h1 style="color: #f5c518; margin: 0;">Gym Builder</h1>
         </div>
         <h2 style="color: #ffffff; margin-bottom: 20px;">Resetare parolă</h2>
         <p style="color: #cccccc; line-height: 1.6;">
@@ -84,14 +86,14 @@ export async function sendPasswordResetEmail(email: string, token: string, name:
 }
 
 export async function sendSupplierWelcomeEmail(email: string, name: string, companyName: string) {
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await getResend().emails.send({
     from: FROM_EMAIL,
     to: email,
-    subject: 'Înregistrare furnizor primită - GymBuilder',
+    subject: 'Înregistrare furnizor primită - Gym Builder',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #1a1a1a; color: #ffffff; padding: 40px; border-radius: 12px;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #f5c518; margin: 0;">GymBuilder</h1>
+          <h1 style="color: #f5c518; margin: 0;">Gym Builder</h1>
         </div>
         <h2 style="color: #ffffff; margin-bottom: 20px;">Bine ai venit, ${name}!</h2>
         <p style="color: #cccccc; line-height: 1.6;">
@@ -109,7 +111,7 @@ export async function sendSupplierWelcomeEmail(email: string, name: string, comp
           <p style="color: #cccccc; margin: 5px 0 0 0;">✅ Profil: Trimis spre aprobare</p>
         </div>
         <p style="color: #999999; font-size: 12px; margin-top: 30px;">
-          Echipa GymBuilder
+          Echipa Gym Builder
         </p>
       </div>
     `,

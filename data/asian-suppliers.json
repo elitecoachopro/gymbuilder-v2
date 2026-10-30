@@ -1,0 +1,528 @@
+{
+  "checked_at": "2026-10-21T00:00:00Z",
+  "suppliers": [
+    {
+      "key": "dhz",
+      "company_name": "DHZ Fitness",
+      "brand": "DHZ Fitness",
+      "country": "China",
+      "city": "Dezhou",
+      "address": "Ningjin Development Zone, Ningjin County, Dezhou, Shandong, China 253400",
+      "website": "https://www.dhzfitness.com/",
+      "phone": "+86 21 62370156",
+      "contact_email": "sales@dhzfitness.com",
+      "listing_source_url": "https://www.dhzfitness.com/contact-us/",
+      "catalog_url": "https://www.dhzfitness.com/products/",
+      "logo_source": null,
+      "description": "Producător de echipamente fitness din Shandong, China. Catalogul oficial include aparate de forță, echipamente cardio, stații cu cabluri și accesorii. Contact comercial direct prin email sau telefon.",
+      "products": [
+        {
+          "key": "dhz-u2073c",
+          "name": "DHZ Abdominal Isolator U2073C",
+          "category": "strength",
+          "description": "Aparat pentru antrenamentul abdominal din seria Alien. Dispune de șezut reglabil, suport pentru picioare și role de sprijin. Configurația și oferta se confirmă direct cu producătorul.",
+          "source_url": "https://www.dhzfitness.com/abdominal-isolator-u2073c-product/",
+          "image_sources": [
+            "https://www.dhzfitness.com/uploads/Abdominal-Isolator-U2073C-1.jpg"
+          ],
+          "specs": {
+            "Producător": "DHZ Fitness",
+            "Model": "U2073C",
+            "Serie": "Alien",
+            "Tip": "Abdominal Isolator"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/dhz-u2073c-1.jpg"
+          ]
+        },
+        {
+          "key": "dhz-u2021c",
+          "name": "DHZ Abductor & Adductor U2021C",
+          "category": "strength",
+          "description": "Aparat cu două funcții pentru antrenamentul musculaturii interne și externe a coapselor. Poziția de pornire este reglabilă, iar suporturile pentru picioare permit adaptarea poziției de lucru.",
+          "source_url": "https://www.dhzfitness.com/abductor-adductor-u2021c-product/",
+          "image_sources": [
+            "https://www.dhzfitness.com/uploads/Abductor-Adductor-U2021C-1g.jpg"
+          ],
+          "specs": {
+            "Producător": "DHZ Fitness",
+            "Model": "U2021C",
+            "Serie": "Alien",
+            "Funcții": "Abductor / Adductor"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/dhz-u2021c-1.jpg"
+          ]
+        },
+        {
+          "key": "dhz-u2004c",
+          "name": "DHZ Butterfly Machine U2004C",
+          "category": "strength",
+          "description": "Aparat pentru exerciții de fluturări la piept din seria Alien, cu brațe independente și șezut reglabil. Consultă fișa oficială pentru configurație și detalii tehnice.",
+          "source_url": "https://www.dhzfitness.com/butterfly-machine-u2004c-product/",
+          "image_sources": [
+            "https://www.dhzfitness.com/uploads/Butterfly-Machine-U2004C-1.jpg"
+          ],
+          "specs": {
+            "Producător": "DHZ Fitness",
+            "Model": "U2004C",
+            "Serie": "Alien",
+            "Tip": "Butterfly / Pec Fly"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/dhz-u2004c-1.jpg"
+          ]
+        },
+        {
+          "key": "dhz4",
+          "name": "DHZ Back Extension U2031C",
+          "brand": "DHZ Fitness",
+          "brand_country": "China",
+          "category": "strength",
+          "description": "Aparat pentru extensia spatelui din seria Alien, cu role reglabile și suport pentru picioare ridicat. Mânerele auxiliare ajută la stabilizarea poziției în timpul exercițiului.",
+          "source_url": "https://www.dhzfitness.com/back-extension-u2031c-product/",
+          "image_sources": [
+            "https://www.dhzfitness.com/uploads/Back-Extension-U2031C-1.jpg"
+          ],
+          "specs": {
+            "Marcă": "DHZ Fitness",
+            "Model": "U2031C",
+            "Serie": "Alien",
+            "Exercițiu": "Extensia spatelui",
+            "Reglaje": "Role de sprijin reglabile"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/dhz4-1.jpg"
+          ]
+        },
+        {
+          "key": "dhz5",
+          "name": "DHZ Biceps Curl U2030C",
+          "brand": "DHZ Fitness",
+          "brand_country": "China",
+          "category": "strength",
+          "description": "Aparat pentru flexia bicepsului, cu mânere rotative și șezut reglabil asistat cu gaz. Suportul pentru brațe permite stabilizarea poziției de lucru.",
+          "source_url": "https://www.dhzfitness.com/biceps-curl-u2030c-product/",
+          "image_sources": [
+            "https://www.dhzfitness.com/uploads/Biceps-Curl-U2030C-1.jpg"
+          ],
+          "specs": {
+            "Marcă": "DHZ Fitness",
+            "Model": "U2030C",
+            "Serie": "Alien",
+            "Exercițiu": "Flexii pentru biceps",
+            "Șezut": "Reglabil, asistat cu gaz"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/dhz5-1.jpg"
+          ]
+        }
+      ],
+      "logo_url": null
+    },
+    {
+      "key": "shua",
+      "company_name": "SHUA Fitness",
+      "brand": "SHUA",
+      "country": "China",
+      "city": "Jinjiang",
+      "address": "Shichun Industry Park, Chidian, Jinjiang City, Fujian Province, China",
+      "website": "https://shuafitness.com/",
+      "phone": null,
+      "contact_email": null,
+      "listing_source_url": "https://shuafitness.com/contact/",
+      "catalog_url": "https://shuafitness.com/product-category/facility-cardio/",
+      "logo_source": "https://shuafitness.com/img/logo.png",
+      "description": "Producător de echipamente fitness cu sediul în Jinjiang, China. Oferta oficială cuprinde cardio și aparate de forță. Solicitările comerciale se trimit prin formularul de contact oficial; furnizorul poate indica distribuitorul potrivit.",
+      "products": [
+        {
+          "key": "shua-t9100",
+          "name": "SHUA S2 Treadmill SH-T9100",
+          "category": "cardio",
+          "description": "Bandă de alergare din seria S2, cu viteză reglabilă și înclinare motorizată. Specificațiile publicate includ utilizatori de până la 180 kg și suprafață de alergare de 580 × 1570 mm.",
+          "source_url": "https://shuafitness.com/product/facility-cardio/treadmills/sh-t9100/",
+          "image_sources": [
+            "https://shuafitness.com/wp-content/uploads/2024/04/SH-T9100-Commercial-Treadmill-2-1.png.webp",
+            "https://shuafitness.com/wp-content/uploads/2024/04/SH-T9100-Commercial-Treadmill-4-1.png.webp"
+          ],
+          "specs": {
+            "Producător": "SHUA Fitness",
+            "Model": "SH-T9100",
+            "Dimensiuni (L × l × H)": "2217 × 982 × 1523 mm",
+            "Viteză": "0,5–25 km/h",
+            "Înclinare": "−2% până la 18%",
+            "Greutate maximă utilizator": "180 kg"
+          },
+          "brochure_url": "https://shuafitness.com/wp-content/uploads/2025/08/S2-Series-Treadmill-Sell-Sheet.pdf",
+          "images": [
+            "/equipment/asia/shua-t9100-1.webp",
+            "/equipment/asia/shua-t9100-2.webp"
+          ]
+        },
+        {
+          "key": "shua-b9100u",
+          "name": "SHUA S2 Upright Bike SH-B9100U",
+          "category": "cardio",
+          "description": "Bicicletă verticală pentru antrenament cardio, cu rezistență electromagnetică și 40 de niveluri de reglaj. Modelul are consolă LED și monitorizare a pulsului.",
+          "source_url": "https://shuafitness.com/product/facility-cardio/bikes/sh-b9100u/",
+          "image_sources": [
+            "https://shuafitness.com/wp-content/uploads/2024/04/SH-B9100U-Commercial-Upright-Bike-2.png",
+            "https://shuafitness.com/wp-content/uploads/2024/04/SH-B9100U-Commercial-Upright-Bike-4.png"
+          ],
+          "specs": {
+            "Producător": "SHUA Fitness",
+            "Model": "SH-B9100U",
+            "Dimensiuni (L × l × H)": "1123 × 675 × 1506 mm",
+            "Niveluri rezistență": "40",
+            "Greutate maximă utilizator": "180 kg"
+          },
+          "brochure_url": "https://shuafitness.com/wp-content/uploads/2025/08/SH-B9100U-Sell-Sheet.pdf",
+          "images": [
+            "/equipment/asia/shua-b9100u-1.png",
+            "/equipment/asia/shua-b9100u-2.png"
+          ]
+        },
+        {
+          "key": "shua-b9100e",
+          "name": "SHUA S2 Elliptical SH-B9100E",
+          "category": "cardio",
+          "description": "Aparat eliptic din seria S2, cu rezistență electromagnetică și 40 de niveluri. Fișa oficială indică o greutate maximă a utilizatorului de 180 kg.",
+          "source_url": "https://shuafitness.com/product/facility-cardio/ellipticals/sh-b9100e/",
+          "image_sources": [
+            "https://shuafitness.com/wp-content/uploads/2024/05/shua_0002_9100.1989.png",
+            "https://shuafitness.com/wp-content/uploads/2024/05/shua_0001_9100.1990.png"
+          ],
+          "specs": {
+            "Producător": "SHUA Fitness",
+            "Model": "SH-B9100E",
+            "Dimensiuni (L × l × H)": "1883 × 780 × 1835 mm",
+            "Niveluri rezistență": "40",
+            "Greutate maximă utilizator": "180 kg"
+          },
+          "brochure_url": "https://shuafitness.com/wp-content/uploads/2024/05/SH-B9100E-Sell-Sheet-v1.pdf",
+          "images": [
+            "/equipment/asia/shua-b9100e-1.png",
+            "/equipment/asia/shua-b9100e-2.png"
+          ]
+        },
+        {
+          "key": "shua4",
+          "name": "SHUA S2 Recumbent Bike SH-B9100R",
+          "brand": "SHUA",
+          "brand_country": "China",
+          "category": "cardio",
+          "description": "Bicicletă recumbent comercială cu rezistență electromagnetică și consolă LED de 15,6 in. Permite monitorizarea pulsului prin mânere sau fără fir.",
+          "source_url": "https://shuafitness.com/product/facility-cardio/bikes/sh-b9100r/",
+          "image_sources": [
+            "https://shuafitness.com/wp-content/uploads/2024/04/SH-B9100R-Commercial-Recumbent-Bike-2.png"
+          ],
+          "specs": {
+            "Marcă": "SHUA",
+            "Model": "SH-B9100R",
+            "Niveluri rezistență": "40",
+            "Dimensiuni": "1663 × 620 × 1400 mm",
+            "Greutate maximă utilizator": "180 kg",
+            "Greutate aparat": "97 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/shua4-1.png"
+          ]
+        },
+        {
+          "key": "shua5",
+          "name": "SHUA Pro Rower SH-R8800",
+          "brand": "SHUA",
+          "brand_country": "China",
+          "category": "cardio",
+          "description": "Aparat de vâslit cu rezistență magnetică și pe aer, cu zece niveluri de reglaj. Fișa oficială indică o consolă LCD și monitorizarea wireless a pulsului.",
+          "source_url": "https://shuafitness.com/product/facility-cardio/rowers/sh-r8800/",
+          "image_sources": [
+            "https://shuafitness.com/wp-content/uploads/2024/04/SH-R8800-Commercial-Rower-4.png"
+          ],
+          "specs": {
+            "Marcă": "SHUA",
+            "Model": "SH-R8800",
+            "Rezistență": "Magnetică + aer",
+            "Niveluri": "10",
+            "Dimensiuni": "2400 × 490 × 1100 mm",
+            "Greutate maximă utilizator": "180 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/shua5-1.png"
+          ]
+        }
+      ],
+      "logo_url": "/equipment/asia/shua-logo.png"
+    },
+    {
+      "key": "impulse",
+      "company_name": "Impulse Fitness",
+      "brand": "Impulse",
+      "country": "China",
+      "city": "Qingdao",
+      "address": "No. 297 Mashan Road, Jimo, Qingdao, China",
+      "website": "https://www.impulsehealthtech.com/",
+      "phone": "+86 532 85793158",
+      "contact_email": "sales@impulsefitness.com",
+      "listing_source_url": "https://www.impulsehealthtech.com/contact-us/",
+      "catalog_url": "https://www.impulsehealthtech.com/products/",
+      "logo_source": "https://www.impulsehealthtech.com/uploads/logo.png",
+      "description": "Producător de echipamente cardio, forță și antrenament funcțional, cu sediul în Qingdao, China. Contactul telefonic publicat pentru Europa și adresa comercială de email sunt disponibile pentru solicitări directe.",
+      "products": [
+        {
+          "key": "impulse-xsc500",
+          "name": "Impulse XSC500 Stair Climber",
+          "category": "cardio",
+          "description": "Simulator de urcare a scărilor cu 20 de niveluri de rezistență și afișaj LED. Pagina oficială indică utilizatori de până la 160 kg și o cadență de 25–158 trepte pe minut.",
+          "source_url": "https://www.impulsehealthtech.com/xsc500-product/",
+          "image_sources": [
+            "https://www.impulsehealthtech.com/uploads/e755ce994.png",
+            "https://www.impulsehealthtech.com/uploads/ade7f36b42.png"
+          ],
+          "specs": {
+            "Producător": "Impulse Fitness",
+            "Model": "XSC500",
+            "Greutate maximă utilizator": "160 kg",
+            "Niveluri rezistență": "20",
+            "Cadență": "25–158 trepte/min"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/impulse-xsc500-1.png",
+            "/equipment/asia/impulse-xsc500-2.png"
+          ]
+        },
+        {
+          "key": "impulse-lcs201",
+          "name": "Impulse LCS201 Chest Press",
+          "category": "strength",
+          "description": "Aparat de împins la piept din seria LCS, cu transmisie prin curea și mecanism de asistare a pornirii. Fișa oficială include dimensiunile și greutatea echipamentului.",
+          "source_url": "https://www.impulsehealthtech.com/lcs201-chest-press-product/",
+          "image_sources": [
+            "https://www.impulsehealthtech.com/uploads/LCS201-2418_square.png",
+            "https://www.impulsehealthtech.com/uploads/220-300x224.png"
+          ],
+          "specs": {
+            "Producător": "Impulse Fitness",
+            "Model": "LCS201",
+            "Dimensiuni (L × l × H)": "1671 × 1719 × 1770 mm",
+            "Greutate echipament": "237 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/impulse-lcs201-1.png",
+            "/equipment/asia/impulse-lcs201-2.png"
+          ]
+        },
+        {
+          "key": "impulse-ecp721",
+          "name": "Impulse ECP721 Smith",
+          "category": "strength",
+          "description": "Aparat Smith cu șine reglabile în poziție verticală sau la 7°, cadru deschis și puncte de prindere pentru benzi elastice. Sarcina maximă publicată este de 150 kg.",
+          "source_url": "https://www.impulsehealthtech.com/ecp721-smith-product/",
+          "image_sources": [
+            "https://www.impulsehealthtech.com/uploads/ECP721.2.png",
+            "https://www.impulsehealthtech.com/uploads/ECP721-300x210.png"
+          ],
+          "specs": {
+            "Producător": "Impulse Fitness",
+            "Model": "ECP721",
+            "Dimensiuni (L × l × H)": "2242 × 1373 × 2222 mm",
+            "Greutate echipament": "260 kg",
+            "Sarcină maximă": "150 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/impulse-ecp721-1.png",
+            "/equipment/asia/impulse-ecp721-2.png"
+          ]
+        },
+        {
+          "key": "imp4",
+          "name": "Impulse IFP1301 Lat Pulldown",
+          "brand": "Impulse",
+          "brand_country": "China",
+          "category": "strength",
+          "description": "Aparat pentru tracțiuni la helcometru din gama IFP. Verifică direct cu producătorul configurația greutăților și accesoriile incluse în ofertă.",
+          "source_url": "https://www.impulsehealthtech.com/ifp1301-lat-pulldown-product/",
+          "image_sources": [
+            "https://www.impulsehealthtech.com/uploads/IFP1301.394.jpg"
+          ],
+          "specs": {
+            "Marcă": "Impulse",
+            "Model": "IFP1301",
+            "Exercițiu": "Lat pulldown",
+            "Dimensiuni": "1703 × 1339 × 2047 mm",
+            "Greutate aparat": "95 kg",
+            "Capacitate maximă declarată": "200 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/imp4-1.jpg"
+          ]
+        },
+        {
+          "key": "imp5",
+          "name": "Impulse IT9522 Lat Pulldown / Vertical Row",
+          "brand": "Impulse",
+          "brand_country": "China",
+          "category": "strength",
+          "description": "Aparat cu două funcții pentru spate: tracțiuni de sus și ramat vertical. Rezistența este selectată din coloana de greutăți; producătorul oferă mai multe configurații ale acesteia.",
+          "source_url": "https://www.impulsehealthtech.com/lat-pulldownvertical-row-2-product/",
+          "image_sources": [
+            "https://www.impulsehealthtech.com/uploads/IT9522.271.png"
+          ],
+          "specs": {
+            "Marcă": "Impulse",
+            "Model": "IT9522",
+            "Serie": "IT95",
+            "Rezistență": "Coloană de greutăți selectabilă",
+            "Dimensiuni": "1900 × 900 × 2230 mm",
+            "Greutate netă": "120 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/imp5-1.png"
+          ]
+        }
+      ],
+      "logo_url": "/equipment/asia/impulse-logo.png"
+    },
+    {
+      "key": "sportsart",
+      "company_name": "SportsArt",
+      "brand": "SportsArt",
+      "country": "Taiwan",
+      "city": "Tainan",
+      "address": "No. 11, Gong Huan Road, Tainan City 70955, Taiwan",
+      "website": "https://www.gosportsart.com/",
+      "phone": "+886 6 3840888",
+      "contact_email": null,
+      "listing_source_url": "https://www.gosportsart.com/contact/",
+      "catalog_url": "https://catalogs.gosportsart.com/link/612841/",
+      "logo_source": null,
+      "description": "Producător de echipamente cardio și de forță cu sediul în Tainan, Taiwan. Fișa include contactul sediului asiatic; pagina oficială oferă și contact pentru Europa, Orientul Mijlociu și Africa.",
+      "products": [
+        {
+          "key": "sportsart-t661",
+          "name": "SportsArt T661 Treadmill",
+          "category": "cardio",
+          "description": "Bandă de alergare cu lubrifiere automată ECO-GLIDE și amortizare MyFlex+. Fișa oficială indică viteză de până la 20 km/h și înclinare de până la 15%.",
+          "source_url": "https://www.gosportsart.com/product/t661-treadmill/",
+          "image_sources": [
+            "https://www.gosportsart.com/wp-content/uploads/2025/01/T661-01-web-600x400.png"
+          ],
+          "specs": {
+            "Producător": "SportsArt",
+            "Model": "T661",
+            "Dimensiuni (L × l × H)": "199 × 86 × 143 cm",
+            "Viteză": "0,16–20 km/h",
+            "Greutate maximă utilizator": "180 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/sportsart-t661-1.png"
+          ]
+        },
+        {
+          "key": "sportsart-c565u",
+          "name": "SportsArt C565U Upright Cycle",
+          "category": "cardio",
+          "description": "Bicicletă verticală autoalimentată, cu 15 niveluri de rezistență. Șezutul se ajustează vertical și orizontal, iar pedalele au curele reglabile.",
+          "source_url": "https://www.gosportsart.com/product/c565u-upright-cycle/",
+          "image_sources": [
+            "https://www.gosportsart.com/wp-content/uploads/2025/05/C565U-01-1000x667_300-600x400.png"
+          ],
+          "specs": {
+            "Producător": "SportsArt",
+            "Model": "C565U",
+            "Dimensiuni (L × l × H)": "107,5 × 64 × 144,5 cm",
+            "Niveluri rezistență": "15",
+            "Greutate maximă utilizator": "181,4 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/sportsart-c565u-1.png"
+          ]
+        },
+        {
+          "key": "sportsart-n915",
+          "name": "SportsArt N915 Independent Chest Press",
+          "category": "strength",
+          "description": "Aparat de împins la piept cu brațe independente, șezut reglabil și coloană de greutăți. Modelul aparține seriei Selectorized Status.",
+          "source_url": "https://www.gosportsart.com/product/n915/",
+          "image_sources": [
+            "https://www.gosportsart.com/wp-content/uploads/2025/05/N915-Independent-Chest-Press-1000x667_300-600x400.png"
+          ],
+          "specs": {
+            "Producător": "SportsArt",
+            "Model": "N915",
+            "Dimensiuni (L × l × H)": "125,3 × 168,6 × 153,5 cm",
+            "Coloană greutăți": "100 kg",
+            "Greutate echipament": "255 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/sportsart-n915-1.png"
+          ]
+        },
+        {
+          "key": "sa4",
+          "name": "SportsArt G660 Treadmill",
+          "brand": "SportsArt",
+          "brand_country": "Taiwan",
+          "category": "cardio",
+          "description": "Bandă fără motor din seria ECO-POWR Elite, cu covor din lamele și moduri Run și Push. Include tehnologie de conversie a energiei și sistem de frânare controlat.",
+          "source_url": "https://www.gosportsart.com/product/g660/",
+          "image_sources": [
+            "https://www.gosportsart.com/wp-content/uploads/2021/01/SA_20G660Treadmill-41-edit-600x400.jpg"
+          ],
+          "specs": {
+            "Marcă": "SportsArt",
+            "Model": "G660",
+            "Acționare": "Fără motor",
+            "Suprafață de alergare": "48,3 × 147,3 cm",
+            "Dimensiuni": "215,7 × 84,1 × 157,2 cm",
+            "Greutate utilizator indicată": "45–150 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/sa4-1.jpg"
+          ]
+        },
+        {
+          "key": "sa5",
+          "name": "SportsArt G874 Elliptical",
+          "brand": "SportsArt",
+          "brand_country": "Taiwan",
+          "category": "cardio",
+          "description": "Aparat eliptic ECO-POWR cu lungimea pasului reglabilă electronic și comenzi pe mânere. Pedalele includ amortizare MyFlex. Configurația și cerințele electrice se confirmă cu producătorul.",
+          "source_url": "https://www.gosportsart.com/product/g874-elliptical/",
+          "image_sources": [
+            "https://www.gosportsart.com/wp-content/uploads/2021/01/SA_20G874Elliptical-01-600x400.jpeg"
+          ],
+          "specs": {
+            "Marcă": "SportsArt",
+            "Model": "G874",
+            "Niveluri rezistență": "40",
+            "Lungime pas": "17–29 in, reglabilă electronic",
+            "Dimensiuni": "208,5 × 68 × 176,5 cm",
+            "Greutate maximă utilizator": "205 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/asia/sa5-1.jpg"
+          ]
+        }
+      ],
+      "logo_url": null
+    }
+  ]
+}

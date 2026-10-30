@@ -1,21 +1,31 @@
 'use client';
 
+import { createContactSender } from '@/lib/contact-sender';
+import { useSearchParams } from 'next/navigation';
+import { useUiText } from '@/i18n/useUiText';
+
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Mail, Phone, MapPin, Send, Loader2, CheckCircle, AlertCircle, MessageSquare } from 'lucide-react';
 import { useClientTranslations } from '@/i18n/client';
 
 export default function ContactPage() {
+  const ui = useUiText();
+  const [sendContact] = useState(() => createContactSender('/api/contact'));
   const { t } = useClientTranslations('contact');
+  const params = useSearchParams();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: '',
+    subject: (params?.get('subject') || '').slice(0, 200),
     message: '',
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const feedbackRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (status === 'success' || status === 'error') feedbackRef.current?.focus(); }, [status]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,13 +33,10 @@ export default function ContactPage() {
 
     setStatus('loading');
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+      const res = await sendContact(formData);
       const data = await res.json();
       if (res.ok) {
+        setSuccessMessage(data.message || ui('Mesajul a fost înregistrat.'));
         setStatus('success');
         setFormData({ name: '', email: '', subject: '', message: '' });
       } else {
@@ -57,15 +64,15 @@ export default function ContactPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
             {/* Form */}
-            <div className="lg:col-span-3">
+            <div ref={feedbackRef} tabIndex={-1} className="lg:col-span-3">
               {status === 'success' ? (
-                <div className="bg-anthracite-900 border border-emerald-500/30 rounded-2xl p-8 text-center">
+                <div role="status" className="bg-anthracite-900 border border-emerald-500/30 rounded-2xl p-8 text-center">
                   <div className="w-14 h-14 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CheckCircle className="w-7 h-7 text-emerald-400" />
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">{t('successTitle')}</h3>
                   <p className="text-anthracite-400 text-sm mb-6">
-                    {t('successMessage')}
+                    {ui(successMessage)}
                   </p>
                   <button
                     onClick={() => setStatus('idle')}
@@ -78,57 +85,57 @@ export default function ContactPage() {
                 <form onSubmit={handleSubmit} className="bg-anthracite-900 border border-anthracite-800 rounded-2xl p-6 md:p-8 space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-sm font-medium text-anthracite-300 mb-1.5">{t('labelName')} *</label>
+                      <label htmlFor="contact-name" className="block text-sm font-medium text-anthracite-300 mb-1.5">{t('labelName')} *</label>
                       <input
                         type="text"
                         required
-                        value={formData.name}
+                        id="contact-name" value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder={t('placeholderName')}
-                        className="w-full bg-anthracite-800 border border-anthracite-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors"
+                        placeholder={ui(t('placeholderName'))}
+                        className="w-full bg-anthracite-800 border border-anthracite-700 rounded-lg px-4 py-2.5 text-base sm:text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-anthracite-300 mb-1.5">{t('labelEmail')} *</label>
+                      <label htmlFor="contact-email" className="block text-sm font-medium text-anthracite-300 mb-1.5">{t('labelEmail')} *</label>
                       <input
                         type="email"
                         required
-                        value={formData.email}
+                        id="contact-email" value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder={t('placeholderEmail')}
-                        className="w-full bg-anthracite-800 border border-anthracite-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors"
+                        placeholder={ui(t('placeholderEmail'))}
+                        className="w-full bg-anthracite-800 border border-anthracite-700 rounded-lg px-4 py-2.5 text-base sm:text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-anthracite-300 mb-1.5">{t('labelSubject')} *</label>
+                    <label htmlFor="contact-subject" className="block text-sm font-medium text-anthracite-300 mb-1.5">{t('labelSubject')} *</label>
                     <input
                       type="text"
                       required
-                      value={formData.subject}
+                      id="contact-subject" value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      placeholder={t('placeholderSubject')}
-                      className="w-full bg-anthracite-800 border border-anthracite-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors"
+                      placeholder={ui(t('placeholderSubject'))}
+                      className="w-full bg-anthracite-800 border border-anthracite-700 rounded-lg px-4 py-2.5 text-base sm:text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-anthracite-300 mb-1.5">{t('labelMessage')} *</label>
+                    <label htmlFor="contact-message" className="block text-sm font-medium text-anthracite-300 mb-1.5">{t('labelMessage')} *</label>
                     <textarea
                       required
                       rows={5}
-                      value={formData.message}
+                      id="contact-message" value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      placeholder={t('placeholderMessage')}
-                      className="w-full bg-anthracite-800 border border-anthracite-700 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors resize-none"
+                      placeholder={ui(t('placeholderMessage'))}
+                      className="w-full bg-anthracite-800 border border-anthracite-700 rounded-lg px-4 py-2.5 text-base sm:text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400 transition-colors resize-none"
                     />
                   </div>
 
                   {status === 'error' && (
-                    <div className="flex items-center gap-2 text-red-400 text-sm">
+                    <div role="alert" className="flex items-center gap-2 text-red-400 text-sm">
                       <AlertCircle className="w-4 h-4" />
-                      {errorMsg}
+                      {ui(errorMsg)}
                     </div>
                   )}
 
@@ -178,7 +185,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-white">{t('location')}</p>
-                      <p className="text-xs text-anthracite-400">Mangalia, România</p>
+                      <p className="text-xs text-anthracite-400">{ui("Mangalia, România")}</p>
                     </div>
                   </div>
                 </div>

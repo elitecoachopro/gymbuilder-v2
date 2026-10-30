@@ -1,84 +1,52 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import crypto from 'crypto';
+import { localizedJson } from '@/lib/json-response';
+import { NextRequest } from 'next/server';
+import crypto from 'node:crypto';
+import { registrationSession, registrationDatabase, registrationBucket } from '@/lib/registration-upload-server';
 
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
-
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-
-function validateMagicBytes(buffer: Buffer): boolean {
-  if (buffer.length < 8) return false;
-  // JPEG
-  if (buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF) return true;
-  // PNG
-  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) return true;
-  // WebP
-  if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 &&
-      buffer.length >= 12 && buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50) return true;
-  return false;
+const types: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+function validImage(buffer: Buffer, type: string) {
+  if (type === 'image/jpeg') return buffer.length >= 3 && buffer[0] === 255 && buffer[1] === 216 && buffer[2] === 255;
+  if (type === 'image/png') return buffer.length >= 8 && buffer.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
+  return type === 'image/webp' && buffer.length >= 12 && buffer.toString('ascii',0,4) === 'RIFF' && buffer.toString('ascii',8,12) === 'WEBP';
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const formData = await request.formData();
-    const file = formData.get('file') as File | null;
-    const registrationToken = formData.get('token') as string;
-
-    if (!file) {
-      return NextResponse.json({ error: 'Niciun fișier selectat.' }, { status: 400 });
-    }
-
-    if (!registrationToken || registrationToken.length < 16) {
-      return NextResponse.json({ error: 'Token de înregistrare invalid.' }, { status: 400 });
-    }
-
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json({ error: 'Tip neacceptat. Acceptăm: JPG, PNG, WebP.' }, { status: 400 });
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: 'Fișierul depășește 5MB.' }, { status: 400 });
-    }
-
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    if (!validateMagicBytes(buffer)) {
-      return NextResponse.json({ error: 'Fișierul nu este o imagine validă.' }, { status: 400 });
-    }
-
-    const supabase = getSupabaseAdmin();
-    const ext = file.name.split('.').pop() || 'jpg';
-    const uniqueName = `registration/${registrationToken}/${Date.now()}-${crypto.randomBytes(4).toString('hex')}.${ext}`;
-
-    const { error } = await supabase.storage
-      .from('uploads')
-      .upload(uniqueName, buffer, { contentType: file.type, upsert: false });
-
-    if (error) {
-      // Try creating bucket if it doesn't exist
-      if (error.message?.includes('not found') || error.message?.includes('Bucket')) {
-        await supabase.storage.createBucket('uploads', { public: true, fileSizeLimit: MAX_FILE_SIZE, allowedMimeTypes: ALLOWED_TYPES });
-        const { error: retryError } = await supabase.storage.from('uploads').upload(uniqueName, buffer, { contentType: file.type, upsert: false });
-        if (retryError) {
-          return NextResponse.json({ error: 'Eroare la upload. Încearcă din nou.' }, { status: 500 });
-        }
-      } else {
-        return NextResponse.json({ error: 'Eroare la upload. Încearcă din nou.' }, { status: 500 });
-      }
-    }
-
-    const { data: urlData } = supabase.storage.from('uploads').getPublicUrl(uniqueName);
-
-    return NextResponse.json({ success: true, url: urlData.publicUrl, path: uniqueName });
-  } catch (err) {
-    console.error('Registration upload error:', err);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+  const session = await registrationSession();
+  if (!session) return await localizedJson({ error: 'Sesiune de upload invalida sau expirata.' }, { status: 401 });
+  const form = await request.formData();
+  const file = form.get('file');
+  if (!(file instanceof File) || !types[file.type] || file.size < 1 || file.size > 5242880) return await localizedJson({ error: 'Imagine invalida sau mai mare de 5MB.' }, { status: 400 });
+  const buffer = Buffer.from(await file.arrayBuffer());
+  if (!validImage(buffer,file.type)) return await localizedJson({ error: 'Semnatura imaginii nu corespunde formatului.' }, { status: 400 });
+  const database = registrationDatabase();
+  const { data: reserved, error: quotaError } = await database.rpc('reserve_registration_upload', { p_token_hash: session.hash });
+  if (quotaError || !reserved) return await localizedJson({ error: 'Limita de 10 poze a fost atinsa sau sesiunea a expirat.' }, { status: 429 });
+  const path = `${session.id}/${crypto.randomUUID()}.${types[file.type]}`;
+  const { error } = await database.storage.from(registrationBucket).upload(path,buffer,{contentType:file.type});
+  if (error) {
+    await database.rpc('release_registration_upload',{p_session_id:session.id});
+    return await localizedJson({ error: 'Imaginea nu a putut fi salvata.' },{status:500});
   }
+  const { data: preview, error: previewError } = await database.storage.from(registrationBucket).createSignedUrl(path,3600);
+  if (previewError || !preview) {
+    await database.storage.from(registrationBucket).remove([path]);
+    await database.rpc('release_registration_upload',{p_session_id:session.id});
+    return await localizedJson({error:'Previzualizarea nu a putut fi creata.'},{status:500});
+  }
+  return await localizedJson({success:true,path,url:preview.signedUrl});
+}
+
+export async function DELETE(request: NextRequest) {
+  const session = await registrationSession();
+  if (!session) return await localizedJson({error:'Sesiune invalida.'},{status:401});
+  const body = await request.json().catch(()=>null);
+  const path = body?.path;
+  if (typeof path !== 'string' || !new RegExp(`^${session.id}/[a-f0-9-]{36}\\.(jpg|png|webp)$`).test(path)) return await localizedJson({error:'Fisier invalid.'},{status:400});
+  const database = registrationDatabase();
+  const { data: files } = await database.storage.from(registrationBucket).list(session.id);
+  if (!(files || []).some(file => `${session.id}/${file.name}` === path)) return await localizedJson({error:'Fisier negasit.'},{status:404});
+  const { error } = await database.storage.from(registrationBucket).remove([path]);
+  if (error) return await localizedJson({error:'Fisierul nu a putut fi sters.'},{status:500});
+  await database.rpc('release_registration_upload',{p_session_id:session.id});
+  return await localizedJson({success:true});
 }

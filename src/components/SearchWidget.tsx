@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useUiText } from '@/i18n/useUiText';
+
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Dumbbell, Heart, Zap, Wrench, LayoutGrid } from 'lucide-react';
 import { useClientTranslations } from '@/i18n/client';
@@ -20,46 +22,31 @@ const categories: Category[] = [
 ];
 
 export default function SearchWidget() {
+  const ui = useUiText();
   const { t } = useClientTranslations('searchWidget');
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [count, setCount] = useState<number | null>(null);
   const [loadingCount, setLoadingCount] = useState(false);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch product count based on category and search
-  const fetchCount = useCallback(async (category: string, search: string) => {
-    setLoadingCount(true);
-    try {
-      const params = new URLSearchParams();
-      if (category !== 'all') params.set('category', category);
-      if (search.trim()) params.set('search', search.trim());
-      const res = await fetch(`/api/products/count?${params.toString()}`);
-      if (res.ok) {
-        const data = await res.json();
-        setCount(data.count);
-      }
-    } catch {
-      // Keep previous count on error
-    } finally {
-      setLoadingCount(false);
-    }
-  }, []);
-
-  // Fetch count on mount and when category changes
   useEffect(() => {
-    fetchCount(activeCategory, searchQuery);
-  }, [activeCategory]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Debounced fetch on search input change
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      fetchCount(activeCategory, value);
+    const controller = new AbortController();
+    setLoadingCount(true);
+    const timer = setTimeout(async () => {
+      try {
+        const params = new URLSearchParams();
+        if (activeCategory !== 'all') params.set('category', activeCategory);
+        if (searchQuery.trim()) params.set('search', searchQuery.trim());
+        const res = await fetch(`/api/products/count?${params}`, { signal: controller.signal });
+        if (!res.ok) throw new Error();
+        setCount((await res.json()).count);
+      } catch { if (!controller.signal.aborted) setCount(null); }
+      finally { if (!controller.signal.aborted) setLoadingCount(false); }
     }, 300);
-  };
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, [activeCategory, searchQuery]);
+  const handleSearchChange = (value: string) => setSearchQuery(value);
 
   // Navigate to products page with filters
   const handleSearch = () => {
@@ -96,7 +83,7 @@ export default function SearchWidget() {
                 : 'bg-anthracite-800 text-anthracite-300 hover:bg-anthracite-700 hover:text-white border border-anthracite-700'
             }`}
           >
-            {cat.icon}
+            {ui(cat.icon)}
             <span>{t(cat.labelKey)}</span>
           </button>
         ))}
@@ -111,7 +98,7 @@ export default function SearchWidget() {
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={t('placeholder')}
+            placeholder={ui(t('placeholder'))} aria-label={ui(t('placeholder'))}
             className="w-full pl-12 pr-4 py-4 bg-anthracite-800 border border-anthracite-700 rounded-xl text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400/50 focus:ring-1 focus:ring-gold-400/20 transition-all"
           />
         </div>
@@ -120,7 +107,7 @@ export default function SearchWidget() {
           disabled={loadingCount}
           className="px-8 py-4 bg-gold-400 hover:bg-gold-500 text-anthracite-900 font-bold rounded-xl transition-all duration-200 whitespace-nowrap shadow-lg shadow-gold-400/20 hover:shadow-gold-400/30 active:scale-[0.97] disabled:opacity-70"
         >
-          {getButtonText()}
+          {ui(getButtonText())}
         </button>
       </div>
     </div>

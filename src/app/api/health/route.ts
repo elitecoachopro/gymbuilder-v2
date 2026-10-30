@@ -1,4 +1,6 @@
-import { NextResponse } from 'next/server';
+import { getErrorMessage } from '@/lib/error-message';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
 import { createClient } from '@supabase/supabase-js';
 
 export async function GET() {
@@ -23,7 +25,7 @@ export async function GET() {
   // Check Supabase connection
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
-      const supabase = createClient(
+      const supabase = createClient<Database>(
         process.env.NEXT_PUBLIC_SUPABASE_URL,
         process.env.SUPABASE_SERVICE_ROLE_KEY
       );
@@ -35,8 +37,8 @@ export async function GET() {
       } else {
         checks['database'] = { status: 'ok' };
       }
-    } catch (err: any) {
-      checks['database'] = { status: 'error', message: err.message || 'Connection failed' };
+    } catch (err) {
+      checks['database'] = { status: 'error', message: getErrorMessage(err, 'Connection failed') };
       overallStatus = 'unhealthy';
     }
   } else {
@@ -60,7 +62,7 @@ export async function GET() {
 
   const statusCode = overallStatus === 'unhealthy' ? 503 : 200;
 
-  return NextResponse.json({
+  return await localizedJson({
     status: overallStatus,
     timestamp: new Date().toISOString(),
     version: '1.0.0',

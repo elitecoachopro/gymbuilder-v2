@@ -1,7 +1,11 @@
 'use client';
 
+import { createContactSender } from '@/lib/contact-sender';
+import { useUiText } from '@/i18n/useUiText';
+
 import { useState, useEffect, useRef } from 'react';
 import { MessageCircle, X, Send, Loader2, CheckCircle } from 'lucide-react';
+import { useAuthStore } from '@/store/auth';
 import { usePathname } from 'next/navigation';
 
 interface PageContext {
@@ -12,6 +16,12 @@ interface PageContext {
   supplierId?: string;
 }
 
+interface ConversationRequest {
+  id: string; status: string;
+  supplier_profiles: { company_name: string } | null;
+  products: { name: string } | null;
+}
+
 interface ActiveConversation {
   requestId: string;
   supplierName: string;
@@ -19,99 +29,63 @@ interface ActiveConversation {
 }
 
 export default function FloatingChatButton() {
+  const ui = useUiText();
+  const [sendGeneral] = useState(() => createContactSender('/api/contact'));
+  const [sendSupplier] = useState(() => createContactSender('/api/contact/supplier'));
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<{ id: string; full_name: string; email: string } | null>(null);
+  const user = useAuthStore(s => s.user);
+  const [formError, setFormError] = useState('');
+  const [contextLoading, setContextLoading] = useState(false);
   const [activeConversations, setActiveConversations] = useState<ActiveConversation[]>([]);
   const [pageContext, setPageContext] = useState<PageContext>({ type: 'general' });
   const [formState, setFormState] = useState<'form' | 'sending' | 'success'>('form');
   const [formData, setFormData] = useState({ name: '', contact: '', message: '' });
   const pathname = usePathname();
   const panelRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // Check user session
   useEffect(() => {
-    async function checkSession() {
-      try {
-        const res = await fetch('/api/auth/me');
-        if (res.ok) {
-          const data = await res.json();
-          if (data.user) {
-            setUser(data.user);
-            // Fetch active conversations for logged-in user
-            fetchConversations(data.user.id);
-          }
-        }
-      } catch {}
-    }
-    checkSession();
-  }, []);
+    const controller = new AbortController();
+    if (user) fetchConversations(user.id, controller.signal);
+    else { setActiveConversations([]); setFormData({ name: '', contact: '', message: '' }); }
+    return () => controller.abort();
+  }, [user]);
 
-  // Detect page context from URL and page content
   useEffect(() => {
-    detectPageContext();
+    const controller = new AbortController();
+    const productMatch = pathname?.match(/^\/products\/([^/]+)$/);
+    const supplierMatch = pathname?.match(/^\/suppliers\/([^/]+)$/);
+    setPageContext({ type: 'general' }); setFormError('');
+    if (!productMatch && !supplierMatch) { setContextLoading(false); return; }
+    setContextLoading(true);
+    const url = productMatch ? `/api/products/${productMatch[1]}` : `/api/suppliers/${supplierMatch![1]}`;
+    fetch(url, { signal: controller.signal }).then(async res => {
+      if (!res.ok) throw new Error('Contextul paginii nu a putut fi încărcat.');
+      const data = await res.json();
+      const supplier = data.product?.supplier || data.supplier;
+      if (!supplier?.id) throw new Error('Furnizor indisponibil.');
+      setPageContext({ type: productMatch ? 'product' : 'supplier', productId: data.product?.id, productName: data.product?.name, supplierId: supplier.id, supplierName: supplier.company_name });
+      setFormData(previous => ({ ...previous, message: productMatch ? `Bună ziua! Sunt interesat(ă) de ${data.product.name}.` : 'Bună ziua! Aș dori detalii despre produsele dumneavoastră.' }));
+    }).catch(error => { if (!controller.signal.aborted) setFormError(error.message); })
+      .finally(() => { if (!controller.signal.aborted) setContextLoading(false); });
+    return () => controller.abort();
   }, [pathname]);
 
-  function detectPageContext() {
-    if (!pathname) return;
-    // Product page: /products/[id]
-    const productMatch = pathname.match(/^\/products\/([^/]+)$/);
-    if (productMatch) {
-      // Try to get product name from page title or DOM
-      const productName = document.querySelector('h1')?.textContent || 'acest produs';
-      const supplierEl = document.querySelector('[data-supplier-id]');
-      setPageContext({
-        type: 'product',
-        productId: productMatch[1],
-        productName,
-        supplierId: supplierEl?.getAttribute('data-supplier-id') || undefined,
-        supplierName: supplierEl?.getAttribute('data-supplier-name') || undefined,
-      });
-      setFormData(prev => ({
-        ...prev,
-        message: `Bună ziua! Sunt interesat(ă) de ${productName}. Aș dori mai multe detalii.`
-      }));
-      return;
-    }
-
-    // Supplier page: /suppliers/[id]
-    const supplierMatch = pathname.match(/^\/suppliers\/([^/]+)$/);
-    if (supplierMatch) {
-      const supplierName = document.querySelector('h1')?.textContent || 'acest furnizor';
-      setPageContext({
-        type: 'supplier',
-        supplierId: supplierMatch[1],
-        supplierName,
-      });
-      setFormData(prev => ({
-        ...prev,
-        message: `Bună ziua! Aș dori să discut despre produsele dumneavoastră.`
-      }));
-      return;
-    }
-
-    // General page
-    setPageContext({ type: 'general' });
-    setFormData(prev => ({
-      ...prev,
-      message: ''
-    }));
-  }
-
-  async function fetchConversations(userId: string) {
+  async function fetchConversations(userId: string, signal: AbortSignal) {
     try {
-      const res = await fetch('/api/client/dashboard');
+      const res = await fetch('/api/client/dashboard', { signal });
       if (res.ok) {
-        const data = await res.json();
+        const data: { contactRequests?: ConversationRequest[] } = await res.json();
         if (data.contactRequests) {
           const active = data.contactRequests
-            .filter((cr: any) => cr.status === 'replied' || cr.status === 'viewed')
+            .filter((cr) => cr.status === 'replied' || cr.status === 'viewed')
             .slice(0, 3)
-            .map((cr: any) => ({
+            .map((cr) => ({
               requestId: cr.id,
               supplierName: cr.supplier_profiles?.company_name || 'Furnizor',
               productName: cr.products?.name || undefined,
             }));
-          setActiveConversations(active);
+          if (!signal.aborted) setActiveConversations(active);
         }
       }
     } catch {}
@@ -124,52 +98,14 @@ export default function FloatingChatButton() {
     setFormState('sending');
 
     try {
-      // Use the existing contact/supplier API
-      const body: any = {
-        name: formData.name,
-        email: formData.contact.includes('@') ? formData.contact : undefined,
-        phone: !formData.contact.includes('@') ? formData.contact : undefined,
-        message: formData.message,
-      };
-
-      // If we have supplier context, send to that supplier
-      if (pageContext.supplierId) {
-        body.supplierId = pageContext.supplierId;
-        if (pageContext.productId) {
-          body.productId = pageContext.productId;
-        }
-        const res = await fetch('/api/contact/supplier', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-        if (res.ok) {
-          setFormState('success');
-          setTimeout(() => {
-            setFormState('form');
-            setIsOpen(false);
-          }, 3000);
-          return;
-        }
-      }
-
-      // General contact (no specific supplier)
-      body.subject = 'Contact rapid - GymBuilder';
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      if (res.ok) {
-        setFormState('success');
-        setTimeout(() => {
-          setFormState('form');
-          setIsOpen(false);
-        }, 3000);
-      } else {
-        setFormState('form');
-      }
-    } catch {
+      const body = { name: formData.name, email: formData.contact, message: formData.message, supplierId: pageContext.supplierId, productId: pageContext.productId, subject: 'Contact rapid - Gym Builder' };
+      if (/^\/(products|suppliers)\/[^/]+$/.test(pathname || '') && !pageContext.supplierId) throw new Error('Furnizor indisponibil. Reîncarcă pagina.');
+      const res = await (pageContext.supplierId ? sendSupplier : sendGeneral)(body);
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Mesajul nu a putut fi trimis.');
+      setFormState('success'); setFormError('');
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Eroare de conexiune.');
       setFormState('form');
     }
   }
@@ -185,23 +121,27 @@ export default function FloatingChatButton() {
     if (user) {
       setFormData(prev => ({
         ...prev,
-        name: prev.name || user.full_name || '',
+        name: prev.name || user.name || '',
         contact: prev.contact || user.email || '',
       }));
     }
   }, [user]);
 
-  // Close on outside click
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
+    if (!isOpen) return;
+    function handleOutside(e: PointerEvent) {
+      const target = e.target as Node;
+      if (!panelRef.current?.contains(target) && !triggerRef.current?.contains(target)) setIsOpen(false);
     }
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') { setIsOpen(false); triggerRef.current?.focus(); }
     }
+    document.addEventListener('pointerdown', handleOutside);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('pointerdown', handleOutside);
+      document.removeEventListener('keydown', handleKey);
+    };
   }, [isOpen]);
 
   // Determine if we should show conversations or form
@@ -212,13 +152,16 @@ export default function FloatingChatButton() {
     <>
       {/* Floating Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-6 z-[60] w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 ${
+        ref={triggerRef}
+        aria-expanded={isOpen}
+        aria-controls="quick-contact"
+        onClick={() => setIsOpen(open => !open)}
+        className={`fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-4 sm:right-6 z-[60] w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 ${
           isOpen
             ? 'bg-anthracite-800 border border-anthracite-600 rotate-0'
             : 'bg-gold-400 hover:bg-gold-300 hover:scale-105 active:scale-95'
         }`}
-        aria-label={isOpen ? 'Închide chat' : 'Chat rapid'}
+        aria-label={ui(isOpen ? 'Închide chat' : 'Chat rapid')}
       >
         {isOpen ? (
           <X className="w-5 h-5 text-white" />
@@ -231,14 +174,17 @@ export default function FloatingChatButton() {
       {isOpen && (
         <div
           ref={panelRef}
-          className="fixed bottom-24 right-6 z-[60] w-[340px] max-h-[480px] bg-anthracite-900 border border-anthracite-700 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200"
+          id="quick-contact"
+          role="region"
+          aria-label={ui("Contact rapid")}
+          className="fixed bottom-[calc(max(1.5rem,env(safe-area-inset-bottom))+4.5rem)] right-4 sm:right-6 z-[60] flex flex-col w-[calc(100vw-2rem)] max-w-[340px] max-h-[min(480px,calc(100dvh-7rem-env(safe-area-inset-bottom)))] bg-anthracite-900 border border-anthracite-700 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-200"
         >
           {/* Header */}
-          <div className="bg-anthracite-800 px-4 py-3 border-b border-anthracite-700">
+          <div className="shrink-0 bg-anthracite-800 px-4 py-3 border-b border-anthracite-700">
             <h3 className="text-sm font-semibold text-white">
-              {pageContext.type === 'product' && '💬 Întreabă despre produs'}
-              {pageContext.type === 'supplier' && '💬 Contactează furnizorul'}
-              {pageContext.type === 'general' && '💬 Contact rapid'}
+              {pageContext.type === 'product' && ui('💬 Întreabă despre produs')}
+              {pageContext.type === 'supplier' && ui('💬 Contactează furnizorul')}
+              {pageContext.type === 'general' && `💬 ${ui('Contact rapid')}`}
             </h3>
             <p className="text-xs text-anthracite-400 mt-0.5">
               {pageContext.type === 'product' && pageContext.productName && (
@@ -247,18 +193,17 @@ export default function FloatingChatButton() {
               {pageContext.type === 'supplier' && pageContext.supplierName && (
                 <span className="truncate block">{pageContext.supplierName}</span>
               )}
-              {pageContext.type === 'general' && 'Răspundem în maxim 24h'}
+              {pageContext.type === 'general' && ui('Răspundem în maxim 24h')}
             </p>
           </div>
 
           {/* Content */}
-          <div className="p-4 overflow-y-auto max-h-[380px]">
+          <div className="p-4 min-h-0 overflow-y-auto overscroll-contain">
             {/* Show active conversations if on general page and user has chats */}
             {showConversationsList && (
               <div className="mb-4">
                 <p className="text-xs text-anthracite-400 uppercase tracking-wider mb-2 font-medium">
-                  Conversații active
-                </p>
+                  {ui("Conversații active")}</p>
                 <div className="space-y-2">
                   {activeConversations.map((conv) => (
                     <button
@@ -279,8 +224,7 @@ export default function FloatingChatButton() {
                 </div>
                 <div className="border-t border-anthracite-700 my-3" />
                 <p className="text-xs text-anthracite-400 uppercase tracking-wider mb-2 font-medium">
-                  Mesaj nou
-                </p>
+                  {ui("Mesaj nou")}</p>
               </div>
             )}
 
@@ -290,61 +234,58 @@ export default function FloatingChatButton() {
                 <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center mb-3">
                   <CheckCircle className="w-6 h-6 text-emerald-400" />
                 </div>
-                <p className="text-sm font-medium text-white">Mesaj trimis!</p>
+                <p className="text-sm font-medium text-white">{ui("Mesaj trimis!")}</p>
                 <p className="text-xs text-anthracite-400 mt-1">
-                  Vei primi un răspuns în cel mai scurt timp.
-                </p>
+                  {ui("Vei primi un răspuns în cel mai scurt timp.")}</p>
               </div>
             )}
 
+            {formError && <p role="alert" className="text-sm text-red-400 mb-3">{ui(formError)}</p>}
             {/* Form */}
             {formState !== 'success' && (
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
                   <input
                     type="text"
-                    placeholder="Numele tău"
+                    placeholder={ui("Numele tău")} aria-label={ui("Numele tău")}
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 bg-anthracite-800 border border-anthracite-700 rounded-lg text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400/50 transition-colors"
+                    className="w-full px-3 py-2 bg-anthracite-800 border border-anthracite-700 rounded-lg text-base sm:text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400/50 transition-colors"
                     required
                   />
                 </div>
                 <div>
                   <input
-                    type="text"
-                    placeholder="Email sau telefon"
+                    type="email" placeholder="Email" aria-label="Email"
                     value={formData.contact}
                     onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-                    className="w-full px-3 py-2 bg-anthracite-800 border border-anthracite-700 rounded-lg text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400/50 transition-colors"
+                    className="w-full px-3 py-2 bg-anthracite-800 border border-anthracite-700 rounded-lg text-base sm:text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400/50 transition-colors"
                     required
                   />
                 </div>
                 <div>
                   <textarea
-                    placeholder="Mesajul tău..."
+                    placeholder={ui("Mesajul tău...")} aria-label={ui("Mesaj")} maxLength={5000}
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     rows={3}
-                    className="w-full px-3 py-2 bg-anthracite-800 border border-anthracite-700 rounded-lg text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400/50 transition-colors resize-none"
+                    className="w-full px-3 py-2 bg-anthracite-800 border border-anthracite-700 rounded-lg text-base sm:text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400/50 transition-colors resize-none"
                     required
                   />
                 </div>
                 <button
                   type="submit"
-                  disabled={formState === 'sending'}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gold-400 hover:bg-gold-300 text-anthracite-950 font-semibold text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={formState === 'sending' || contextLoading}
+                  className="w-full min-h-11 flex items-center justify-center gap-2 px-4 py-2.5 bg-gold-400 hover:bg-gold-300 text-anthracite-950 font-semibold text-sm rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {formState === 'sending' ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Se trimite...
-                    </>
+                      {ui("Se trimite...")}</>
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      Trimite mesajul
-                    </>
+                      {ui("Trimite mesajul")}</>
                   )}
                 </button>
               </form>

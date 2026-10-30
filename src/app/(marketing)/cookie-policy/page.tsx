@@ -1,11 +1,14 @@
 'use client';
 
+import { useUiText } from '@/i18n/useUiText';
+
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useClientTranslations } from '@/i18n/client';
 
 export default function CookiePolicyPage() {
+  const ui = useUiText();
   const { t } = useClientTranslations('cookiePolicy');
 
   return (
@@ -112,7 +115,7 @@ export default function CookiePolicyPage() {
               <p>{t('s8Text')}</p>
               <ul className="list-none space-y-1 mt-3">
                 <li><strong className="text-white">Email:</strong> contact@gymbuilder.app</li>
-                <li><strong className="text-white">{t('address')}:</strong> Mangalia, România</li>
+                <li><strong className="text-white">{t('address')}:</strong> {ui("Mangalia, România")}</li>
               </ul>
             </div>
           </div>

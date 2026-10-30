@@ -1,6 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import crypto from 'crypto';
+import { getPlanImageLimit } from '@/lib/plans';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { productCreateInput, productUpdateInput } from '@/lib/validation';
+import { authenticateSession } from '@/lib/session-server';
+import { NextRequest } from 'next/server';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 function escapeHtml(str: string): string {
   if (!str) return '';
@@ -12,54 +16,18 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#x27;');
 }
 
-// Validate file by checking magic bytes (binary signature)
-function validateMagicBytes(buffer: Buffer): boolean {
-  if (buffer.length < 8) return false;
-  // JPEG
-  if (buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF) return true;
-  // PNG
-  if (buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47 &&
-      buffer[4] === 0x0D && buffer[5] === 0x0A && buffer[6] === 0x1A && buffer[7] === 0x0A) return true;
-  // WebP
-  if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 &&
-      buffer.length >= 12 && buffer[8] === 0x57 && buffer[9] === 0x45 && buffer[10] === 0x42 && buffer[11] === 0x50) return true;
-  // GIF
-  if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x38 &&
-      (buffer[4] === 0x37 || buffer[4] === 0x39) && buffer[5] === 0x61) return true;
-  return false;
-}
-
 function getSupabaseAdmin() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
 // Verify session token and get user ID
-function verifySessionToken(token: string): { userId: string } | null {
-  try {
-    const [payloadB64, hmac] = token.split('.');
-    if (!payloadB64 || !hmac) return null;
-
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!secret) throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured');
-    const payload = Buffer.from(payloadB64, 'base64').toString();
-    const expectedHmac = crypto.createHmac('sha256', secret).update(payload).digest('hex');
-
-    if (hmac !== expectedHmac) return null;
-
-    const parsed = JSON.parse(payload);
-    if (parsed.exp < Date.now()) return null;
-
-    return { userId: parsed.userId };
-  } catch {
-    return null;
-  }
-}
+async function verifySessionToken(token: string) { return authenticateSession(token); }
 
 // Helper: get supplier profile from session
-async function getSupplierProfile(supabase: any, userId: string) {
+async function getSupplierProfile(supabase: SupabaseClient<Database>, userId: string) {
   const { data: user } = await supabase
     .from('users')
     .select('id, role')
@@ -76,52 +44,13 @@ async function getSupplierProfile(supabase: any, userId: string) {
   return profile;
 }
 
-// Helper: upload base64 image to Supabase Storage
-async function uploadImage(supabase: any, base64Data: string, supplierId: string, index: number): Promise<string | null> {
-  try {
-    // Extract mime type and data from base64
-    const match = base64Data.match(/^data:(image\/\w+);base64,(.+)$/);
-    if (!match) return null;
-
-    const mimeType = match[1];
-    const data = match[2];
-    const ext = mimeType.split('/')[1] || 'jpg';
-    const buffer = Buffer.from(data, 'base64');
-
-    // Validate magic bytes
-    if (!validateMagicBytes(buffer)) return null;
-
-    // Max 5MB
-    if (buffer.length > 5 * 1024 * 1024) return null;
-
-    const fileName = `products/${supplierId}/${Date.now()}-${index}-${crypto.randomBytes(4).toString('hex')}.${ext}`;
-
-    // Ensure bucket exists
-    const { error: bucketError } = await supabase.storage.getBucket('uploads');
-    if (bucketError) {
-      await supabase.storage.createBucket('uploads', {
-        public: true,
-        fileSizeLimit: 5 * 1024 * 1024,
-        allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-      });
-    }
-
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('uploads')
-      .upload(fileName, buffer, { contentType: mimeType, upsert: false });
-
-    if (uploadError) {
-      console.error('Image upload error:', uploadError);
-      return null;
-    }
-
-    // Get public URL
-    const { data: urlData } = supabase.storage.from('uploads').getPublicUrl(fileName);
-    return urlData.publicUrl;
-  } catch (err) {
-    console.error('Upload image exception:', err);
-    return null;
-  }
+async function resolveBrand(supabase: SupabaseClient<Database>, suppliedName: string) {
+  const name = suppliedName === 'Altul' ? 'Altele' : suppliedName;
+  const { error } = await supabase.from('brands').upsert({ name }, { onConflict: 'name', ignoreDuplicates: true });
+  if (error) throw new Error('Brand could not be saved');
+  const { data, error: lookupError } = await supabase.from('brands').select('id').eq('name', name).single();
+  if (lookupError || !data) throw new Error('Brand could not be loaded');
+  return data.id;
 }
 
 export async function POST(request: NextRequest) {
@@ -130,96 +59,55 @@ export async function POST(request: NextRequest) {
       request.headers.get('authorization')?.replace('Bearer ', '');
 
     if (!sessionToken) {
-      return NextResponse.json({ error: 'Trebuie să fii autentificat pentru a adăuga produse.' }, { status: 401 });
+      return await localizedJson({ error: 'Trebuie să fii autentificat pentru a adăuga produse.' }, { status: 401 });
     }
 
-    const session = verifySessionToken(sessionToken);
+    const session = await verifySessionToken(sessionToken);
     if (!session) {
-      return NextResponse.json({ error: 'Sesiune expirată. Te rugăm să te autentifici din nou.' }, { status: 401 });
+      return await localizedJson({ error: 'Sesiune expirată. Te rugăm să te autentifici din nou.' }, { status: 401 });
     }
 
     const supabase = getSupabaseAdmin();
     const supplierProfile = await getSupplierProfile(supabase, session.userId);
 
     if (!supplierProfile) {
-      return NextResponse.json({ error: 'Doar furnizorii pot adăuga produse.' }, { status: 403 });
+      return await localizedJson({ error: 'Doar furnizorii pot adăuga produse.' }, { status: 403 });
     }
 
     if (supplierProfile.status !== 'approved') {
-      return NextResponse.json({ error: 'Profilul tău de furnizor nu este încă aprobat.' }, { status: 403 });
+      return await localizedJson({ error: 'Profilul tău de furnizor nu este încă aprobat.' }, { status: 403 });
     }
 
     const body = await request.json();
-    const { name, category, brand, condition, price_eur, description, images, images_360 } = body;
+    const parsed = productCreateInput.safeParse(body);
+    if (!parsed.success) return await localizedJson({ error: 'Date produs invalide.' }, { status: 400 });
+    const { name, category, brand, condition, price_eur, description, images, images_360 } = parsed.data;
+
+    if (images && images.length > getPlanImageLimit(supplierProfile.plan)) return await localizedJson({ error: `Pachetul permite maximum ${getPlanImageLimit(supplierProfile.plan)} imagini per produs.` }, { status: 403 });
 
     // Validation
     if (!name || !category || !brand || !price_eur) {
-      return NextResponse.json({ error: 'Completează toate câmpurile obligatorii.' }, { status: 400 });
+      return await localizedJson({ error: 'Completează toate câmpurile obligatorii.' }, { status: 400 });
     }
 
     const validCategories = ['cardio', 'strength', 'functional', 'accessories', 'wellness', 'lockers', 'reception'];
     if (!validCategories.includes(category)) {
-      return NextResponse.json({ error: 'Categorie invalidă.' }, { status: 400 });
+      return await localizedJson({ error: 'Categorie invalidă.' }, { status: 400 });
     }
 
     const validConditions = ['new', 'used'];
     if (!validConditions.includes(condition)) {
-      return NextResponse.json({ error: 'Condiție invalidă.' }, { status: 400 });
+      return await localizedJson({ error: 'Condiție invalidă.' }, { status: 400 });
     }
 
     if (typeof price_eur !== 'number' || price_eur <= 0) {
-      return NextResponse.json({ error: 'Prețul trebuie să fie un număr pozitiv.' }, { status: 400 });
+      return await localizedJson({ error: 'Prețul trebuie să fie un număr pozitiv.' }, { status: 400 });
     }
 
-    // Find brand_id from brands table
-    let brandId = null;
-    const { data: brandRecord } = await supabase
-      .from('brands')
-      .select('id')
-      .eq('name', brand)
-      .single();
-
-    if (brandRecord) {
-      brandId = brandRecord.id;
-    }
-
-    // Upload images to Supabase Storage
-    const imageUrls: string[] = [];
-    if (Array.isArray(images) && images.length > 0) {
-      for (let i = 0; i < Math.min(images.length, 6); i++) {
-        const img = images[i];
-        if (typeof img === 'string') {
-          if (img.startsWith('data:image/')) {
-            // Base64 image - upload to storage
-            const url = await uploadImage(supabase, img, supplierProfile.id, i);
-            if (url) imageUrls.push(url);
-          } else if (img.startsWith('http')) {
-            // Already a URL - keep as is
-            imageUrls.push(img);
-          }
-        }
-      }
-    }
-
-    // Upload 360° images if provided (only professional/enterprise plans)
-    const image360Urls: string[] = [];
-    const allowedPlansFor360 = ['professional', 'enterprise'];
-    if (Array.isArray(images_360) && images_360.length > 0) {
-      if (!allowedPlansFor360.includes(supplierProfile.plan || 'free')) {
-        return NextResponse.json({ error: 'Galeria 360° este disponibilă doar pentru planurile Professional și Enterprise.' }, { status: 403 });
-      }
-      for (let i = 0; i < Math.min(images_360.length, 36); i++) {
-        const img = images_360[i];
-        if (typeof img === 'string') {
-          if (img.startsWith('data:image/')) {
-            const url = await uploadImage(supabase, img, supplierProfile.id, 100 + i);
-            if (url) image360Urls.push(url);
-          } else if (img.startsWith('http')) {
-            image360Urls.push(img);
-          }
-        }
-      }
-    }
+    const brandId = await resolveBrand(supabase, brand);
+    const imageUrls = images || [];
+    const image360Urls = images_360 || [];
+    if (image360Urls.length && !['professional', 'enterprise'].includes(supplierProfile.plan)) return await localizedJson({ error: 'Galeria 360° este disponibilă doar pentru planurile Professional și Enterprise.' }, { status: 403 });
 
     // Insert product
     const { data: newProduct, error: insertError } = await supabase
@@ -241,18 +129,19 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
+      if (insertError.code === '23514' && /limit|quota|plan/i.test(insertError.message)) return await localizedJson({ error: 'Ai atins limita de produse a planului. Arhivează un produs sau contactează-ne pentru schimbarea planului.' }, { status: 409 });
       console.error('Product insert error:', insertError);
-      return NextResponse.json({ error: 'Eroare la salvarea produsului. Încearcă din nou.' }, { status: 500 });
+      return await localizedJson({ error: 'Eroare la salvarea produsului. Încearcă din nou.' }, { status: 500 });
     }
 
-    return NextResponse.json({
+    return await localizedJson({
       success: true,
       message: 'Produs adăugat cu succes!',
       product: newProduct,
     });
   } catch (error) {
     console.error('Add product error:', error);
-    return NextResponse.json({ error: 'Eroare internă. Încearcă din nou.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă. Încearcă din nou.' }, { status: 500 });
   }
 }
 
@@ -263,22 +152,22 @@ export async function GET(request: NextRequest) {
       request.headers.get('authorization')?.replace('Bearer ', '');
 
     if (!sessionToken) {
-      return NextResponse.json({ error: 'Trebuie să fii autentificat.' }, { status: 401 });
+      return await localizedJson({ error: 'Trebuie să fii autentificat.' }, { status: 401 });
     }
 
-    const session = verifySessionToken(sessionToken);
+    const session = await verifySessionToken(sessionToken);
     if (!session) {
-      return NextResponse.json({ error: 'Sesiune expirată.' }, { status: 401 });
+      return await localizedJson({ error: 'Sesiune expirată.' }, { status: 401 });
     }
 
     const supabase = getSupabaseAdmin();
     const { data: supplierProfile } = await supabase
       .from('supplier_profiles')
-      .select('id, plan')
+      .select('id, plan, status')
       .eq('user_id', session.userId)
       .single();
     if (!supplierProfile) {
-      return NextResponse.json({ error: 'Profil de furnizor negăsit.' }, { status: 404 });
+      return await localizedJson({ error: 'Profil de furnizor negăsit.' }, { status: 404 });
     }
     const { data: products, error } = await supabase
       .from('products')
@@ -287,12 +176,12 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
     if (error) {
       console.error('Products fetch error:', error);
-      return NextResponse.json({ error: 'Eroare la încărcarea produselor.' }, { status: 500 });
+      return await localizedJson({ error: 'Eroare la încărcarea produselor.' }, { status: 500 });
     }
-    return NextResponse.json({ products: products || [], plan: supplierProfile.plan || 'free' });
+    return await localizedJson({ products: products || [], plan: supplierProfile.plan || 'free', supplierStatus: supplierProfile.status });
   } catch (error) {
     console.error('Get products error:', error);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă.' }, { status: 500 });
   }
 }
 
@@ -303,25 +192,28 @@ export async function PATCH(request: NextRequest) {
       request.headers.get('authorization')?.replace('Bearer ', '');
 
     if (!sessionToken) {
-      return NextResponse.json({ error: 'Trebuie să fii autentificat.' }, { status: 401 });
+      return await localizedJson({ error: 'Trebuie să fii autentificat.' }, { status: 401 });
     }
 
-    const session = verifySessionToken(sessionToken);
+    const session = await verifySessionToken(sessionToken);
     if (!session) {
-      return NextResponse.json({ error: 'Sesiune expirată.' }, { status: 401 });
+      return await localizedJson({ error: 'Sesiune expirată.' }, { status: 401 });
     }
 
     const supabase = getSupabaseAdmin();
     const supplierProfile = await getSupplierProfile(supabase, session.userId);
     if (!supplierProfile) {
-      return NextResponse.json({ error: 'Acces interzis.' }, { status: 403 });
+      return await localizedJson({ error: 'Acces interzis.' }, { status: 403 });
     }
 
     const body = await request.json();
-    const { productId, name, category, brand, condition, price_eur, description, images, images_360, status } = body;
+    const parsed = productUpdateInput.safeParse(body);
+    if (!parsed.success) return await localizedJson({ error: 'Date produs invalide.' }, { status: 400 });
+    const { productId, name, category, brand, condition, price_eur, description, images, images_360, status } = parsed.data;
+    if (images && images.length > getPlanImageLimit(supplierProfile.plan)) return await localizedJson({ error: `Pachetul permite maximum ${getPlanImageLimit(supplierProfile.plan)} imagini per produs.` }, { status: 403 });
 
     if (!productId) {
-      return NextResponse.json({ error: 'ID produs lipsă.' }, { status: 400 });
+      return await localizedJson({ error: 'ID produs lipsă.' }, { status: 400 });
     }
 
     // Verify product belongs to this supplier
@@ -333,11 +225,11 @@ export async function PATCH(request: NextRequest) {
       .single();
 
     if (!existingProduct) {
-      return NextResponse.json({ error: 'Produs negăsit sau nu îți aparține.' }, { status: 404 });
+      return await localizedJson({ error: 'Produs negăsit sau nu îți aparține.' }, { status: 404 });
     }
 
     // Build update object
-    const updateData: any = { updated_at: new Date().toISOString() };
+    const updateData: Database['public']['Tables']['products']['Update'] = { updated_at: new Date().toISOString() };
     if (name) updateData.name = name;
     if (category) updateData.category = category;
     if (condition) updateData.condition = condition;
@@ -345,48 +237,11 @@ export async function PATCH(request: NextRequest) {
     if (description !== undefined) updateData.description = description;
     if (status) updateData.status = status;
 
-    // Handle brand
-    if (brand) {
-      const { data: brandRecord } = await supabase.from('brands').select('id').eq('name', brand).single();
-      updateData.brand_id = brandRecord?.id || null;
-    }
-
-    // Handle images (upload new ones, keep existing URLs)
-    if (Array.isArray(images)) {
-      const imageUrls: string[] = [];
-      for (let i = 0; i < Math.min(images.length, 6); i++) {
-        const img = images[i];
-        if (typeof img === 'string') {
-          if (img.startsWith('data:image/')) {
-            const url = await uploadImage(supabase, img, supplierProfile.id, i);
-            if (url) imageUrls.push(url);
-          } else if (img.startsWith('http')) {
-            imageUrls.push(img);
-          }
-        }
-      }
-      updateData.images = imageUrls;
-    }
-
-    // Handle 360° images (upload new ones, keep existing URLs) - only professional/enterprise
-    if (Array.isArray(images_360)) {
-      const allowedPlansFor360 = ['professional', 'enterprise'];
-      if (!allowedPlansFor360.includes(supplierProfile.plan || 'free')) {
-        return NextResponse.json({ error: 'Galeria 360° este disponibilă doar pentru planurile Professional și Enterprise.' }, { status: 403 });
-      }
-      const image360Urls: string[] = [];
-      for (let i = 0; i < Math.min(images_360.length, 36); i++) {
-        const img = images_360[i];
-        if (typeof img === 'string') {
-          if (img.startsWith('data:image/')) {
-            const url = await uploadImage(supabase, img, supplierProfile.id, 100 + i);
-            if (url) image360Urls.push(url);
-          } else if (img.startsWith('http')) {
-            image360Urls.push(img);
-          }
-        }
-      }
-      updateData.images_360 = image360Urls;
+    if (brand) updateData.brand_id = await resolveBrand(supabase, brand);
+    if (images !== undefined) updateData.images = images;
+    if (images_360 !== undefined) {
+      if (images_360.length && !['professional', 'enterprise'].includes(supplierProfile.plan)) return await localizedJson({ error: 'Galeria 360° este disponibilă doar pentru planurile Professional și Enterprise.' }, { status: 403 });
+      updateData.images_360 = images_360;
     }
 
     const { data: updatedProduct, error: updateError } = await supabase
@@ -398,12 +253,12 @@ export async function PATCH(request: NextRequest) {
 
     if (updateError) {
       console.error('Product update error:', updateError);
-      return NextResponse.json({ error: 'Eroare la actualizarea produsului.' }, { status: 500 });
+      return await localizedJson({ error: 'Eroare la actualizarea produsului.' }, { status: 500 });
     }
 
     // Check for price drop and notify users who have this product in favorites
     if (price_eur && existingProduct.price_eur && price_eur < existingProduct.price_eur) {
-      notifyPriceDrop(
+      await notifyPriceDrop(
         supabase,
         productId,
         existingProduct.name || name || 'Produs',
@@ -412,16 +267,16 @@ export async function PATCH(request: NextRequest) {
       ).catch((err) => console.error('Price drop notification error:', err));
     }
 
-    return NextResponse.json({ success: true, message: 'Produs actualizat!', product: updatedProduct });
+    return await localizedJson({ success: true, message: 'Produs actualizat!', product: updatedProduct });
   } catch (error) {
     console.error('Update product error:', error);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă.' }, { status: 500 });
   }
 }
 
 // Notify users who favorited a product when its price drops
 async function notifyPriceDrop(
-  supabase: any,
+  supabase: SupabaseClient<Database>,
   productId: string,
   productName: string,
   oldPrice: number,
@@ -436,12 +291,13 @@ async function notifyPriceDrop(
   if (!favUsers || favUsers.length === 0) return;
 
   // Get user emails for sending Resend notifications
-  const userIds = favUsers.map((f: any) => f.user_id);
-  const { data: users } = await supabase
+  const userIds = favUsers.map((f) => f.user_id);
+  const { data: users, error: usersError } = await supabase
     .from('users')
-    .select('id, email, name')
+    .select('id, email, full_name')
     .in('id', userIds);
 
+  if (usersError) throw new Error('Could not load favorite recipients');
   if (!users || users.length === 0) return;
 
   const title = `Prețul a scăzut la ${productName}`;
@@ -449,7 +305,7 @@ async function notifyPriceDrop(
   const link = `/products/${productId}`;
 
   // Create in-app notifications for all users
-  const notifications = users.map((u: any) => ({
+  const notifications = users.map((u) => ({
     user_id: u.id,
     type: 'price_drop',
     title,
@@ -459,22 +315,24 @@ async function notifyPriceDrop(
     created_at: new Date().toISOString(),
   }));
 
-  await supabase.from('notifications').insert(notifications);
+  const { error: notificationError } = await supabase.from('notifications').insert(notifications);
+  if (notificationError) throw new Error('Could not save price drop notifications');
 
   // Send email notifications via Resend
+  if (!process.env.RESEND_API_KEY) return;
   const { Resend } = await import('resend');
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   for (const user of users) {
     try {
       await resend.emails.send({
-        from: 'GymBuilder <noreply@gymbuilder.app>',
+        from: 'Gym Builder <noreply@gymbuilder.app>',
         to: user.email,
-        subject: 'Prețul a scăzut la un produs din favoritele tale — GymBuilder',
+        subject: 'Prețul a scăzut la un produs din favoritele tale — Gym Builder',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #1a1a1a;">Prețul a scăzut! 🎉</h2>
-            <p style="color: #333;">Salut${user.name ? ` ${escapeHtml(user.name)}` : ''},</p>
+            <p style="color: #333;">Salut${user.full_name ? ` ${escapeHtml(user.full_name)}` : ''},</p>
             <p style="color: #333;">Un produs din favoritele tale a primit o reducere de preț:</p>
             <div style="background: #f8f8f8; border-radius: 8px; padding: 16px; margin: 16px 0;">
               <h3 style="margin: 0 0 8px 0; color: #1a1a1a;">${escapeHtml(productName)}</h3>
@@ -486,7 +344,7 @@ async function notifyPriceDrop(
               <p style="margin: 8px 0 0 0; color: #16a34a; font-size: 13px;">Economisești €${Number(oldPrice - newPrice).toLocaleString()}!</p>
             </div>
             <a href="https://gymbuilder.app/products/${productId}" style="display: inline-block; background: #d4a843; color: #1a1a1a; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 8px;">Vezi Produsul</a>
-            <p style="color: #999; font-size: 12px; margin-top: 24px;">Primești acest email pentru că ai adăugat acest produs la favorite pe GymBuilder.</p>
+            <p style="color: #999; font-size: 12px; margin-top: 24px;">Primești acest email pentru că ai adăugat acest produs la favorite pe Gym Builder.</p>
           </div>
         `,
       });
@@ -503,25 +361,25 @@ export async function DELETE(request: NextRequest) {
       request.headers.get('authorization')?.replace('Bearer ', '');
 
     if (!sessionToken) {
-      return NextResponse.json({ error: 'Trebuie să fii autentificat.' }, { status: 401 });
+      return await localizedJson({ error: 'Trebuie să fii autentificat.' }, { status: 401 });
     }
 
-    const session = verifySessionToken(sessionToken);
+    const session = await verifySessionToken(sessionToken);
     if (!session) {
-      return NextResponse.json({ error: 'Sesiune expirată.' }, { status: 401 });
+      return await localizedJson({ error: 'Sesiune expirată.' }, { status: 401 });
     }
 
     const supabase = getSupabaseAdmin();
     const supplierProfile = await getSupplierProfile(supabase, session.userId);
     if (!supplierProfile) {
-      return NextResponse.json({ error: 'Acces interzis.' }, { status: 403 });
+      return await localizedJson({ error: 'Acces interzis.' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('id');
 
     if (!productId) {
-      return NextResponse.json({ error: 'ID produs lipsă.' }, { status: 400 });
+      return await localizedJson({ error: 'ID produs lipsă.' }, { status: 400 });
     }
 
     // Verify product belongs to this supplier
@@ -533,7 +391,7 @@ export async function DELETE(request: NextRequest) {
       .single();
 
     if (!existingProduct) {
-      return NextResponse.json({ error: 'Produs negăsit sau nu îți aparține.' }, { status: 404 });
+      return await localizedJson({ error: 'Produs negăsit sau nu îți aparține.' }, { status: 404 });
     }
 
     const { error: deleteError } = await supabase
@@ -543,12 +401,12 @@ export async function DELETE(request: NextRequest) {
 
     if (deleteError) {
       console.error('Product delete error:', deleteError);
-      return NextResponse.json({ error: 'Eroare la ștergerea produsului.' }, { status: 500 });
+      return await localizedJson({ error: 'Eroare la ștergerea produsului.' }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, message: 'Produs șters cu succes.' });
+    return await localizedJson({ success: true, message: 'Produs șters cu succes.' });
   } catch (error) {
     console.error('Delete product error:', error);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă.' }, { status: 500 });
   }
 }

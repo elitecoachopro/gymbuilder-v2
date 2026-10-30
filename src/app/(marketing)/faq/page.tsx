@@ -1,4 +1,6 @@
 'use client';
+import { useUiText } from '@/i18n/useUiText';
+
 
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
@@ -26,6 +28,7 @@ function AccordionItem({ question, answer, isOpen, onToggle }: { question: strin
 }
 
 export default function FAQPage() {
+  const ui = useUiText();
   const { t } = useClientTranslations('faq');
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
 
@@ -59,7 +62,7 @@ export default function FAQPage() {
 
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{t('title')}</h1>
           <p className="text-anthracite-400 mb-12 max-w-2xl">
-            {t('subtitle')}{' '}
+            {t('subtitle')}{ui(' ')}
             <Link href="/contact" className="text-gold-400 hover:text-gold-300 underline underline-offset-2 transition-colors">
               {t('contactUs')}
             </Link>

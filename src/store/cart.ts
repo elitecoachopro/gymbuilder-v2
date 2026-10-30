@@ -1,12 +1,16 @@
 'use client';
 
+import type { PublishedPrice } from '@/lib/catalog-price';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export interface CartProduct {
+export interface CartProduct extends PublishedPrice {
   id: string;
+  variant_id?: string;
+  variant_label?: string;
+  product_id?: string;
   name: string;
-  price_eur: number;
+  price_eur: number | null;
   images: string[];
   category: string;
   condition: string;

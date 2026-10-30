@@ -1,9 +1,15 @@
 'use client';
 
+import { loginHref } from '@/lib/journeys';
+import { logoutClient } from '@/lib/logout-client';
+import { useUiText } from '@/i18n/useUiText';
+
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Search, Heart, MessageSquare, Star, Building2, Package, Loader2, Dumbbell, Clock, Send, CheckCircle, ArrowRight, Trash2, LogOut, ChevronDown, ChevronUp, LayoutGrid } from 'lucide-react';
+import { Search, Heart, MessageSquare, Star, Building2, Package, Loader2, Clock, Send, CheckCircle, Trash2, LogOut, ChevronDown, ChevronUp, LayoutGrid } from 'lucide-react';
+import MyGymProjects from '@/components/MyGymProjects';
+import RequestChat from '@/components/RequestChat';
 import NotificationBell from '@/components/NotificationBell';
 
 interface ContactRequest {
@@ -50,6 +56,8 @@ interface RecentSupplier {
 }
 
 interface DashboardData {
+  pagination?: { page: number; hasNext: boolean };
+  totals?: { contactRequests: number; favorites: number; reviews: number };
   user: { id: string; full_name: string; email: string };
   contactRequests: ContactRequest[];
   favorites: Favorite[];
@@ -58,30 +66,36 @@ interface DashboardData {
 }
 
 export default function ClientDashboard() {
+  const ui = useUiText();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const wantedChat = searchParams?.get('chat') || '';
+  const [removingFavorite, setRemovingFavorite] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
   const [openChat, setOpenChat] = useState<string | null>(null);
+  useEffect(() => { setOpenChat(searchParams?.get('chat') || null); }, [searchParams]);
   const [logoutLoading, setLogoutLoading] = useState(false);
 
   const handleLogout = async () => {
     setLogoutLoading(true);
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await logoutClient();
       router.push('/login');
-    } catch {
-      router.push('/login');
-    }
+    } catch { window.alert(ui('Deconectarea nu a reușit. Încearcă din nou.')); } finally { setLogoutLoading(false); }
   };
 
   useEffect(() => {
     fetchDashboard();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, wantedChat]);
 
   async function fetchDashboard() {
+    setLoading(true); setError('');
     try {
-      const res = await fetch('/api/client/dashboard');
+      const res = await fetch(`/api/client/dashboard?page=${page}&chat=${encodeURIComponent(wantedChat)}`);
       if (res.ok) {
         const json = await res.json();
         setData(json);
@@ -98,22 +112,20 @@ export default function ClientDashboard() {
   }
 
   async function removeFavorite(productId: string) {
+    if (!productId || removingFavorite) return;
+    setRemovingFavorite(productId);
     try {
-      const res = await fetch('/api/client/favorites', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product_id: productId }),
+      const res = await fetch('/api/client/favorites', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: productId }) });
+      if (!res.ok || (await res.json()).favorited !== false) throw new Error();
+      setData(prev => {
+        if (!prev || !prev.favorites.some(f => f.products?.id === productId)) return prev;
+        return { ...prev, favorites: prev.favorites.filter(f => f.products?.id !== productId), totals: prev.totals ? { ...prev.totals, favorites: Math.max(0, prev.totals.favorites - 1) } : undefined };
       });
-      if (res.ok) {
-        setData(prev => prev ? {
-          ...prev,
-          favorites: prev.favorites.filter(f => f.products?.id !== productId)
-        } : prev);
-      }
-    } catch {}
+    } catch { window.alert(ui('Favoritele nu au putut fi actualizate. Încearcă din nou.')); }
+    finally { setRemovingFavorite(null); }
   }
 
-  if (loading) {
+  if (loading && !data) {
     return (
       <main className="min-h-screen bg-anthracite-950 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-gold-400 animate-spin" />
@@ -121,14 +133,14 @@ export default function ClientDashboard() {
     );
   }
 
-  if (error) {
+  if (error && !data) {
     return (
       <main className="min-h-screen bg-anthracite-950 flex flex-col items-center justify-center px-4">
         <Building2 className="w-16 h-16 text-anthracite-600 mb-4" />
-        <h1 className="text-xl font-bold text-white mb-2">{error}</h1>
-        <Link href="/login" className="text-gold-400 hover:underline text-sm mt-4">
-          Autentifică-te →
-        </Link>
+        <h1 className="text-xl font-bold text-white mb-2">{ui(error)}</h1>
+        <button className="btn-secondary mt-4" onClick={fetchDashboard}>{ui("Reîncearcă")}</button>
+        <Link href={loginHref(`/client/dashboard${wantedChat ? `?chat=${encodeURIComponent(wantedChat)}` : ""}`)} className="text-gold-400 hover:underline text-sm mt-4">
+          {ui("Autentifică-te →")}</Link>
       </main>
     );
   }
@@ -160,33 +172,31 @@ export default function ClientDashboard() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">Bun venit, {data.user.full_name}!</h1>
-            <p className="text-anthracite-400 text-sm mt-1">Dashboard-ul tău de client</p>
+            <h1 className="text-2xl font-bold text-white">{ui("Bun venit, ")}{data.user.full_name}!</h1>
+            <p className="text-anthracite-400 text-sm mt-1">{ui("Dashboard-ul tău de client")}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <NotificationBell />
 {/* Configurator Sală - hidden temporarily, code preserved on develop */}
-            {false && <Link
+            {<Link
               href="/configurator"
               className="flex items-center gap-2 bg-indigo-500 text-white font-bold px-5 py-3 rounded-lg hover:bg-indigo-400 transition-colors"
             >
               <LayoutGrid className="w-4 h-4" />
-              Configurator Sală
-            </Link>}
+              {ui("Configurator Sală")}</Link>}
             <Link
               href="/products"
               className="flex items-center gap-2 bg-gold-400 text-anthracite-950 font-bold px-5 py-3 rounded-lg hover:bg-gold-300 transition-colors"
             >
               <Search className="w-4 h-4" />
-              Caută Echipamente
-            </Link>
+              {ui("Caută Echipamente")}</Link>
             <button
               onClick={handleLogout}
               disabled={logoutLoading}
               className="flex items-center gap-2 px-4 py-3 rounded-lg border border-anthracite-700 text-anthracite-300 hover:text-red-400 hover:border-red-400/30 text-sm font-medium transition-colors disabled:opacity-50"
             >
               <LogOut className="w-4 h-4" />
-              {logoutLoading ? 'Se deconectează...' : 'Logout'}
+              {ui(logoutLoading ? 'Se deconectează...' : 'Logout')}
             </button>
           </div>
         </div>
@@ -195,23 +205,23 @@ export default function ClientDashboard() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 text-center">
             <Send className="w-5 h-5 text-blue-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">{data.contactRequests.length}</p>
-            <p className="text-xs text-anthracite-400">Cereri Trimise</p>
+            <p className="text-2xl font-bold text-white">{data.totals?.contactRequests ?? data.contactRequests.length}</p>
+            <p className="text-xs text-anthracite-400">{ui("Cereri Trimise")}</p>
           </div>
           <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 text-center">
             <Heart className="w-5 h-5 text-red-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">{data.favorites.length}</p>
+            <p className="text-2xl font-bold text-white">{data.totals?.favorites ?? data.favorites.length}</p>
             <p className="text-xs text-anthracite-400">Favorite</p>
           </div>
           <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 text-center">
             <Star className="w-5 h-5 text-gold-400 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-white">{data.reviews.length}</p>
-            <p className="text-xs text-anthracite-400">Recenzii</p>
+            <p className="text-2xl font-bold text-white">{data.totals?.reviews ?? data.reviews.length}</p>
+            <p className="text-xs text-anthracite-400">{ui("Recenzii")}</p>
           </div>
           <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 text-center">
             <Building2 className="w-5 h-5 text-emerald-400 mx-auto mb-2" />
             <p className="text-2xl font-bold text-white">{data.recentSuppliers.length}</p>
-            <p className="text-xs text-anthracite-400">Furnizori Contactați</p>
+            <p className="text-xs text-anthracite-400">{ui("Furnizori Contactați")}</p>
           </div>
         </div>
 
@@ -219,15 +229,13 @@ export default function ClientDashboard() {
         <section className="mb-8">
           <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
             <Building2 className="w-5 h-5 text-gold-400" />
-            Furnizori Contactați Recent
-          </h2>
+            {ui("Furnizori Contactați Recent")}</h2>
           {data.recentSuppliers.length === 0 ? (
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-8 text-center">
               <Building2 className="w-10 h-10 text-anthracite-600 mx-auto mb-3" />
-              <p className="text-anthracite-400 text-sm">Nu ai contactat niciun furnizor încă.</p>
+              <p className="text-anthracite-400 text-sm">{ui("Nu ai contactat niciun furnizor încă.")}</p>
               <Link href="/suppliers" className="text-gold-400 text-sm hover:underline mt-2 inline-block">
-                Explorează furnizori →
-              </Link>
+                {ui("Explorează furnizori →")}</Link>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -252,7 +260,7 @@ export default function ClientDashboard() {
                   </div>
                   <div className="flex items-center gap-1.5 mt-3 text-xs text-anthracite-500">
                     <Clock className="w-3 h-3" />
-                    Contactat: {new Date(supplier.last_contact).toLocaleDateString('ro-RO')}
+                    {ui("Contactat: ")}{ui(new Date(supplier.last_contact).toLocaleDateString(ui('ro-RO')))}
                   </div>
                 </Link>
               ))}
@@ -264,21 +272,19 @@ export default function ClientDashboard() {
         <section className="mb-8">
           <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
             <Heart className="w-5 h-5 text-red-400" />
-            Produse Favorite
-          </h2>
+            {ui("Produse Favorite")}</h2>
           {data.favorites.length === 0 ? (
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-8 text-center">
               <Heart className="w-10 h-10 text-anthracite-600 mx-auto mb-3" />
-              <p className="text-anthracite-400 text-sm">Nu ai salvat niciun produs la favorite.</p>
+              <p className="text-anthracite-400 text-sm">{ui("Nu ai salvat niciun produs la favorite.")}</p>
               <Link href="/products" className="text-gold-400 text-sm hover:underline mt-2 inline-block">
-                Explorează produse →
-              </Link>
+                {ui("Explorează produse →")}</Link>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {data.favorites.map((fav) => (
                 <div key={fav.id} className="bg-anthracite-800 border border-anthracite-700 rounded-xl overflow-hidden group">
-                  <Link href={`/products/${fav.products?.id}`}>
+                  <Link href={fav.products?.id ? `/products/${fav.products.id}` : "/products"}>
                     <div className="aspect-[16/10] bg-anthracite-700 relative overflow-hidden">
                       {fav.products?.images && fav.products.images.length > 0 ? (
                         <img src={fav.products.images[0]} alt={fav.products.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -290,26 +296,27 @@ export default function ClientDashboard() {
                       <span className={`absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full font-medium ${
                         fav.products?.condition === 'new' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'
                       }`}>
-                        {fav.products?.condition === 'new' ? 'Nou' : 'SH'}
+                        {ui(fav.products?.condition === 'new' ? 'Nou' : 'SH')}
                       </span>
                     </div>
                   </Link>
                   <div className="p-3">
-                    <p className="text-xs text-anthracite-400 uppercase">{fav.products?.category}</p>
-                    <Link href={`/products/${fav.products?.id}`}>
+                    <p className="text-xs text-anthracite-400 uppercase">{ui(fav.products?.category)}</p>
+                    <Link href={fav.products?.id ? `/products/${fav.products.id}` : "/products"}>
                       <h3 className="text-sm font-medium text-white mt-0.5 line-clamp-1 hover:text-gold-400 transition-colors">{fav.products?.name}</h3>
                     </Link>
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-base font-bold text-gold-400">€{Number(fav.products?.price_eur).toLocaleString()}</span>
                       <button
+                        disabled={!!removingFavorite || !fav.products?.id}
                         onClick={() => removeFavorite(fav.products?.id)}
                         className="text-anthracite-500 hover:text-red-400 transition-colors p-1"
-                        title="Elimină din favorite"
+                        title={ui("Elimină din favorite")}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
-                    <p className="text-xs text-anthracite-500 mt-1">{(fav.products as any)?.supplier_profiles?.company_name}</p>
+                    <p className="text-xs text-anthracite-500 mt-1">{fav.products?.supplier_profiles?.company_name}</p>
                   </div>
                 </div>
               ))}
@@ -318,18 +325,19 @@ export default function ClientDashboard() {
         </section>
 
         {/* Contact Requests */}
+        <MyGymProjects />
+        {error && <div role="alert" className="border border-red-400/30 p-3 rounded-lg mb-4"><p>{ui(error)}</p><button className="btn-secondary" onClick={fetchDashboard}>{ui('Reîncearcă')}</button></div>}
+        <nav aria-label={ui('Pagini istoric')} className="flex flex-wrap items-center gap-4 mb-6"><button className="btn-secondary" disabled={loading || page === 1} onClick={() => setPage(p => p - 1)}>{ui('Pagina anterioară')}</button><span>{ui('Pagina')} {data.pagination?.page ?? page}</span><button className="btn-secondary" disabled={loading || !data.pagination?.hasNext} onClick={() => setPage(p => p + 1)}>{ui('Pagina următoare')}</button></nav>
         <section id="cereri" className="mb-8">
           <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-blue-400" />
-            Cereri de Ofertă
-          </h2>
+            {ui("Cereri de Ofertă")}</h2>
           {data.contactRequests.length === 0 ? (
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-8 text-center">
               <MessageSquare className="w-10 h-10 text-anthracite-600 mx-auto mb-3" />
-              <p className="text-anthracite-400 text-sm">Nu ai trimis nicio cerere de ofertă.</p>
+              <p className="text-anthracite-400 text-sm">{ui("Nu ai trimis nicio cerere de ofertă.")}</p>
               <Link href="/suppliers" className="text-gold-400 text-sm hover:underline mt-2 inline-block">
-                Contactează un furnizor →
-              </Link>
+                {ui("Contactează un furnizor →")}</Link>
             </div>
           ) : (
             <div className="space-y-3">
@@ -343,20 +351,20 @@ export default function ClientDashboard() {
                           <Building2 className="w-4 h-4 text-anthracite-500" />
                         </div>
                         <div className="min-w-0">
-                          <Link href={`/suppliers/${(cr.supplier_profiles as any)?.id}`} className="text-sm font-medium text-white hover:text-gold-400 transition-colors">
-                            {(cr.supplier_profiles as any)?.company_name}
+                          <Link href={`/suppliers/${cr.supplier_profiles?.id}`} className="text-sm font-medium text-white hover:text-gold-400 transition-colors">
+                            {cr.supplier_profiles?.company_name}
                           </Link>
                           {cr.products && (
-                            <p className="text-xs text-anthracite-400 truncate">Produs: {(cr.products as any)?.name}</p>
+                            <p className="text-xs text-anthracite-400 truncate">{ui("Produs: ")}{cr.products?.name}</p>
                           )}
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${status.color}`}>
-                          {status.icon} {status.text}
+                          {status.icon} {ui(status.text)}
                         </span>
                         <span className="text-xs text-anthracite-500">
-                          {new Date(cr.created_at).toLocaleDateString('ro-RO')}
+                          {ui(new Date(cr.created_at).toLocaleDateString(ui('ro-RO')))}
                         </span>
                       </div>
                     </div>
@@ -369,11 +377,11 @@ export default function ClientDashboard() {
                       className="mt-3 ml-12 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
                     >
                       <MessageSquare className="w-3 h-3" />
-                      {openChat === cr.id ? 'Ascunde conversația' : 'Deschide conversația'}
+                      {ui(openChat === cr.id ? 'Ascunde conversația' : 'Deschide conversația')}
                       {openChat === cr.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                     </button>
                     {openChat === cr.id && (
-                      <ChatBox requestId={cr.id} userRole="client" />
+                      <RequestChat requestId={cr.id} userRole="client" />
                     )}
                   </div>
                 );
@@ -386,15 +394,13 @@ export default function ClientDashboard() {
         <section className="mb-8">
           <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
             <Star className="w-5 h-5 text-gold-400" />
-            Recenziile Mele
-          </h2>
+            {ui("Recenziile Mele")}</h2>
           {data.reviews.length === 0 ? (
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-8 text-center">
               <Star className="w-10 h-10 text-anthracite-600 mx-auto mb-3" />
-              <p className="text-anthracite-400 text-sm">Nu ai lăsat nicio recenzie.</p>
+              <p className="text-anthracite-400 text-sm">{ui("Nu ai lăsat nicio recenzie.")}</p>
               <Link href="/suppliers" className="text-gold-400 text-sm hover:underline mt-2 inline-block">
-                Lasă o recenzie unui furnizor →
-              </Link>
+                {ui("Lasă o recenzie unui furnizor →")}</Link>
             </div>
           ) : (
             <div className="space-y-3">
@@ -407,21 +413,19 @@ export default function ClientDashboard() {
                           <Star key={s} className={`w-3.5 h-3.5 ${s <= review.rating ? 'text-gold-400 fill-gold-400' : 'text-anthracite-600'}`} />
                         ))}
                       </div>
-                      <Link href={`/suppliers/${(review.supplier_profiles as any)?.id}`} className="text-sm text-anthracite-300 hover:text-gold-400 transition-colors">
-                        {(review.supplier_profiles as any)?.company_name}
+                      <Link href={`/suppliers/${review.supplier_profiles?.id}`} className="text-sm text-anthracite-300 hover:text-gold-400 transition-colors">
+                        {review.supplier_profiles?.company_name}
                       </Link>
                     </div>
                     <div className="flex items-center gap-2">
                       {review.verified ? (
                         <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
-                          <CheckCircle className="w-3 h-3" /> Publicată
-                        </span>
+                          <CheckCircle className="w-3 h-3" /> {ui("Publicată")}</span>
                       ) : (
                         <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full">
-                          În verificare
-                        </span>
+                          {ui("În verificare")}</span>
                       )}
-                      <span className="text-xs text-anthracite-500">{new Date(review.created_at).toLocaleDateString('ro-RO')}</span>
+                      <span className="text-xs text-anthracite-500">{ui(new Date(review.created_at).toLocaleDateString(ui('ro-RO')))}</span>
                     </div>
                   </div>
                   <h4 className="text-sm font-medium text-white">{review.title}</h4>
@@ -434,17 +438,15 @@ export default function ClientDashboard() {
 
         {/* Setări Cont */}
         <section className="mt-10 bg-anthracite-900 border border-anthracite-800 rounded-2xl p-6">
-          <h3 className="text-lg font-bold text-white mb-4">Setări Cont</h3>
+          <h3 className="text-lg font-bold text-white mb-4">{ui("Setări Cont")}</h3>
           <div className="border border-red-500/20 bg-red-500/5 rounded-xl p-5">
-            <h4 className="text-sm font-semibold text-red-400 mb-2">Ștergerea contului</h4>
+            <h4 className="text-sm font-semibold text-red-400 mb-2">{ui("Ștergerea contului")}</h4>
             <p className="text-anthracite-400 text-xs leading-relaxed mb-4">
-              Conform GDPR Art. 17, ai dreptul de a solicita ștergerea completă a contului și a tuturor datelor personale asociate. 
-              Cererea va fi procesată în maxim 30 de zile. Această acțiune este ireversibilă.
-            </p>
+              {ui("Conform GDPR Art. 17, ai dreptul de a solicita ștergerea completă a contului și a tuturor datelor personale asociate. Cererea va fi procesată în maxim 30 de zile. Această acțiune este ireversibilă.")}</p>
             <button
               onClick={async () => {
-                if (!confirm('Ești sigur că vrei să soliciți ștergerea contului? Această acțiune este ireversibilă și toate datele tale vor fi șterse permanent.')) return;
-                const reason = prompt('Motiv (opțional):') || '';
+                if (!confirm(ui('Ești sigur că vrei să soliciți ștergerea contului? Această acțiune este ireversibilă și toate datele tale vor fi șterse permanent.'))) return;
+                const reason = prompt(ui('Motiv (opțional):')) || '';
                 try {
                   const res = await fetch('/api/account/delete-request', {
                     method: 'POST',
@@ -453,7 +455,7 @@ export default function ClientDashboard() {
                   });
                   const data = await res.json();
                   if (res.ok) {
-                    alert(data.message || 'Cererea a fost înregistrată.');
+                    alert(data.message || ui('Cererea a fost înregistrată.'));
                   } else {
                     alert(data.error || 'Eroare la trimiterea cererii.');
                   }
@@ -463,8 +465,8 @@ export default function ClientDashboard() {
               }}
               className="px-4 py-2 text-sm font-medium text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500/10 transition-colors"
             >
-              Solicită ștergerea contului
-            </button>
+              {ui("Solicită ștergerea contului")}</button>
+            <Link href="/delete-account" className="mt-3 flex min-h-11 items-center text-sm text-gold-400 underline">{ui('Șterge contul Gym Builder')}</Link>
           </div>
         </section>
       </div>
@@ -473,99 +475,3 @@ export default function ClientDashboard() {
 }
 
 // ChatBox component for inline messaging
-function ChatBox({ requestId, userRole }: { requestId: string; userRole: 'client' | 'supplier' }) {
-  const [messages, setMessages] = useState<{ id: string; sender_type: string; sender_name: string; content: string; created_at: string }[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [newMessage, setNewMessage] = useState('');
-  const [sending, setSending] = useState(false);
-
-  useEffect(() => {
-    fetchMessages();
-  }, [requestId]);
-
-  async function fetchMessages() {
-    try {
-      const res = await fetch(`/api/messages?request_id=${requestId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(data.messages || []);
-      }
-    } catch {} finally { setLoading(false); }
-  }
-
-  async function handleSend() {
-    if (!newMessage.trim() || sending) return;
-    setSending(true);
-    try {
-      const res = await fetch('/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ request_id: requestId, content: newMessage.trim() }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(prev => [...prev, data.message]);
-        setNewMessage('');
-      }
-    } catch {} finally { setSending(false); }
-  }
-
-  if (loading) {
-    return (
-      <div className="mt-3 ml-0 sm:ml-12 flex items-center gap-2 text-xs text-anthracite-400">
-        <Loader2 className="w-3 h-3 animate-spin" /> Se încarcă mesajele...
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-3 ml-0 sm:ml-12 border border-anthracite-700 rounded-lg overflow-hidden">
-      {/* Messages list */}
-      <div className="max-h-64 overflow-y-auto p-3 space-y-2 bg-anthracite-900/50">
-        {messages.length === 0 ? (
-          <p className="text-xs text-anthracite-500 text-center py-4">Niciun mesaj încă. Începe conversația!</p>
-        ) : (
-          messages.map((msg) => {
-            const isOwn = msg.sender_type === userRole;
-            return (
-              <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[75%] rounded-lg px-3 py-2 ${
-                  isOwn
-                    ? 'bg-gold-400/10 border border-gold-400/30'
-                    : 'bg-anthracite-700 border border-anthracite-600'
-                }`}>
-                  <p className={`text-[10px] font-medium mb-0.5 ${isOwn ? 'text-gold-400' : 'text-blue-400'}`}>
-                    {msg.sender_name}
-                  </p>
-                  <p className="text-sm text-white whitespace-pre-wrap">{msg.content}</p>
-                  <p className="text-[10px] text-anthracite-500 mt-1">
-                    {new Date(msg.created_at).toLocaleString('ro-RO', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-      {/* Composer */}
-      <div className="flex items-center gap-2 p-2 border-t border-anthracite-700 bg-anthracite-800">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-          placeholder="Scrie un mesaj..."
-          className="flex-1 bg-anthracite-900 border border-anthracite-600 rounded-lg px-3 py-2 text-sm text-white placeholder:text-anthracite-500 focus:outline-none focus:border-gold-400"
-          disabled={sending}
-        />
-        <button
-          onClick={handleSend}
-          disabled={sending || !newMessage.trim()}
-          className="bg-gold-400 text-anthracite-950 p-2 rounded-lg hover:bg-gold-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-        </button>
-      </div>
-    </div>
-  );
-}

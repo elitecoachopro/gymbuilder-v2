@@ -15,11 +15,13 @@ export function LocaleProvider({ initialLocale, children }: { initialLocale: str
     const handleLocaleChange = () => {
       const match = document.cookie.match(/(?:^|; )locale=([^;]*)/);
       const newLocale = match?.[1] || 'ro';
-      setLocale(newLocale);
+      setLocale(newLocale === 'en' ? 'en' : 'ro');
     };
     window.addEventListener('locale-changed', handleLocaleChange);
     return () => window.removeEventListener('locale-changed', handleLocaleChange);
   }, []);
+
+  useEffect(() => { document.documentElement.lang = locale; }, [locale]);
 
   return (
     <LocaleContext.Provider value={locale}>

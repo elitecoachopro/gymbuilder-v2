@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { getSessionUser } from '@/lib/session-server';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
-import * as crypto from 'crypto';
 
 function escapeHtml(str: string): string {
   if (!str) return '';
@@ -14,7 +15,7 @@ function escapeHtml(str: string): string {
 }
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
@@ -32,7 +33,7 @@ async function sendEmail(to: string, subject: string, html: string) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'GymBuilder <noreply@gymbuilder.app>',
+        from: 'Gym Builder <contact@gymbuilder.app>',
         to: [to],
         subject,
         html,
@@ -44,37 +45,21 @@ async function sendEmail(to: string, subject: string, html: string) {
   }
 }
 
-function getUserFromSession(): { userId: string } | null {
-  const cookieStore = cookies();
-  const sessionToken = cookieStore.get('session_token')?.value;
-  if (!sessionToken) return null;
-  try {
-    const [payloadB64, signature] = sessionToken.split('.');
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || '';
-    const decodedPayload = Buffer.from(payloadB64, 'base64').toString();
-    const expected = crypto.createHmac('sha256', secret).update(decodedPayload).digest('hex');
-    if (signature !== expected) return null;
-    const data = JSON.parse(decodedPayload);
-    if (data.exp && data.exp < Date.now()) return null;
-    return { userId: data.userId };
-  } catch {
-    return null;
-  }
-}
+async function getUserFromSession(_request?: unknown) { return getSessionUser(); }
 
 export async function POST(request: NextRequest) {
   try {
-    const authUser = getUserFromSession();
+    const authUser = await getUserFromSession();
 
     if (!authUser) {
-      return NextResponse.json({ error: 'Neautorizat.' }, { status: 401 });
+      return await localizedJson({ error: 'Neautorizat.' }, { status: 401 });
     }
 
     const body = await request.json();
     const { requestId, replyMessage } = body;
 
-    if (!requestId || !replyMessage || !replyMessage.trim()) {
-      return NextResponse.json({ error: 'ID cerere și mesajul sunt obligatorii.' }, { status: 400 });
+    if (typeof requestId !== 'string' || typeof replyMessage !== 'string' || !replyMessage.trim() || replyMessage.length > 5000) {
+      return await localizedJson({ error: 'ID cerere și mesajul sunt obligatorii.' }, { status: 400 });
     }
 
     const supabase = getSupabase();
@@ -87,7 +72,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (!supplierProfile) {
-      return NextResponse.json({ error: 'Profil furnizor negăsit.' }, { status: 403 });
+      return await localizedJson({ error: 'Profil furnizor negăsit.' }, { status: 403 });
     }
 
     // Get the contact request
@@ -98,11 +83,11 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (!contactRequest) {
-      return NextResponse.json({ error: 'Cererea nu a fost găsită.' }, { status: 404 });
+      return await localizedJson({ error: 'Cererea nu a fost găsită.' }, { status: 404 });
     }
 
     if (contactRequest.supplier_id !== supplierProfile.id) {
-      return NextResponse.json({ error: 'Nu ai acces la această cerere.' }, { status: 403 });
+      return await localizedJson({ error: 'Nu ai acces la această cerere.' }, { status: 403 });
     }
 
     // Get product info if available
@@ -116,22 +101,22 @@ export async function POST(request: NextRequest) {
       if (product) productName = product.name;
     }
 
-    // Update status to replied
-    await supabase
-      .from('contact_requests')
-      .update({ status: 'replied', updated_at: new Date().toISOString() })
-      .eq('id', requestId);
+    // Persist reply and update request status in one transaction.
+    const { error: replyError } = await supabase.rpc('send_request_message', {
+      p_request_id: requestId, p_user_id: authUser.id, p_content: replyMessage.trim(),
+    });
+    if (replyError) return await localizedJson({ error: 'Raspunsul nu a putut fi salvat.' }, { status: 500 });
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gymbuilder.app';
 
     // Send email notification to client
-    await sendEmail(
+    const emailSent = await sendEmail(
       contactRequest.client_email,
-      'Ai primit un răspuns pe GymBuilder',
+      'Ai primit un răspuns pe Gym Builder',
       `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #1a1a1a; color: #ffffff;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #f5c542; font-size: 28px; margin: 0;">GymBuilder</h1>
+          <h1 style="color: #f5c542; font-size: 28px; margin: 0;">Gym Builder</h1>
         </div>
         <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
           <h2 style="color: #4ade80; margin-top: 0;">✅ Ai primit un răspuns!</h2>
@@ -151,13 +136,13 @@ export async function POST(request: NextRequest) {
             Poți continua conversația contactând direct furnizorul sau accesând dashboard-ul tău.
           </p>
           <div style="text-align: center; margin-top: 24px;">
-            <a href="${appUrl}/client/dashboard" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
+            <a href="${appUrl}/client/dashboard?chat=${encodeURIComponent(requestId)}#cereri" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">
               Vezi în Dashboard
             </a>
           </div>
         </div>
         <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 24px;">
-          © ${new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
+          © ${new Date().getFullYear()} Gym Builder. Toate drepturile rezervate.
         </p>
       </div>
       `
@@ -170,14 +155,14 @@ export async function POST(request: NextRequest) {
         type: 'reply_received',
         title: `Răspuns de la ${supplierProfile.company_name}`,
         message: productName ? `Produs: ${productName}` : replyMessage.substring(0, 100),
-        link: '/client/dashboard#cereri',
+        link: `/client/dashboard?chat=${encodeURIComponent(requestId)}#cereri`,
         is_read: false,
       });
     }
 
-    return NextResponse.json({ success: true });
+    return await localizedJson({ success: true, recorded: true, emailSent });
   } catch (err) {
     console.error('Reply to contact request error:', err);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă.' }, { status: 500 });
   }
 }
