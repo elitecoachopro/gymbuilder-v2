@@ -1,5 +1,7 @@
 'use client';
 
+import { useUiText } from '@/i18n/useUiText';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Footer from '@/components/layout/Footer';
@@ -125,14 +127,16 @@ interface EstimateResult {
 }
 
 export default function BudgetEstimatorPage() {
+  const ui = useUiText();
   const [step, setStep] = useState(1); // 1: form, 2: results
   const [area, setArea] = useState('');
   const [gymType, setGymType] = useState('');
   const [selectedZones, setSelectedZones] = useState<string[]>([]);
   const [result, setResult] = useState<EstimateResult | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [saved, setSaved] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ id: string } | null>(null);
 
   useEffect(() => {
     async function checkSession() {
@@ -155,7 +159,7 @@ export default function BudgetEstimatorPage() {
 
   const calculateEstimate = () => {
     const totalArea = Number(area);
-    if (!totalArea || !gymType || selectedZones.length === 0) return;
+    if (!Number.isFinite(totalArea) || totalArea <= 0 || !gymType || selectedZones.length === 0) return;
 
     const multiplier = gymTypes[gymType]?.multiplier || 1;
     const totalRatio = selectedZones.reduce((sum, zId) => {
@@ -174,15 +178,16 @@ export default function BudgetEstimatorPage() {
     const totalMin = breakdown.reduce((sum, b) => sum + b.costMin, 0);
     const totalMax = breakdown.reduce((sum, b) => sum + b.costMax, 0);
 
+    setSaved(false); setSaveError('');
     setResult({ totalMin, totalMax, zoneBreakdown: breakdown });
     setStep(2);
   };
 
   const saveEstimate = async () => {
     if (!user || !result) return;
-    setSaving(true);
+    setSaving(true); setSaved(false); setSaveError('');
     try {
-      await fetch('/api/budget-estimates', {
+      const response = await fetch('/api/budget-estimates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -200,8 +205,9 @@ export default function BudgetEstimatorPage() {
           })),
         }),
       });
+      if (!response.ok) { const data = await response.json(); throw new Error(data.error || 'Estimarea nu a putut fi salvată.'); }
       setSaved(true);
-    } catch {}
+    } catch (error) { setSaveError(error instanceof Error ? error.message : 'Eroare de conexiune.'); }
     setSaving(false);
   };
 
@@ -210,27 +216,24 @@ export default function BudgetEstimatorPage() {
 
       <section className="pt-24 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
+          {saveError && <p role="alert" className="text-red-400 mb-4">{ui(saveError)}</p>}
           {/* Header */}
           <Link href="/construieste-sala" className="text-sm text-anthracite-400 hover:text-gold-400 transition-colors flex items-center gap-1 mb-4">
-            <ArrowLeft className="w-4 h-4" /> Înapoi la Construiește Sala
-          </Link>
+            <ArrowLeft className="w-4 h-4" /> {ui("Înapoi la Construiește Sala")}</Link>
           <h1 className="text-3xl md:text-4xl font-bold text-white flex items-center gap-3 mb-2">
             <Calculator className="w-8 h-8 text-gold-400" />
-            Estimator Buget Sală
-          </h1>
+            {ui("Estimator Buget Sală")}</h1>
           <p className="text-anthracite-400 mb-8">
-            Calculează un buget orientativ pentru echiparea sălii tale, bazat pe suprafață, tip și zone dorite.
-          </p>
+            {ui("Calculează un buget orientativ pentru echiparea sălii tale, bazat pe suprafață, tip și zone dorite.")}</p>
 
           {step === 1 && (
             <div className="space-y-8">
               {/* Area Input */}
               <div className="bg-anthracite-900 border border-anthracite-700 rounded-xl p-6">
-                <label className="flex items-center gap-2 text-sm font-semibold text-white mb-3">
+                <label htmlFor="field-marketingestimatorbuget-8096" className="flex items-center gap-2 text-sm font-semibold text-white mb-3">
                   <Ruler className="w-4 h-4 text-gold-400" />
-                  Suprafață totală (mp) *
-                </label>
-                <input
+                  {ui("Suprafață totală (mp) *")}</label>
+                <input id="field-marketingestimatorbuget-8096"
                   type="number"
                   value={area}
                   onChange={(e) => setArea(e.target.value)}
@@ -239,15 +242,14 @@ export default function BudgetEstimatorPage() {
                   min="50"
                   max="10000"
                 />
-                <p className="text-xs text-anthracite-500 mt-2">Minim 50 mp, maxim 10.000 mp</p>
+                <p className="text-xs text-anthracite-500 mt-2">{ui("Minim 50 mp, maxim 10.000 mp")}</p>
               </div>
 
               {/* Gym Type */}
               <div className="bg-anthracite-900 border border-anthracite-700 rounded-xl p-6">
-                <label className="flex items-center gap-2 text-sm font-semibold text-white mb-3">
+                <p className="flex items-center gap-2 text-sm font-semibold text-white mb-3">
                   <Target className="w-4 h-4 text-gold-400" />
-                  Tipul sălii *
-                </label>
+                  {ui("Tipul sălii *")}</p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {Object.entries(gymTypes).map(([key, type]) => (
                     <button
@@ -262,24 +264,22 @@ export default function BudgetEstimatorPage() {
                           : 'bg-anthracite-800 border-anthracite-700 text-anthracite-300 hover:border-anthracite-500'
                       }`}
                     >
-                      <span className="text-sm font-medium">{type.label}</span>
+                      <span className="text-sm font-medium">{ui(type.label)}</span>
                     </button>
                   ))}
                 </div>
                 {gymType && (
                   <p className="text-xs text-anthracite-500 mt-3">
-                    Zonele recomandate au fost pre-selectate. Poți modifica mai jos.
-                  </p>
+                    {ui("Zonele recomandate au fost pre-selectate. Poți modifica mai jos.")}</p>
                 )}
               </div>
 
               {/* Zones Selection */}
               <div className="bg-anthracite-900 border border-anthracite-700 rounded-xl p-6">
-                <label className="flex items-center gap-2 text-sm font-semibold text-white mb-3">
+                <p className="flex items-center gap-2 text-sm font-semibold text-white mb-3">
                   <Building2 className="w-4 h-4 text-gold-400" />
-                  Zone incluse *
-                </label>
-                <p className="text-xs text-anthracite-500 mb-4">Selectează zonele pe care vrei să le incluzi în sală.</p>
+                  {ui("Zone incluse *")}</p>
+                <p className="text-xs text-anthracite-500 mb-4">{ui("Selectează zonele pe care vrei să le incluzi în sală.")}</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {zones.map((zone) => (
                     <button
@@ -302,7 +302,7 @@ export default function BudgetEstimatorPage() {
                           </svg>
                         )}
                       </div>
-                      <span className="text-sm font-medium">{zone.name}</span>
+                      <span className="text-sm font-medium">{ui(zone.name)}</span>
                     </button>
                   ))}
                 </div>
@@ -315,8 +315,7 @@ export default function BudgetEstimatorPage() {
                 className="w-full bg-gold-400 text-anthracite-950 font-bold py-4 rounded-xl hover:bg-gold-300 transition-colors flex items-center justify-center gap-2 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Calculator className="w-5 h-5" />
-                Calculează Estimarea
-                <ArrowRight className="w-5 h-5" />
+                {ui("Calculează Estimarea")}<ArrowRight className="w-5 h-5" />
               </button>
             </div>
           )}
@@ -325,18 +324,17 @@ export default function BudgetEstimatorPage() {
             <div className="space-y-8">
               {/* Total Estimate */}
               <div className="bg-gradient-to-br from-gold-400/10 to-anthracite-900 border border-gold-400/30 rounded-2xl p-8 text-center">
-                <p className="text-sm text-anthracite-400 uppercase tracking-wider mb-2">Buget Estimat Total</p>
+                <p className="text-sm text-anthracite-400 uppercase tracking-wider mb-2">{ui("Buget Estimat Total")}</p>
                 <div className="text-4xl md:text-5xl font-bold text-white mb-2">
                   €{result.totalMin.toLocaleString()} — €{result.totalMax.toLocaleString()}
                 </div>
                 <p className="text-anthracite-400 text-sm">
-                  Pentru o sală de <span className="text-white font-semibold">{area} mp</span> de tip{' '}
-                  <span className="text-gold-400 font-semibold">{gymTypes[gymType]?.label}</span> cu{' '}
-                  <span className="text-white font-semibold">{selectedZones.length} zone</span>
+                  {ui("Pentru o sală de ")}<span className="text-white font-semibold">{area} {ui("mp")}</span> {ui("de tip")}{ui(' ')}
+                  <span className="text-gold-400 font-semibold">{ui(gymTypes[gymType]?.label)}</span> {ui("cu")}{ui(' ')}
+                  <span className="text-white font-semibold">{selectedZones.length} {ui("zone")}</span>
                 </p>
                 <p className="text-xs text-anthracite-500 mt-3">
-                  * Estimare orientativă. Prețurile reale variază în funcție de brand, condiție (nou/SH) și furnizor.
-                </p>
+                  {ui("* Estimare orientativă. Prețurile reale variază în funcție de brand, condiție (nou/SH) și furnizor.")}</p>
               </div>
 
               {/* Save Button */}
@@ -347,33 +345,31 @@ export default function BudgetEstimatorPage() {
                   className="w-full bg-anthracite-800 border border-anthracite-600 text-white font-semibold py-3 rounded-xl hover:bg-anthracite-700 transition-colors flex items-center justify-center gap-2"
                 >
                   {saving ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Se salvează...</>
+                    <><Loader2 className="w-4 h-4 animate-spin" /> {ui("Se salvează...")}</>
                   ) : (
-                    <><Save className="w-4 h-4" /> Salvează estimarea în Dashboard</>
+                    <><Save className="w-4 h-4" /> {ui("Salvează estimarea în Dashboard")}</>
                   )}
                 </button>
               )}
               {saved && (
                 <div className="flex items-center justify-center gap-2 text-emerald-400 text-sm bg-emerald-500/10 border border-emerald-500/20 rounded-xl py-3">
                   <CheckCircle className="w-4 h-4" />
-                  Estimarea a fost salvată în Client Dashboard
-                </div>
+                  {ui("Estimarea a fost salvată în Client Dashboard")}</div>
               )}
               {!user && (
                 <div className="text-center text-sm text-anthracite-500 bg-anthracite-900 border border-anthracite-700 rounded-xl py-3">
-                  <Link href="/login" className="text-gold-400 hover:underline">Autentifică-te</Link> pentru a salva estimarea în dashboard.
-                </div>
+                  <Link href="/login" className="text-gold-400 hover:underline">{ui("Autentifică-te")}</Link> {ui("pentru a salva estimarea în dashboard.")}</div>
               )}
 
               {/* Zone Breakdown */}
               <div className="space-y-4">
-                <h2 className="text-xl font-bold text-white">Detaliere pe Zone</h2>
+                <h2 className="text-xl font-bold text-white">{ui("Detaliere pe Zone")}</h2>
                 {result.zoneBreakdown.map((item) => (
                   <div key={item.zone.id} className="bg-anthracite-900 border border-anthracite-700 rounded-xl p-5">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <h3 className="text-white font-semibold">{item.zone.name}</h3>
-                        <p className="text-xs text-anthracite-500">~{item.allocatedSqm} mp alocați</p>
+                        <h3 className="text-white font-semibold">{ui(item.zone.name)}</h3>
+                        <p className="text-xs text-anthracite-500">~{item.allocatedSqm} {ui("mp alocați")}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-gold-400 font-bold">
@@ -384,7 +380,7 @@ export default function BudgetEstimatorPage() {
 
                     {/* Recommended Equipment */}
                     <div className="mb-3">
-                      <p className="text-xs text-anthracite-400 uppercase tracking-wider mb-2">Echipamente recomandate:</p>
+                      <p className="text-xs text-anthracite-400 uppercase tracking-wider mb-2">{ui("Echipamente recomandate:")}</p>
                       <div className="flex flex-wrap gap-2">
                         {item.zone.equipment.map((eq) => (
                           <span key={eq} className="text-xs bg-anthracite-800 border border-anthracite-700 text-anthracite-300 px-2.5 py-1 rounded-lg">
@@ -399,7 +395,7 @@ export default function BudgetEstimatorPage() {
                       href={`/products?category=${item.zone.category}`}
                       className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors font-medium"
                     >
-                      Vezi echipamente {item.zone.name.toLowerCase()} →
+                      {ui("Vezi echipamente ")}{ui(item.zone.name.toLowerCase())} →
                     </Link>
                   </div>
                 ))}
@@ -412,14 +408,12 @@ export default function BudgetEstimatorPage() {
                   className="flex-1 bg-anthracite-800 border border-anthracite-600 text-white font-semibold py-3 rounded-xl hover:bg-anthracite-700 transition-colors flex items-center justify-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  Recalculează
-                </button>
+                  {ui("Recalculează")}</button>
                 <Link
                   href="/consultation"
                   className="flex-1 bg-gold-400 text-anthracite-950 font-bold py-3 rounded-xl hover:bg-gold-300 transition-colors flex items-center justify-center gap-2 text-center"
                 >
-                  Consultanță Personalizată — €99
-                </Link>
+                  {ui("Consultanță Personalizată — €99")}</Link>
               </div>
             </div>
           )}

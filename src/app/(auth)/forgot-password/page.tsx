@@ -1,15 +1,20 @@
 'use client';
 
+import { useUiText } from '@/i18n/useUiText';
+
 import Link from 'next/link';
 import { Dumbbell, Mail, ArrowLeft, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useClientTranslations } from '@/i18n/client';
 
 export default function ForgotPasswordPage() {
+  const ui = useUiText();
   const { t } = useClientTranslations('auth');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (error) errorRef.current?.focus(); }, [error]);
   const [success, setSuccess] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,7 +44,7 @@ export default function ForgotPasswordPage() {
       }
 
       setSuccess(data.message || t('resetEmailSent'));
-    } catch (err) {
+    } catch {
       setError(t('connectionError'));
     } finally {
       setLoading(false);
@@ -53,7 +58,7 @@ export default function ForgotPasswordPage() {
           <Link href="/" className="inline-flex items-center gap-2">
             <Dumbbell className="w-8 h-8 text-gold-400" />
             <span className="text-2xl font-bold">
-              <span className="text-white">Gym</span>
+              <span className="text-white">Gym </span>
               <span className="text-gold-400">Builder</span>
             </span>
           </Link>
@@ -62,26 +67,26 @@ export default function ForgotPasswordPage() {
         </div>
 
         {success && (
-          <div className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center gap-2">
+          <div role="status" className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-            <p className="text-sm text-green-400">{success}</p>
+            <p className="text-sm text-green-400">{ui(success)}</p>
           </div>
         )}
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-2">
+          <div id="form-error" ref={errorRef} tabIndex={-1} role="alert" className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-            <p className="text-sm text-red-400">{error}</p>
+            <p className="text-sm text-red-400">{ui(error)}</p>
           </div>
         )}
 
         <div className="glass-card p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Email</label>
+              <label htmlFor="field-authforgotpassword-2677" className="block text-sm font-medium text-anthracite-200 mb-1.5">Email</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
-                <input
-                  type="email"
+                <input id="field-authforgotpassword-2677"
+                  aria-describedby={error ? "form-error" : undefined} type="email"
                   className="input-field pl-11"
                   placeholder="email@exemplu.com"
                   value={email}

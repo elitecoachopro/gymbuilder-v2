@@ -1,0 +1,416 @@
+{
+  "checked_at": "2026-10-21T00:00:00Z",
+  "suppliers": [
+    {
+      "key": "rogue",
+      "company_name": "Rogue Fitness",
+      "country": "USA",
+      "city": "Columbus",
+      "address": "545 E 5th Ave, Columbus, OH 43201, Statele Unite",
+      "website": "https://www.roguefitness.com/",
+      "phone": "+1 614 358 6190",
+      "contact_email": "team@roguefitness.com",
+      "listing_source_url": "https://www.roguefitness.com/contact-us",
+      "catalog_url": "https://www.roguefitness.com/strength-equipment",
+      "logo_source": null,
+      "logo_url": null,
+      "description": "Producător american de echipamente pentru antrenamente de forță și condiționare. Catalogul include rack-uri, bănci, bare și accesorii. Pentru livrarea în România, cere direct furnizorului o ofertă cu destinația exactă, transport, taxe și condiții de garanție.",
+      "additional_source_urls": [
+        "https://assets.roguefitness.com/instructions/IS0564/IS0564_CUST_INSTR_V1"
+      ],
+      "products": [
+        {
+          "key": "rogue1",
+          "name": "Rogue Adjustable Bench 3.0",
+          "brand": "Rogue Fitness",
+          "brand_country": "USA",
+          "category": "strength",
+          "description": "Bancă reglabilă cu structură din oțel și suport integrat pentru depozitare verticală. Spătarul și șezutul se reglează separat. Finisajul și varianta se confirmă cu producătorul.",
+          "source_url": "https://www.roguefitness.com/rogue-adjustable-bench-3-0",
+          "image_sources": [
+            "https://assets.roguefitness.com/f_auto,q_auto,c_limit,w_1600,b_rgb:ffffff/v1/catalog/Strength%20Equipment/Strength%20Training/Weight%20Benches/Adjustable%20:%20Incline%20Benches/RF0935/Headers/RF0935-Black-Black_lnnwlu.png"
+          ],
+          "specs": {
+            "Marcă": "Rogue Fitness",
+            "Model": "Adjustable Bench 3.0",
+            "Poziții spătar": "10 (0–85°)",
+            "Poziții șezut": "3 (0°, 15°, 30°)",
+            "Structură": "Oțel 3 × 3 in, 11 gauge"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/rogue1-1.png"
+          ]
+        },
+        {
+          "key": "rogue2",
+          "name": "Rogue The Ohio Bar – Black Zinc",
+          "brand": "Rogue Fitness",
+          "brand_country": "USA",
+          "category": "strength",
+          "description": "Bară de 20 kg pentru haltere și powerlifting, cu marcaje duble și fără striație centrală. Varianta selectată are ax cu finisaj Black Zinc și manșoane Bright Zinc.",
+          "source_url": "https://www.roguefitness.com/the-ohio-bar-black-zinc",
+          "image_sources": [
+            "https://assets.roguefitness.com/f_auto,q_auto,c_limit,w_1600,b_rgb:ffffff/v1/catalog/Weightlifting%20Bars%20and%20Plates/Barbells/Mens%2020KG%20Barbells/RA0539-BLBR/RA0539-BLBR-TH_rylohr.png"
+          ],
+          "specs": {
+            "Marcă": "Rogue Fitness",
+            "Model": "The Ohio Bar – Black Zinc",
+            "Greutate": "20 kg",
+            "Diametru": "28,5 mm",
+            "Striație centrală": "Nu"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/rogue2-1.png"
+          ]
+        },
+        {
+          "key": "rogue3",
+          "name": "Rogue RML-390F Flat Foot Monster Lite Rack",
+          "brand": "Rogue Fitness",
+          "brand_country": "USA",
+          "category": "strength",
+          "description": "Rack de forță cu bază Flat Foot și montanți Monster Lite. Verifică dimensiunile spațiului și accesoriile incluse în oferta oficială înainte de comandă.",
+          "source_url": "https://www.roguefitness.com/rml-390f-flat-foot-monster-lite-rack",
+          "image_sources": [
+            "https://assets.roguefitness.com/f_auto,q_auto,c_limit,w_1600,b_rgb:ffffff/v1/catalog/Rigs%20and%20Racks/Power%20Racks%20/Monster%20Lite%20Racks/XX12047/XX12047-h_r4wtbo_uyzuar.png"
+          ],
+          "specs": {
+            "Marcă": "Rogue Fitness",
+            "Model": "RML-390F",
+            "Amprentă la sol": "48 × 49 in",
+            "Înălțime": "92,25 in",
+            "Montanți": "Oțel 3 × 3 in, 11 gauge"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/rogue3-1.png"
+          ]
+        },
+        {
+          "key": "rogue4",
+          "name": "Rogue Echo Bike V3.0",
+          "brand": "Rogue Fitness",
+          "brand_country": "USA",
+          "category": "cardio",
+          "description": "Bicicletă cu rezistență pe aer și transmisie prin curea. Versiunea 3.0 include consolă LCD cu Bluetooth și ANT+; monitorul M2 este o opțiune separată.",
+          "source_url": "https://www.roguefitness.com/rogue-echo-bike",
+          "image_sources": [
+            "https://assets.roguefitness.com/f_auto,q_auto,c_limit,w_1600,b_rgb:ffffff/v1/catalog/Conditioning/Endurance%20/Bikes/ECHOBIKE/ECHOBIKE-H_t5871p.png"
+          ],
+          "specs": {
+            "Marcă": "Rogue Fitness",
+            "Model": "Echo Bike V3.0",
+            "Rezistență": "Aer",
+            "Transmisie": "Curea",
+            "Greutate maximă utilizator": "330 lb",
+            "Conectivitate consolă standard": "Bluetooth, ANT+"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/rogue4-1.png"
+          ]
+        },
+        {
+          "key": "rogue5",
+          "name": "Rogue Ductile Iron Kettlebells",
+          "brand": "Rogue Fitness",
+          "brand_country": "USA",
+          "category": "strength",
+          "description": "Gamă de kettlebell-uri din fontă ductilă, cu finisaj negru texturat și marcaje colorate pe mâner. Greutatea dorită se selectează pe pagina oficială; fotografia prezintă gama, nu un set inclus.",
+          "source_url": "https://www.roguefitness.com/rogue-kettlebells",
+          "image_sources": [
+            "https://assets.roguefitness.com/f_auto,q_auto,c_limit,w_1600,b_rgb:ffffff/v1/catalog/Conditioning/Strength%20Equipment/Kettlebells/IP0670/IP0670-H_j6gkfw.png"
+          ],
+          "specs": {
+            "Marcă": "Rogue Fitness",
+            "Gamă": "Ductile Iron Kettlebells",
+            "Greutăți disponibile": "4–92 kg, în variantele din catalog",
+            "Material": "Fontă ductilă",
+            "Finisaj": "Powder coat negru",
+            "Vânzare": "Greutăți selectabile individual"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/rogue5-1.png"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "bh-fitness",
+      "company_name": "BH Fitness (Exercycle SL)",
+      "country": "Spain",
+      "city": "Vitoria-Gasteiz",
+      "address": "Calle Zurrupitieta 22, Polígono Industrial Júndiz, 01015 Vitoria-Gasteiz, Spania",
+      "website": "https://bh.fitness/en/",
+      "phone": "+34 945 290 258",
+      "contact_email": "bhpro@bhfitness.com",
+      "listing_source_url": "https://bh.fitness/en/contact/",
+      "catalog_url": "https://bh.fitness/en/catalogues/",
+      "logo_source": null,
+      "logo_url": null,
+      "description": "Furnizor spaniol de echipamente fitness comerciale: cardio, forță, antrenament funcțional și indoor cycling. Echipa comercială oferă informații și oferte pentru săli. Livrarea în România, instalarea și service-ul trebuie confirmate direct cu BH Fitness.",
+      "additional_source_urls": [
+        "https://bh.fitness/en/help/",
+        "https://bhfitness.com/domestico/contacto/"
+      ],
+      "products": [
+        {
+          "key": "bh1",
+          "name": "BH Fitness HIIT Rower R899",
+          "brand": "BH Fitness",
+          "brand_country": "Spain",
+          "category": "cardio",
+          "description": "Aparat de vâslit cu rezistență combinată pe aer și magnetică. Include șină de 140 cm și conectivitate Bluetooth și ANT+ pentru monitorizarea antrenamentului.",
+          "source_url": "https://bh.fitness/en/equipment/cardiovascular/hiit-cardiovascular/hiitrower-r899/",
+          "image_sources": [
+            "https://bh.fitness/cms/wp-content/archivos/2025/01/r899_hiit_rower_img01.jpg"
+          ],
+          "specs": {
+            "Marcă": "BH Fitness",
+            "Model": "R899",
+            "Rezistență": "Aer + magnetică",
+            "Șină": "140 cm",
+            "Conectivitate": "Bluetooth, ANT+"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/bh1-1.jpg"
+          ]
+        },
+        {
+          "key": "bh2",
+          "name": "BH Fitness Air Bike H899",
+          "brand": "BH Fitness",
+          "brand_country": "Spain",
+          "category": "cardio",
+          "description": "Bicicletă pentru antrenamente HIIT, cu rezistență pe aer și brațe mobile. Rezistența crește în funcție de efortul utilizatorului.",
+          "source_url": "https://bh.fitness/en/equipment/cardiovascular/hiit-cardiovascular/air-bike-h899-bh-fitness/",
+          "image_sources": [
+            "https://bh.fitness/cms/wp-content/archivos/2024/10/airbike-h899.png"
+          ],
+          "specs": {
+            "Marcă": "BH Fitness",
+            "Model": "H899",
+            "Rezistență": "Aer",
+            "Dimensiuni": "134 × 72 × 136 cm",
+            "Greutate aparat": "86,4 kg",
+            "Greutate maximă utilizator": "160 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/bh2-1.png"
+          ]
+        },
+        {
+          "key": "bh3",
+          "name": "BH Fitness Sled Run G699",
+          "brand": "BH Fitness",
+          "brand_country": "Spain",
+          "category": "cardio",
+          "description": "Bandă comercială cu mod de alergare și mod HIIT pentru împingere. Include butoane de acces rapid și suprafață de alergare de 147 × 56 cm.",
+          "source_url": "https://bh.fitness/en/equipment/functional-training/hiit-cardiovascular/sled-run-g699/",
+          "image_sources": [
+            "https://bh.fitness/cms/wp-content/archivos/2024/03/sledrun_g699_dist.png"
+          ],
+          "specs": {
+            "Marcă": "BH Fitness",
+            "Model": "G699",
+            "Viteză în Run Mode": "0,8–25 km/h",
+            "Suprafață de alergare": "147 × 56 cm",
+            "Dimensiuni": "197 × 91 × 164 cm",
+            "Greutate maximă utilizator": "180 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/bh3-1.png"
+          ]
+        },
+        {
+          "key": "bh4",
+          "name": "BH Fitness SC700 Climber",
+          "brand": "BH Fitness",
+          "brand_country": "Spain",
+          "category": "cardio",
+          "description": "Simulator de urcare a scărilor, cu senzori de mișcare, oprire automată și buton de urgență. Are trei trepte vizibile și suport pentru accesorii.",
+          "source_url": "https://bh.fitness/en/equipment/cardiovascular/inertia/sc700-climber/",
+          "image_sources": [
+            "https://bh.fitness/cms/wp-content/archivos/2026/06/SC700-CLIMBER.png"
+          ],
+          "specs": {
+            "Marcă": "BH Fitness",
+            "Model": "SC700",
+            "Înălțime treaptă": "20 cm",
+            "Dimensiuni": "175 × 76 × 203 cm",
+            "Greutate aparat": "211 kg",
+            "Greutate maximă utilizator": "180 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/bh4-1.png"
+          ]
+        },
+        {
+          "key": "bh5",
+          "name": "BH Fitness CrossBike H889",
+          "brand": "BH Fitness",
+          "brand_country": "Spain",
+          "category": "cardio",
+          "description": "Bicicletă cu rezistență pe aer și brațe mobile pentru antrenamentul părții superioare și inferioare a corpului. Are șa reglabilă vertical și orizontal și roți pentru transport.",
+          "source_url": "https://bh.fitness/en/equipment/cardiovascular/hiit-cardiovascular/crossbike-h889/",
+          "image_sources": [
+            "https://bh.fitness/cms/wp-content/archivos/2019/11/h889_cabecera.png"
+          ],
+          "specs": {
+            "Marcă": "BH Fitness",
+            "Model": "H889",
+            "Rezistență": "Aer",
+            "Transmisie": "Lanț",
+            "Dimensiuni": "127 × 59,7 × 121,9 cm",
+            "Greutate maximă utilizator": "160 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/bh5-1.png"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "concept2",
+      "company_name": "Concept2",
+      "country": "USA",
+      "city": "Morrisville",
+      "address": "105 Industrial Park Drive, Morrisville, VT 05661, Statele Unite",
+      "website": "https://www.concept2.com/",
+      "phone": "+1 802 888 7971",
+      "contact_email": "info@concept2.com",
+      "listing_source_url": "https://www.concept2.com/contact",
+      "catalog_url": "https://www.concept2.com/brochures",
+      "logo_source": null,
+      "logo_url": null,
+      "description": "Producător american de ergometre pentru vâslit, schi și ciclism. Contactul public este al sediului din Vermont. Pentru România, solicită identificarea distribuitorului potrivit și confirmarea livrării, prețului total și garanției.",
+      "additional_source_urls": [],
+      "products": [
+        {
+          "key": "c1",
+          "name": "Concept2 RowErg",
+          "brand": "Concept2",
+          "brand_country": "USA",
+          "category": "cardio",
+          "description": "Ergometru de vâslit cu monitor PM5 și suport pentru dispozitiv. Este disponibil cu picioare standard sau înalte; fotografia prezintă varianta standard.",
+          "source_url": "https://www.concept2.com/ergs/rowerg",
+          "image_sources": [
+            "https://cms.concept2.com/sites/default/files/styles/max_2048/public/2024-05/RowERG_Standard_ReUpload.png?itok=Yt44myc1"
+          ],
+          "specs": {
+            "Marcă": "Concept2",
+            "Model": "RowErg",
+            "Monitor": "PM5",
+            "Înălțime șezut standard": "36 cm",
+            "Înălțime șezut variantă înaltă": "51 cm"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/c1-1.png"
+          ]
+        },
+        {
+          "key": "c2",
+          "name": "Concept2 SkiErg",
+          "brand": "Concept2",
+          "brand_country": "USA",
+          "category": "cardio",
+          "description": "Ergometru pentru mișcări de schi nordic, cu monitor PM5. Fotografia prezintă versiunea pentru montaj pe perete; suportul independent și condițiile de instalare se verifică în catalog.",
+          "source_url": "https://www.concept2.com/ergs/skierg",
+          "image_sources": [
+            "https://cms.concept2.com/sites/default/files/styles/max_2048/public/2024-02/SKI_ERG_BLACK_WallMount_1920px.png?itok=3VIHWGnO"
+          ],
+          "specs": {
+            "Marcă": "Concept2",
+            "Model": "SkiErg",
+            "Monitor": "PM5",
+            "Configurație ilustrată": "Montare pe perete"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/c2-1.png"
+          ]
+        },
+        {
+          "key": "c3",
+          "name": "Concept2 BikeErg",
+          "brand": "Concept2",
+          "brand_country": "USA",
+          "category": "cardio",
+          "description": "Bicicletă ergometrică cu volant pe aer, reglaj al admisiei de aer și ambreiaj care permite volantului să continue să se rotească după oprirea pedalării. Include monitor PM5 și suport pentru dispozitiv.",
+          "source_url": "https://www.concept2.com/ergs/bikeerg",
+          "image_sources": [
+            "https://cms.concept2.com/sites/default/files/styles/max_2048/public/2024-02/BIKE_ERG_BLACK_Profile_2_1920px.png?itok=QldY8Wxj"
+          ],
+          "specs": {
+            "Marcă": "Concept2",
+            "Model": "BikeErg",
+            "Monitor": "PM5",
+            "Rezistență": "Aer",
+            "Șa": "Standard sau joasă, conform configurației"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/c3-1.png"
+          ]
+        },
+        {
+          "key": "conceptcat",
+          "name": "Concept2 StrengthErg",
+          "brand": "Concept2",
+          "brand_country": "USA",
+          "category": "strength",
+          "description": "Aparat multifuncțional cu rezistență pe aer, pentru leg press, chest press și seated row. Se poate configura cu monitor PM5 sau doar cu suport pentru dispozitiv și aplicația ErgData. Fotografia prezintă varianta fără PM5.",
+          "source_url": "https://www.concept2.com/ergs/strengtherg",
+          "image_sources": [
+            "https://cms.concept2.com/sites/default/files/styles/max_2048/public/2026-07/StrErg_noPM_angle.png?itok=xXQnD542"
+          ],
+          "specs": {
+            "Marcă": "Concept2",
+            "Model": "StrengthErg",
+            "Rezistență": "Aer",
+            "Exerciții": "Leg press, chest press, seated row",
+            "Monitorizare": "ErgData; PM5 în configurația opțională",
+            "Configurație ilustrată": "Fără PM5"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/conceptcat-1.png"
+          ]
+        },
+        {
+          "key": "concept5",
+          "name": "Concept2 SkiErg Floor Stand",
+          "brand": "Concept2",
+          "brand_country": "USA",
+          "category": "accessories",
+          "description": "Suport independent pentru SkiErg negru, cu structură din oțel, bază din lemn laminat și roți pentru deplasare. SkiErg se cumpără separat. Sunt disponibile variante Standard și Wide.",
+          "source_url": "https://www.concept2.com/product/295",
+          "image_sources": [
+            "https://cms.concept2.com/sites/default/files/styles/max_2048/public/2024-04/2372-skierg-floor-stand.jpg?itok=LKrmILRx"
+          ],
+          "specs": {
+            "Marcă": "Concept2",
+            "Produs": "SkiErg Floor Stand",
+            "Compatibilitate": "SkiErg negru",
+            "Bază Standard": "59,6 × 127 cm",
+            "Bază Wide": "81,3 × 132 cm",
+            "Include SkiErg": "Nu"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/rest-of-world/concept5-1.jpg"
+          ]
+        }
+      ]
+    }
+  ]
+}

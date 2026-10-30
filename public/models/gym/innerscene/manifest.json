@@ -1,0 +1,303 @@
+[
+  {
+    "id": "cad_treadmill",
+    "name": "Bandă alergare CAD",
+    "nameEn": "Treadmill CAD",
+    "length_m": 1.95,
+    "width_m": 0.89,
+    "height_m": 1.41,
+    "url": "/models/gym/innerscene/cad_treadmill.glb",
+    "cadUrl": "/models/gym/innerscene/cad/cad_treadmill.step",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/treadmill-gym-equipment-f58c0bc4",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "originalDownloadUrl": "https://www.innerscene.com/api/library/treadmill-gym-equipment-f58c0bc4/download",
+    "downloadedOn": "2026-10-23",
+    "stepSha256": "2abee38e5e03684a1f597b2985802990f40202bf5f8ef09bda60529bc4558c13",
+    "glbSha256": "450c26e3104cd15b17d4dee992305a6207c4acba16994cf730b4da78359e8ae4",
+    "stepBytes": 443554,
+    "glbBytes": 83360,
+    "sourceBounds_m": {
+      "min": [
+        -0.445,
+        -0.975,
+        0
+      ],
+      "max": [
+        0.445,
+        0.975,
+        1.41
+      ]
+    },
+    "triangles": 984,
+    "meshes": 28,
+    "transformations": [
+      "millimetres to metres via OpenCascade",
+      "(X,Y,Z) to (Y,Z,X), preserving handedness",
+      "centre X/Z and place floor at Y=0",
+      "triangulate 0.75 mm; 0.22 rad",
+      "preserve source colours; assign PBR metalness/roughness by part name",
+      "add planar UV coordinates; original position/normal/index buffers unchanged"
+    ],
+    "priceNote": "GymBuilder indicative planning allowance, not a source or manufacturer quotation."
+  },
+  {
+    "id": "cad_exercise_bike",
+    "name": "Bicicletă fitness CAD",
+    "nameEn": "Exercise bike CAD",
+    "length_m": 1.24,
+    "width_m": 0.63,
+    "height_m": 1.42,
+    "url": "/models/gym/innerscene/cad_exercise_bike.glb",
+    "cadUrl": "/models/gym/innerscene/cad/cad_exercise_bike.step",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/exercise-bike-gym-equipment-bef7223c",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "originalDownloadUrl": "https://www.innerscene.com/api/library/exercise-bike-gym-equipment-bef7223c/download",
+    "downloadedOn": "2026-10-23",
+    "stepSha256": "5decbe15297fd7057ad1339768746f55dadbfc61131fe320f9fe549802caf8db",
+    "glbSha256": "dbd6057e2554e6b22bb0324b1ef110966759a642daee07000eddadf4acbc6d2e",
+    "stepBytes": 507401,
+    "glbBytes": 141428,
+    "sourceBounds_m": {
+      "min": [
+        -0.315,
+        -0.625,
+        0
+      ],
+      "max": [
+        0.315,
+        0.615,
+        1.42
+      ]
+    },
+    "triangles": 2152,
+    "meshes": 33,
+    "transformations": [
+      "millimetres to metres via OpenCascade",
+      "(X,Y,Z) to (Y,Z,X), preserving handedness",
+      "centre X/Z and place floor at Y=0",
+      "triangulate 0.75 mm; 0.22 rad",
+      "preserve source colours; assign PBR metalness/roughness by part name",
+      "add planar UV coordinates; original position/normal/index buffers unchanged"
+    ],
+    "priceNote": "GymBuilder indicative planning allowance, not a source or manufacturer quotation."
+  },
+  {
+    "id": "cad_elliptical",
+    "name": "Eliptică CAD",
+    "nameEn": "Elliptical CAD",
+    "length_m": 1.306,
+    "width_m": 0.68,
+    "height_m": 1.676,
+    "url": "/models/gym/innerscene/cad_elliptical.glb",
+    "cadUrl": "/models/gym/innerscene/cad/cad_elliptical.step",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/elliptical-gym-equipment-4457b0ef",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "originalDownloadUrl": "https://www.innerscene.com/api/library/elliptical-gym-equipment-4457b0ef/download",
+    "downloadedOn": "2026-10-23",
+    "stepSha256": "791d2cafcafc46711a844bfa4910fcafe3632ff616fd87fcfc0c2f96eaa1cca3",
+    "glbSha256": "7abe669f8e280b8d96f0072672c68a4b876991506e7ed7310e3dea996933bafb",
+    "stepBytes": 529049,
+    "glbBytes": 172872,
+    "sourceBounds_m": {
+      "min": [
+        -0.34,
+        -0.6903349602922,
+        0
+      ],
+      "max": [
+        0.34,
+        0.615,
+        1.6755878819580001
+      ]
+    },
+    "triangles": 2836,
+    "meshes": 34,
+    "transformations": [
+      "millimetres to metres via OpenCascade",
+      "(X,Y,Z) to (Y,Z,X), preserving handedness",
+      "centre X/Z and place floor at Y=0",
+      "triangulate 0.75 mm; 0.22 rad",
+      "preserve source colours; assign PBR metalness/roughness by part name",
+      "add planar UV coordinates; original position/normal/index buffers unchanged"
+    ],
+    "priceNote": "GymBuilder indicative planning allowance, not a source or manufacturer quotation."
+  },
+  {
+    "id": "cad_squat_rack",
+    "name": "Rack squat CAD",
+    "nameEn": "Squat rack CAD",
+    "length_m": 1.401,
+    "width_m": 2.1,
+    "height_m": 2.23,
+    "url": "/models/gym/innerscene/cad_squat_rack.glb",
+    "cadUrl": "/models/gym/innerscene/cad/cad_squat_rack.step",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/squat-rack-gym-equipment-c1888dee",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "originalDownloadUrl": "https://www.innerscene.com/api/library/squat-rack-gym-equipment-c1888dee/download",
+    "downloadedOn": "2026-10-23",
+    "stepSha256": "461ce91f0b0dd48599a74a0ac60e8a13b833853b859bed7a131b6c78aae40a64",
+    "glbSha256": "71be2e84a62a7a203d90f5a9c0a4ea201e755b526a2a1ca10b7198d20c36e9c4",
+    "stepBytes": 520359,
+    "glbBytes": 536912,
+    "sourceBounds_m": {
+      "min": [
+        -1.05,
+        -0.7000000000000001,
+        0
+      ],
+      "max": [
+        1.05,
+        0.7000000000000001,
+        2.23
+      ]
+    },
+    "triangles": 11524,
+    "meshes": 23,
+    "transformations": [
+      "millimetres to metres via OpenCascade",
+      "(X,Y,Z) to (Y,Z,X), preserving handedness",
+      "centre X/Z and place floor at Y=0",
+      "triangulate 0.75 mm; 0.22 rad",
+      "preserve source colours; assign PBR metalness/roughness by part name",
+      "add planar UV coordinates; original position/normal/index buffers unchanged"
+    ],
+    "priceNote": "GymBuilder indicative planning allowance, not a source or manufacturer quotation."
+  },
+  {
+    "id": "cad_adjustable_bench",
+    "name": "Bancă reglabilă CAD",
+    "nameEn": "Adjustable bench CAD",
+    "length_m": 1.149,
+    "width_m": 0.52,
+    "height_m": 1.153,
+    "url": "/models/gym/innerscene/cad_adjustable_bench.glb",
+    "cadUrl": "/models/gym/innerscene/cad/cad_adjustable_bench.step",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/adjustable-bench-gym-equipment-ec77d95e",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "originalDownloadUrl": "https://www.innerscene.com/api/library/adjustable-bench-gym-equipment-ec77d95e/download",
+    "downloadedOn": "2026-10-23",
+    "stepSha256": "d514857d133f8e7dd6b85d6127d020b9586c1d3b3ce4465b86e6d99bd72dbc97",
+    "glbSha256": "2c7c68e64c66102b751eef27ec0f0cad5667eaa38f0fb641412182ae23f7b35f",
+    "stepBytes": 360758,
+    "glbBytes": 59236,
+    "sourceBounds_m": {
+      "min": [
+        -0.26,
+        -0.5830219915945001,
+        0
+      ],
+      "max": [
+        0.26,
+        0.5650000000000001,
+        1.152040278491
+      ]
+    },
+    "triangles": 708,
+    "meshes": 19,
+    "transformations": [
+      "millimetres to metres via OpenCascade",
+      "(X,Y,Z) to (Y,Z,X), preserving handedness",
+      "centre X/Z and place floor at Y=0",
+      "triangulate 0.75 mm; 0.22 rad",
+      "preserve source colours; assign PBR metalness/roughness by part name",
+      "add planar UV coordinates; original position/normal/index buffers unchanged"
+    ],
+    "priceNote": "GymBuilder indicative planning allowance, not a source or manufacturer quotation."
+  },
+  {
+    "id": "cad_dumbbell_rack",
+    "name": "Suport gantere CAD",
+    "nameEn": "Dumbbell rack CAD",
+    "length_m": 0.575,
+    "width_m": 1.51,
+    "height_m": 0.892,
+    "url": "/models/gym/innerscene/cad_dumbbell_rack.glb",
+    "cadUrl": "/models/gym/innerscene/cad/cad_dumbbell_rack.step",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/dumbbell-rack-with-dumbbells-gym-equipment-9079ce82",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "originalDownloadUrl": "https://www.innerscene.com/api/library/dumbbell-rack-with-dumbbells-gym-equipment-9079ce82/download",
+    "downloadedOn": "2026-10-23",
+    "stepSha256": "6d5473da9fd5f7eb19f6fd4c265be4ecf43f3a9435df5496e9662ec5a3c072ea",
+    "glbSha256": "94e54ed705a6b5f187b65c554bfadac27514010b4e912a2897de2ba817804c00",
+    "stepBytes": 534703,
+    "glbBytes": 379048,
+    "sourceBounds_m": {
+      "min": [
+        -0.755,
+        -0.28500000000000003,
+        0
+      ],
+      "max": [
+        0.755,
+        0.29,
+        0.8915000000000001
+      ]
+    },
+    "triangles": 7080,
+    "meshes": 50,
+    "transformations": [
+      "millimetres to metres via OpenCascade",
+      "(X,Y,Z) to (Y,Z,X), preserving handedness",
+      "centre X/Z and place floor at Y=0",
+      "triangulate 0.75 mm; 0.22 rad",
+      "preserve source colours; assign PBR metalness/roughness by part name",
+      "add planar UV coordinates; original position/normal/index buffers unchanged"
+    ],
+    "priceNote": "GymBuilder indicative planning allowance, not a source or manufacturer quotation."
+  },
+  {
+    "id": "cad_leg_press",
+    "name": "Presă picioare CAD",
+    "nameEn": "Leg press CAD",
+    "length_m": 2.112,
+    "width_m": 1.42,
+    "height_m": 1.501,
+    "url": "/models/gym/innerscene/cad_leg_press.glb",
+    "cadUrl": "/models/gym/innerscene/cad/cad_leg_press.step",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/leg-press-gym-equipment-75e948fb",
+    "author": "Innerscene",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "originalDownloadUrl": "https://www.innerscene.com/api/library/leg-press-gym-equipment-75e948fb/download",
+    "downloadedOn": "2026-10-23",
+    "stepSha256": "aded29e15759eefb7f68b67c5f9ac05857808aa6f523b05455c265c67a517003",
+    "glbSha256": "a23c4b34d951b2f37543690969311dd6a486f58f04c387be99540c3ec5aa6aef",
+    "stepBytes": 491470,
+    "glbBytes": 199536,
+    "sourceBounds_m": {
+      "min": [
+        -0.71,
+        -1.161300981233,
+        0
+      ],
+      "max": [
+        0.71,
+        0.9500000000000001,
+        1.500940515706
+      ]
+    },
+    "triangles": 3480,
+    "meshes": 33,
+    "transformations": [
+      "millimetres to metres via OpenCascade",
+      "(X,Y,Z) to (Y,Z,X), preserving handedness",
+      "centre X/Z and place floor at Y=0",
+      "triangulate 0.75 mm; 0.22 rad",
+      "preserve source colours; assign PBR metalness/roughness by part name",
+      "add planar UV coordinates; original position/normal/index buffers unchanged"
+    ],
+    "priceNote": "GymBuilder indicative planning allowance, not a source or manufacturer quotation."
+  }
+]

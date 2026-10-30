@@ -1,0 +1,535 @@
+{
+  "checked_at": "2026-10-23",
+  "fitout": {
+    "checked_at": "2026-10-23",
+    "verification": "Direct HTTP GET official supplier pages; price and photo from live HTML/JSON-LD. No supplier contact made. Stock remains indicative.",
+    "products": [
+      {
+        "category": "pardoseli",
+        "name": "Covor cauciucat inSPORTline Proteko II 50 x 50 x 3 cm",
+        "supplier": "inSPORTline România",
+        "country": "România",
+        "product_url": "https://www.insportline.ro/protectii-podea/10272-covor-cauciucat-insportline-proteko-ii-50-x-50-x-3-cm-8596084153340.html",
+        "image_url": "https://api.insportline.ro/51479-large_default/covor-cauciucat-insportline-proteko-ii-50-x-50-x-3-cm.jpg",
+        "price": 69,
+        "currency": "RON",
+        "unit": "bucată 50 x 50 cm",
+        "vat": "Confirmare TVA la furnizor; pagina actuală nu precizează explicit în datele extrase",
+        "availability": "În stoc, conform JSON-LD",
+        "contact_url": "https://www.insportline.ro/contact",
+        "phone": "+40 377 101 449",
+        "email": "comenzi@insportline.ro",
+        "specifications": {
+          "dimensiuni": "50 x 50 x 3 cm",
+          "tip": "puzzle din cauciuc"
+        },
+        "evidence": "Live metadata product:price:amount=69 and Offer price=69.00 RON; product OG image verified. Search index price89 is stale."
+      },
+      {
+        "category": "finisaje-oglinzi",
+        "name": "Panou riflaj acustic stejar fumuriu furniruit 18 x 560 x 2600 mm",
+        "supplier": "HORNBACH România",
+        "country": "România",
+        "product_url": "https://www.hornbach.ro/p/panou-riflaj-acustic-stejar-fumuriu-furniruit-18x560x2600-mm/12085631/",
+        "image_url": "https://media.hornbach.ro/hb/packshot/as.155445528.jpg?dvid=8",
+        "price": 199,
+        "currency": "RON",
+        "unit": "bucată",
+        "vat": "TVA inclus",
+        "availability": "Poate fi comandat online, conform paginii",
+        "contact_url": "https://www.hornbach.ro/",
+        "phone": "+40 312 272 955",
+        "email": "comanda-constanta@hornbach.com",
+        "contact_note": "Contact magazin Constanța publicat în antetul paginii oficiale",
+        "specifications": {
+          "dimensiuni": "18 x 560 x 2600 mm",
+          "utilizare": "perete sau tavan",
+          "material": "MDF furniruit"
+        },
+        "evidence": "Live Product JSON-LD offers199.00 RON; visible text199,00 lei/buc, allprices TVAinclus."
+      },
+      {
+        "category": "climatizare-ventilatie",
+        "name": "Recuperator de căldură RENAIR RHR 1000",
+        "supplier": "Venti-Store / PRESSING VENT SRL",
+        "country": "România",
+        "product_url": "https://www.venti-store.ro/product/1304.html",
+        "image_url": "https://www.venti-store.ro/userfiles/productlargeimages/product_5925.jpg",
+        "price": 15454.23,
+        "currency": "RON",
+        "unit": "bucată",
+        "vat": "TVA inclus; preț fără TVA12.772,09RON",
+        "availability": "În stoc conform JSON-LD; termenul se confirmă la furnizor",
+        "contact_url": "https://www.venti-store.ro/page/13/date-identificare-si-contact.html",
+        "phone": "+40 733 028 205",
+        "email": "com.ventistore@gmail.com",
+        "specifications": {
+          "debit_maxim": "1000 m³/h",
+          "alimentare": "230 V",
+          "putere_instalata": "0,31 kW"
+        },
+        "evidence": "Live visible Pret cu TVA15.454,23 RON and JSON-LDOffer15454.23. Search index prices differ. Source explicitlymentions commercial premises/sports halls."
+      },
+      {
+        "category": "electricitate-iluminat",
+        "name": "Panou LED 60W 60x60cm Aplicat Alb Backlight",
+        "supplier": "LED-Zone / LED ZONE SRL",
+        "country": "România",
+        "product_url": "https://www.led-zone.ro/panou-led-60w-60x60cm-aplicat-alb-backlight",
+        "image_url": "https://www.led-zone.ro/wp-content/uploads/2026/03/panou-led-60w-60x60cm-aplicat-alb-5.jpg",
+        "price": 236,
+        "currency": "RON",
+        "unit": "bucată",
+        "vat": "TVA inclus",
+        "availability": "La comandă conform JSON-LD BackOrder; confirmați culoarea luminii și termenul",
+        "contact_url": "https://www.led-zone.ro/contact",
+        "phone": "+40 726 715 365",
+        "email": "comenzi@led-zone.ro",
+        "specifications": {
+          "putere": "60 W",
+          "dimensiuni": "600 x 600 x 38 mm",
+          "montaj": "aplicat",
+          "alimentare": "220 V"
+        },
+        "evidence": "Live variantsNatural/Rece bothOffer236RON; visible TVAinclus, official imageOG and contactOrganization JSON-LD."
+      },
+      {
+        "category": "apa-calda-sanitare",
+        "name": "Boiler cu pompă de căldură Clivet AQUA F 300, fără serpentină solară",
+        "supplier": "Mat Mag / ARHICON TRADE SRL",
+        "country": "România",
+        "product_url": "https://mat-mag.ro/product/boiler-cu-pompa-de-caldura-300-litri-clivet-aqua-f-300-fara-serpentina-solara/",
+        "image_url": "https://mat-mag.ro/wp-content/uploads/2026/09/40449_14870_prd.png",
+        "price": 11458.9,
+        "currency": "RON",
+        "unit": "bucată",
+        "vat": "TVA inclus",
+        "availability": "Stoc la cerere, confirmați disponibilitatea; JSON-LD BackOrder",
+        "contact_url": "https://mat-mag.ro/contact-us/",
+        "phone": "+40 770 186 863",
+        "email": "contact@mat-mag.ro",
+        "specifications": {
+          "capacitate_nominala": "300 litri",
+          "agent_frigorific": "R290",
+          "clasa_energetica": "A+"
+        },
+        "evidence": "Live visible11.458,90leiTVAINCLUS, meta andOffer11458.90; imageOG exact; sellercontacts Organization JSON-LD."
+      },
+      {
+        "category": "apa-calda-sanitare",
+        "name": "Boiler electric Tesy BiLight GCV1004420B11TSR, 100 l, 2000 W",
+        "supplier": "Mat Mag / ARHICON TRADE SRL",
+        "country": "România",
+        "product_url": "https://mat-mag.ro/product/boiler-electric-100-l-tesy-bilight-gcv1004420b11tsr-2000-w-vertical-fara-serpentine-1-rezervor-alb/",
+        "image_url": "https://mat-mag.ro/wp-content/uploads/2026/09/10807695-produs.jpg",
+        "price": 692.9,
+        "currency": "RON",
+        "unit": "bucată",
+        "vat": "TVA inclus",
+        "availability": "În stoc conform JSON-LD; confirmați înaintea comenzii",
+        "contact_url": "https://mat-mag.ro/contact-us/",
+        "phone": "+40 770 186 863",
+        "email": "contact@mat-mag.ro",
+        "specifications": {
+          "capacitate": "100 litri",
+          "putere": "2000 W",
+          "montaj": "vertical"
+        },
+        "evidence": "Live meta price692.90, Offer692.90RON, priceSpecificationvalueAddedTaxIncluded=true. 100L is product characteristic, not sizingrecommendation for an entiregym."
+      }
+    ]
+  },
+  "amenities": {
+    "checkedAt": "2026-10-23",
+    "method": "Official supplier product and contact pages; no supplier contacted.",
+    "products": [
+      {
+        "categories": [
+          "receptie"
+        ],
+        "name": "Recepție Antracit Moff",
+        "supplier": {
+          "name": "Moff / Lucs Design SRL",
+          "country": "România",
+          "website": "https://www.moff.ro/",
+          "contactUrl": "https://www.moff.ro/contact/",
+          "phone": "+40722327743",
+          "email": "office@moff.ro",
+          "address": "București, România"
+        },
+        "productUrl": "https://www.moff.ro/produs/receptie-antracit-892/",
+        "imageUrl": "https://www.moff.ro/images/produse/receptie-antracit-1.webp",
+        "price": {
+          "amount": 3886,
+          "currency": "RON",
+          "kind": "from",
+          "unit": "bucată",
+          "vat": "included",
+          "note": "Preț de la; produs la comandă, personalizabil. Confirmare ofertă pentru configurația finală."
+        },
+        "summary": "Mobilier de recepție fabricat la comandă în România.",
+        "specifications": [
+          "SKU RA3475",
+          "Dimensiuni și culori personalizabile"
+        ],
+        "evidence": "Pagina curentă: Preț de la 3.886 RON cu TVA; JSON-LD lowPrice 3886.",
+        "checkedAt": "2026-10-23",
+        "imageHttpStatus": 200,
+        "imageContentType": "image/webp"
+      },
+      {
+        "categories": [
+          "vestiare"
+        ],
+        "name": "Dulap vestiar modular GE-DV1",
+        "supplier": {
+          "name": "Magazin Sportiv / MSP CHROMES SRL",
+          "country": "România",
+          "website": "https://www.magazinsportiv.ro/",
+          "contactUrl": "https://www.magazinsportiv.ro/contact/",
+          "phone": "+40377702813",
+          "whatsapp": "+40749353600",
+          "email": "comenzi@magazinsportiv.ro",
+          "address": "Recea, str. Europa nr. 41, jud. Maramureș"
+        },
+        "productUrl": "https://www.magazinsportiv.ro/produs/dulap-vestiar/",
+        "imageUrl": "https://www.magazinsportiv.ro/wp-content/uploads/2018/04/6.jpg",
+        "price": {
+          "amount": 589,
+          "maxAmount": 1199,
+          "currency": "RON",
+          "kind": "range",
+          "unit": "modul",
+          "vat": "not_specified",
+          "note": "Intervalul depinde de închiderea cu cheie sau electronică. TVA neprecizat explicit în pagina verificată."
+        },
+        "summary": "Modul de vestiar cu opțiune de închidere cu cheie sau electronică.",
+        "specifications": [
+          "SKU GE-DV1",
+          "PAL melaminat 18 mm",
+          "Module interconectabile"
+        ],
+        "evidence": "Preț vizibil 589.00–1199.00 lei; Pret per modul; JSON-LD aceeași plajă.",
+        "checkedAt": "2026-10-23",
+        "imageHttpStatus": 200,
+        "imageContentType": "image/jpeg"
+      },
+      {
+        "categories": [
+          "stretching",
+          "studiouri"
+        ],
+        "name": "Saltea Spokey Savasana TPE + plută",
+        "supplier": {
+          "name": "Magazin Sportiv / MSP CHROMES SRL",
+          "country": "România",
+          "website": "https://www.magazinsportiv.ro/",
+          "contactUrl": "https://www.magazinsportiv.ro/contact/",
+          "phone": "+40377702813",
+          "whatsapp": "+40749353600",
+          "email": "comenzi@magazinsportiv.ro",
+          "address": "Recea, str. Europa nr. 41, jud. Maramureș"
+        },
+        "productUrl": "https://www.magazinsportiv.ro/produs/saltea-fitness-yoga-pilates-aerobic-din-tpe/",
+        "imageUrl": "https://www.magazinsportiv.ro/wp-content/uploads/2026/05/Saltea-yoga-Spokey-Savasana.jpg",
+        "price": {
+          "amount": 105,
+          "maxAmount": 117,
+          "currency": "RON",
+          "kind": "range",
+          "unit": "bucată",
+          "vat": "not_specified",
+          "note": "Preț variabil după variantă; TVA neprecizat explicit în pagina verificată."
+        },
+        "summary": "Saltea pentru yoga, Pilates și exerciții la sol.",
+        "specifications": [
+          "SKU SPK-SAVASANA",
+          "180 × 60 × 0,4 cm",
+          "TPE și strat superior din plută"
+        ],
+        "evidence": "Preț vizibil 105.00–117.00 lei, confirmat de JSON-LD.",
+        "checkedAt": "2026-10-23",
+        "imageHttpStatus": 200,
+        "imageContentType": "image/jpeg"
+      },
+      {
+        "categories": [
+          "wellness"
+        ],
+        "name": "Saună Family Large DOMO",
+        "supplier": {
+          "name": "DOMO WELLNESS ROMÂNIA SRL",
+          "country": "România",
+          "website": "https://www.sauna.ro/",
+          "contactUrl": "https://www.sauna.ro/contact.php",
+          "phone": "+40758023005",
+          "email": "vanzari@sauna.ro",
+          "address": "Str. Stadionului nr. 4, Gheorgheni 535500, Harghita"
+        },
+        "productUrl": "https://www.sauna.ro/sauna-family.php",
+        "imageUrl": "https://www.sauna.ro/products/saune-din-lemn-masiv/big/family.jpg",
+        "price": {
+          "amount": null,
+          "currency": null,
+          "kind": "on_request",
+          "unit": "configurație",
+          "vat": "not_specified",
+          "note": "Pagina nu publică preț; se solicită ofertă de la furnizor. Dimensionarea și utilizarea comercială se confirmă în consultanță."
+        },
+        "summary": "Cabină de saună din lemn masiv, disponibilă prin producătorul român.",
+        "specifications": [
+          "Family Large: 4 persoane",
+          "1960 × 1890 × 2040 mm",
+          "Pereți din molid de 40 mm",
+          "Recomandare sobă 7–9 kW / 400 V"
+        ],
+        "evidence": "Pagina oficială produs răspunde 200, descrie Family Large și Medium; contact oficial public.",
+        "checkedAt": "2026-10-23",
+        "imageHttpStatus": 200,
+        "imageContentType": "image/jpeg"
+      },
+      {
+        "categories": [
+          "hidratare",
+          "lounge"
+        ],
+        "name": "Dozator de apă AQUAPHOR PRO 100",
+        "supplier": {
+          "name": "AQUAPHOR România",
+          "country": "România",
+          "website": "https://aquaphor.com/ro-ro/",
+          "contactUrl": "https://aquaphor.com/ro-ro/contacts",
+          "phone": "+40376500800",
+          "email": "office@aquaphor.ro",
+          "address": "Strada SLT. Papadopol Petre nr. 14, Constanța"
+        },
+        "productUrl": "https://aquaphor.com/ro-ro/pentru-birou/ro-pro-100",
+        "imageUrl": "https://aquaphor.com/media/sub_products/products/ro_pro_100_hq0.png",
+        "price": {
+          "amount": 4980,
+          "currency": "RON",
+          "kind": "fixed",
+          "unit": "bucată",
+          "vat": "not_specified",
+          "note": "Preț publicat pe site-ul oficial; TVA și instalarea se confirmă cu furnizorul."
+        },
+        "summary": "Dozator conectat la apă, cu filtrare și apă caldă/rece.",
+        "specifications": [
+          "340 × 375 × 1200 mm",
+          "Rezervor apă rece 10,9 l",
+          "Rezervor apă caldă 3 l",
+          "Încălzire 600 W; răcire 120 W"
+        ],
+        "evidence": "Pagina oficială afișează 4980 lei; imaginea este link de galerie oficială; contact confirmat în JSON-LD organizație.",
+        "checkedAt": "2026-10-23",
+        "imageHttpStatus": 200,
+        "imageContentType": "image/png"
+      },
+      {
+        "categories": [
+          "control-acces"
+        ],
+        "name": "Turnichet tripod Centurion-M",
+        "supplier": {
+          "name": "Stardors SRL",
+          "country": "România",
+          "website": "https://stardors.ro/",
+          "contactUrl": "https://stardors.ro/collections/turnicheti",
+          "phone": "+40723464848",
+          "additionalPhone": "+40743499488",
+          "email": "office@stardors.ro",
+          "address": "Punct de lucru: Frumușani, jud. Călărași, Str. Prelungirea Apusului nr. 11"
+        },
+        "productUrl": "https://stardors.ro/products/turnichet-tripod-centurion-m",
+        "imageUrl": "https://stardors.ro/cdn/shop/products/tripod-centurion-m_1024x1024.jpg?v=1769422438",
+        "price": {
+          "amount": 9700,
+          "currency": "RON",
+          "kind": "fixed",
+          "unit": "bucată",
+          "vat": "included",
+          "note": "TVA inclus. Transportul la finalizarea comenzii; integrarea și montajul se confirmă separat."
+        },
+        "summary": "Turnichet de acces cu integrare în sisteme de identificare.",
+        "specifications": [
+          "SKU T000001",
+          "Pasaj util 600 mm",
+          "Alimentare 220–240 V AC",
+          "Funcție drop arm"
+        ],
+        "evidence": "Preț vizibil și JSON-LD 9700 RON; TVA inclus explicit. Contact în footer colecție și telefoane și pe pagina produs.",
+        "checkedAt": "2026-10-23",
+        "imageHttpStatus": 200,
+        "imageContentType": "image/jpeg"
+      }
+    ]
+  },
+  "services": {
+    "verifiedAt": "2026-10-23",
+    "verificationMethod": "Official supplier pages opened through web search and fetched directly; remote images referenced without downloading.",
+    "entries": [
+      {
+        "category": "Evaluarea spațiului și proiectare",
+        "name": "Amenajare și design interior pentru săli de fitness",
+        "kind": "service",
+        "supplier": "DACCA Group",
+        "country": "România",
+        "officialSourceUrl": "https://www.daccagroup.ro/amenajare-spatii-relaxare-cinema-teatru-spa/amenajare-sala-de-sport-kinetoterapie-fitness",
+        "imageUrl": "https://www.daccagroup.ro/filehandler/ProjectFirstFile/300x300/amenajare-fortuna-sport-center-cluj-napoca-208.jpg?v=638102455130460663",
+        "imageNote": "Official project photo, Fortuna Sport Center, shown on service page.",
+        "price": null,
+        "currency": "RON",
+        "priceLabel": "Preț la cerere",
+        "unit": "proiect",
+        "contactUrl": "https://www.daccagroup.ro/contact",
+        "phone": "+40 720 546 044",
+        "email": "office.dacca.1@gmail.com",
+        "address": "Str. W. A. Mozart 16, Cluj-Napoca, România",
+        "evidence": "Official page lists fitness interior design services, Fortuna Sport Center project, phone and email. No fixed service price published."
+      },
+      {
+        "category": "Curățenie și spații auxiliare",
+        "name": "Kärcher BR 30/4 C Anniversary Edition",
+        "kind": "product",
+        "supplier": "Kärcher România",
+        "country": "România",
+        "officialSourceUrl": "https://www.karcher.com/ro/ro/professional/produse/br-30-4-c-anniversary-edition-p17832350",
+        "imageUrl": "https://d1y4tv7o00gnfq.cloudfront.net/mam/17832350/mainproduct/8c5e3322-cd21-4144-8852-ef675459d176/d2.jpg",
+        "imageNote": "Exact model image from official product page.",
+        "price": 7584.36,
+        "currency": "RON",
+        "priceLabel": "7.584,36 RON / buc., TVA inclus",
+        "unit": "bucată",
+        "taxIncluded": true,
+        "contactUrl": "https://www.karcher.com/ro/ro/servicii/asistenta/contact.html",
+        "phone": "+40 372 709 003",
+        "email": "office.ro@karcher.com",
+        "evidence": "Official product HTML JSON-LD price 7584.36 RON InStock; page title exact code 1.783-235.0. Official contact page provides office email and phone."
+      },
+      {
+        "category": "Curățenie și spații auxiliare",
+        "name": "Închiriere mașină de spălat pardoseli BR 30/4",
+        "kind": "service",
+        "supplier": "Kärcher România",
+        "country": "România",
+        "officialSourceUrl": "https://www.kaercher.com/ro/ro/servicii/professional/inchiriere-echipamente-c3960",
+        "imageUrl": "https://files.website.karcher-media.com/pub/media/karcher-ro/medium_kaercher_mietgeraete_490c28f79c.jpg",
+        "imageNote": "Official rental-service photo; not a claimed exact product-only photo.",
+        "price": 430,
+        "currency": "RON",
+        "priceLabel": "De la 430 RON / săptămână — închiriere",
+        "unit": "săptămână",
+        "taxIncluded": null,
+        "contactUrl": "https://www.kaercher.com/ro/ro/servicii/professional/inchiriere-echipamente-c3960",
+        "phone": "+40 372 245 415",
+        "email": "rental.ro@karcher.com",
+        "evidence": "Official rental table lists BR 30/4 from 430 RON/week; minimum 7 days. Tax treatment unspecified on observed table."
+      },
+      {
+        "category": "Siguranță și prim ajutor",
+        "name": "Defibrilator complet automat ME PAD auto, 30.10-4600A",
+        "kind": "product",
+        "supplier": "Med Tehnica SRL",
+        "country": "România",
+        "officialSourceUrl": "https://www.med-tehnica.ro/defibrilator-me-pad-auto",
+        "imageUrl": "https://www.med-tehnica.ro/userfiles/dc5f99a7-dfef-4ef0-8594-b899a47d673b/products/6687868_big.jpg",
+        "price": 7040.64,
+        "currency": "RON",
+        "priceLabel": "7.040,64 RON / buc., TVA inclus",
+        "unit": "bucată",
+        "taxIncluded": true,
+        "contactUrl": "https://www.med-tehnica.ro/infocenter/contact",
+        "phone": "+40 743 200 828",
+        "email": "online@medtehnica.ro",
+        "evidence": "Direct current HTML agrees across og:price:amount=7040.64, var prodPrice=7040.6400, JSON-LD price=7040.64 and visible 7.040,64 Lei. Search index/web cache has older different prices; use direct current price. Product code 9990112889239."
+      },
+      {
+        "category": "Siguranță și prim ajutor",
+        "name": "Trusă sanitară de prim ajutor, fixă",
+        "kind": "product",
+        "supplier": "Med Tehnica SRL",
+        "country": "România",
+        "officialSourceUrl": "https://www.med-tehnica.ro/trusa-sanitara-de-prim-ajutor-fixa",
+        "imageUrl": "https://www.med-tehnica.ro/userfiles/dc5f99a7-dfef-4ef0-8594-b899a47d673b/products/11901023_big.jpg",
+        "price": 230,
+        "currency": "RON",
+        "priceLabel": "230 RON / buc., TVA inclus",
+        "unit": "bucată",
+        "taxIncluded": true,
+        "contactUrl": "https://www.med-tehnica.ro/infocenter/contact",
+        "phone": "+40 743 200 828",
+        "email": "online@medtehnica.ro",
+        "evidence": "Official page and direct HTML show 230 RON inclusive VAT, SKU 9990112894752; product-specific official og:image."
+      },
+      {
+        "category": "Livrare, montaj și mentenanță",
+        "name": "Instalare și întreținere echipamente fitness",
+        "kind": "service",
+        "supplier": "Fitness Equipment Consulting / Service Fitness",
+        "country": "România",
+        "officialSourceUrl": "https://www.servicefitness.ro/servicii/",
+        "imageUrl": "https://www.servicefitness.ro/wp-content/uploads/2013/06/home2.png",
+        "imageNote": "Official service photo labelled home2 on services page.",
+        "price": null,
+        "currency": "RON",
+        "priceLabel": "Preț la cerere",
+        "unit": "intervenție / proiect",
+        "contactUrl": "https://www.servicefitness.ro/contact/",
+        "phone": "+40 723 568 561",
+        "email": "office@servicefitness.ro",
+        "evidence": "Official services list installation, repair, servicing, preventive maintenance and design. Contact HTML publishes phone and email. No fixed service price published."
+      }
+    ]
+  },
+  "training": [
+    {
+      "url": "https://fitlife.ro/banda-de-alergare-profesionala-cu-touchscreen-si-motor-ac-8-hp-sh-t9100tp-shua",
+      "status": 200,
+      "image": "https://fitlife.ro/images/thumbs/0019879_banda-de-alergare-profesionala-shua-s2-pro-touchscreen-si-sistem-flexair-adaptive-deck_747.jpeg",
+      "price": "27984.00",
+      "title": "SH-T9100TP S2&#x2B; Pro | Band&#x103; de Alergare Profesional&#x103; Premium &#x2013; FitLife | Fitlife",
+      "signals": [
+        " SH-T9100TP22T Adaugă prima recenzie 39177,00 lei Preț: 27984,00 lei In stoc Cantitate: + - Adauga in cos Adaugă Listă de dorințe personalizată OK Adaug&#x",
+        "0 lei Adauga in cos Adaugă la lista de preferinte În stoc - 6% Profesionale Banda de alergare FENX M-8395, Salter 49609,00 lei 46725,00 lei la comand&#x103; ",
+        "0 lei Adauga in cos Adaugă la lista de preferinte În stoc Profesionale Banda de alergare curbata SH-T901Z, SHUA 17717,00 lei Stoc epuizat Band&#x103; de aler",
+        " 124A, Cluj-Napoca, 400396 [email&#160;protected] 0737 307 370 0722.800.483 Informatii Cerere de retragere Blog Despre noi Politica de utilizare a cookie-"
+      ]
+    },
+    {
+      "url": "https://fitlife.ro/bodytone-solid-grow-vertical-leg-press-presa-verticala-profesionala-pentru-picioare",
+      "status": 200,
+      "image": "https://fitlife.ro/images/thumbs/0019646_bodytone-solid-grow-vertical-leg-press-presa-verticala-profesionala-pentru-picioare_747.jpeg",
+      "price": "5750.00",
+      "title": "Bodytone Vertical Leg Press | Pres&#x103; Profesional&#x103; pentru Picioare | FitLife | Fitlife",
+      "signals": [
+        "YTONE SKU: SG54 Adaugă prima recenzie 8990,00 lei Preț: 5750,00 lei In stoc Cantitate: + - Adauga in cos Adaugă Listă de dorințe personalizată OK Adaug&#x1",
+        "0 lei Adauga in cos Adaugă la lista de preferinte În stoc - 30% Aparat Squat / Calf L-SC19 Powertec 6829,00 lei 4795,00 lei Stoc epuizat - 15% Profesionale P",
+        "0 lei Adauga in cos Adaugă la lista de preferinte În stoc - 30% Profesionale Aparat Combo Presa Picioare/Hack Squat P-LPHS26, Powertec 12450,00 lei 8690,00 l",
+        "0 lei Adauga in cos Adaugă la lista de preferinte În stoc - 29% Profesionale Aparat profesional Linear Hack Press SHUA SH-G6914 &#x2013; Pres&#x103; pentru p",
+        " 124A, Cluj-Napoca, 400396 [email&#160;protected] 0737 307 370 0722.800.483 Informatii Cerere de retragere Blog Despre noi Politica de utilizare a cookie-"
+      ]
+    },
+    {
+      "url": "https://fitlife.ro/set-gantere-si-suport-de-lux-1-10-kg-theway-fitness",
+      "status": 200,
+      "image": "https://fitlife.ro/images/thumbs/0011672_set-gantere-si-suport-de-lux-1-10-kg-theway-fitness_747.jpeg",
+      "price": "9047.00",
+      "title": "Set gantere si suport de lux 1-10 kg, TheWay Fitness | Fitlife",
+      "signals": [
+        " SKU: LWDA-CRY Adaugă prima recenzie 11687,00 lei Preț: 9047,00 lei In stoc Cantitate: + - Adauga in cos Adaugă Listă de dorințe personalizată OK Adaug&#x1",
+        " 124A, Cluj-Napoca, 400396 [email&#160;protected] 0737 307 370 0722.800.483 Informatii Cerere de retragere Blog Despre noi Politica de utilizare a cookie-"
+      ]
+    },
+    {
+      "url": "https://fitlife.ro/kettlebell-profesional-atx-din-fonta-8-48-kg-greutati-pentru-functional-training-si-forta",
+      "status": 200,
+      "image": "https://fitlife.ro/images/thumbs/0020067_kettlebell-profesional-atx-din-fonta-8-48-kg-greutati-pentru-functional-training-si-forta_747.webp",
+      "price": "163.00",
+      "title": "Kettlebell ATX din Font&#x103; | Greut&#x103;&#x21B;i Profesionale | FitLife | Fitlife",
+      "signals": [
+        "ucător: ATX SKU: Adaugă prima recenzie 220,00 lei Preț: 163,00 lei In stoc Greutate * Vă rugăm să selectați 8 kg 12 kg 16 kg 20 kg 24 kg 28 kg 32 kg 36 kg ",
+        " 124A, Cluj-Napoca, 400396 [email&#160;protected] 0737 307 370 0722.800.483 Informatii Cerere de retragere Blog Despre noi Politica de utilizare a cookie-"
+      ]
+    }
+  ]
+}

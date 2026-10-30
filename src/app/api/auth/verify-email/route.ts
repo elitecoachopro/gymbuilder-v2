@@ -1,58 +1,24 @@
+import type { Database } from '@/types/database.generated';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const token = searchParams.get('token');
-
-    if (!token) {
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gymbuilder-v2.vercel.app';
-      return NextResponse.redirect(`${appUrl}/login?error=Token lipsă`);
-    }
-
-    const supabase = getSupabaseAdmin();
-
-    // Find user by verification token
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('id, email, full_name')
-      .eq('verification_token', token)
-      .single();
-
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gymbuilder-v2.vercel.app';
-
-    if (error || !user) {
-      return NextResponse.redirect(`${appUrl}/login?error=Token invalid sau expirat`);
-    }
-
-    // Mark email as verified and clear token
-    const { error: updateError } = await supabase
-      .from('users')
-      .update({
-        email_verified: true,
-        verification_token: null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', user.id);
-
-    if (updateError) {
-      console.error('Verify email update error:', updateError);
-      return NextResponse.redirect(`${appUrl}/login?error=Eroare la verificare`);
-    }
-
-    // Redirect to login with success message
-    return NextResponse.redirect(`${appUrl}/login?verified=true`);
-  } catch (error) {
-    console.error('Verify email error:', error);
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gymbuilder-v2.vercel.app';
-    return NextResponse.redirect(`${appUrl}/login?error=Eroare internă`);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+  const destination = new URL('/login', appUrl);
+  const token = request.nextUrl.searchParams.get('token');
+  if (!token || !/^[a-f0-9]{64}$/.test(token)) {
+    destination.searchParams.set('error', 'Token invalid sau expirat');
+    return NextResponse.redirect(destination);
   }
+  const database = createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+  const { data, error } = await database.from('users').update({
+    email_verified: true, verification_token: null, verification_token_expires_at: null,
+    updated_at: new Date().toISOString(),
+  }).eq('verification_token', token).eq('email_verified', false)
+    .gt('verification_token_expires_at', new Date().toISOString()).select('id').maybeSingle();
+  if (error || !data) destination.searchParams.set('error', 'Token invalid sau expirat');
+  else destination.searchParams.set('verified', 'true');
+  return NextResponse.redirect(destination);
 }

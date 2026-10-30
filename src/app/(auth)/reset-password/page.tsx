@@ -1,14 +1,17 @@
 'use client';
 
+import { isStrongPassword } from '@/lib/sanitize';
+import { useUiText } from '@/i18n/useUiText';
+
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Dumbbell, Lock, Eye, EyeOff, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useClientTranslations } from '@/i18n/client';
 
 export default function ResetPasswordPage() {
+  const ui = useUiText();
   const { t } = useClientTranslations('auth');
-  const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams?.get('token') || null;
 
@@ -17,6 +20,8 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (error) errorRef.current?.focus(); }, [error]);
   const [success, setSuccess] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,8 +34,9 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    if (!password || password.length < 8) {
-      setError(t('passwordMin'));
+    const passwordCheck = isStrongPassword(password);
+    if (!passwordCheck.valid) {
+      setError(ui(passwordCheck.message));
       return;
     }
 
@@ -57,10 +63,8 @@ export default function ResetPasswordPage() {
 
       setSuccess(data.message || t('resetSuccess'));
 
-      setTimeout(() => {
-        router.push('/login');
-      }, 3000);
-    } catch (err) {
+
+    } catch {
       setError(t('connectionError'));
     } finally {
       setLoading(false);
@@ -89,7 +93,7 @@ export default function ResetPasswordPage() {
           <Link href="/" className="inline-flex items-center gap-2">
             <Dumbbell className="w-8 h-8 text-gold-400" />
             <span className="text-2xl font-bold">
-              <span className="text-white">Gym</span>
+              <span className="text-white">Gym </span>
               <span className="text-gold-400">Builder</span>
             </span>
           </Link>
@@ -98,28 +102,28 @@ export default function ResetPasswordPage() {
         </div>
 
         {success && (
-          <div className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center gap-2">
+          <div role="status" className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-            <p className="text-sm text-green-400">{success}</p>
+            <p className="text-sm text-green-400">{ui(success)} <Link href="/login" className="underline">{t("loginButton")}</Link></p>
           </div>
         )}
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-2">
+          <div id="form-error" ref={errorRef} tabIndex={-1} role="alert" className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-            <p className="text-sm text-red-400">{error}</p>
+            <p className="text-sm text-red-400">{ui(error)} <Link href="/forgot-password" className="underline">{t("requestNewLink")}</Link></p>
           </div>
         )}
 
         <div className="glass-card p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <p id="password-rules" className="mb-4 text-sm text-anthracite-300">{ui("Parola: 8–128 caractere, cu literă mare, literă mică și cifră.")}</p><form hidden={!!success} onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('newPassword')}</label>
+              <label htmlFor="auth-reset-password-0" className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('newPassword')}</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
-                <input
+                <input id="auth-reset-password-0"
                   type={showPassword ? 'text' : 'password'}
                   className="input-field pl-11 pr-11"
-                  placeholder={t('passwordPlaceholder')}
+                  minLength={8} maxLength={128} aria-describedby={error ? "password-rules form-error" : "password-rules"} placeholder={ui(t('passwordPlaceholder'))}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -127,7 +131,7 @@ export default function ResetPasswordPage() {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={ui(showPassword ? 'Ascunde parola' : 'Arată parola')} aria-pressed={showPassword} onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-anthracite-400 hover:text-white"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -136,13 +140,13 @@ export default function ResetPasswordPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('confirmPassword')}</label>
+              <label htmlFor="auth-reset-password-1" className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('confirmPassword')}</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
-                <input
+                <input id="auth-reset-password-1"
                   type={showPassword ? 'text' : 'password'}
                   className="input-field pl-11"
-                  placeholder={t('confirmPasswordPlaceholder')}
+                  placeholder={ui(t('confirmPasswordPlaceholder'))}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required

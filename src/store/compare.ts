@@ -6,7 +6,7 @@ import { persist } from 'zustand/middleware';
 export interface CompareProduct {
   id: string | number;
   name: string;
-  price: number;
+  price: number | null;
   category: string;
   condition: string;
   brand: string;

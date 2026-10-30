@@ -1,9 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { jsonObject } from '@/lib/database-values';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
@@ -15,7 +18,7 @@ export async function GET(request: NextRequest) {
   const supplierId = searchParams.get('supplier_id');
 
   if (!supplierId) {
-    return NextResponse.json({ error: 'supplier_id este obligatoriu.' }, { status: 400 });
+    return await localizedJson({ error: 'supplier_id este obligatoriu.' }, { status: 400 });
   }
 
   const limit = searchParams.get('limit');
@@ -36,31 +39,18 @@ export async function GET(request: NextRequest) {
 
     const { data: reviews, error } = await query;
 
-    // Also get total count for stats (without limit)
-    const { count: totalCount } = await supabase
-      .from('reviews')
-      .select('id', { count: 'exact', head: true })
-      .eq('supplier_id', supplierId)
-      .eq('verified', true);
+    const { data: stats, error: statsError } = await supabase.rpc('supplier_review_stats', { p_supplier_id: supplierId });
+    if (error || statsError) return await localizedJson({ error: 'Recenziile nu au putut fi incarcate.' }, { status: 500 });
+    const count = Number(jsonObject(stats)?.count || 0);
+    const avgRating = Number(jsonObject(stats)?.avgRating || 0);
 
-    if (error) {
-      console.error('Reviews fetch error:', error);
-      return NextResponse.json({ reviews: [], stats: { avgRating: 0, count: 0 } });
-    }
-
-    // Calculate stats from all reviews (not just limited)
-    const count = totalCount || reviews?.length || 0;
-    const avgRating = (reviews && reviews.length > 0)
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-      : 0;
-
-    return NextResponse.json({
+    return await localizedJson({
       reviews: reviews || [],
       stats: { avgRating: Math.round(avgRating * 10) / 10, count },
     });
   } catch (err) {
     console.error('Reviews error:', err);
-    return NextResponse.json({ reviews: [], stats: { avgRating: 0, count: 0 } });
+    return await localizedJson({ reviews: [], stats: { avgRating: 0, count: 0 } });
   }
 }
 
@@ -69,7 +59,7 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limit: 2 requests per minute per IP
     const ip = getClientIP(request);
-    const rateCheck = checkRateLimit(`reviews:${ip}`, { maxRequests: 2, windowMs: 60 * 1000 });
+    const rateCheck = await checkRateLimit(`reviews:${ip}`, { maxRequests: 2, windowMs: 60 * 1000 });
     if (!rateCheck.allowed) {
       return rateLimitResponse(rateCheck.resetTime!);
     }
@@ -79,17 +69,17 @@ export async function POST(request: NextRequest) {
 
     // Validation
     if (!supplier_id || !client_name || !client_email || !rating || !title) {
-      return NextResponse.json({ error: 'Câmpuri obligatorii lipsă.' }, { status: 400 });
+      return await localizedJson({ error: 'Câmpuri obligatorii lipsă.' }, { status: 400 });
     }
 
     if (typeof rating !== 'number' || rating < 1 || rating > 5) {
-      return NextResponse.json({ error: 'Rating-ul trebuie să fie între 1 și 5.' }, { status: 400 });
+      return await localizedJson({ error: 'Rating-ul trebuie să fie între 1 și 5.' }, { status: 400 });
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(client_email)) {
-      return NextResponse.json({ error: 'Email invalid.' }, { status: 400 });
+      return await localizedJson({ error: 'Email invalid.' }, { status: 400 });
     }
 
     // Sanitize inputs
@@ -106,7 +96,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (!supplier) {
-      return NextResponse.json({ error: 'Furnizor negăsit.' }, { status: 404 });
+      return await localizedJson({ error: 'Furnizor negăsit.' }, { status: 404 });
     }
 
     // Check for duplicate review (same email + supplier in last 24h)
@@ -119,7 +109,7 @@ export async function POST(request: NextRequest) {
       .gte('created_at', oneDayAgo);
 
     if (existing && existing.length > 0) {
-      return NextResponse.json({ error: 'Ai trimis deja o recenzie pentru acest furnizor recent.' }, { status: 429 });
+      return await localizedJson({ error: 'Ai trimis deja o recenzie pentru acest furnizor recent.' }, { status: 429 });
     }
 
     // Insert review (unverified)
@@ -139,7 +129,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Review insert error:', error);
-      return NextResponse.json({ error: 'Eroare la salvarea recenziei.' }, { status: 500 });
+      return await localizedJson({ error: 'Eroare la salvarea recenziei.' }, { status: 500 });
     }
 
     // Create notification for admin users about new review to moderate
@@ -161,13 +151,13 @@ export async function POST(request: NextRequest) {
       await supabase.from('notifications').insert(notifications);
     }
 
-    return NextResponse.json({
+    return await localizedJson({
       success: true,
       message: 'Recenzia a fost trimisă și va fi publicată după verificare.',
       review,
     });
   } catch (err) {
     console.error('Review POST error:', err);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă.' }, { status: 500 });
   }
 }

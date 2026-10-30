@@ -1,0 +1,29 @@
+[
+  {
+    "pose": "reception",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/mei-3d-person-receptionist-d36b82b9",
+    "height_m": 1.67,
+    "author": "Innerscene, adapted from MakeHuman CC0 assets",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sourceSha256": "04c4ec59f5704db616bd9955405ea8774e61e32ceb3973d13a75f9db14a50c3e"
+  },
+  {
+    "pose": "coach",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/jordan-3d-person-athlete-a0770454",
+    "height_m": 1.7,
+    "author": "Innerscene, adapted from MakeHuman CC0 assets",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sourceSha256": "a4f9919aee21ad0ad7097cb8311f7555ea8ef731e93c38808bfe5042a5f5b170"
+  },
+  {
+    "pose": "child",
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/maya-3d-person-child-standing-bace98fd",
+    "height_m": 1.35,
+    "author": "Innerscene, adapted from MakeHuman CC0 assets",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sourceSha256": "86616920f6d52fa4a553de446f6448fcf298c53e53b537ec11834850646af7b5"
+  }
+]

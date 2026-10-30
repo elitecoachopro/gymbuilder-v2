@@ -1,0 +1,38 @@
+{
+  "name": "Wood Floor",
+  "author": "Dimitrios Savva / Poly Haven",
+  "source": "https://polyhaven.com/a/wood_floor",
+  "license": "CC0-1.0",
+  "licenseUrl": "https://polyhaven.com/license",
+  "tileMetres": 1.7,
+  "size": 512,
+  "maps": [
+    {
+      "channel": "map",
+      "file": "map.jpg",
+      "url": "/textures/wood-floor/map.jpg",
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wood_floor/wood_floor_diff_1k.jpg",
+      "sourceMd5": "b7e927d2bf2f8f103820ff3890c8407c",
+      "bytes": 47676,
+      "sha256": "8362d26bd9f0b9a29433a017f6d42c36cc1f29e181c2a6d3b87dd179e74d7433"
+    },
+    {
+      "channel": "bumpMap",
+      "file": "bumpMap.jpg",
+      "url": "/textures/wood-floor/bumpMap.jpg",
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wood_floor/wood_floor_disp_1k.jpg",
+      "sourceMd5": "0bd892af0a41211131dd4921feab4561",
+      "bytes": 66764,
+      "sha256": "e3674f564bf23632e69cc4d8c805d34cbc5c5cb1a02a1dbec88ab02e097de047"
+    },
+    {
+      "channel": "roughnessMap",
+      "file": "roughnessMap.jpg",
+      "url": "/textures/wood-floor/roughnessMap.jpg",
+      "sourceUrl": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wood_floor/wood_floor_rough_1k.jpg",
+      "sourceMd5": "36146634f1dbd1bc30cd071857584c10",
+      "bytes": 31525,
+      "sha256": "dadb2159c4e313a2952cc63cdd803af84c46addb8955d80a88776935e09a6324"
+    }
+  ]
+}

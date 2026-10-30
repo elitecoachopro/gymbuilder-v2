@@ -13,7 +13,6 @@
  */
 
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
 
 const CSRF_COOKIE_NAME = 'csrf_token';
 const CSRF_HEADER_NAME = 'x-csrf-token';

@@ -1,8 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { getSessionUser } from '@/lib/session-server';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
-import * as crypto from 'crypto';
 import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
+import { z } from 'zod';
+
+const enquiryInput = z.object({
+  idempotencyKey: z.string().uuid().optional(),
+  name: z.string().trim().min(2).max(120),
+  email: z.string().trim().email().max(254).transform(value => value.toLowerCase()),
+  phone: z.string().trim().max(30).nullish(),
+  message: z.string().trim().min(1).max(5000),
+  supplierId: z.string().uuid(),
+  productId: z.string().uuid().nullish(),
+});
 
 function escapeHtml(str: string): string {
   if (!str) return '';
@@ -15,29 +27,13 @@ function escapeHtml(str: string): string {
 }
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
-function getUserFromSession(): { userId: string } | null {
-  try {
-    const cookieStore = cookies();
-    const sessionToken = cookieStore.get('session_token')?.value;
-    if (!sessionToken) return null;
-    const [payloadB64, signature] = sessionToken.split('.');
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || '';
-    const decodedPayload = Buffer.from(payloadB64, 'base64').toString();
-    const expected = crypto.createHmac('sha256', secret).update(decodedPayload).digest('hex');
-    if (signature !== expected) return null;
-    const data = JSON.parse(decodedPayload);
-    if (data.exp && data.exp < Date.now()) return null;
-    return { userId: data.userId };
-  } catch {
-    return null;
-  }
-}
+async function getUserFromSession(_request?: unknown) { return getSessionUser(); }
 
 async function sendEmail(to: string, subject: string, html: string) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -51,7 +47,7 @@ async function sendEmail(to: string, subject: string, html: string) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'GymBuilder <noreply@gymbuilder.app>',
+        from: 'Gym Builder <noreply@gymbuilder.app>',
         to: [to],
         subject,
         html,
@@ -65,33 +61,40 @@ async function sendEmail(to: string, subject: string, html: string) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limit: 3 requests per minute per IP
+    const body = await request.json();
+    const parsed = enquiryInput.safeParse({ ...body, supplierId: body.supplierId || body.supplier_id, productId: body.productId || body.product_id || null });
+    if (!parsed.success) return await localizedJson({ error: 'Datele cererii sunt invalide.' }, { status: 400 });
+    // Limit repeated contact with the same supplier while allowing a multi-supplier basket.
     const ip = getClientIP(request);
-    const rateCheck = checkRateLimit(`contact-supplier:${ip}`, { maxRequests: 3, windowMs: 60 * 1000 });
+    const rateCheck = await checkRateLimit(`contact-supplier:${ip}:${parsed.data.supplierId}`, { maxRequests: 3, windowMs: 60 * 1000 });
     if (!rateCheck.allowed) {
       return rateLimitResponse(rateCheck.resetTime!);
     }
 
-    const body = await request.json();
-    const { name, email, phone, message, supplierId, supplier_id } = body;
-    const resolvedSupplierId = supplierId || supplier_id;
-
-    if (!name || !email || !message || !resolvedSupplierId) {
-      return NextResponse.json({ error: 'Câmpuri obligatorii lipsă.' }, { status: 400 });
-    }
+    const { idempotencyKey, name, email, phone, message, supplierId: resolvedSupplierId, productId: resolvedProductId } = parsed.data;
 
     const supabase = getSupabase();
+
+    if (idempotencyKey) {
+      const { data: existing } = await supabase.from('contact_requests').select('id,client_email,supplier_id').eq('idempotency_key', idempotencyKey).maybeSingle();
+      if (existing) return existing.client_email === email && existing.supplier_id === resolvedSupplierId
+        ? await localizedJson({ success: true, requestId: existing.id })
+        : await localizedJson({ error: 'Identificator de cerere deja folosit.' }, { status: 409 });
+    }
 
     // Get supplier info
     const { data: supplier } = await supabase
       .from('supplier_profiles')
       .select('id, company_name, user_id')
       .eq('id', resolvedSupplierId)
+      .eq('status', 'approved')
       .single();
+
+    if (supplier && !supplier.user_id) return await localizedJson({ error: 'Contactează furnizorul direct folosind datele de contact oficiale din profil.' }, { status: 400 });
 
     // Get supplier user email
     let supplierEmail = null;
-    if (supplier) {
+    if (supplier?.user_id) {
       const { data: userData } = await supabase
         .from('users')
         .select('email, full_name')
@@ -101,20 +104,24 @@ export async function POST(request: NextRequest) {
     }
 
     if (!supplier) {
-      return NextResponse.json({ error: 'Furnizor negăsit.' }, { status: 404 });
+      return await localizedJson({ error: 'Furnizor negăsit.' }, { status: 404 });
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gymbuilder.app';
 
     // Save contact request to database
-    const { productId, product_id: productIdAlt } = body;
-    const resolvedProductId = productId || productIdAlt || null;
+    if (resolvedProductId) {
+      const { data: product } = await supabase.from('products').select('id')
+        .eq('id', resolvedProductId).eq('supplier_id', resolvedSupplierId).in('status', ['active', 'featured']).maybeSingle();
+      if (!product) return await localizedJson({ error: 'Produsul nu este disponibil la acest furnizor.' }, { status: 400 });
+    }
 
     // Try to get logged-in user's ID to link the contact request
-    const session = getUserFromSession();
+    const session = await getUserFromSession();
     const clientId = session?.userId || null;
 
-    const { data: insertedRequest } = await supabase.from('contact_requests').insert({
+    const { data: insertedRequest, error: insertError } = await supabase.from('contact_requests').insert({
+      idempotency_key: idempotencyKey,
       client_name: name,
       client_email: email,
       client_phone: phone || null,
@@ -124,7 +131,13 @@ export async function POST(request: NextRequest) {
       message: message,
       status: 'sent',
     }).select('id').single();
-    const requestId = insertedRequest?.id || '';
+    if (insertError?.code === '23505' && idempotencyKey) {
+      const { data: existing } = await supabase.from('contact_requests').select('id').eq('idempotency_key', idempotencyKey).eq('client_email', email).eq('supplier_id', resolvedSupplierId).maybeSingle();
+      if (existing) return await localizedJson({ success: true, requestId: existing.id });
+    }
+    if (insertError || !insertedRequest) return await localizedJson({ error: 'Cererea nu a putut fi salvata. Incearca din nou.' }, { status: 500 });
+    const requestId = insertedRequest.id;
+    let supplierEmailSent = false;
 
     // Get product info if available
     let productName = '';
@@ -143,18 +156,18 @@ export async function POST(request: NextRequest) {
 
     // Send email to supplier
     if (supplierEmail) {
-      await sendEmail(
+      supplierEmailSent = await sendEmail(
         supplierEmail,
-        'Ai o cerere nouă pe GymBuilder',
+        'Ai o cerere nouă pe Gym Builder',
         `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #1a1a1a; color: #ffffff;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #f5c542; font-size: 28px; margin: 0;">GymBuilder</h1>
+            <h1 style="color: #f5c542; font-size: 28px; margin: 0;">Gym Builder</h1>
           </div>
           <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
-            <h2 style="color: #f5c542; margin-top: 0;">📩 Ai o cerere nouă pe GymBuilder</h2>
+            <h2 style="color: #f5c542; margin-top: 0;">📩 Ai o cerere nouă pe Gym Builder</h2>
             <p style="color: #d1d5db; line-height: 1.6;">
-              Un client a trimis o cerere de ofertă pe platforma GymBuilder.
+              Un client a trimis o cerere de ofertă pe platforma Gym Builder.
             </p>
             <div style="background: #1a1a1a; border-radius: 8px; padding: 16px; margin: 16px 0;">
               <p style="color: #9ca3af; margin: 4px 0; font-size: 14px;"><strong style="color: #f5c542;">Client:</strong> ${escapeHtml(name)}</p>
@@ -178,7 +191,7 @@ export async function POST(request: NextRequest) {
             </div>
           </div>
           <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 24px;">
-            © ${new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
+            © ${new Date().getFullYear()} Gym Builder. Toate drepturile rezervate.
           </p>
         </div>
         `
@@ -186,13 +199,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Also send confirmation to the requester
-    await sendEmail(
+    const confirmationEmailSent = await sendEmail(
       email,
       `Cererea ta a fost trimisă către ${supplier.company_name}`,
       `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #1a1a1a; color: #ffffff;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #f5c542; font-size: 28px; margin: 0;">GymBuilder</h1>
+          <h1 style="color: #f5c542; font-size: 28px; margin: 0;">Gym Builder</h1>
         </div>
         <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
           <h2 style="color: #4ade80; margin-top: 0;">✅ Cerere trimisă cu succes!</h2>
@@ -209,7 +222,7 @@ export async function POST(request: NextRequest) {
           </div>
         </div>
         <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 24px;">
-          © ${new Date().getFullYear()} GymBuilder. Toate drepturile rezervate.
+          © ${new Date().getFullYear()} Gym Builder. Toate drepturile rezervate.
         </p>
       </div>
       `
@@ -221,15 +234,15 @@ export async function POST(request: NextRequest) {
         user_id: supplier.user_id,
         type: 'new_request',
         title: `Cerere nouă de la ${name}`,
-        message: productName ? `Produs solicitat: ${productName}` : (message ? message.substring(0, 100) : null),
+        message: productName ? `Produs solicitat: ${productName}` : (message ? message.substring(0, 100) : 'Cerere nouă'),
         link: `/supplier/dashboard#cereri-${requestId}`,
         is_read: false,
       });
     }
 
-    return NextResponse.json({ success: true });
+    return await localizedJson({ success: true, requestId, recorded: true, supplierEmailSent, confirmationEmailSent });
   } catch (err) {
     console.error('Contact supplier error:', err);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă.' }, { status: 500 });
   }
 }

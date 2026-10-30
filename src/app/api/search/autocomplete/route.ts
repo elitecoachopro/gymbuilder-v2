@@ -1,8 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { formatCatalogPrice } from '@/lib/catalog-price';
+import { firstImage } from '@/lib/database-values';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
@@ -69,10 +73,10 @@ interface Suggestion {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get('q')?.trim() || '';
+    const query = searchParams.get('q')?.trim().slice(0, 120) || '';
 
     if (!query || query.length < 2) {
-      return NextResponse.json({ suggestions: [] });
+      return await localizedJson({ suggestions: [] });
     }
 
     const supabase = getSupabase();
@@ -81,8 +85,8 @@ export async function GET(request: NextRequest) {
     // Fetch products (only name, category, brand for speed)
     const { data: products } = await supabase
       .from('products')
-      .select('id, name, category, brand_id, images, price_eur')
-      .eq('status', 'active')
+      .select('id, name, category, brand_id, images, price_eur, listed_price_amount, listed_price_currency, supplier_profiles!inner(status)')
+      .in('status', ['active', 'featured']).eq('supplier_profiles.status', 'approved')
       .limit(200);
 
     // Fetch brands
@@ -103,7 +107,7 @@ export async function GET(request: NextRequest) {
     // Score products
     if (products) {
       for (const p of products) {
-        const brandName = brandMap.get(p.brand_id) || '';
+        const brandName = brandMap.get(p.brand_id || '') || '';
         const nameScore = fuzzyScore(query, p.name);
         const brandScore = brandName ? fuzzyScore(query, brandName) * 0.8 : 0;
         const catScore = p.category ? fuzzyScore(query, p.category) * 0.7 : 0;
@@ -114,8 +118,8 @@ export async function GET(request: NextRequest) {
             type: 'product',
             id: p.id,
             text: p.name,
-            subtitle: [brandName, p.category, `${p.price_eur}€`].filter(Boolean).join(' · '),
-            image: p.images?.[0] || null,
+            subtitle: [brandName, p.category, formatCatalogPrice(p.price_eur, 'ro', p)].filter(Boolean).join(' · '),
+            image: firstImage(p.images),
             score: bestScore,
           });
         }
@@ -177,11 +181,11 @@ export async function GET(request: NextRequest) {
     // Sort by score and return top 5
     suggestions.sort((a, b) => b.score - a.score);
 
-    return NextResponse.json({
-      suggestions: suggestions.slice(0, 5).map(({ score, ...rest }) => rest),
+    return await localizedJson({
+      suggestions: suggestions.slice(0, 5).map(({ type, id, text, subtitle, image }) => ({ type, id, text, subtitle, image })),
     });
   } catch (error) {
     console.error('Autocomplete API error:', error);
-    return NextResponse.json({ suggestions: [] });
+    return await localizedJson({ suggestions: [] });
   }
 }

@@ -1,6 +1,9 @@
 'use client';
 
+import { useUiText } from '@/i18n/useUiText';
+
 import Footer from '@/components/layout/Footer';
+import SuperPricePromotion from '@/components/SuperPricePromotion';
 import Link from 'next/link';
 import { Check, X, Star, Zap, Crown, Rocket, Building2 } from 'lucide-react';
 
@@ -103,17 +106,17 @@ const plans = [
 ];
 
 export default function PricingPage() {
+  const ui = useUiText();
   return (
     <main className="min-h-screen">
 
       <section className="pt-32 pb-16 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Pachete & <span className="gold-gradient">Prețuri</span>
+            {ui("Pachete & ")}<span className="gold-gradient">{ui("Prețuri")}</span>
           </h1>
           <p className="text-anthracite-300 text-lg max-w-2xl mx-auto">
-            Alege pachetul potrivit pentru afacerea ta. Upgrade sau downgrade oricând.
-          </p>
+            {ui("Alege pachetul potrivit pentru afacerea ta. Upgrade sau downgrade oricând.")}</p>
         </div>
       </section>
 
@@ -140,18 +143,18 @@ export default function PricingPage() {
                   <div className="w-10 h-10 bg-gold-400/10 rounded-lg flex items-center justify-center mb-3">
                     <plan.icon className="w-5 h-5 text-gold-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-white">{plan.name}</h3>
-                  <p className="text-xs text-anthracite-400 mt-1">{plan.description}</p>
+                  <h3 className="text-lg font-bold text-white">{ui(plan.name)}</h3>
+                  <p className="text-xs text-anthracite-400 mt-1">{ui(plan.description)}</p>
                 </div>
 
                 <div className="mb-6">
                   {plan.price !== null ? (
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold text-white">&euro;{plan.price}</span>
-                      <span className="text-anthracite-400 text-sm">{plan.period}</span>
+                      <span className="text-3xl font-bold text-white">&euro;{ui(plan.price)}</span>
+                      <span className="text-anthracite-400 text-sm">{ui(plan.period)}</span>
                     </div>
                   ) : (
-                    <span className="text-2xl font-bold text-white">La cerere</span>
+                    <span className="text-2xl font-bold text-white">{ui("La cerere")}</span>
                   )}
                 </div>
 
@@ -164,21 +167,21 @@ export default function PricingPage() {
                         <X className="w-4 h-4 text-anthracite-600 mt-0.5 shrink-0" />
                       )}
                       <span className={`text-xs ${feature.included ? 'text-anthracite-200' : 'text-anthracite-500'}`}>
-                        {feature.text}
+                        {ui(feature.text)}
                       </span>
                     </li>
                   ))}
                 </ul>
 
                 <Link
-                  href="/register/supplier"
+                  href={plan.name === "Custom" ? "/contact?subject=Plan%20Custom" : `/register/supplier?plan=${plan.name.toLowerCase()}`}
                   className={`block text-center py-3 rounded-lg text-sm font-semibold transition-all ${
                     plan.popular
                       ? 'bg-gold-400 text-anthracite-950 hover:bg-gold-300'
                       : 'border border-gold-400/30 text-gold-400 hover:bg-gold-400/10'
                   }`}
                 >
-                  {plan.cta}
+                  {ui(plan.cta)}
                 </Link>
               </div>
             ))}
@@ -186,6 +189,7 @@ export default function PricingPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-xl px-4 pb-16"><SuperPricePromotion /></section>
       <Footer />
     </main>
   );

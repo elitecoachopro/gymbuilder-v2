@@ -1,6 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import crypto from 'crypto';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { parseCSV, parseCSVPrice } from '@/lib/csv';
+import { authenticateSession } from '@/lib/session-server';
+import { NextRequest } from 'next/server';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,62 +11,22 @@ const VALID_CATEGORIES = ['cardio', 'strength', 'functional', 'accessories', 'we
 const VALID_CONDITIONS = ['new', 'used'];
 
 function getSupabaseAdmin() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
-function verifySessionToken(token: string): { userId: string } | null {
-  try {
-    const [payloadB64, hmac] = token.split('.');
-    if (!payloadB64 || !hmac) return null;
-    const expected = crypto.createHmac('sha256', process.env.JWT_SECRET || 'dev-secret')
-      .update(payloadB64).digest('hex');
-    if (hmac !== expected) return null;
-    const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString());
-    if (payload.exp && payload.exp < Date.now() / 1000) return null;
-    return { userId: payload.userId || payload.id || payload.sub };
-  } catch {
-    return null;
-  }
-}
+async function verifySessionToken(token: string) { return authenticateSession(token); }
 
-async function getSupplierProfile(supabase: any, userId: string) {
+async function getSupplierProfile(supabase: SupabaseClient<Database>, userId: string) {
   const { data } = await supabase
     .from('supplier_profiles')
-    .select('id, user_id')
+    .select('id, user_id, plan')
     .eq('user_id', userId)
+    .eq('status', 'approved')
     .single();
   return data;
-}
-
-function parseCSV(text: string): { headers: string[]; rows: string[][] } {
-  const lines = text.split(/\r?\n/).filter(line => line.trim());
-  if (lines.length === 0) return { headers: [], rows: [] };
-  
-  const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/"/g, ''));
-  const rows = lines.slice(1).map(line => {
-    // Simple CSV parsing that handles quoted fields
-    const result: string[] = [];
-    let current = '';
-    let inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        result.push(current.trim());
-        current = '';
-      } else {
-        current += char;
-      }
-    }
-    result.push(current.trim());
-    return result;
-  });
-  
-  return { headers, rows };
 }
 
 interface ValidatedRow {
@@ -74,9 +37,9 @@ interface ValidatedRow {
     name: string;
     description: string;
     price_eur: number;
-    category: string;
-    condition: string;
-    status: string;
+    category: Database['public']['Enums']['product_category'];
+    condition: Database['public']['Enums']['product_condition'];
+    status: Database['public']['Enums']['product_status'];
     images: string[];
   } | null;
 }
@@ -101,7 +64,7 @@ function validateRow(headers: string[], values: string[], rowIndex: number): Val
   if (!category) errors.push('Categoria este obligatorie');
 
   // Validate price
-  const price = parseFloat(priceStr.replace(/[€,\s]/g, ''));
+  const price = parseCSVPrice(priceStr);
   if (priceStr && (isNaN(price) || price <= 0)) {
     errors.push(`Preț invalid: "${priceStr}" (trebuie să fie un număr pozitiv)`);
   }
@@ -150,9 +113,9 @@ function validateRow(headers: string[], values: string[], rowIndex: number): Val
       name,
       description,
       price_eur: price,
-      category: mappedCategory,
-      condition: mappedCondition,
-      status: 'available',
+      category: mappedCategory as Database['public']['Enums']['product_category'],
+      condition: mappedCondition as Database['public']['Enums']['product_condition'],
+      status: 'active',
       images: imageUrl ? [imageUrl] : [],
     },
   };
@@ -165,35 +128,37 @@ export async function POST(request: NextRequest) {
       request.headers.get('authorization')?.replace('Bearer ', '');
 
     if (!sessionToken) {
-      return NextResponse.json({ error: 'Trebuie să fii autentificat.' }, { status: 401 });
+      return await localizedJson({ error: 'Trebuie să fii autentificat.' }, { status: 401 });
     }
 
-    const session = verifySessionToken(sessionToken);
+    const session = await verifySessionToken(sessionToken);
     if (!session) {
-      return NextResponse.json({ error: 'Sesiune expirată.' }, { status: 401 });
+      return await localizedJson({ error: 'Sesiune expirată.' }, { status: 401 });
     }
+    if (!['supplier', 'admin'].includes(session.role)) return await localizedJson({ error: 'Acces interzis.' }, { status: 403 });
 
     const supabase = getSupabaseAdmin();
     const supplierProfile = await getSupplierProfile(supabase, session.userId);
     if (!supplierProfile) {
-      return NextResponse.json({ error: 'Acces interzis.' }, { status: 403 });
+      return await localizedJson({ error: 'Acces interzis.' }, { status: 403 });
     }
 
     const body = await request.json();
     const { csvContent, confirm } = body;
 
-    if (!csvContent) {
-      return NextResponse.json({ error: 'Conținut CSV lipsă.' }, { status: 400 });
+    if (typeof csvContent !== 'string' || !csvContent.trim() || csvContent.length > 1048576) {
+      return await localizedJson({ error: 'Conținut CSV lipsă.' }, { status: 400 });
     }
 
-    const { headers, rows } = parseCSV(csvContent);
+    let headers: string[], rows: string[][];
+    try { ({ headers, rows } = parseCSV(csvContent)); } catch (error) { return await localizedJson({ error: error instanceof Error ? error.message : 'CSV invalid.' }, { status: 400 }); }
 
     if (rows.length === 0) {
-      return NextResponse.json({ error: 'Fișierul CSV nu conține rânduri de date.' }, { status: 400 });
+      return await localizedJson({ error: 'Fișierul CSV nu conține rânduri de date.' }, { status: 400 });
     }
 
     if (rows.length > 100) {
-      return NextResponse.json({ error: 'Maximum 100 de produse per import.' }, { status: 400 });
+      return await localizedJson({ error: 'Maximum 100 de produse per import.' }, { status: 400 });
     }
 
     // Validate all rows
@@ -203,7 +168,7 @@ export async function POST(request: NextRequest) {
 
     // If not confirming, return preview
     if (!confirm) {
-      return NextResponse.json({
+      return await localizedJson({
         preview: true,
         total: rows.length,
         valid: validRows.length,
@@ -215,7 +180,14 @@ export async function POST(request: NextRequest) {
 
     // Confirm: insert valid products
     if (validRows.length === 0) {
-      return NextResponse.json({ error: 'Nu există rânduri valide de importat.' }, { status: 400 });
+      return await localizedJson({ error: 'Nu există rânduri valide de importat.' }, { status: 400 });
+    }
+
+    const productLimits: Record<string, number> = { free: 3, starter: 25, professional: 100, enterprise: Infinity };
+    const { count, error: countError } = await supabase.from('products').select('id', { count: 'exact', head: true }).eq('supplier_id', supplierProfile.id);
+    if (countError) return await localizedJson({ error: 'Limita de produse nu a putut fi verificata.' }, { status: 500 });
+    if ((count || 0) + validRows.length > (productLimits[supplierProfile.plan] ?? 3)) {
+      return await localizedJson({ error: 'Importul depaseste limita de produse a pachetului.' }, { status: 403 });
     }
 
     // Get or create a default brand for CSV imports
@@ -248,10 +220,10 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       console.error('CSV import insert error:', insertError);
-      return NextResponse.json({ error: 'Eroare la salvarea produselor.' }, { status: 500 });
+      return await localizedJson({ error: 'Eroare la salvarea produselor.' }, { status: 500 });
     }
 
-    return NextResponse.json({
+    return await localizedJson({
       success: true,
       imported: inserted?.length || 0,
       skipped: invalidRows.length,
@@ -259,6 +231,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('CSV import error:', error);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă.' }, { status: 500 });
   }
 }

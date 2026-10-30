@@ -6,20 +6,36 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "setup:local": "supabase start && supabase migration up --local && node scripts/setup-local.mjs",
+    "db:stop": "supabase stop",
+    "test": "node --experimental-strip-types --test tests/unit/*.test.mjs",
+    "test:integration": "node --env-file=.env.local --experimental-strip-types --test --test-concurrency=1 tests/integration/*.test.mjs",
+    "db:types": "node scripts/generate-db-types.mjs",
+    "local:install": "node scripts/local-service.mjs install",
+    "local:status": "node scripts/local-service.mjs status",
+    "local:restart": "node scripts/local-service.mjs restart",
+    "local:uninstall": "node scripts/local-service.mjs uninstall",
+    "prebuild": "node --experimental-strip-types scripts/verify-gym-pilot.mjs"
   },
   "dependencies": {
-    "@react-three/drei": "9.117.0",
-    "@react-three/fiber": "8.17.10",
+    "@apple/app-store-server-library": "^3.1.0",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/barlow": "^5.3.0",
+    "@fontsource/barlow-condensed": "^5.3.0",
+    "@react-three/drei": "10.7.9",
+    "@react-three/fiber": "9.8.2",
     "@supabase/ssr": "^0.5.0",
     "@supabase/supabase-js": "^2.45.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "google-auth-library": "^11.3.2",
     "lucide-react": "^0.453.0",
-    "next": "14.2.15",
+    "next": "^15.5.28",
     "next-intl": "^4.13.2",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "resend": "^4.0.0",
     "tailwind-merge": "^2.5.0",
     "three": "0.169.0",
@@ -27,13 +43,26 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^20.14.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "@types/three": "0.169.0",
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.13",
-    "typescript": "^5.5.0"
+    "eslint": "^9.39.5",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "postcss": "^8.5.31",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.71.2"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "overrides": {
+    "postcss": "$postcss"
   }
 }

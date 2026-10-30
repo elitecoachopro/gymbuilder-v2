@@ -1,43 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { Database, Json } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { validStudioProject } from '@/lib/gym-studio';
+import { projectCreateInput, projectUpdateInput } from '@/lib/validation';
+import { getSessionUser } from '@/lib/session-server';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
-import * as crypto from 'crypto';
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
-async function getUser(): Promise<{ id: string; email: string; full_name: string; role: string } | null> {
-  const cookieStore = cookies();
-  const sessionToken = cookieStore.get('session_token')?.value;
-  if (!sessionToken) return null;
-  try {
-    const [payloadB64, signature] = sessionToken.split('.');
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || '';
-    const decodedPayload = Buffer.from(payloadB64, 'base64').toString();
-    const expected = crypto.createHmac('sha256', secret).update(decodedPayload).digest('hex');
-    if (signature !== expected) return null;
-    const data = JSON.parse(decodedPayload);
-    if (data.exp && data.exp < Date.now()) return null;
-    const supabase = getSupabase();
-    const { data: user } = await supabase
-      .from('users')
-      .select('id, email, full_name, role')
-      .eq('id', data.userId)
-      .single();
-    return user;
-  } catch {
-    return null;
-  }
-}
+async function getUser(_request?: unknown) { return getSessionUser(); }
 
 // GET - list user's gym projects
 export async function GET() {
   const user = await getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!user) return await localizedJson({ error: 'Unauthorized' }, { status: 401 });
 
   const supabase = getSupabase();
   const { data: projects, error } = await supabase
@@ -46,17 +27,22 @@ export async function GET() {
     .eq('client_id', user.id)
     .order('updated_at', { ascending: false });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ projects });
+  if (error) return await localizedJson({ error: error.message }, { status: 500 });
+  return await localizedJson({ projects });
 }
 
 // POST - create or update a gym project
 export async function POST(request: NextRequest) {
   const user = await getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!user) return await localizedJson({ error: 'Unauthorized' }, { status: 401 });
 
-  const body = await request.json();
-  const { id, name, variant, total_area, length_m, width_m, zones, status } = body;
+  let body: unknown;
+  try { body = await request.json(); }
+  catch { return await localizedJson({ error: 'Dimensiuni sau date proiect invalide.' }, { status: 400 }); }
+  const updating = body !== null && typeof body === 'object' && 'id' in body && Boolean(body.id);
+  const parsed = (updating ? projectUpdateInput : projectCreateInput).safeParse(body);
+  if (!parsed.success) return await localizedJson({ error: 'Dimensiuni sau date proiect invalide.' }, { status: 400 });
+  const { id, name, variant, total_area, length_m, width_m, zones, status, configuration } = { id: undefined, ...parsed.data };
 
   const supabase = getSupabase();
 
@@ -64,21 +50,23 @@ export async function POST(request: NextRequest) {
     // Update existing project
     const { data: existing } = await supabase
       .from('gym_projects')
-      .select('id')
+      .select('*')
       .eq('id', id)
       .eq('client_id', user.id)
       .single();
 
-    if (!existing) return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    if (!existing) return await localizedJson({ error: 'Project not found' }, { status: 404 });
 
-    const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    if (!validStudioProject({ ...existing, ...parsed.data })) return await localizedJson({ error: 'Suprafețele sau geometria zonelor sunt inconsistente.' }, { status: 400 });
+    const updateData: Database['public']['Tables']['gym_projects']['Update'] = { updated_at: new Date().toISOString() };
     if (name !== undefined) updateData.name = name;
     if (variant !== undefined) updateData.variant = variant;
     if (total_area !== undefined) updateData.total_area = total_area;
     if (length_m !== undefined) updateData.length_m = length_m;
     if (width_m !== undefined) updateData.width_m = width_m;
-    if (zones !== undefined) updateData.zones = zones;
+    if (zones !== undefined) updateData.zones = zones as Json;
     if (status !== undefined) updateData.status = status;
+    if (configuration !== undefined) updateData.configuration = configuration as Json;
 
     const { data: project, error } = await supabase
       .from('gym_projects')
@@ -87,14 +75,15 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ project });
+    if (error) return await localizedJson({ error: error.message }, { status: 500 });
+    return await localizedJson({ project });
   } else {
     // Create new project
     if (!variant || !total_area || !length_m || !width_m) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      return await localizedJson({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    if (!validStudioProject({ total_area, length_m, width_m, zones, configuration })) return await localizedJson({ error: 'Suprafețele sau geometria zonelor sunt inconsistente.' }, { status: 400 });
     const { data: project, error } = await supabase
       .from('gym_projects')
       .insert({
@@ -104,25 +93,26 @@ export async function POST(request: NextRequest) {
         total_area,
         length_m,
         width_m,
-        zones: zones || [],
+        zones: (zones || []) as Json,
         status: status || 'draft',
+        configuration: (configuration || null) as Json,
       })
       .select()
       .single();
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ project }, { status: 201 });
+    if (error) return await localizedJson({ error: error.message }, { status: 500 });
+    return await localizedJson({ project }, { status: 201 });
   }
 }
 
 // DELETE - delete a gym project
 export async function DELETE(request: NextRequest) {
   const user = await getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!user) return await localizedJson({ error: 'Unauthorized' }, { status: 401 });
 
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
-  if (!id) return NextResponse.json({ error: 'Missing project id' }, { status: 400 });
+  if (!id) return await localizedJson({ error: 'Missing project id' }, { status: 400 });
 
   const supabase = getSupabase();
   const { error } = await supabase
@@ -131,6 +121,6 @@ export async function DELETE(request: NextRequest) {
     .eq('id', id)
     .eq('client_id', user.id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true });
+  if (error) return await localizedJson({ error: error.message }, { status: 500 });
+  return await localizedJson({ success: true });
 }

@@ -150,7 +150,8 @@ export function hasSQLInjection(input: string): boolean {
 /**
  * Validate password strength
  */
-export function isStrongPassword(password: string): { valid: boolean; message: string } {
+export function isStrongPassword(password: unknown): { valid: boolean; message: string } {
+  if (typeof password !== 'string') return { valid: false, message: 'Parola invalida.' };
   if (password.length < 8) {
     return { valid: false, message: 'Parola trebuie să aibă minim 8 caractere.' };
   }

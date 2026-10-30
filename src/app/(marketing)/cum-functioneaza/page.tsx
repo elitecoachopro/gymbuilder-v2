@@ -1,4 +1,6 @@
 'use client';
+import { useUiText } from '@/i18n/useUiText';
+
 
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
@@ -25,6 +27,7 @@ function StepCard({ number, title, description, icon: Icon }: { number: number; 
 }
 
 export default function CumFunctioneazaPage() {
+  const ui = useUiText();
   const { t } = useClientTranslations('howItWorks');
 
   const clientIcons = [Search, ClipboardList, MessageSquare, CheckCircle];
@@ -61,13 +64,13 @@ export default function CumFunctioneazaPage() {
                   key={i}
                   number={i + 1}
                   icon={clientIcons[i]}
-                  title={t(`clients.steps.${i}.title`)}
+                  title={ui(t(`clients.steps.${i}.title`))}
                   description={t(`clients.steps.${i}.description`)}
                 />
               ))}
             </div>
             <div className="mt-4 text-center">
-              <Link href="/register/client" className="text-gold-400 hover:text-gold-300 text-sm font-medium underline underline-offset-2 transition-colors">
+              <Link href="/products" className="text-gold-400 hover:text-gold-300 text-sm font-medium underline underline-offset-2 transition-colors">
                 {t('clients.cta')}
               </Link>
             </div>
@@ -90,7 +93,7 @@ export default function CumFunctioneazaPage() {
                   key={i}
                   number={i + 1}
                   icon={supplierIcons[i]}
-                  title={t(`suppliers.steps.${i}.title`)}
+                  title={ui(t(`suppliers.steps.${i}.title`))}
                   description={t(`suppliers.steps.${i}.description`)}
                 />
               ))}
@@ -119,13 +122,13 @@ export default function CumFunctioneazaPage() {
                   key={i}
                   number={i + 1}
                   icon={buildIcons[i]}
-                  title={t(`build.steps.${i}.title`)}
+                  title={ui(t(`build.steps.${i}.title`))}
                   description={t(`build.steps.${i}.description`)}
                 />
               ))}
             </div>
             <div className="mt-4 flex flex-wrap justify-center gap-6">
-              <Link href="/construieste-sala" className="text-gold-400 hover:text-gold-300 text-sm font-medium underline underline-offset-2 transition-colors">
+              <Link href="/configurator" className="text-gold-400 hover:text-gold-300 text-sm font-medium underline underline-offset-2 transition-colors">
                 {t('build.cta1')}
               </Link>
               <Link href="/consultation" className="text-gold-400 hover:text-gold-300 text-sm font-medium underline underline-offset-2 transition-colors">
@@ -134,6 +137,7 @@ export default function CumFunctioneazaPage() {
             </div>
           </div>
 
+          <nav aria-label={ui('Ajutor suplimentar')} className="flex flex-wrap gap-4 mb-10"><Link className="btn-secondary" href="/faq">FAQ</Link><Link className="btn-secondary" href="/estimator-buget">{ui('Estimează bugetul')}</Link><Link className="btn-secondary" href="/client/dashboard#proiecte">{ui('Proiectele mele')}</Link></nav>
           {/* FAQ teaser */}
           <div className="bg-gold-400/5 border border-gold-400/20 rounded-2xl p-6 md:p-8 text-center">
             <h3 className="text-lg font-bold text-white mb-2">{t('ctaTitle')}</h3>

@@ -1,0 +1,313 @@
+{
+  "checked_at": "2026-10-21T00:00:00Z",
+  "suppliers": [
+    {
+      "key": "gym-solutions-ro",
+      "company_name": "Gym Solutions România",
+      "country": "Romania",
+      "city": "Cluj-Napoca",
+      "address": "Cluj-Napoca, România; adresa exactă pentru vizionare se solicită vânzătorului.",
+      "website": "https://gymsolutions-romania.com/",
+      "phone": "+40 742 844 644",
+      "contact_email": "gymsolutionsromania@gmail.com",
+      "listing_source_url": "https://gymsolutions-romania.com/contact",
+      "catalog_url": "https://gymsolutions-romania.com/echipamente-fitness",
+      "logo_url": null,
+      "description": "Comerciant de echipamente fitness noi, recondiționate și în starea existentă. Contact suplimentar: +40 729 962 991. Starea fiecărei unități, TVA, garanția și posibilitatea de vizionare se confirmă direct. Prețurile reproduse sunt cele publicate în paginile individuale.",
+      "products": [
+        {
+          "key": "shro1",
+          "name": "Precor Icarian Smith Machine – second-hand",
+          "brand": "Precor",
+          "brand_country": null,
+          "condition": "used",
+          "category": "strength",
+          "listed_price_amount": 2650,
+          "listed_price_currency": "EUR",
+          "description": "Aparat Smith cu contragreutăți, bancă detașabilă reglabilă și limitatoare de cursă. Vânzătorul declară stare foarte bună. Preț documentat la 21.10.2026; confirmă disponibilitatea, TVA și costurile de livrare direct cu vânzătorul.",
+          "source_url": "https://gymsolutions-romania.com/smith-machine-precor-icarian",
+          "image_sources": [
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JHRBEY0A2MGPVYFC4FA910RB/assets/f6945f7d-6bfe-4910-b46a-4b7d0627d563.jpg"
+          ],
+          "images": [
+            "/equipment/second-hand/shro1.jpg"
+          ],
+          "specs": {
+            "Marcă": "Precor",
+            "Gamă": "Icarian",
+            "Stare declarată": "Foarte bună, folosit",
+            "Bancă": "Reglabilă în unghi și adâncime, detașabilă",
+            "Ghidare": "Pe rulmenți",
+            "Depozitare": "Suporturi laterale pentru discuri",
+            "Moneda prețului": "EUR",
+            "Data verificării ofertei": "21.10.2026"
+          }
+        },
+        {
+          "key": "shro2",
+          "name": "Star Trac / Nautilus Leverage – presă 45°, second-hand",
+          "brand": "Star Trac",
+          "brand_country": null,
+          "condition": "used",
+          "category": "strength",
+          "listed_price_amount": 2950,
+          "listed_price_currency": "EUR",
+          "description": "Presă de picioare cu încărcare pe discuri olimpice și spătar reglabil. Pagina vânzătorului afișează un preț redus de la 3.450 EUR la 2.950 EUR și declară stare impecabilă. Preț documentat la 21.10.2026; confirmă disponibilitatea, TVA și costurile de livrare direct cu vânzătorul.",
+          "source_url": "https://gymsolutions-romania.com/presa-45-star-trac-nautilus-leverage",
+          "image_sources": [
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JHRBEY0A2MGPVYFC4FA910RB%2Fassets%2F1741295098679-whatsappimage2025-03-06at23.03.02_051f3238.jpg"
+          ],
+          "images": [
+            "/equipment/second-hand/shro2.jpg"
+          ],
+          "specs": {
+            "Marcă": "Star Trac",
+            "Tip": "Presă picioare 45°",
+            "Încărcare": "Discuri olimpice",
+            "Spătar": "3 poziții",
+            "Ghidare": "Rulmenți liniari",
+            "Depozitare discuri": "4 suporturi",
+            "Stare declarată": "Impecabilă, folosit",
+            "Moneda prețului": "EUR",
+            "Data verificării ofertei": "21.10.2026"
+          }
+        },
+        {
+          "key": "shro3",
+          "name": "Paramount Lateral Raise – second-hand",
+          "brand": "Paramount",
+          "brand_country": null,
+          "condition": "used",
+          "category": "strength",
+          "listed_price_amount": 1450,
+          "listed_price_currency": "EUR",
+          "description": "Aparat pentru ridicări laterale ale umerilor, cu șezut reglabil. Defect declarat de vânzător: protecția din plastic a părții din spate este deteriorată. Preț documentat la 21.10.2026; confirmă disponibilitatea, TVA și costurile de livrare direct cu vânzătorul.",
+          "source_url": "https://gymsolutions-romania.com/lateral-raise-paramount",
+          "image_sources": [
+            "https://cdn.zyrosite.com/cdn-ecommerce/store_01JHRBEY0A2MGPVYFC4FA910RB/assets/2d66f967-20c1-46c4-89af-0eec2b82e306.jpg"
+          ],
+          "images": [
+            "/equipment/second-hand/shro3.jpg"
+          ],
+          "specs": {
+            "Marcă": "Paramount",
+            "Exercițiu": "Ridicări laterale umeri",
+            "Coloană greutăți": "84 kg",
+            "Șezut": "Reglabil pe înălțime",
+            "Defect declarat": "Protecție plastic spate deteriorată",
+            "Moneda prețului": "EUR",
+            "Data verificării ofertei": "21.10.2026"
+          }
+        }
+      ]
+    },
+    {
+      "key": "homefitness-sg",
+      "company_name": "Homefitness Singapore",
+      "country": "Singapore",
+      "city": "Singapore",
+      "address": "Vizionare cu programare: 29 Mandai Estate, Innovation Place Tower 3, #06-01, Singapore 729932. Ridicare: 23 Kian Teck Road, #04-03, Singapore 628774.",
+      "website": "https://www.homefitness.com.sg/",
+      "phone": "+65 6910 0903",
+      "contact_email": "inquiry@homefitness.com.sg",
+      "listing_source_url": "https://www.homefitness.com.sg/contact-us",
+      "catalog_url": "https://www.homefitness.com.sg/pre-owned-equipment",
+      "logo_url": null,
+      "description": "Comerciant din Singapore cu oferte declarate Certified Pre-Owned. Telefon suplimentar: +65 9387 2866. Prețurile sunt în SGD, dolari singaporezi. Transportul și instalarea nu sunt incluse în ofertele selectate. Pentru export către România, cere ofertă și condiții direct vânzătorului. Fotografiile sunt cele publicate de comerciant; solicită confirmarea unității disponibile.",
+      "products": [
+        {
+          "key": "shsg3",
+          "name": "BH Fitness T200 – Certified Pre-Owned",
+          "brand": "BH Fitness",
+          "brand_country": null,
+          "condition": "used",
+          "category": "cardio",
+          "listed_price_amount": 800,
+          "listed_price_currency": "SGD",
+          "description": "Bandă de alergare folosită, listată de Homefitness drept Certified Pre-Owned. Prețul publicat nu include transportul și instalarea. Pagina menționează garanții diferite în secțiuni diferite; cere în scris condițiile pentru unitatea second-hand. Preț documentat la 21.10.2026; confirmă disponibilitatea, TVA și costurile de livrare direct cu vânzătorul.",
+          "source_url": "https://www.homefitness.com.sg/pre-owned-equipment/display-set-bh-fitness-t200-treadmill",
+          "image_sources": [
+            "https://www.homefitness.com.sg//image/cache/catalog/products/BH%20Fitness/BH%20T200-522x612-422x512.png"
+          ],
+          "images": [
+            "/equipment/second-hand/shsg3.png"
+          ],
+          "specs": {
+            "Marcă": "BH Fitness",
+            "Model": "T200",
+            "Stare declarată": "Certified Pre-Owned",
+            "Suprafață alergare": "135 × 44 cm",
+            "Viteză": "1–14 km/h",
+            "Înclinare": "12 niveluri",
+            "Greutate maximă utilizator": "115 kg",
+            "Dimensiuni": "169 × 75 × 134 cm",
+            "Moneda prețului": "SGD",
+            "Data verificării ofertei": "21.10.2026"
+          }
+        },
+        {
+          "key": "shsg4",
+          "name": "TuffStuff Evolution CPR-265 – Certified Pre-Owned",
+          "brand": "TuffStuff",
+          "brand_country": null,
+          "condition": "used",
+          "category": "strength",
+          "listed_price_amount": 1200,
+          "listed_price_currency": "SGD",
+          "description": "Power cage folosit, cu opritoare reglabile și J-hooks cu blocare. Oferta declară trei luni de garanție. Bara și discurile prezentate ca produse conexe se verifică separat; transportul și instalarea sunt excluse din preț. Preț documentat la 21.10.2026; confirmă disponibilitatea, TVA și costurile de livrare direct cu vânzătorul.",
+          "source_url": "https://www.homefitness.com.sg/pre-owned-equipment/certified-pre-owned-tuffstuff-evolution-power-cage-cpr-265",
+          "image_sources": [
+            "https://www.homefitness.com.sg//image/cache/catalog/product/CPR-265_Power-Cage-Wt-422x512.jpg"
+          ],
+          "images": [
+            "/equipment/second-hand/shsg4.jpg"
+          ],
+          "specs": {
+            "Marcă": "TuffStuff",
+            "Model": "CPR-265",
+            "Stare declarată": "Certified Pre-Owned",
+            "Siguranțe": "Reglabile, cu pini",
+            "Prindere bară": "J-hooks cu blocare",
+            "Bară superioară": "Pentru tracțiuni",
+            "Garanție declarată": "3 luni; condiții de confirmat",
+            "Moneda prețului": "SGD",
+            "Data verificării ofertei": "21.10.2026"
+          }
+        },
+        {
+          "key": "shsg5",
+          "name": "Spirit CS800 Stepper – Certified Pre-Owned",
+          "brand": "Spirit Fitness",
+          "brand_country": null,
+          "condition": "used",
+          "category": "cardio",
+          "listed_price_amount": 1079,
+          "listed_price_currency": "SGD",
+          "description": "Stepper folosit, cu rezistență reglabilă, ventilator și port USB. Vânzătorul publică trei luni de garanție pentru componentele electronice. Prețul nu include transportul și instalarea. Preț documentat la 21.10.2026; confirmă disponibilitatea, TVA și costurile de livrare direct cu vânzătorul.",
+          "source_url": "https://www.homefitness.com.sg/pre-owned-equipment/certified-pre-owned-spirit-cs800-stepper",
+          "image_sources": [
+            "https://www.homefitness.com.sg//image/cache/catalog/products/Untitled%20design%20-%202025-12-10T142518.550-422x512.png"
+          ],
+          "images": [
+            "/equipment/second-hand/shsg5.png"
+          ],
+          "specs": {
+            "Marcă": "Spirit Fitness",
+            "Model": "CS800",
+            "Stare declarată": "Certified Pre-Owned",
+            "Niveluri rezistență": "20",
+            "Înălțime maximă pas": "16 in",
+            "Distanță între pedale": "2 in",
+            "Garanție declarată": "3 luni pentru componente electronice",
+            "Moneda prețului": "SGD",
+            "Data verificării ofertei": "21.10.2026"
+          }
+        }
+      ]
+    },
+    {
+      "key": "john-peter-fitness",
+      "company_name": "John Peter Fitness SL",
+      "country": "Spain",
+      "city": "Marbella",
+      "address": "Calle República Checa 3, nave 15, Polígono San Pedro de Alcántara, 29670 Marbella, Spania",
+      "website": "https://johnpeterfitness.es/en/",
+      "phone": "+34 669 272 018",
+      "contact_email": "info@johnpeterfitness.es",
+      "listing_source_url": "https://johnpeterfitness.es/en/atencion-al-cliente/",
+      "catalog_url": "https://johnpeterfitness.es/en/product-category/ocasion/",
+      "logo_url": null,
+      "description": "Comerciant spaniol de echipamente fitness cu secțiune de aparate folosite și de expoziție. Birou: +34 951 556 500; telefon comercial suplimentar: +34 696 282 838. Prețurile în EUR, starea unității, TVA, garanția și livrarea în România se confirmă direct cu vânzătorul.",
+      "products": [
+        {
+          "key": "shes1",
+          "name": "Technogym Skillrow – second-hand",
+          "brand": "Technogym",
+          "brand_country": null,
+          "condition": "used",
+          "category": "cardio",
+          "listed_price_amount": 2695,
+          "listed_price_currency": "EUR",
+          "description": "Ergometru de vâslit listat explicit ca USED, cu rezistență pe aer și tehnologie Multidrive. Prețul redus publicat este 2.695 EUR, față de prețul anterior de 4.495 EUR. Preț documentat la 21.10.2026; confirmă disponibilitatea, TVA și costurile de livrare direct cu vânzătorul.",
+          "source_url": "https://johnpeterfitness.es/en/product/technogym-skillrow-ocasion/",
+          "image_sources": [
+            "https://johnpeterfitness.es/wp-content/uploads/2025/09/3309-thickbox_default-TECHNOGYM-SKILLROW.jpg"
+          ],
+          "images": [
+            "/equipment/second-hand/shes1.jpg"
+          ],
+          "specs": {
+            "Marcă": "Technogym",
+            "Model": "Skillrow",
+            "Stare declarată": "Used / folosit",
+            "Dimensiuni": "243,5 × 63 × 128 cm",
+            "Greutate aparat": "61 kg",
+            "Greutate maximă utilizator": "160 kg",
+            "Rezistență": "10 niveluri aer + 3 niveluri power",
+            "Moneda prețului": "EUR",
+            "Data verificării ofertei": "21.10.2026"
+          }
+        },
+        {
+          "key": "shes2",
+          "name": "Technogym Excite Jog 500 – second-hand",
+          "brand": "Technogym",
+          "brand_country": null,
+          "condition": "used",
+          "category": "cardio",
+          "listed_price_amount": 2995,
+          "listed_price_currency": "EUR",
+          "description": "Bandă comercială cu afișaj LED, oferită ca echipament folosit. Pagina publică un preț redus de la 3.995 EUR la 2.995 EUR. Cere detalii despre revizie și istoricul unității. Preț documentat la 21.10.2026; confirmă disponibilitatea, TVA și costurile de livrare direct cu vânzătorul.",
+          "source_url": "https://johnpeterfitness.es/en/product/technogym-excite-jog-500-ocasion/",
+          "image_sources": [
+            "https://johnpeterfitness.es/wp-content/uploads/2025/09/Captura-de-pantalla-2025-07-15-153623.png"
+          ],
+          "images": [
+            "/equipment/second-hand/shes2.png"
+          ],
+          "specs": {
+            "Marcă": "Technogym",
+            "Model": "Excite Jog 500",
+            "Stare declarată": "Used / folosit",
+            "Dimensiuni": "210 × 85 × 148 cm",
+            "Greutate aparat": "164 kg",
+            "Viteză publicată": "0,4–20 km/h",
+            "Înclinare": "0–15%",
+            "Moneda prețului": "EUR",
+            "Data verificării ofertei": "21.10.2026"
+          }
+        },
+        {
+          "key": "shes4",
+          "name": "Technogym Run Personal – fost exemplar de expoziție",
+          "brand": "Technogym",
+          "brand_country": null,
+          "condition": "used",
+          "category": "cardio",
+          "listed_price_amount": 8995,
+          "listed_price_currency": "EUR",
+          "description": "Bandă Run Personal listată în categoria USED; vânzătorul precizează că este fost exemplar de expoziție, inspectat și garantat de un service oficial. Condițiile și durata garanției trebuie confirmate în ofertă. Preț documentat la 21.10.2026; confirmă disponibilitatea, TVA și costurile de livrare direct cu vânzătorul.",
+          "source_url": "https://johnpeterfitness.es/en/product/technogym-run-personal-ocasion/",
+          "image_sources": [
+            "https://johnpeterfitness.es/wp-content/uploads/2025/09/Captura-de-pantalla-2025-08-02-142435.png"
+          ],
+          "images": [
+            "/equipment/second-hand/shes4.png"
+          ],
+          "specs": {
+            "Marcă": "Technogym",
+            "Model": "Run Personal",
+            "Stare declarată": "Ex-display / fost exemplar de expoziție",
+            "Viteză maximă": "22 km/h",
+            "Înclinare maximă": "15%",
+            "Suprafață alergare": "145 × 51 cm",
+            "Ecran": "Touchscreen 21,5 in",
+            "Dimensiuni": "2010 × 800 × 1470 mm",
+            "Moneda prețului": "EUR",
+            "Data verificării ofertei": "21.10.2026"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,8 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
@@ -14,11 +16,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { product_id, session_id } = body;
 
-    if (!product_id || !session_id) {
-      return NextResponse.json({ error: 'product_id și session_id obligatorii' }, { status: 400 });
+    if (typeof product_id !== 'string' || !/^[a-f0-9-]{36}$/i.test(product_id) || typeof session_id !== 'string' || !/^[a-zA-Z0-9_-]{1,120}$/.test(session_id)) {
+      return await localizedJson({ error: 'product_id și session_id obligatorii' }, { status: 400 });
     }
 
     const supabase = getSupabase();
+
+    const { data: product } = await supabase.from('products').select('id, supplier_profiles!inner(status)').eq('id', product_id).in('status', ['active', 'featured']).eq('supplier_profiles.status', 'approved').maybeSingle();
+    if (!product) return await localizedJson({ error: 'Produs negăsit.' }, { status: 404 });
 
     // Use upsert with the unique constraint on (product_id, session_id)
     // This ensures only one view per session per product
@@ -32,13 +37,13 @@ export async function POST(request: NextRequest) {
     if (error) {
       // Ignore duplicate key errors silently
       if (error.code === '23505') {
-        return NextResponse.json({ recorded: false, reason: 'already_viewed' });
+        return await localizedJson({ recorded: false, reason: 'already_viewed' });
       }
-      return NextResponse.json({ error: 'Eroare la înregistrare' }, { status: 500 });
+      return await localizedJson({ error: 'Eroare la înregistrare' }, { status: 500 });
     }
 
-    return NextResponse.json({ recorded: true });
+    return await localizedJson({ recorded: true });
   } catch {
-    return NextResponse.json({ error: 'Eroare la procesare' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare la procesare' }, { status: 500 });
   }
 }

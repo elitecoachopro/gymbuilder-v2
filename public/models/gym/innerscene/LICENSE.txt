@@ -1,0 +1,20 @@
+Innerscene original unbranded gym models
+
+License: CC0 1.0 Universal
+https://creativecommons.org/publicdomain/zero/1.0/
+Library terms: https://www.innerscene.com/tools/library/terms
+
+Each source page identifies its original model as CC0, reusable and redistributable commercially. Verified and downloaded on 2026-10-23.
+
+Source pages:
+https://www.innerscene.com/tools/library/3d-parts/treadmill-gym-equipment-f58c0bc4
+https://www.innerscene.com/tools/library/3d-parts/exercise-bike-gym-equipment-bef7223c
+https://www.innerscene.com/tools/library/3d-parts/elliptical-gym-equipment-4457b0ef
+https://www.innerscene.com/tools/library/3d-parts/squat-rack-gym-equipment-c1888dee
+https://www.innerscene.com/tools/library/3d-parts/adjustable-bench-gym-equipment-ec77d95e
+https://www.innerscene.com/tools/library/3d-parts/dumbbell-rack-with-dumbbells-gym-equipment-9079ce82
+https://www.innerscene.com/tools/library/3d-parts/leg-press-gym-equipment-75e948fb
+
+GymBuilder modifications: STEP triangulation to GLB; metres and Y-up conversion; floor origin; PBR material settings; optional runtime frame/upholstery recolouring; planar UV coordinates appended without changing original position/normal/index buffers.
+The original STEP files are retained in cad/. No manufacturer affiliation, engineering certification or manufacturer price is represented.
+Full provenance, original dimensions and SHA-256 hashes: manifest.json.

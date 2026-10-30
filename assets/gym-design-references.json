@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-26",
+  "scope": "Visual inspiration for original Imperial Gym equipment; no manufacturer CAD or branding copied, no certification or precise product equivalence claimed.",
+  "references": [
+    {
+      "brand": "Panatta",
+      "collection": "Freeweight Special / General Catalogue",
+      "url": "https://www.panattasport.com/en/free-weight-special/",
+      "catalogue": "https://panattasport.com/download/panatta-general-catalogue.pdf",
+      "applied": "Independent plate-loaded levers, visible load sleeves/storage horns, height-adjustable seat and substantial frame.",
+      "access": "Official indexed catalogue and product listing inspected; direct server requests returned403."
+    },
+    {
+      "brand": "Life Fitness",
+      "collection": "Symbio Runner",
+      "url": "https://shop.lifefitness.com/products/symbio-runner",
+      "applied": "Wide console, accessible handrail controls, long belt side rails and protected motor cover."
+    },
+    {
+      "brand": "Technogym",
+      "collection": "Skill Line",
+      "url": "https://pdf.archiexpo.com/pdf/technogym/skill-line/5169-457124.html",
+      "author": "TECHNOGYM manufacturer catalogue, distributed through ArchiExpo",
+      "applied": "Streamlined frame, quick controls and uncluttered display layout."
+    }
+  ]
+}

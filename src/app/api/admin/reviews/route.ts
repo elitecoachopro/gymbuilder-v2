@@ -1,43 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { getSessionUser } from '@/lib/session-server';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
-import * as crypto from 'crypto';
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
-async function verifyAdmin(request: NextRequest): Promise<boolean> {
-  const cookieStore = cookies();
-  const sessionToken = cookieStore.get('session_token')?.value;
-  if (!sessionToken) return false;
-
-  try {
-    const [payload] = sessionToken.split('.');
-    const data = JSON.parse(Buffer.from(payload, 'base64').toString());
-    if (data.role !== 'admin') return false;
-
-    const supabase = getSupabase();
-    const { data: user } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', data.userId)
-      .single();
-
-    return user?.role === 'admin';
-  } catch {
-    return false;
-  }
-}
+async function verifyAdmin(_request?: unknown) { const user = await getSessionUser(); return user?.role === 'admin' ? user : null; }
 
 // GET /api/admin/reviews — list unverified reviews
 export async function GET(request: NextRequest) {
   const isAdmin = await verifyAdmin(request);
   if (!isAdmin) {
-    return NextResponse.json({ error: 'Acces interzis.' }, { status: 403 });
+    return await localizedJson({ error: 'Acces interzis.' }, { status: 403 });
   }
 
   const { searchParams } = new URL(request.url);
@@ -64,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Admin reviews error:', error);
-      return NextResponse.json({ reviews: [], pendingCount: 0 });
+      return await localizedJson({ reviews: [], pendingCount: 0 });
     }
 
     // Get pending count
@@ -73,13 +53,13 @@ export async function GET(request: NextRequest) {
       .select('id', { count: 'exact', head: true })
       .eq('verified', false);
 
-    return NextResponse.json({
+    return await localizedJson({
       reviews: reviews || [],
       pendingCount: count || 0,
     });
   } catch (err) {
     console.error('Admin reviews error:', err);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă.' }, { status: 500 });
   }
 }
 
@@ -87,7 +67,7 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const isAdmin = await verifyAdmin(request);
   if (!isAdmin) {
-    return NextResponse.json({ error: 'Acces interzis.' }, { status: 403 });
+    return await localizedJson({ error: 'Acces interzis.' }, { status: 403 });
   }
 
   try {
@@ -95,7 +75,7 @@ export async function PATCH(request: NextRequest) {
     const { reviewId, action } = body; // action: 'approve' | 'reject'
 
     if (!reviewId || !action || !['approve', 'reject'].includes(action)) {
-      return NextResponse.json({ error: 'Date invalide.' }, { status: 400 });
+      return await localizedJson({ error: 'Date invalide.' }, { status: 400 });
     }
 
     const supabase = getSupabase();
@@ -107,10 +87,10 @@ export async function PATCH(request: NextRequest) {
         .eq('id', reviewId);
 
       if (error) {
-        return NextResponse.json({ error: 'Eroare la aprobare.' }, { status: 500 });
+        return await localizedJson({ error: 'Eroare la aprobare.' }, { status: 500 });
       }
 
-      return NextResponse.json({ success: true, message: 'Recenzie aprobată.' });
+      return await localizedJson({ success: true, message: 'Recenzie aprobată.' });
     } else {
       // Delete the review
       const { error } = await supabase
@@ -119,13 +99,13 @@ export async function PATCH(request: NextRequest) {
         .eq('id', reviewId);
 
       if (error) {
-        return NextResponse.json({ error: 'Eroare la ștergere.' }, { status: 500 });
+        return await localizedJson({ error: 'Eroare la ștergere.' }, { status: 500 });
       }
 
-      return NextResponse.json({ success: true, message: 'Recenzie ștearsă.' });
+      return await localizedJson({ success: true, message: 'Recenzie ștearsă.' });
     }
   } catch (err) {
     console.error('Admin review action error:', err);
-    return NextResponse.json({ error: 'Eroare internă.' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare internă.' }, { status: 500 });
   }
 }

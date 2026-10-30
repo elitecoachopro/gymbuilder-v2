@@ -1,27 +1,66 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 
 @layer base {
   :root {
-    --gold-primary: #e8b811;
-    --gold-hover: #f0cf4f;
-    --bg-primary: #0a0a0d;
-    --bg-secondary: #141418;
-    --bg-card: #1e1e23;
-    --bg-card-hover: #2d2d33;
-    --text-primary: #f4f4f5;
-    --text-secondary: #9e9ea6;
-    --text-muted: #71717a;
-    --border-color: #2d2d33;
+    --app-header-height: calc(8rem + 2px);
+    --sport-accent-50: #f5fce8;
+    --sport-accent-100: #e9f9cd;
+    --sport-accent-200: #d7f79a;
+    --sport-accent-300: #d1fa83;
+    --sport-accent-400: #c2f45b;
+    --sport-accent-500: #a5da39;
+    --sport-accent-600: #78a821;
+    --sport-accent-700: #52751b;
+    --sport-accent-800: #344c16;
+    --sport-accent-900: #1e2d10;
+    --sport-surface-50: #f5f7f3;
+    --sport-surface-100: #e2e8e1;
+    --sport-surface-200: #c9d2c7;
+    --sport-surface-300: #b2beb3;
+    --sport-surface-400: #96a498;
+    --sport-surface-500: #69786c;
+    --sport-surface-600: #435047;
+    --sport-surface-700: #303d34;
+    --sport-surface-800: #1d2620;
+    --sport-surface-900: #151c18;
+    --sport-surface-950: #101513;
+    --bg-primary: var(--sport-surface-950);
+    --bg-secondary: var(--sport-surface-900);
+    --bg-card: var(--sport-surface-800);
+    --bg-card-hover: var(--sport-surface-700);
+    --border-color: var(--sport-surface-700);
+    --gold-primary: var(--sport-accent-400);
+    --gold-hover: var(--sport-accent-300);
+    --text-primary: var(--sport-surface-50);
+    --text-secondary: var(--sport-surface-300);
+    --text-muted: var(--sport-surface-400);
+  }
+
+  @media (min-width: 1280px) {
+    :root { --app-header-height: calc(5rem + 1px); }
   }
 
   body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Barlow', system-ui, sans-serif;
+  }
+
+  :is(h1, h2, h3, h4, h5, h6) {
+    font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .015em;
+    text-wrap: balance;
+  }
+
+  :is(button, input, select, textarea) { font-family: inherit; }
+
+  :is(a, button, input, select, textarea, summary):focus-visible {
+    outline: 2px solid var(--sport-accent-400);
+    outline-offset: 4px;
   }
 
   * {
@@ -51,7 +90,7 @@
   }
 
   .card-hover {
-    @apply card hover:shadow-lg hover:shadow-gold-400/5 hover:-translate-y-1;
+    @apply bg-anthracite-800 border border-anthracite-700 rounded-xl p-6 hover:border-gold-400/30 transition-all duration-300 hover:shadow-lg hover:shadow-gold-400/5 hover:-translate-y-1;
   }
 
   .input-field {
@@ -89,5 +128,21 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: var(--sport-surface-600);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* iOS keeps the viewport stable when focusing a form control. */
+@media (max-width: 639px) {
+  :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
+    font-size: max(1rem, 1em);
+  }
 }

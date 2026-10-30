@@ -1,0 +1,8 @@
+{
+  "eslint": "passed",
+  "productionBuild": "passed",
+  "desktop": {"width": 1280, "horizontalOverflow": false},
+  "mobile": {"width": 390, "horizontalOverflow": false},
+  "sectionOrder": ["buying-steps", "super-pret", "oferta-zilei", "ofertele-saptamanii", "equipment-categories", "markets"],
+  "scope": "src/app/page.tsx only; promotion data and behavior unchanged"
+}

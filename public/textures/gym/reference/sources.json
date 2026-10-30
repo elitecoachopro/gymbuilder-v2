@@ -1,0 +1,20 @@
+[
+  {
+    "file": "rubber-normal.png",
+    "source": "https://polyhaven.com/a/rubber_tiles",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://polyhaven.com/license",
+    "modification": "OpenGL normal map resized from1k to512px; original surface colour not used",
+    "sha256": "cafb0ae4a5a3963eeadd427f7672f61512389205fe65a5f06ccdf8a490c406db",
+    "bytes": 288088
+  },
+  {
+    "file": "upholstery-normal.png",
+    "source": "https://polyhaven.com/a/leather_red_02",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://polyhaven.com/license",
+    "modification": "OpenGL normal map resized from1k to512px; original surface colour not used",
+    "sha256": "a8fea99837c71906d6d1647fdc5874d3f9c94ac61d234b12fbcd3cd74a9a6430",
+    "bytes": 513951
+  }
+]

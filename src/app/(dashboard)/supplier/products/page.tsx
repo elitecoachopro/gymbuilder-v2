@@ -1,10 +1,20 @@
 'use client';
 
+import Modal from '@/components/Modal';
+import { logoutClient } from '@/lib/logout-client';
+import { useUiText } from '@/i18n/useUiText';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { Dumbbell, Plus, Pencil, Trash2, Loader2, Package, ArrowLeft, Eye, EyeOff, CheckCircle, LogOut, X, Save, PackagePlus, Upload, Download, AlertTriangle, FileSpreadsheet, Layers, RotateCw } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Dumbbell, Plus, Pencil, Trash2, Loader2, ArrowLeft, Eye, EyeOff, CheckCircle, LogOut, X, Save, PackagePlus, Upload, Download, AlertTriangle, FileSpreadsheet, Layers, RotateCw } from 'lucide-react';
 import { useClientTranslations } from '@/i18n/client';
+
+interface CsvPreview {
+  total: number; valid: number; invalid: number;
+  validRows: Array<{ rowIndex: number; data: { name: string; price_eur: number } }>;
+  invalidRows: Array<{ rowIndex: number; errors: string[] }>;
+}
 
 interface Product {
   id: string;
@@ -22,6 +32,7 @@ interface Product {
 }
 
 export default function SupplierProductsPage() {
+  const ui = useUiText();
   const router = useRouter();
   const { t, locale } = useClientTranslations('supplierProducts');
   const [products, setProducts] = useState<Product[]>([]);
@@ -35,7 +46,7 @@ export default function SupplierProductsPage() {
   const [editLoading, setEditLoading] = useState(false);
   const [showCsvImport, setShowCsvImport] = useState(false);
   const [csvContent, setCsvContent] = useState('');
-  const [csvPreview, setCsvPreview] = useState<any>(null);
+  const [csvPreview, setCsvPreview] = useState<CsvPreview | null>(null);
   const [csvLoading, setCsvLoading] = useState(false);
   const [csvImporting, setCsvImporting] = useState(false);
 
@@ -45,7 +56,6 @@ export default function SupplierProductsPage() {
   const [variantsLoading, setVariantsLoading] = useState(false);
   const [newVariant, setNewVariant] = useState({ label: '', price_override: '', description_override: '', image_url: '' });
   const [addingVariant, setAddingVariant] = useState(false);
-  const [supplierPlan, setSupplierPlan] = useState<string>('free');
 
   const categoryLabels: Record<string, string> = {
     cardio: t('categories.cardio'),
@@ -57,39 +67,42 @@ export default function SupplierProductsPage() {
     reception: t('categories.reception'),
   };
 
-  const dateLocale = locale === 'en' ? 'en-GB' : 'ro-RO';
 
-  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+  const showToast = useCallback((msg: string, type: 'success' | 'error' = 'success') => {
     setToast(msg);
     setToastType(type);
     setTimeout(() => setToast(''), 4000);
-  };
-
-  useEffect(() => {
-    fetchProducts();
   }, []);
 
-  async function fetchProducts() {
+  const fetchProducts = useCallback(async (signal?: AbortSignal) => {
     try {
-      const res = await fetch('/api/supplier/products');
+      const res = await fetch('/api/supplier/products', { signal });
+      if (signal?.aborted) return;
       if (res.status === 401) {
         router.push('/login');
         return;
       }
       if (res.ok) {
         const data = await res.json();
+        if (signal?.aborted) return;
         setProducts(data.products || []);
-        if (data.plan) setSupplierPlan(data.plan);
       } else {
         const data = await res.json();
+        if (signal?.aborted) return;
         showToast(data.error || t('loadError'), 'error');
       }
     } catch {
-      showToast(t('connectionError'), 'error');
+      if (!signal?.aborted) showToast(t('connectionError'), 'error');
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) setLoading(false);
     }
-  }
+  }, [router, showToast, t]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchProducts(controller.signal);
+    return () => controller.abort();
+  }, [fetchProducts]);
 
   async function toggleStatus(product: Product) {
     const newStatus = product.status === 'active' || product.status === 'featured' ? 'inactive' : 'active';
@@ -103,7 +116,7 @@ export default function SupplierProductsPage() {
       });
 
       if (res.ok) {
-        setProducts(prev => prev.map(p => p.id === product.id ? { ...p, status: newStatus as any } : p));
+        setProducts(prev => prev.map(p => p.id === product.id ? { ...p, status: newStatus } : p));
         showToast(newStatus === 'active' ? t('productActivated') : t('productDeactivated'));
       } else {
         const data = await res.json();
@@ -270,13 +283,13 @@ export default function SupplierProductsPage() {
               ? 'bg-anthracite-800 border-gold-400/30 text-gold-400'
               : 'bg-anthracite-800 border-red-400/30 text-red-400'
           }`}>
-            {toast}
+            {ui(toast)}
           </div>
         )}
 
         {/* Delete Confirmation Modal */}
         {deleteConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <Modal onClose={() => setDeleteConfirm(null)} label={t('deleteConfirmTitle')}>
             <div className="bg-anthracite-800 border border-anthracite-700 rounded-2xl p-6 max-w-sm w-full mx-4">
               <h3 className="text-lg font-bold text-white mb-2">{t('deleteConfirmTitle')}</h3>
               <p className="text-sm text-anthracite-300 mb-6">
@@ -303,48 +316,48 @@ export default function SupplierProductsPage() {
                 </button>
               </div>
             </div>
-          </div>
+          </Modal>
         )}
 
         {/* Edit Modal */}
         {editProduct && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl p-6 max-w-lg w-full relative max-h-[90vh] overflow-y-auto">
-              <button
+          <Modal onClose={() => setEditProduct(null)} label={ui("Editează produsul")}>
+            <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl p-6 max-w-lg w-full relative max-h-[90dvh] overflow-y-auto">
+              <button aria-label={ui("Închide")}
                 onClick={() => setEditProduct(null)}
-                className="absolute top-4 right-4 text-anthracite-400 hover:text-white"
+                className="absolute top-2 right-2 min-h-11 min-w-11 flex items-center justify-center text-anthracite-400 hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              <h3 className="text-lg font-bold text-white mb-6">{t('editProduct')}</h3>
+              <h3 className="text-lg font-bold text-white mb-6 pr-10">{t('editProduct')}</h3>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('productName')} *</label>
+                  <label htmlFor="edit-name" className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('productName')} *</label>
                   <input
                     type="text"
                     className="input-field"
-                    value={editForm.name}
+                    id="edit-name" value={editForm.name}
                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('priceEur')} *</label>
+                    <label htmlFor="edit-price_eur" className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('priceEur')} *</label>
                     <input
                       type="number"
                       className="input-field"
-                      value={editForm.price_eur}
+                      id="edit-price_eur" value={editForm.price_eur}
                       onChange={(e) => setEditForm({ ...editForm, price_eur: e.target.value })}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('condition')}</label>
+                    <label htmlFor="edit-condition" className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('condition')}</label>
                     <select
                       className="input-field"
-                      value={editForm.condition}
+                      id="edit-condition" value={editForm.condition}
                       onChange={(e) => setEditForm({ ...editForm, condition: e.target.value })}
                     >
                       <option value="new">{t('conditionNew')}</option>
@@ -354,10 +367,10 @@ export default function SupplierProductsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('category')}</label>
+                  <label htmlFor="edit-category" className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('category')}</label>
                   <select
                     className="input-field"
-                    value={editForm.category}
+                    id="edit-category" value={editForm.category}
                     onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
                   >
                     {Object.entries(categoryLabels).map(([value, label]) => (
@@ -367,10 +380,10 @@ export default function SupplierProductsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('description')}</label>
+                  <label htmlFor="edit-description" className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('description')}</label>
                   <textarea
                     className="input-field min-h-[100px] resize-y"
-                    value={editForm.description}
+                    id="edit-description" value={editForm.description}
                     onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                   />
                 </div>
@@ -397,11 +410,11 @@ export default function SupplierProductsPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </Modal>
         )}
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
             <Link
               href="/supplier/dashboard"
@@ -412,11 +425,11 @@ export default function SupplierProductsPage() {
             <div>
               <h1 className="text-2xl font-bold text-white">{t('title')}</h1>
               <p className="text-anthracite-400 text-sm mt-1">
-                {loading ? t('loadingProducts') : `${products.length} ${products.length === 1 ? t('productSingular') : t('productPlural')} ${t('totalProducts')}`}
+                {ui(loading ? t('loadingProducts') : `${products.length} ${products.length === 1 ? t('productSingular') : t('productPlural')} ${t('totalProducts')}`)}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => setShowCsvImport(true)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-anthracite-700 text-anthracite-300 hover:text-gold-400 hover:border-gold-400/30 text-sm font-medium transition-colors"
@@ -432,7 +445,7 @@ export default function SupplierProductsPage() {
               {t('addProduct')}
             </Link>
             <button
-              onClick={async () => { await fetch('/api/auth/logout', { method: 'POST' }); window.location.href = '/login'; }}
+              onClick={async () => { try { await logoutClient(); window.location.href = '/login'; } catch { window.alert(ui('Deconectarea nu a reușit. Încearcă din nou.')); } }}
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-anthracite-700 text-anthracite-300 hover:text-red-400 hover:border-red-400/30 text-sm font-medium transition-colors"
             >
               <LogOut className="w-4 h-4" /> {t('logout')}
@@ -526,11 +539,11 @@ export default function SupplierProductsPage() {
 
       {/* Variants Management Modal */}
       {variantsProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl p-6 max-w-lg w-full relative max-h-[90vh] overflow-y-auto">
-            <button
+        <Modal onClose={() => setVariantsProduct(null)} label={ui("Variante produs")}>
+          <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl p-6 max-w-lg w-full relative max-h-[90dvh] overflow-y-auto">
+            <button aria-label={ui("Închide")}
               onClick={() => setVariantsProduct(null)}
-              className="absolute top-4 right-4 text-anthracite-400 hover:text-white"
+              className="absolute top-2 right-2 min-h-11 min-w-11 flex items-center justify-center text-anthracite-400 hover:text-white"
             >
               <X className="w-5 h-5" />
             </button>
@@ -562,8 +575,8 @@ export default function SupplierProductsPage() {
                     </div>
                     <button
                       onClick={() => deleteVariant(v.id)}
-                      className="p-1.5 rounded text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0 ml-2"
-                      title={t('variants.deleteVariant')}
+                      className="min-h-11 min-w-11 flex items-center justify-center p-1.5 rounded text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0 ml-2"
+                      title={ui(t('variants.deleteVariant'))}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -584,43 +597,43 @@ export default function SupplierProductsPage() {
                 <p className="text-xs font-medium text-anthracite-300 uppercase tracking-wider mb-3">{t('variants.addNew')}</p>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs text-anthracite-400 mb-1">{t('variants.labelName')} *</label>
+                    <label htmlFor="variant-label" className="block text-xs text-anthracite-400 mb-1">{t('variants.labelName')} *</label>
                     <input
                       type="text"
-                      className="input-field text-sm"
-                      placeholder={t('variants.labelPlaceholder')}
-                      value={newVariant.label}
+                      className="input-field text-base sm:text-sm"
+                      placeholder={ui(t('variants.labelPlaceholder'))}
+                      id="variant-label" value={newVariant.label}
                       onChange={(e) => setNewVariant({ ...newVariant, label: e.target.value })}
                       maxLength={100}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-anthracite-400 mb-1">{t('variants.priceOverride')}</label>
+                    <label htmlFor="variant-price_override" className="block text-xs text-anthracite-400 mb-1">{t('variants.priceOverride')}</label>
                     <input
                       type="number"
-                      className="input-field text-sm"
-                      placeholder={t('variants.pricePlaceholder')}
-                      value={newVariant.price_override}
+                      className="input-field text-base sm:text-sm"
+                      placeholder={ui(t('variants.pricePlaceholder'))}
+                      id="variant-price_override" value={newVariant.price_override}
                       onChange={(e) => setNewVariant({ ...newVariant, price_override: e.target.value })}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-anthracite-400 mb-1">{t('variants.descriptionOverride')}</label>
+                    <label htmlFor="variant-description_override" className="block text-xs text-anthracite-400 mb-1">{t('variants.descriptionOverride')}</label>
                     <textarea
-                      className="input-field text-sm min-h-[60px] resize-y"
-                      placeholder={t('variants.descriptionPlaceholder')}
-                      value={newVariant.description_override}
+                      className="input-field text-base sm:text-sm min-h-[60px] resize-y"
+                      placeholder={ui(t('variants.descriptionPlaceholder'))}
+                      id="variant-description_override" value={newVariant.description_override}
                       onChange={(e) => setNewVariant({ ...newVariant, description_override: e.target.value })}
                       maxLength={500}
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-anthracite-400 mb-1">{t('variants.imageUrl')}</label>
+                    <label htmlFor="variant-image_url" className="block text-xs text-anthracite-400 mb-1">{t('variants.imageUrl')}</label>
                     <input
                       type="url"
-                      className="input-field text-sm"
+                      className="input-field text-base sm:text-sm"
                       placeholder="https://..."
-                      value={newVariant.image_url}
+                      id="variant-image_url" value={newVariant.image_url}
                       onChange={(e) => setNewVariant({ ...newVariant, image_url: e.target.value })}
                     />
                   </div>
@@ -640,19 +653,19 @@ export default function SupplierProductsPage() {
               </div>
             )}
           </div>
-        </div>
+        </Modal>
       )}
 
       {/* CSV Import Modal */}
       {showCsvImport && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+        <Modal onClose={() => setShowCsvImport(false)} label={ui("Import CSV")}>
+          <div className="bg-anthracite-900 border border-anthracite-700 rounded-2xl w-full max-w-2xl max-h-[90dvh] overflow-y-auto p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5 text-gold-400" />
                 {t('csvImport.title')}
               </h2>
-              <button onClick={() => { setShowCsvImport(false); setCsvPreview(null); setCsvContent(''); }} className="text-anthracite-400 hover:text-white">
+              <button aria-label={ui("Închide")} onClick={() => { setShowCsvImport(false); setCsvPreview(null); setCsvContent(''); }} className="min-h-11 min-w-11 shrink-0 flex items-center justify-center text-anthracite-400 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -681,28 +694,29 @@ export default function SupplierProductsPage() {
             {!csvPreview ? (
               <>
                 {/* File upload */}
-                <div className="border-2 border-dashed border-anthracite-700 rounded-xl p-8 text-center mb-4 hover:border-gold-400/30 transition-colors">
+                <div className="border-2 border-dashed border-anthracite-700 rounded-xl p-4 sm:p-8 text-center mb-4 hover:border-gold-400/30 transition-colors">
                   <Upload className="w-8 h-8 text-anthracite-500 mx-auto mb-2" />
                   <p className="text-sm text-anthracite-300 mb-3">{t('csvImport.uploadHint')}</p>
                   <input
                     type="file"
                     accept=".csv"
                     onChange={(e) => {
-                      const file = e.target.files?.[0];
+                      const file = e.currentTarget.files?.[0];
+                      e.currentTarget.value = '';
                       if (file) {
                         const reader = new FileReader();
                         reader.onload = (ev) => setCsvContent(ev.target?.result as string || '');
                         reader.readAsText(file);
                       }
                     }}
-                    className="text-sm text-anthracite-300"
+                    aria-label={t('csvImport.uploadHint')} className="max-w-full min-w-0 text-base sm:text-sm text-anthracite-300"
                   />
                 </div>
                 <textarea
-                  value={csvContent}
+                  aria-label={ui("Conținut CSV")} value={csvContent}
                   onChange={(e) => setCsvContent(e.target.value)}
-                  placeholder={t('csvImport.pastePlaceholder')}
-                  className="w-full h-32 bg-anthracite-800 border border-anthracite-700 rounded-xl p-3 text-sm text-white placeholder-anthracite-500 font-mono resize-none"
+                  placeholder={ui(t('csvImport.pastePlaceholder'))}
+                  className="w-full h-32 bg-anthracite-800 border border-anthracite-700 rounded-xl p-3 text-base sm:text-sm text-white placeholder-anthracite-500 font-mono resize-none"
                 />
                 <button
                   onClick={async () => {
@@ -747,7 +761,7 @@ export default function SupplierProductsPage() {
                   {csvPreview.validRows?.length > 0 && (
                     <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-3 max-h-40 overflow-y-auto">
                       <p className="text-xs text-anthracite-400 mb-2 font-medium">{t('csvImport.validProducts')}:</p>
-                      {csvPreview.validRows.slice(0, 10).map((r: any, i: number) => (
+                      {csvPreview.validRows.slice(0, 10).map((r, i) => (
                         <div key={i} className="flex items-center justify-between py-1 border-b border-anthracite-700/50 last:border-0">
                           <span className="text-sm text-white">{r.data.name}</span>
                           <span className="text-sm text-gold-400">€{r.data.price_eur.toLocaleString()}</span>
@@ -765,7 +779,7 @@ export default function SupplierProductsPage() {
                       <p className="text-xs text-red-400 mb-2 font-medium flex items-center gap-1">
                         <AlertTriangle className="w-3 h-3" /> {t('csvImport.errorRows')}:
                       </p>
-                      {csvPreview.invalidRows.map((r: any, i: number) => (
+                      {csvPreview.invalidRows.map((r, i) => (
                         <div key={i} className="py-1 border-b border-red-500/10 last:border-0">
                           <span className="text-xs text-anthracite-400">{t('csvImport.row')} {r.rowIndex}:</span>
                           {r.errors.map((err: string, j: number) => (
@@ -813,7 +827,7 @@ export default function SupplierProductsPage() {
               </>
             )}
           </div>
-        </div>
+        </Modal>
       )}
     </main>
   );
@@ -840,10 +854,11 @@ function ProductCard({
   locale: string;
   categoryLabels: Record<string, string>;
 }) {
+  const ui = useUiText();
   const dateLocale = locale === 'en' ? 'en-GB' : 'ro-RO';
 
   return (
-    <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 cursor-pointer hover:border-anthracite-600 transition-colors" onClick={onEdit}>
+    <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 cursor-pointer hover:border-anthracite-600 transition-colors">
       {/* Image */}
       <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-anthracite-700 flex-shrink-0 overflow-hidden flex items-center justify-center">
         {product.images && product.images.length > 0 ? (
@@ -855,11 +870,11 @@ function ProductCard({
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <h3 className="text-white font-medium text-sm truncate">{product.name}</h3>
+        <h3 className="text-white font-medium text-sm truncate"><button onClick={onEdit} className="text-left hover:underline">{product.name}</button></h3>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
-          <span className="text-xs text-anthracite-400">{categoryLabels[product.category] || product.category}</span>
+          <span className="text-xs text-anthracite-400">{ui(categoryLabels[product.category] || product.category)}</span>
           <span className="text-xs text-anthracite-600 hidden sm:inline">&bull;</span>
-          <span className="text-xs text-anthracite-400">{product.condition === 'new' ? t('conditionNew') : t('conditionUsed')}</span>
+          <span className="text-xs text-anthracite-400">{ui(product.condition === 'new' ? t('conditionNew') : t('conditionUsed'))}</span>
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
           <span className="text-xs text-gold-400 font-medium">&euro;{Number(product.price_eur).toLocaleString()}</span>
@@ -868,7 +883,7 @@ function ProductCard({
               ? 'bg-emerald-500/10 text-emerald-400'
               : 'bg-anthracite-700 text-anthracite-400'
           }`}>
-            {product.status === 'active' || product.status === 'featured' ? t('statusAvailable') : t('statusUnavailable')}
+            {ui(product.status === 'active' || product.status === 'featured' ? t('statusAvailable') : t('statusUnavailable'))}
           </span>
           {product.images_360 && product.images_360.length >= 12 && (
             <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-gold-400/10 text-gold-400">
@@ -876,28 +891,28 @@ function ProductCard({
             </span>
           )}
           <span className="text-[10px] text-anthracite-500">
-            {t('added')}: {new Date(product.created_at).toLocaleDateString(dateLocale)}
+            {t('added')}: {ui(new Date(product.created_at).toLocaleDateString(dateLocale))}
           </span>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0 w-full sm:w-auto justify-end mt-2 sm:mt-0 border-t border-anthracite-700 sm:border-0 pt-2 sm:pt-0" onClick={(e) => e.stopPropagation()}>
-        <button onClick={onVariants} className="p-2 rounded-lg text-anthracite-400 hover:text-purple-400 hover:bg-purple-400/10 transition-colors" title={t('tooltipVariants')}>
+      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0 w-full sm:w-auto justify-end mt-2 sm:mt-0 border-t border-anthracite-700 sm:border-0 pt-2 sm:pt-0">
+        <button onClick={onVariants} className="min-h-11 min-w-11 flex items-center justify-center p-2 rounded-lg text-anthracite-400 hover:text-purple-400 hover:bg-purple-400/10 transition-colors" title={ui(t('tooltipVariants'))}>
           <Layers className="w-4 h-4" />
         </button>
-        <button onClick={onEdit} disabled={actionLoading === product.id} className="p-2 rounded-lg text-anthracite-400 hover:text-gold-400 hover:bg-gold-400/10 transition-colors" title={t('tooltipEdit')}>
+        <button onClick={onEdit} disabled={actionLoading === product.id} className="min-h-11 min-w-11 flex items-center justify-center p-2 rounded-lg text-anthracite-400 hover:text-gold-400 hover:bg-gold-400/10 transition-colors" title={ui(t('tooltipEdit'))}>
           <Pencil className="w-4 h-4" />
         </button>
         <button
           onClick={onToggleStatus}
           disabled={actionLoading === product.id}
-          className={`p-2 rounded-lg transition-colors ${
+          className={`min-h-11 min-w-11 flex items-center justify-center p-2 rounded-lg transition-colors ${
             product.status === 'active' || product.status === 'featured'
               ? 'text-emerald-400 hover:bg-emerald-500/10'
               : 'text-anthracite-400 hover:bg-anthracite-700'
           }`}
-          title={product.status === 'active' || product.status === 'featured' ? t('tooltipMarkUnavailable') : t('tooltipMarkAvailable')}
+          title={ui(product.status === 'active' || product.status === 'featured' ? t('tooltipMarkUnavailable') : t('tooltipMarkAvailable'))}
         >
           {actionLoading === product.id ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -907,7 +922,7 @@ function ProductCard({
             <EyeOff className="w-4 h-4" />
           )}
         </button>
-        <button onClick={onDelete} disabled={actionLoading === product.id} className="p-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors" title={t('tooltipDelete')}>
+        <button onClick={onDelete} disabled={actionLoading === product.id} className="min-h-11 min-w-11 flex items-center justify-center p-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors" title={ui(t('tooltipDelete'))}>
           <Trash2 className="w-4 h-4" />
         </button>
       </div>

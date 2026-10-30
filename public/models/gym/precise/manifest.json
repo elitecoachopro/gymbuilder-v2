@@ -1,0 +1,266 @@
+[
+  {
+    "id": "real_spin_bike",
+    "slug": "indoor-spin-bike-with-front-flywheel-2bb33e74",
+    "name": "Bicicletă spinning GLB",
+    "nameEn": "Detailed spin bike GLB",
+    "zone": "cardio",
+    "price_eur": 1100,
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/indoor-spin-bike-with-front-flywheel-2bb33e74",
+    "downloadUrl": "https://www.innerscene.com/api/library/indoor-spin-bike-with-front-flywheel-2bb33e74/download",
+    "sourceBytes": 4049032,
+    "sourceSha256": "f8227433fa54b28695383fc221ff46a7391febc04f211840e8fdcbb83814bd2b",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "author": "Innerscene",
+    "downloadedOn": "2026-10-25",
+    "length_m": 1.123,
+    "width_m": 0.56,
+    "height_m": 1.149,
+    "url": "/models/gym/precise/real_spin_bike.glb",
+    "glbBytes": 1365076,
+    "glbSha256": "4c9e246cac9bcd5b307b6b0632be2c8d8371170d2cadcb1b333d63ed99aed633",
+    "triangles": 13075,
+    "drawCalls": 15,
+    "bounds": {
+      "min": [
+        -0.5612990260124208,
+        0,
+        -0.2795000076293947
+      ],
+      "max": [
+        0.5612990260124208,
+        1.1489827632904053,
+        0.2795000076293947
+      ]
+    },
+    "transforms": [
+      "Y-up retained; rotate Y +90 degrees so length is X",
+      "centre X/Z and place floor at Y=0; no scaling",
+      "flatten/join by source materials; weld; simplify 80%, max relative error0.0005",
+      "embedded maps resized to at most512px, PNG, no runtime external requests",
+      "remove optional multilayer material extensions for economical standard PBR; retain core materials and embedded maps"
+    ],
+    "priceNote": "Indicative planning allowance, not a manufacturer quotation."
+  },
+  {
+    "id": "real_rower",
+    "slug": "indoor-rowing-machine-air-flywheel-26c74213",
+    "name": "Aparat de vâslit GLB",
+    "nameEn": "Detailed rowing machine GLB",
+    "zone": "functional",
+    "price_eur": 1600,
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/indoor-rowing-machine-air-flywheel-26c74213",
+    "downloadUrl": "https://www.innerscene.com/api/library/indoor-rowing-machine-air-flywheel-26c74213/download",
+    "sourceBytes": 7039780,
+    "sourceSha256": "179a32c5f0f4becfc7608ba240d9173b6c0ca955a77560516283a38e594f6717",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "author": "Innerscene",
+    "downloadedOn": "2026-10-25",
+    "length_m": 2.412,
+    "width_m": 0.572,
+    "height_m": 0.983,
+    "url": "/models/gym/precise/real_rower.glb",
+    "glbBytes": 1561336,
+    "glbSha256": "f26df7770bd38e734d6a00d31c3195b4f869aa98e92a9f8a64fde72417077d57",
+    "triangles": 13122,
+    "drawCalls": 18,
+    "bounds": {
+      "min": [
+        -1.2057499885559084,
+        0,
+        -0.28595891594886785
+      ],
+      "max": [
+        1.2057499885559084,
+        0.9824092984199524,
+        0.28595891594886785
+      ]
+    },
+    "transforms": [
+      "Y-up retained; rotate Y +90 degrees so length is X",
+      "centre X/Z and place floor at Y=0; no scaling",
+      "flatten/join by source materials; weld; simplify 80%, max relative error0.0005",
+      "embedded maps resized to at most512px, PNG, no runtime external requests",
+      "remove optional multilayer material extensions for economical standard PBR; retain core materials and embedded maps"
+    ],
+    "priceNote": "Indicative planning allowance, not a manufacturer quotation."
+  },
+  {
+    "id": "real_power_rack",
+    "slug": "power-rack-with-barbell-bumper-plates-and-strap-safeties-840f5472",
+    "name": "Power rack cu bară și discuri GLB",
+    "nameEn": "Power rack with barbell and plates GLB",
+    "zone": "greutati",
+    "price_eur": 2400,
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/power-rack-with-barbell-bumper-plates-and-strap-safeties-840f5472",
+    "downloadUrl": "https://www.innerscene.com/api/library/power-rack-with-barbell-bumper-plates-and-strap-safeties-840f5472/download",
+    "sourceBytes": 5677048,
+    "sourceSha256": "ab47d5ef9e0e22db89916a66adb3604d42cb1f432d21d48c3e516d9ee268373f",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "author": "Innerscene",
+    "downloadedOn": "2026-10-25",
+    "length_m": 1.409,
+    "width_m": 2.201,
+    "height_m": 2.291,
+    "url": "/models/gym/precise/real_power_rack.glb",
+    "glbBytes": 2303492,
+    "glbSha256": "2ae47f49c15332df647da49a1e1b744a64a5d5cf03b38ec08b906fb7c32dac36",
+    "triangles": 36674,
+    "drawCalls": 11,
+    "bounds": {
+      "min": [
+        -0.7044999599456789,
+        0,
+        -1.1000000238418581
+      ],
+      "max": [
+        0.7044999599456789,
+        2.2904999256134033,
+        1.1000000238418581
+      ]
+    },
+    "transforms": [
+      "Y-up retained; rotate Y +90 degrees so length is X",
+      "centre X/Z and place floor at Y=0; no scaling",
+      "flatten/join by source materials; weld; simplify 80%, max relative error0.0005",
+      "embedded maps resized to at most512px, PNG, no runtime external requests",
+      "remove optional multilayer material extensions for economical standard PBR; retain core materials and embedded maps"
+    ],
+    "priceNote": "Indicative planning allowance, not a manufacturer quotation."
+  },
+  {
+    "id": "real_cable_crossover",
+    "slug": "cable-crossover-gym-machine-with-twin-weight-stacks-b49bb811",
+    "name": "Crossover cu două stive GLB",
+    "nameEn": "Twin-stack cable crossover GLB",
+    "zone": "aparate",
+    "price_eur": 4200,
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/cable-crossover-gym-machine-with-twin-weight-stacks-b49bb811",
+    "downloadUrl": "https://www.innerscene.com/api/library/cable-crossover-gym-machine-with-twin-weight-stacks-b49bb811/download",
+    "sourceBytes": 6233004,
+    "sourceSha256": "dc28f4b87b7f31b917857745527ca7ba418faff5e2c83f4f5d737946f9bd0ed4",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "author": "Innerscene",
+    "downloadedOn": "2026-10-25",
+    "length_m": 1.037,
+    "width_m": 3.57,
+    "height_m": 2.255,
+    "url": "/models/gym/precise/real_cable_crossover.glb",
+    "glbBytes": 2452080,
+    "glbSha256": "afc896c8f8984fa7cdbd73145dd9be624d544eb5ac74fc9e0e1892df203e9268",
+    "triangles": 30743,
+    "drawCalls": 14,
+    "bounds": {
+      "min": [
+        -0.5182499885559086,
+        0,
+        -1.7845000028610234
+      ],
+      "max": [
+        0.5182499885559086,
+        2.2543673515319824,
+        1.7845000028610234
+      ]
+    },
+    "transforms": [
+      "Y-up retained; rotate Y +90 degrees so length is X",
+      "centre X/Z and place floor at Y=0; no scaling",
+      "flatten/join by source materials; weld; simplify 80%, max relative error0.0005",
+      "embedded maps resized to at most512px, PNG, no runtime external requests",
+      "remove optional multilayer material extensions for economical standard PBR; retain core materials and embedded maps"
+    ],
+    "priceNote": "Indicative planning allowance, not a manufacturer quotation."
+  },
+  {
+    "id": "real_multigym",
+    "slug": "home-multigym-with-90-kg-weight-stack-press-arms-lat-pulldow-562d8bde",
+    "name": "Stație multifuncțională GLB",
+    "nameEn": "Multifunction weight station GLB",
+    "zone": "aparate",
+    "price_eur": 2300,
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/home-multigym-with-90-kg-weight-stack-press-arms-lat-pulldow-562d8bde",
+    "downloadUrl": "https://www.innerscene.com/api/library/home-multigym-with-90-kg-weight-stack-press-arms-lat-pulldow-562d8bde/download",
+    "sourceBytes": 6653764,
+    "sourceSha256": "0b25e6faaf575bb65c8fb47a0b1eec93660a99d192c703b4235e9248e98879eb",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "author": "Innerscene",
+    "downloadedOn": "2026-10-25",
+    "length_m": 1.705,
+    "width_m": 1.22,
+    "height_m": 2.151,
+    "url": "/models/gym/precise/real_multigym.glb",
+    "glbBytes": 2410548,
+    "glbSha256": "985d4ef13d5af3d3522321df77a5fdca9aa503f3d78f5e603fb33c3a08b47b4e",
+    "triangles": 28549,
+    "drawCalls": 16,
+    "bounds": {
+      "min": [
+        -0.852250009775162,
+        0,
+        -0.6098235845565797
+      ],
+      "max": [
+        0.852250009775162,
+        2.1506998538970947,
+        0.6098235845565797
+      ]
+    },
+    "transforms": [
+      "Y-up retained; rotate Y +90 degrees so length is X",
+      "centre X/Z and place floor at Y=0; no scaling",
+      "flatten/join by source materials; weld; simplify 80%, max relative error0.0005",
+      "embedded maps resized to at most512px, PNG, no runtime external requests",
+      "remove optional multilayer material extensions for economical standard PBR; retain core materials and embedded maps"
+    ],
+    "priceNote": "Indicative planning allowance, not a manufacturer quotation."
+  },
+  {
+    "id": "real_adjustable_bench",
+    "slug": "adjustable-workout-bench-flat-incline-decline-ff66ec07",
+    "name": "Bancă reglabilă detaliată GLB",
+    "nameEn": "Detailed adjustable bench GLB",
+    "zone": "greutati",
+    "price_eur": 600,
+    "sourceUrl": "https://www.innerscene.com/tools/library/3d-parts/adjustable-workout-bench-flat-incline-decline-ff66ec07",
+    "downloadUrl": "https://www.innerscene.com/api/library/adjustable-workout-bench-flat-incline-decline-ff66ec07/download",
+    "sourceBytes": 3639148,
+    "sourceSha256": "1d98c2e5acb6af3994c614f7c4756d79a60cd6a2ca47a6fe1c34fa41ada2ad2f",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "author": "Innerscene",
+    "downloadedOn": "2026-10-25",
+    "length_m": 1.39,
+    "width_m": 0.61,
+    "height_m": 0.445,
+    "url": "/models/gym/precise/real_adjustable_bench.glb",
+    "glbBytes": 1185616,
+    "glbSha256": "638b150e4bd71a7452cefbdceb85c305ccd1f0c473b398f629cd359059ace994",
+    "triangles": 10136,
+    "drawCalls": 11,
+    "bounds": {
+      "min": [
+        -0.6948556602001191,
+        0,
+        -0.30450001358985906
+      ],
+      "max": [
+        0.6948556602001191,
+        0.4440000057220459,
+        0.30450001358985906
+      ]
+    },
+    "transforms": [
+      "Y-up retained; rotate Y +90 degrees so length is X",
+      "centre X/Z and place floor at Y=0; no scaling",
+      "flatten/join by source materials; weld; simplify 80%, max relative error0.0005",
+      "embedded maps resized to at most512px, PNG, no runtime external requests",
+      "remove optional multilayer material extensions for economical standard PBR; retain core materials and embedded maps"
+    ],
+    "priceNote": "Indicative planning allowance, not a manufacturer quotation."
+  }
+]

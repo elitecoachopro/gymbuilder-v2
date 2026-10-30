@@ -18,7 +18,7 @@ export default function AboutPage() {
           </Link>
 
           <h1 className="text-4xl md:text-5xl font-bold mb-8">
-            {t('title')} <span className="gold-gradient">GymBuilder</span>
+            {t('title')} <span className="gold-gradient">Gym Builder</span>
           </h1>
 
           <div className="border-2 border-gold-400 rounded-2xl p-10 md:p-14">

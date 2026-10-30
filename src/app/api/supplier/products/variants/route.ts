@@ -1,30 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { Database } from '@/types/database.generated';
+import { localizedJson } from '@/lib/json-response';
+import { variantCreateInput, variantUpdateInput } from '@/lib/validation';
+import { getSessionUser } from '@/lib/session-server';
+import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
-import * as crypto from 'crypto';
 
 function getSupabase() {
-  return createClient(
+  return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 }
 
-function getUserFromSession(): { userId: string } | null {
-  const cookieStore = cookies();
-  const sessionToken = cookieStore.get('session_token')?.value;
-  if (!sessionToken) return null;
-  try {
-    const [payloadB64, signature] = sessionToken.split('.');
-    const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || '';
-    const decodedPayload = Buffer.from(payloadB64, 'base64').toString();
-    const expected = crypto.createHmac('sha256', secret).update(decodedPayload).digest('hex');
-    if (signature !== expected) return null;
-    const data = JSON.parse(decodedPayload);
-    if (data.exp && data.exp < Date.now()) return null;
-    return { userId: data.userId };
-  } catch { return null; }
-}
+async function getUserFromSession(_request?: unknown) { return getSessionUser(); }
 
 // GET - list variants for a product (public or authenticated)
 export async function GET(request: NextRequest) {
@@ -32,10 +20,19 @@ export async function GET(request: NextRequest) {
   const productId = searchParams.get('product_id');
 
   if (!productId) {
-    return NextResponse.json({ error: 'product_id obligatoriu' }, { status: 400 });
+    return await localizedJson({ error: 'product_id obligatoriu' }, { status: 400 });
   }
 
   const supabase = getSupabase();
+
+  const { data: product } = await supabase.from('products').select('supplier_id, status').eq('id', productId).maybeSingle();
+  if (!product) return await localizedJson({ error: 'Produs negasit.' }, { status: 404 });
+  const { data: supplier } = await supabase.from('supplier_profiles').select('status, user_id').eq('id', product.supplier_id).maybeSingle();
+  if (!supplier) return await localizedJson({ error: 'Produs negasit.' }, { status: 404 });
+  if (!['active', 'featured'].includes(product.status) || supplier.status !== 'approved') {
+    const user = await getSessionUser();
+    if (!user || (user.id !== supplier.user_id && user.role !== 'admin')) return await localizedJson({ error: 'Produs negasit.' }, { status: 404 });
+  }
 
   const { data, error } = await supabase
     .from('product_variants')
@@ -44,17 +41,17 @@ export async function GET(request: NextRequest) {
     .order('sort_order', { ascending: true });
 
   if (error) {
-    return NextResponse.json({ error: 'Eroare la încărcarea variantelor' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare la încărcarea variantelor' }, { status: 500 });
   }
 
-  return NextResponse.json({ variants: data || [] });
+  return await localizedJson({ variants: data || [] });
 }
 
 // POST - create a new variant
 export async function POST(request: NextRequest) {
-  const session = getUserFromSession();
+  const session = await getUserFromSession();
   if (!session) {
-    return NextResponse.json({ error: 'Neautorizat' }, { status: 401 });
+    return await localizedJson({ error: 'Neautorizat' }, { status: 401 });
   }
 
   const supabase = getSupabase();
@@ -66,14 +63,16 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (!supplier) {
-    return NextResponse.json({ error: 'Profil furnizor negăsit' }, { status: 404 });
+    return await localizedJson({ error: 'Profil furnizor negăsit' }, { status: 404 });
   }
 
   const body = await request.json();
-  const { product_id, label, price_override, description_override, image_url } = body;
+  const parsed = variantCreateInput.safeParse(body);
+  if (!parsed.success) return await localizedJson({ error: 'Date varianta invalide.' }, { status: 400 });
+  const { product_id, label, price_override, description_override, image_url } = parsed.data;
 
   if (!product_id || !label) {
-    return NextResponse.json({ error: 'product_id și label sunt obligatorii' }, { status: 400 });
+    return await localizedJson({ error: 'product_id și label sunt obligatorii' }, { status: 400 });
   }
 
   // Verify product belongs to this supplier
@@ -85,7 +84,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (!product) {
-    return NextResponse.json({ error: 'Produs negăsit sau nu vă aparține' }, { status: 404 });
+    return await localizedJson({ error: 'Produs negăsit sau nu vă aparține' }, { status: 404 });
   }
 
   // Check max 10 variants per product
@@ -95,7 +94,7 @@ export async function POST(request: NextRequest) {
     .eq('product_id', product_id);
 
   if ((count || 0) >= 10) {
-    return NextResponse.json({ error: 'Maxim 10 variante per produs' }, { status: 400 });
+    return await localizedJson({ error: 'Maxim 10 variante per produs' }, { status: 400 });
   }
 
   const { data: variant, error } = await supabase
@@ -103,7 +102,7 @@ export async function POST(request: NextRequest) {
     .insert({
       product_id,
       label: label.slice(0, 100),
-      price_override: price_override || null,
+      price_override: price_override ?? null,
       description_override: description_override?.slice(0, 500) || null,
       image_url: image_url || null,
       sort_order: (count || 0) + 1,
@@ -112,17 +111,17 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: 'Eroare la creare: ' + error.message }, { status: 500 });
+    return await localizedJson({ error: 'Eroare la creare: ' + error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ variant }, { status: 201 });
+  return await localizedJson({ variant }, { status: 201 });
 }
 
 // PATCH - update a variant
 export async function PATCH(request: NextRequest) {
-  const session = getUserFromSession();
+  const session = await getUserFromSession();
   if (!session) {
-    return NextResponse.json({ error: 'Neautorizat' }, { status: 401 });
+    return await localizedJson({ error: 'Neautorizat' }, { status: 401 });
   }
 
   const supabase = getSupabase();
@@ -134,14 +133,16 @@ export async function PATCH(request: NextRequest) {
     .single();
 
   if (!supplier) {
-    return NextResponse.json({ error: 'Profil furnizor negăsit' }, { status: 404 });
+    return await localizedJson({ error: 'Profil furnizor negăsit' }, { status: 404 });
   }
 
   const body = await request.json();
-  const { variant_id, label, price_override, description_override, image_url } = body;
+  const parsed = variantUpdateInput.safeParse(body);
+  if (!parsed.success) return await localizedJson({ error: 'Date varianta invalide.' }, { status: 400 });
+  const { variant_id, label, price_override, description_override, image_url } = parsed.data;
 
   if (!variant_id) {
-    return NextResponse.json({ error: 'variant_id obligatoriu' }, { status: 400 });
+    return await localizedJson({ error: 'variant_id obligatoriu' }, { status: 400 });
   }
 
   // Verify ownership through product
@@ -152,7 +153,7 @@ export async function PATCH(request: NextRequest) {
     .single();
 
   if (!variant) {
-    return NextResponse.json({ error: 'Variantă negăsită' }, { status: 404 });
+    return await localizedJson({ error: 'Variantă negăsită' }, { status: 404 });
   }
 
   const { data: product } = await supabase
@@ -163,12 +164,12 @@ export async function PATCH(request: NextRequest) {
     .single();
 
   if (!product) {
-    return NextResponse.json({ error: 'Nu aveți acces la acest produs' }, { status: 403 });
+    return await localizedJson({ error: 'Nu aveți acces la acest produs' }, { status: 403 });
   }
 
-  const updates: Record<string, unknown> = {};
+  const updates: Database['public']['Tables']['product_variants']['Update'] = {};
   if (label !== undefined) updates.label = label.slice(0, 100);
-  if (price_override !== undefined) updates.price_override = price_override || null;
+  if (price_override !== undefined) updates.price_override = price_override ?? null;
   if (description_override !== undefined) updates.description_override = description_override?.slice(0, 500) || null;
   if (image_url !== undefined) updates.image_url = image_url || null;
 
@@ -180,24 +181,24 @@ export async function PATCH(request: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: 'Eroare la actualizare' }, { status: 500 });
+    return await localizedJson({ error: 'Eroare la actualizare' }, { status: 500 });
   }
 
-  return NextResponse.json({ variant: updated });
+  return await localizedJson({ variant: updated });
 }
 
 // DELETE - remove a variant
 export async function DELETE(request: NextRequest) {
-  const session = getUserFromSession();
+  const session = await getUserFromSession();
   if (!session) {
-    return NextResponse.json({ error: 'Neautorizat' }, { status: 401 });
+    return await localizedJson({ error: 'Neautorizat' }, { status: 401 });
   }
 
   const { searchParams } = new URL(request.url);
   const variantId = searchParams.get('id');
 
   if (!variantId) {
-    return NextResponse.json({ error: 'ID variantă lipsă' }, { status: 400 });
+    return await localizedJson({ error: 'ID variantă lipsă' }, { status: 400 });
   }
 
   const supabase = getSupabase();
@@ -209,7 +210,7 @@ export async function DELETE(request: NextRequest) {
     .single();
 
   if (!supplier) {
-    return NextResponse.json({ error: 'Profil furnizor negăsit' }, { status: 404 });
+    return await localizedJson({ error: 'Profil furnizor negăsit' }, { status: 404 });
   }
 
   // Verify ownership
@@ -220,7 +221,7 @@ export async function DELETE(request: NextRequest) {
     .single();
 
   if (!variant) {
-    return NextResponse.json({ error: 'Variantă negăsită' }, { status: 404 });
+    return await localizedJson({ error: 'Variantă negăsită' }, { status: 404 });
   }
 
   const { data: product } = await supabase
@@ -231,10 +232,11 @@ export async function DELETE(request: NextRequest) {
     .single();
 
   if (!product) {
-    return NextResponse.json({ error: 'Nu aveți acces' }, { status: 403 });
+    return await localizedJson({ error: 'Nu aveți acces' }, { status: 403 });
   }
 
-  await supabase.from('product_variants').delete().eq('id', variantId);
+  const { error: deleteError } = await supabase.from('product_variants').delete().eq('id', variantId);
+  if (deleteError) return await localizedJson({ error: 'Varianta nu a putut fi stearsa.' }, { status: 500 });
 
-  return NextResponse.json({ success: true });
+  return await localizedJson({ success: true });
 }

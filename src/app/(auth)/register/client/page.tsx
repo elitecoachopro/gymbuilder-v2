@@ -1,24 +1,31 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
+import { safeReturnPath } from '@/lib/journeys';
+import VerificationResult from '@/components/VerificationResult';
+import { isStrongPassword } from '@/lib/sanitize';
+import { useUiText } from '@/i18n/useUiText';
+
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Dumbbell, Mail, Lock, Phone, Eye, EyeOff, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import { useState } from 'react';
+import { Dumbbell, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { useClientTranslations } from '@/i18n/client';
 
 export default function ClientRegisterPage() {
+  const ui = useUiText();
+  const returnTo = safeReturnPath(useSearchParams()?.get('redirect'));
   const { t } = useClientTranslations('auth');
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (error) errorRef.current?.focus(); }, [error]);
   const [success, setSuccess] = useState('');
 
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
     password: '',
     confirmPassword: '',
     terms: false,
@@ -38,8 +45,9 @@ export default function ClientRegisterPage() {
       return;
     }
 
-    if (form.password.length < 8) {
-      setError(t('passwordMin'));
+    const passwordCheck = isStrongPassword(form.password);
+    if (!passwordCheck.valid) {
+      setError(ui(passwordCheck.message));
       return;
     }
 
@@ -63,7 +71,6 @@ export default function ClientRegisterPage() {
           firstName: form.firstName,
           lastName: form.lastName,
           email: form.email,
-          phone: form.phone || undefined,
           password: form.password,
         }),
       });
@@ -77,16 +84,15 @@ export default function ClientRegisterPage() {
 
       setSuccess(data.message || t('registerSuccess'));
       
-      setTimeout(() => {
-        router.push('/login');
-      }, 3000);
-    } catch (err) {
+
+    } catch {
       setError(t('connectionError'));
     } finally {
       setLoading(false);
     }
   };
 
+  if (success) return <main className="min-h-screen px-4 py-12"><div className="mx-auto max-w-lg"><VerificationResult returnTo={returnTo} email={form.email} message={success} /></div></main>;
   return (
     <main className="min-h-screen flex items-center justify-center px-4 py-12 bg-anthracite-950">
       <div className="w-full max-w-md">
@@ -94,33 +100,27 @@ export default function ClientRegisterPage() {
           <Link href="/" className="inline-flex items-center gap-2">
             <Dumbbell className="w-8 h-8 text-gold-400" />
             <span className="text-2xl font-bold">
-              <span className="text-white">Gym</span>
+              <span className="text-white">Gym </span>
               <span className="text-gold-400">Builder</span>
             </span>
           </Link>
           <h1 className="text-2xl font-bold text-white mt-6 mb-2">{t('createClientAccount')}</h1>
-          <p className="text-anthracite-400">{t('clientSubtitle')}</p>
+          <p className="text-anthracite-400">{ui("Salvează proiecte, urmărește cereri și păstrează echipamentele favorite. Catalogul este public.")}</p>
         </div>
 
-        {success && (
-          <div className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-            <p className="text-sm text-green-400">{success}</p>
-          </div>
-        )}
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-2">
+          <div id="form-error" ref={errorRef} tabIndex={-1} role="alert" className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-            <p className="text-sm text-red-400">{error}</p>
+            <p className="text-sm text-red-400">{ui(error)}</p>
           </div>
         )}
 
         <div className="glass-card p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <p id="password-rules" className="mb-4 text-sm text-anthracite-300">{ui("Parola: 8–128 caractere, cu literă mare, literă mică și cifră.")}</p><form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('firstName')} *</label>
-                <input
+                <label htmlFor="auth-register-client-0" className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('firstName')} *</label>
+                <input id="auth-register-client-0"
                   type="text"
                   className="input-field"
                   placeholder="Ion"
@@ -130,8 +130,8 @@ export default function ClientRegisterPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('lastName')} *</label>
-                <input
+                <label htmlFor="auth-register-client-1" className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('lastName')} *</label>
+                <input id="auth-register-client-1"
                   type="text"
                   className="input-field"
                   placeholder="Popescu"
@@ -143,11 +143,11 @@ export default function ClientRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">Email *</label>
+              <label htmlFor="field-registerclient-4673" className="block text-sm font-medium text-anthracite-200 mb-1.5">Email *</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
-                <input
-                  type="email"
+                <input id="field-registerclient-4673"
+                  aria-describedby={error ? "form-error" : undefined} type="email"
                   className="input-field pl-11"
                   placeholder="email@exemplu.com"
                   value={form.email}
@@ -157,36 +157,22 @@ export default function ClientRegisterPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('phoneLabel')}</label>
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
-                <input
-                  type="tel"
-                  className="input-field pl-11"
-                  placeholder="+40 7XX XXX XXX"
-                  value={form.phone}
-                  onChange={(e) => updateField('phone', e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-            </div>
 
             <div>
-              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('password')} *</label>
+              <label htmlFor="auth-register-client-4" className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('password')} *</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
-                <input
+                <input id="auth-register-client-4"
                   type={showPassword ? 'text' : 'password'}
                   className="input-field pl-11 pr-11"
-                  placeholder={t('passwordPlaceholder')}
+                  minLength={8} maxLength={128} aria-describedby={error ? "password-rules form-error" : "password-rules"} placeholder={ui(t('passwordPlaceholder'))}
                   value={form.password}
                   onChange={(e) => updateField('password', e.target.value)}
                   disabled={loading}
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={ui(showPassword ? 'Ascunde parola' : 'Arată parola')} aria-pressed={showPassword} onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-anthracite-400 hover:text-white"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -195,13 +181,13 @@ export default function ClientRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('confirmPassword')} *</label>
+              <label htmlFor="auth-register-client-5" className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('confirmPassword')} *</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
-                <input
+                <input id="auth-register-client-5"
                   type={showPassword ? 'text' : 'password'}
                   className={`input-field pl-11 ${form.confirmPassword && form.password !== form.confirmPassword ? 'border-red-500 focus:border-red-500 focus:ring-red-500/30' : ''}`}
-                  placeholder={t('confirmPasswordPlaceholder')}
+                  placeholder={ui(t('confirmPasswordPlaceholder'))}
                   value={form.confirmPassword}
                   onChange={(e) => updateField('confirmPassword', e.target.value)}
                   disabled={loading}
@@ -224,7 +210,7 @@ export default function ClientRegisterPage() {
                 disabled={loading}
               />
               <label htmlFor="terms" className="text-xs text-anthracite-400">
-                {t('acceptTermsLabel')} <Link href="/terms" className="text-gold-400">{t('termsLink')}</Link> {t('and')}{' '}
+                {t('acceptTermsLabel')} <Link href="/terms" className="text-gold-400">{t('termsLink')}</Link> {t('and')}{ui(' ')}
                 <Link href="/privacy" className="text-gold-400">{t('privacyLink')}</Link>.
               </label>
             </div>
@@ -247,13 +233,13 @@ export default function ClientRegisterPage() {
 
           <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-anthracite-400">
-              {t('hasAccount')}{' '}
+              {t('hasAccount')}{ui(' ')}
               <Link href="/login" className="text-gold-400 hover:text-gold-300 font-medium">
                 {t('loginButton')}
               </Link>
             </p>
             <p className="text-sm text-anthracite-400">
-              {t('isSupplier')}{' '}
+              {t('isSupplier')}{ui(' ')}
               <Link href="/register/supplier" className="text-gold-400 hover:text-gold-300 font-medium">
                 {t('supplierRegister')}
               </Link>

@@ -1,5 +1,7 @@
 'use client';
 
+import { useUiText } from '@/i18n/useUiText';
+
 import { useState, useEffect, useRef } from 'react';
 import { Bell, Check, CheckCheck, MessageSquare, Star, ShieldCheck, Package, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -16,12 +18,14 @@ interface Notification {
 }
 
 export default function NotificationBell() {
+  const ui = useUiText();
   const { t, locale } = useClientTranslations('notifications');
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const fetchNotifications = async () => {
@@ -41,26 +45,34 @@ export default function NotificationBell() {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: PointerEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('pointerdown', handleClickOutside);
+    return () => document.removeEventListener('pointerdown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    function close(event: KeyboardEvent) { if (event.key === 'Escape') { setIsOpen(false); triggerRef.current?.focus(); } }
+    document.addEventListener('keydown', close);
+    return () => document.removeEventListener('keydown', close);
+  }, [isOpen]);
 
   const markAsRead = async (notificationId: string) => {
     try {
-      await fetch('/api/notifications', {
+      const response = await fetch('/api/notifications', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ notificationId }),
       });
+      if (!response.ok) throw new Error('Notification update failed');
       setNotifications(prev =>
         prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
       );
@@ -73,12 +85,13 @@ export default function NotificationBell() {
   const markAllRead = async () => {
     setLoading(true);
     try {
-      await fetch('/api/notifications', {
+      const response = await fetch('/api/notifications', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ markAllRead: true }),
       });
+      if (!response.ok) throw new Error('Notification update failed');
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (err) {
@@ -133,38 +146,41 @@ export default function NotificationBell() {
     <div className="relative" ref={dropdownRef}>
       {/* Bell Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-lg hover:bg-anthracite-700/50 transition-colors"
-        aria-label={t('title')}
+        ref={triggerRef}
+        aria-expanded={isOpen}
+        aria-controls="notifications-panel"
+        onClick={() => setIsOpen(open => !open)}
+        className="relative min-h-11 min-w-11 flex items-center justify-center p-2 rounded-lg hover:bg-anthracite-700/50 transition-colors"
+        aria-label={ui(t('title'))}
       >
         <Bell className="w-5 h-5 text-anthracite-300 hover:text-white transition-colors" />
         {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {ui(unreadCount > 9 ? '9+' : unreadCount)}
           </span>
         )}
       </button>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-anthracite-800 border border-anthracite-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+        <div id="notifications-panel" role="region" aria-label={t('title')} className="fixed inset-x-4 top-[calc(var(--app-header-height)+1rem)] sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 flex flex-col max-h-[calc(100dvh-var(--app-header-height)-2rem)] bg-anthracite-800 border border-anthracite-700 rounded-xl shadow-2xl z-50 overflow-hidden">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-anthracite-700">
+          <div className="flex flex-wrap gap-2 shrink-0 items-center justify-between px-4 py-3 border-b border-anthracite-700">
             <h3 className="text-sm font-semibold text-white">{t('title')}</h3>
             <div className="flex items-center gap-2">
               {unreadCount > 0 && (
                 <button
                   onClick={markAllRead}
                   disabled={loading}
-                  className="text-xs text-gold-400 hover:text-gold-300 flex items-center gap-1 transition-colors disabled:opacity-50"
+                  className="min-h-11 text-xs text-gold-400 hover:text-gold-300 flex items-center gap-1 transition-colors disabled:opacity-50"
                 >
                   <CheckCheck className="w-3 h-3" />
                   {t('markAll')}
                 </button>
               )}
-              <button
+              <button aria-label={ui("Închide")}
                 onClick={() => setIsOpen(false)}
-                className="text-anthracite-400 hover:text-white transition-colors"
+                className="min-h-11 min-w-11 flex items-center justify-center text-anthracite-400 hover:text-white transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -172,7 +188,7 @@ export default function NotificationBell() {
           </div>
 
           {/* Notifications List */}
-          <div className="max-h-80 overflow-y-auto">
+          <div className="min-h-0 max-h-80 overflow-y-auto overscroll-contain">
             {notifications.length === 0 ? (
               <div className="px-4 py-8 text-center">
                 <Bell className="w-8 h-8 text-anthracite-600 mx-auto mb-2" />
@@ -196,7 +212,7 @@ export default function NotificationBell() {
                   }}
                 >
                   <div className="w-8 h-8 rounded-full bg-anthracite-700 flex items-center justify-center shrink-0 mt-0.5">
-                    {getIcon(notification.type)}
+                    {ui(getIcon(notification.type))}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
@@ -210,7 +226,7 @@ export default function NotificationBell() {
                     {notification.message && (
                       <p className="text-xs text-anthracite-400 mt-0.5 line-clamp-1">{notification.message}</p>
                     )}
-                    <p className="text-xs text-anthracite-500 mt-1">{timeAgo(notification.created_at)}</p>
+                    <p className="text-xs text-anthracite-500 mt-1">{ui(timeAgo(notification.created_at))}</p>
                   </div>
                 </div>
               ))

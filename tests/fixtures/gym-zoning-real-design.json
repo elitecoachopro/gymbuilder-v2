@@ -1,0 +1,134 @@
+{
+  "summary": "Propunere conceptuală echilibrată pentru 200 m², cu păstrarea conturului de 20 × 10 m și a înălțimii de 3,5 m, fără plafon bugetar. Recepția și cele două vestiare sunt prevăzute pentru compartimentare automată, cu un coridor comun de 1,2 m. Se propune distribuirea egală între vestiarul femeilor și cel al bărbaților: fiecare cu două module de câte cinci dulapuri, o bancă, două dușuri, un WC și un lavoar. Selecția inițială include cinci echipamente cardio, greutăți libere, patru aparate de forță și dotări compacte pentru antrenament funcțional și stretching. Recepția și vestiarele sunt dimensionate conceptual pentru aproximativ o treime din suprafață; ponderile zonelor exclud o rezervă de 15% pentru circulație. Suprafețele efective, amplasările și eventualele omisiuni sunt stabilite de motorul geometric, inclusiv în funcție de accesul și degajările echipamentelor. Costurile de amenajare, instalațiile sanitare și de ventilație, transportul, accesibilitatea și capacitatea simultană necesită verificare ulterioară. Propunerea nu reprezintă proiect arhitectural sau confirmare de conformitate legală.",
+  "questions": [],
+  "length_m": 20,
+  "width_m": 10,
+  "total_area": 200,
+  "height_m": 3.5,
+  "budget_eur": null,
+  "profile": "balanced",
+  "zones": [
+    {
+      "zoneId": "receptie",
+      "weight": 0.06,
+      "equipment": [
+        {
+          "templateId": "desk_receptie",
+          "quantity": 1
+        },
+        {
+          "templateId": "canapea",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "zoneId": "vestiare",
+      "weight": 0.33,
+      "equipment": [
+        {
+          "templateId": "dulap_vestiar",
+          "quantity": 4
+        },
+        {
+          "templateId": "banca_vestiar",
+          "quantity": 2
+        },
+        {
+          "templateId": "dus",
+          "quantity": 4
+        },
+        {
+          "templateId": "wc",
+          "quantity": 2
+        },
+        {
+          "templateId": "lavoar",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "zoneId": "cardio",
+      "weight": 0.16,
+      "equipment": [
+        {
+          "templateId": "banda_alergare",
+          "quantity": 2
+        },
+        {
+          "templateId": "bicicleta_spinning",
+          "quantity": 2
+        },
+        {
+          "templateId": "eliptica",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "zoneId": "greutati",
+      "weight": 0.18,
+      "equipment": [
+        {
+          "templateId": "real_power_rack",
+          "quantity": 1
+        },
+        {
+          "templateId": "banca_reglabila",
+          "quantity": 2
+        },
+        {
+          "templateId": "suport_gantere",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "zoneId": "aparate",
+      "weight": 0.18,
+      "equipment": [
+        {
+          "templateId": "aparat_piept",
+          "quantity": 1
+        },
+        {
+          "templateId": "aparat_picioare",
+          "quantity": 1
+        },
+        {
+          "templateId": "aparat_lat",
+          "quantity": 1
+        },
+        {
+          "templateId": "seated_row",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "zoneId": "functional",
+      "weight": 0.05,
+      "equipment": [
+        {
+          "templateId": "rowing_machine",
+          "quantity": 1
+        },
+        {
+          "templateId": "box_pliometric",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "zoneId": "stretching",
+      "weight": 0.04,
+      "equipment": [
+        {
+          "templateId": "saltea_stretching",
+          "quantity": 2
+        }
+      ]
+    }
+  ]
+}

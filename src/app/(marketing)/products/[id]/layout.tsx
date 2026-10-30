@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import { formatCatalogPrice } from '@/lib/catalog-price';
+import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
 
 function getSupabase() {
@@ -9,32 +11,34 @@ function getSupabase() {
 }
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
   children: React.ReactNode;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const english = (await cookies()).get('locale')?.value === 'en';
   const supabase = getSupabase();
-  const { id } = params;
+  const { id } = await params;
 
   const { data: product } = await supabase
     .from('products')
-    .select('id, name, description, price_eur, images, category, condition')
+    .select('id, name, description, price_eur, listed_price_amount, listed_price_currency, images, category, condition, supplier_profiles!inner(status)')
     .eq('id', id)
-    .eq('status', 'active')
+    .in('status', ['active', 'featured']).eq('supplier_profiles.status', 'approved')
     .single();
 
   if (!product) {
     return {
-      title: 'Produs negăsit | GymBuilder',
-      description: 'Produsul căutat nu a fost găsit pe GymBuilder.',
+      title: english ? 'Product not found | Gym Builder' : 'Produs negăsit | Gym Builder',
+      description: english ? 'This product was not found on Gym Builder.' : 'Produsul căutat nu a fost găsit pe Gym Builder.',
     };
   }
 
-  const title = `${product.name} - ${product.price_eur}€ | GymBuilder`;
+  const priceLabel = formatCatalogPrice(product.price_eur, english ? 'en' : 'ro', product);
+  const title = `${product.name} - ${priceLabel} | Gym Builder`;
   const description = product.description
     ? product.description.substring(0, 155) + (product.description.length > 155 ? '...' : '')
-    : `${product.name} - ${product.category}, ${product.condition}, ${product.price_eur}€ pe GymBuilder.`;
+    : `${product.name} - ${product.category}, ${product.condition}, ${priceLabel} ${english ? 'on' : 'pe'} Gym Builder.`;
   const imageUrl = product.images && product.images.length > 0 ? product.images[0] : null;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gymbuilder.app';
 
@@ -45,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       url: `${appUrl}/products/${id}`,
-      siteName: 'GymBuilder',
+      siteName: 'Gym Builder',
       type: 'website',
       ...(imageUrl && {
         images: [

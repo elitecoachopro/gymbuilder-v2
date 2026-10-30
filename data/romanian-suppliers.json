@@ -1,0 +1,417 @@
+{
+  "checked_at": "2026-10-21T00:00:00Z",
+  "suppliers": [
+    {
+      "key": "fitlife",
+      "company_name": "Fitlife (BNT Sistem SRL)",
+      "country": "Romania",
+      "city": "Cluj-Napoca",
+      "address": "Strada Traian Vuia nr. 124A, Cluj-Napoca, 400396, România",
+      "website": "https://fitlife.ro/",
+      "phone": "+40 737 307 370",
+      "contact_email": "contact@fitlife.ro",
+      "listing_source_url": "https://fitlife.ro/contact/",
+      "catalog_url": "https://fitlife.ro/echipamente-fitness",
+      "logo_source": null,
+      "logo_url": null,
+      "description": "Importator și distribuitor de echipamente fitness din România. Catalogul include aparate de forță, echipamente cardio și accesorii de la mai multe mărci. Pentru echiparea unei săli, contact comercial suplimentar: +40 722 800 483, vanzari@fitlife.ro. Depozit: Prelungirea Gării Cățelu nr. 41, Căldăraru, Cernica, Ilfov. Disponibilitatea, transportul și garanția se confirmă direct cu Fitlife.",
+      "additional_source_urls": [
+        "https://fitlife.ro/echipare-sali-de-fitness-cu-fitlife"
+      ],
+      "products": [
+        {
+          "key": "fit1",
+          "name": "TheWay Fitness X450 – bandă curbată",
+          "brand": "TheWay Fitness",
+          "brand_country": null,
+          "category": "cardio",
+          "description": "Bandă mecanică cu suprafață curbată și cadru din lemn de cireș. Ritmul este controlat de utilizator. Distribuită în România de Fitlife; oferta și configurația se confirmă pe pagina oficială.",
+          "source_url": "https://fitlife.ro/banda-de-alergare-curbata-x450-theway-fitness",
+          "image_sources": [
+            "https://fitlife.ro/images/thumbs/0011686_banda-de-alergare-curbata-x450-theway-fitness_747.jpeg"
+          ],
+          "specs": {
+            "Marcă": "TheWay Fitness",
+            "Model": "X450",
+            "Acționare": "Mecanică, fără motor",
+            "Suprafață de alergare": "50 × 165 cm",
+            "Greutate maximă utilizator": "150 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/fit1-1.jpg"
+          ]
+        },
+        {
+          "key": "fit2",
+          "name": "Merach Cable Cross XH5",
+          "brand": "Merach",
+          "brand_country": null,
+          "category": "strength",
+          "description": "Stație pentru antrenament funcțional prin cablu, cu structură din oțel și lemn. Oferă reglarea înălțimii scripetelui. Consultă distribuitorul pentru configurația greutăților și condițiile de montaj.",
+          "source_url": "https://fitlife.ro/aparat-multifunctional-cable-cross-xh5",
+          "image_sources": [
+            "https://fitlife.ro/images/thumbs/0010846_aparat-fitness-multifunctional-cable-cross-xh5-din-otel-si-lemn-merach_747.jpeg"
+          ],
+          "specs": {
+            "Marcă": "Merach",
+            "Model": "XH5",
+            "Cod furnizor": "XJ-P01",
+            "Reglare cablu": "28 niveluri",
+            "Materiale": "Oțel și lemn"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/fit2-1.jpg"
+          ]
+        },
+        {
+          "key": "fit3",
+          "name": "ATX Cable Pull Tower CPT-800 S90",
+          "brand": "ATX",
+          "brand_country": null,
+          "category": "strength",
+          "description": "Stație cu un scripete reglabil și stivă de greutăți. Include rolă pivotantă și reglaje pe înălțime pentru exerciții variate. Mânerele de tracțiune se comandă separat; furnizorul recomandă fixarea în pardoseală.",
+          "source_url": "https://fitlife.ro/atx-single-tower-multi-statie-cu-bloc-de-greutati-90-kg",
+          "image_sources": [
+            "https://fitlife.ro/images/thumbs/0016020_aparat-multifunctional-atx-cable-pull-tower-cpt-800-scripete-cu-stiva-de-greutati-90-kg_747.jpeg"
+          ],
+          "specs": {
+            "Marcă": "ATX",
+            "Model": "ATX-CPT-800-S90",
+            "Stivă greutăți": "90 kg",
+            "Raport cablu": "2:1",
+            "Poziții scripete": "37",
+            "Dimensiuni": "132 × 105 × 229 cm"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/fit3-1.jpg"
+          ]
+        },
+        {
+          "key": "fit4",
+          "name": "MS Fitness RM03 – aparat de vâslit pe apă",
+          "brand": "MS Fitness",
+          "brand_country": null,
+          "category": "cardio",
+          "description": "Aparat de vâslit cu rezistență pe apă, structură din lemn și șină din aliaj de aluminiu. Rezistența variază cu viteza de vâslire. Necesită montaj.",
+          "source_url": "https://fitlife.ro/aparat-de-vaslit-din-lemn-rezistenta-pe-baza-de-apa-rm03-ms-fitness",
+          "image_sources": [
+            "https://fitlife.ro/images/thumbs/0007386_aparat-de-vaslit-din-lemn-rezistenta-pe-baza-de-apa-rm03-ms-fitness_747.jpeg"
+          ],
+          "specs": {
+            "Marcă": "MS Fitness",
+            "Model": "RM03",
+            "Rezistență": "Apă",
+            "Dimensiuni": "215 × 52 × 60 cm",
+            "Greutate aparat": "32 kg",
+            "Greutate maximă utilizator": "120 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/fit4-1.jpg"
+          ]
+        },
+        {
+          "key": "fit5",
+          "name": "TheWay Fitness – set gantere 1–10 kg cu suport",
+          "brand": "TheWay Fitness",
+          "brand_country": null,
+          "category": "strength",
+          "description": "Set cu câte două gantere pentru fiecare greutate între 1 și 10 kg, în trepte de 1 kg, și suport de depozitare. Pagina furnizorului descrie un finisaj din lemn.",
+          "source_url": "https://fitlife.ro/set-gantere-si-suport-de-lux-1-10-kg-theway-fitness",
+          "image_sources": [
+            "https://fitlife.ro/images/thumbs/0011672_set-gantere-si-suport-de-lux-1-10-kg-theway-fitness_747.jpeg"
+          ],
+          "specs": {
+            "Marcă": "TheWay Fitness",
+            "Greutăți": "1–10 kg, trepte de 1 kg",
+            "Număr gantere": "20",
+            "Greutate totală gantere": "110 kg",
+            "Include": "Suport de depozitare"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/fit5-1.jpg"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "insportline-ro",
+      "company_name": "inSPORTline România (Total Sport Equipment SRL)",
+      "country": "Romania",
+      "city": "Deva",
+      "address": "Str. Depozitelor nr. 21, Deva, județul Hunedoara, România",
+      "website": "https://www.insportline.ro/",
+      "phone": "+40 377 101 449",
+      "contact_email": "comenzi@insportline.ro",
+      "listing_source_url": "https://www.insportline.ro/contact",
+      "catalog_url": "https://www.insportline.ro/",
+      "logo_source": null,
+      "logo_url": null,
+      "description": "Distribuitor de echipamente fitness și articole sportive în România, operat de Total Sport Equipment SRL. Catalogul include biciclete fitness, benzi de alergare, aparate de forță și accesorii. Comenzile, disponibilitatea și serviciile sunt gestionate direct de furnizor.",
+      "additional_source_urls": [],
+      "products": [
+        {
+          "key": "in2",
+          "name": "inSPORTline inCondi UB60i",
+          "brand": "inSPORTline",
+          "brand_country": null,
+          "category": "cardio",
+          "description": "Bicicletă magnetică pentru utilizare casnică, cu rezistență controlată electronic, șa reglabilă și conectare la aplicații de antrenament.",
+          "source_url": "https://www.insportline.ro/ergometre-pentru-acasa/13110-bicicleta-magnetica-insportline-incondi-ub60i.html",
+          "image_sources": [
+            "https://api.insportline.ro/73529-large_default/bicicleta-magnetica-insportline-incondi-ub60i.jpg"
+          ],
+          "specs": {
+            "Marcă": "inSPORTline",
+            "Model": "inCondi UB60i",
+            "Volant": "7 kg",
+            "Niveluri rezistență": "32",
+            "Greutate maximă utilizator": "150 kg",
+            "Utilizare": "Casnică"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/in2-1.jpg"
+          ]
+        },
+        {
+          "key": "in3",
+          "name": "inSPORTline ZenSeat 100",
+          "brand": "inSPORTline",
+          "brand_country": null,
+          "category": "cardio",
+          "description": "Bicicletă recumbent cu acces jos și scaun cu spătar. Permite și mișcarea brațelor; oferă conectivitate Bluetooth pentru aplicații compatibile.",
+          "source_url": "https://www.insportline.ro/ergometre-pentru-acasa/12615-bicicleta-recumbent-insportline-zenseat-100.html",
+          "image_sources": [
+            "https://api.insportline.ro/70300-large_default/bicicleta-recumbent-insportline-zenseat-100.jpg"
+          ],
+          "specs": {
+            "Marcă": "inSPORTline",
+            "Model": "ZenSeat 100",
+            "Cod produs": "29671",
+            "Niveluri rezistență": "16",
+            "Programe": "25",
+            "Greutate maximă utilizator": "120 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/in3-1.jpg"
+          ]
+        },
+        {
+          "key": "in4",
+          "name": "inSPORTline Velocer UB",
+          "brand": "inSPORTline",
+          "brand_country": null,
+          "category": "cardio",
+          "description": "Bicicletă de exerciții pentru spații comerciale sau acasă, cu afișaj TFT LCD și reglare electronică a rezistenței. Include încărcare USB și wireless pentru telefon. Stocul trebuie confirmat direct cu distribuitorul.",
+          "source_url": "https://www.insportline.ro/ergometre-pentru-acasa/10981-bicicleta-fitness-insportline-velocer-ub.html",
+          "image_sources": [
+            "https://api.insportline.ro/57186-large_default/bicicleta-fitness-insportline-velocer-ub.jpg"
+          ],
+          "specs": {
+            "Marcă": "inSPORTline",
+            "Model": "Velocer UB",
+            "Cod produs": "26626",
+            "Dimensiuni": "104 × 59 × 146 cm",
+            "Greutate maximă utilizator": "150 kg",
+            "Programe": "24"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/in4-1.jpg"
+          ]
+        },
+        {
+          "key": "in5",
+          "name": "inSPORTline inCondi UB45i II",
+          "brand": "inSPORTline",
+          "brand_country": null,
+          "category": "cardio",
+          "description": "Bicicletă pentru utilizare casnică, cu rezistență controlată electronic, șa reglabilă și conectivitate Bluetooth. Oferă programe HRC și WATT și suport pentru tabletă.",
+          "source_url": "https://www.insportline.ro/ergometre-pentru-acasa/10625-bicicleta-fitness-insportline-incondi-ub45i-ii.html",
+          "image_sources": [
+            "https://api.insportline.ro/53766-large_default/bicicleta-fitness-insportline-incondi-ub45i-ii.jpg"
+          ],
+          "specs": {
+            "Marcă": "inSPORTline",
+            "Model": "inCondi UB45i II",
+            "Volant": "8 kg",
+            "Niveluri rezistență": "16",
+            "Dimensiuni (L × l × H)": "97,5 × 51 × 139,5 cm",
+            "Greutate maximă utilizator": "130 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/in5-1.jpg"
+          ]
+        },
+        {
+          "key": "in6",
+          "name": "inSPORTline Omahan RMB",
+          "brand": "inSPORTline",
+          "brand_country": null,
+          "category": "cardio",
+          "description": "Bicicletă recumbent pentru acasă, cu scaun și mânere reglabile, rezistență electromagnetică și port USB pentru telefon. Include programe HRC și WATT.",
+          "source_url": "https://www.insportline.ro/ergometre-pentru-acasa/8260-bicicleta-recumbent-insportline-omahan-rmb.html",
+          "image_sources": [
+            "https://api.insportline.ro/31396-large_default/bicicleta-recumbent-insportline-omahan-rmb.jpg"
+          ],
+          "specs": {
+            "Marcă": "inSPORTline",
+            "Model": "Omahan RMB",
+            "Volant": "9 kg",
+            "Niveluri rezistență": "32",
+            "Dimensiuni": "155 × 65 × 114 cm",
+            "Greutate maximă utilizator": "150 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/in6-1.jpg"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "sportist",
+      "company_name": "Sportist (Online Sport Shop SRL)",
+      "country": "Romania",
+      "city": "București",
+      "address": "Sediu social: Calea Rahovei nr. 325, bl. 13, sc. A, et. 6, ap. 32, sector 5, București, România",
+      "website": "https://www.sportist.ro/",
+      "phone": "+40 730 469 101",
+      "contact_email": "office@sportist.ro",
+      "listing_source_url": "https://www.sportist.ro/contacts/",
+      "catalog_url": "https://www.sportist.ro/fitness-si-gimnastica.html",
+      "logo_source": null,
+      "logo_url": null,
+      "description": "Magazin online românesc de echipamente fitness și articole sportive, operat de Online Sport Shop SRL. Include echipamente pentru antrenamente acasă, precum benzi de alergare și biciclete. Telefon suplimentar: +40 785 414 188. Program publicat: luni–vineri, 09:00–17:00. Adresa indicată este sediul social.",
+      "additional_source_urls": [],
+      "products": [
+        {
+          "key": "sport1",
+          "name": "Horizon 7.0 AT – bandă de alergare",
+          "brand": "Horizon Fitness",
+          "brand_country": null,
+          "category": "cardio",
+          "description": "Bandă de alergare electrică cu înclinare motorizată și sistem de pliere, distribuită în România de Sportist. Solicită furnizorului confirmarea versiunii, limitei de greutate și termenului de livrare.",
+          "source_url": "https://www.sportist.ro/banda-de-alergare-electrica-horizon-7-0-at.html",
+          "image_sources": [
+            "https://www.sportist.ro/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/h/o/horizon-70at.jpg"
+          ],
+          "specs": {
+            "Marcă": "Horizon Fitness",
+            "Model": "7.0 AT",
+            "Viteză": "1–20 km/h",
+            "Înclinare": "0–15%",
+            "Motor declarat": "3 CP"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/sport1-1.jpg"
+          ]
+        },
+        {
+          "key": "sport3",
+          "name": "Lotto Smart G500 – bandă de alergare",
+          "brand": "Lotto",
+          "brand_country": null,
+          "category": "cardio",
+          "description": "Bandă electrică pliabilă pentru utilizare casnică. Are înclinare motorizată, afișaj LCD și conectivitate Bluetooth pentru aplicații compatibile.",
+          "source_url": "https://www.sportist.ro/banda-de-alergat-electrica-lotto-smart-g500.html",
+          "image_sources": [
+            "https://www.sportist.ro/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/b/a/banda-de-alergat-electrica-lotto-smart-g500-722381.jpg"
+          ],
+          "specs": {
+            "Marcă": "Lotto",
+            "Model": "Smart G500",
+            "Viteză": "1–14 km/h",
+            "Suprafață de alergare": "121 × 41 cm",
+            "Înclinare": "15 niveluri",
+            "Greutate maximă utilizator": "110 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/sport3-1.jpg"
+          ]
+        },
+        {
+          "key": "sport4",
+          "name": "Lotto Advanced D500 – bandă de alergare",
+          "brand": "Lotto",
+          "brand_country": null,
+          "category": "cardio",
+          "description": "Bandă de alergare electrică pentru acasă, cu suprafață de alergare de 130 × 45 cm și înclinare motorizată. Condițiile de livrare și garanție se stabilesc cu Sportist.",
+          "source_url": "https://www.sportist.ro/banda-de-alergat-electrica-lotto-advanced-d500.html",
+          "image_sources": [
+            "https://www.sportist.ro/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/b/a/banda-de-alergat-electrica-lotto-step-d100-copie-159560.jpg"
+          ],
+          "specs": {
+            "Marcă": "Lotto",
+            "Model": "Advanced D500",
+            "Viteză": "0,8–15 km/h",
+            "Suprafață de alergare": "130 × 45 cm",
+            "Înclinare": "15 niveluri",
+            "Motor declarat": "3,25 CP"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/sport4-1.jpg"
+          ]
+        },
+        {
+          "key": "sport5",
+          "name": "Techfit PED1 – mini bicicletă fitness",
+          "brand": "Techfit",
+          "brand_country": null,
+          "category": "cardio",
+          "description": "Pedalier compact cu reglare manuală a rezistenței, destinat exercițiilor pentru brațe sau picioare. Este un aparat mecanic pentru utilizare casnică, cu picioare antiderapante.",
+          "source_url": "https://www.sportist.ro/fitness-si-gimnastica/biciclete-de-fitness/bicicleta-recuperare-techfit-ped1.html",
+          "image_sources": [
+            "https://www.sportist.ro/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/p/e/ped1_1_large-2000x2000w.jpg"
+          ],
+          "specs": {
+            "Marcă": "Techfit",
+            "Model": "PED1",
+            "Acționare": "Mecanică",
+            "Reglare rezistență": "Manuală",
+            "Dimensiuni": "550 × 400 × 250 mm",
+            "Greutate": "2 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/sport5-1.jpg"
+          ]
+        },
+        {
+          "key": "sport6",
+          "name": "Everfit Welly-S – mini bicicletă fitness",
+          "brand": "Everfit",
+          "brand_country": null,
+          "category": "cardio",
+          "description": "Pedalier mecanic compact cu control manual al dificultății și pedale cu curele. Dimensiunile reduse permit depozitarea ușoară după utilizare.",
+          "source_url": "https://www.sportist.ro/fitness-si-gimnastica/biciclete-de-fitness/bicicleta-recuperare-everfit-welly-s.html",
+          "image_sources": [
+            "https://www.sportist.ro/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/b/i/bicicleta-recuperare-everfit-weely-s.jpg"
+          ],
+          "specs": {
+            "Marcă": "Everfit",
+            "Model": "Welly-S",
+            "Acționare": "Mecanică",
+            "Reglare rezistență": "Manuală",
+            "Dimensiuni": "485 × 410 × 270 mm",
+            "Greutate": "2 kg"
+          },
+          "brochure_url": null,
+          "images": [
+            "/equipment/romania/sport6-1.jpg"
+          ]
+        }
+      ]
+    }
+  ]
+}
