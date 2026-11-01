@@ -7,3 +7,70 @@
 
 .home-sport h3 { font-size: 1.75rem; line-height: 1.1; }
 .home-sport footer h4 { font-size: 1.25rem; }
+
+.home-hero-section { padding-top: 1.5rem; }
+.home-hero-frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid var(--sport-surface-700);
+  border-radius: 1.5rem;
+  background: var(--sport-surface-900);
+}
+.home-hero-photo { object-fit: cover; object-position: 64% 58%; }
+.home-hero-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(10 16 12 / 96%) 0%, rgb(10 16 12 / 83%) 42%, rgb(10 16 12 / 28%) 100%);
+}
+.home-hero-copy { position: relative; max-width: 60rem; padding: 2rem 1.5rem 4rem; }
+.home-hero-badge { border: 1px solid rgb(194 244 91 / 28%); background: rgb(16 21 19 / 84%); }
+.home-hero-subtitle { color: var(--sport-surface-100); }
+.home-search-panel {
+  position: relative;
+  max-width: 64rem;
+  margin: -1.75rem auto 1.75rem;
+  padding: 1.25rem;
+  border: 1px solid var(--sport-surface-600);
+  border-radius: 1rem;
+  background: var(--sport-surface-900);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 16%);
+}
+.home-search-panel > div { max-width: none; }
+.home-search-panel button { box-shadow: none; }
+.home-buying-steps { max-width: 64rem; margin-inline: auto; }
+.home-category-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--sport-surface-700);
+  border-radius: 1rem;
+  background: var(--sport-surface-900);
+  transition: border-color 180ms, box-shadow 180ms;
+}
+.home-category-card:hover { border-color: var(--sport-surface-500); box-shadow: 0 8px 24px rgb(0 0 0 / 12%); }
+.home-category-photo { position: relative; aspect-ratio: 3 / 2; background: var(--sport-surface-800); }
+.home-category-photo img, .home-supplier-photo img { object-fit: cover; }
+.home-category-content { display: flex; flex: 1; flex-direction: column; align-items: flex-start; padding: 1.5rem; }
+.home-category-content > span { margin-top: auto; min-height: 2.75rem; }
+.home-supplier-card { display: grid; overflow: hidden; border: 1px solid var(--sport-surface-700); border-radius: 1rem; background: var(--sport-surface-900); }
+.home-supplier-copy { padding: 1.5rem; }
+.home-supplier-copy .btn-primary { margin-top: 1.5rem; }
+.home-supplier-photo { position: relative; min-height: 14rem; background: var(--sport-surface-800); }
+
+@media (min-width: 640px) {
+  .home-hero-copy { padding: 3rem 3rem 4.5rem; }
+  .home-search-panel { width: calc(100% - 3rem); padding: 1.5rem; }
+  .home-buying-steps { width: calc(100% - 3rem); }
+}
+@media (min-width: 768px) {
+  .home-supplier-card { grid-template-columns: 1.35fr 1fr; }
+  .home-supplier-copy { padding: 2.5rem; }
+}
+@media (max-width: 639px) {
+  .home-hero-section { padding-top: 1rem; }
+  .home-hero-frame { border-radius: 1rem; }
+  .home-hero-photo { object-position: 72% center; }
+  .home-hero-shade { background: linear-gradient(180deg, rgb(10 16 12 / 87%), rgb(10 16 12 / 76%)); }
+  .home-hero-badge { margin-bottom: 1.5rem; }
+}
