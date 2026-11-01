@@ -1,0 +1,55 @@
+{
+  "integrated": "2026-11-01",
+  "photos": [
+    {
+      "file": "public/design/homepage/gym-panorama.webp",
+      "photographer": "Max Vakhtbovych",
+      "source": "https://www.pexels.com/photo/interior-of-modern-fitness-club-with-various-machines-and-equipment-7031705/",
+      "license": "https://www.pexels.com/license/",
+      "license_checked": "2026-10-31",
+      "use": "Decorative homepage photography; not a product listing or a Gym Builder project portfolio",
+      "sha256": "e10262537dc36165d846fccff8cbb8d7513770ce97a4bc0a2323ca54a90dfcb2",
+      "bytes": 262434
+    },
+    {
+      "file": "public/design/homepage/strength-racks.webp",
+      "photographer": "Jason Morrison",
+      "source": "https://www.pexels.com/photo/modern-gym-with-workout-equipment-28320723/",
+      "license": "https://www.pexels.com/license/",
+      "license_checked": "2026-10-31",
+      "use": "Decorative homepage photography; not a product listing or a Gym Builder project portfolio",
+      "sha256": "5b998c6cd2a47b5e65200430581de7a914cf5a8afc160417b546ff009c03f8fc",
+      "bytes": 56974
+    },
+    {
+      "file": "public/design/homepage/cardio-studio.webp",
+      "photographer": "Tima Miroshnichenko",
+      "source": "https://www.pexels.com/photo/grayscale-photo-of-gym-equipment-6388514/",
+      "license": "https://www.pexels.com/license/",
+      "license_checked": "2026-10-31",
+      "use": "Decorative homepage photography; not a product listing or a Gym Builder project portfolio",
+      "sha256": "b5f801f6072456642114b7fb08a0f0c07f5c6b436033396438bf32c2e87ba8e2",
+      "bytes": 32816
+    },
+    {
+      "file": "public/design/homepage/functional-training.webp",
+      "photographer": "TUBARONES PHOTOGRAPHY",
+      "source": "https://www.pexels.com/photo/gym-equipment-inside-the-fitness-gym-9545914/",
+      "license": "https://www.pexels.com/license/",
+      "license_checked": "2026-10-31",
+      "use": "Decorative homepage photography; not a product listing or a Gym Builder project portfolio",
+      "sha256": "23012221a76e3a426daa5e654371a9a545046ceea8cfda2adf73dad011772a91",
+      "bytes": 50206
+    },
+    {
+      "file": "public/design/homepage/free-weights.webp",
+      "photographer": "Anete Lusina",
+      "source": "https://www.pexels.com/photo/gym-body-building-equipment-16513601/",
+      "license": "https://www.pexels.com/license/",
+      "license_checked": "2026-10-31",
+      "use": "Decorative homepage photography; not a product listing or a Gym Builder project portfolio",
+      "sha256": "c1acec6239a8f0bd0e28f3559967cf77b35cbf8a22d363e1d3a16daa7a4d4d79",
+      "bytes": 22062
+    }
+  ]
+}
