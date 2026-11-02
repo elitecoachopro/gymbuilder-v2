@@ -1,0 +1,27 @@
+{
+  "date": "2026-11-02",
+  "deployment": "dpl_DsRf6isynnBPVLb3q8JgNusEtGka",
+  "publicUrl": "https://www.gymbuilder.app/",
+  "previousDeployment": "dpl_7uBwCipCQgfYAvxjRVF5c5RaSM1x",
+  "featureCommit": "50bc27d",
+  "pullRequest": "https://github.com/elitecoachopro/gymbuilder-v2/pull/3",
+  "pullRequestState": "open",
+  "migrationApplied": true,
+  "initialProductionCounters": {
+    "views": 0,
+    "sessions": 0,
+    "profile_views": 0,
+    "product_views": 0
+  },
+  "health": "healthy",
+  "unauthenticatedSummaryHttpStatus": 401,
+  "withoutConsentRecorded": false,
+  "productionAccountFixturesCreated": false,
+  "localFakeFixturesRemoved": true,
+  "temporaryPreviewStopped": true,
+  "notes": [
+    "Production collector opt-in path was not exercised in browser because this existing browser profile has no consent banner; local browser opt-in path exercised.",
+    "Live aggregate function returned correctly shaped zero totals. No synthetic production visits inserted.",
+    "Eight previously deployed sender fixes preserved; main still requires reconciliation of that pre-existing drift."
+  ]
+}
