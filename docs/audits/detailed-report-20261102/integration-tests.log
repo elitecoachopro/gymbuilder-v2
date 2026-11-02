@@ -1,0 +1,26 @@
+✔ review average covers all verified reviews even when only one is displayed (475.97775ms)
+✔ supplier analytics counts views past the REST 1000-row ceiling (406.386084ms)
+✔ variant limit cannot be bypassed by concurrent inserts (92.688667ms)
+✔ navigation retries are idempotent while revisits count and legacy product history stays unique (402.806584ms)
+✔ reports isolate supplier actions and count enquiries as records rather than clicks (191.234791ms)
+✔ private reports and event collection enforce role, consent, publication and source boundaries (420.698917ms)
+✔ hourly reporting uses Bucharest calendar days including the daylight-saving day (95.002834ms)
+✔ admin project results come from persisted projects with an explicit completion status (103.839834ms)
+✔ Bucharest midnight and closed-open period boundaries are correct for every report range (385.971334ms)
+✔ production events retain both current lifetime history and the legacy daily report without double counting (41.550958ms)
+✔ public gallery does not expose unapproved supplier material (169.261584ms)
+✔ public variants respect inactive product visibility (173.737792ms)
+✔ active variants from an unapproved supplier are not public (43.322334ms)
+✔ promotions and views respect the supplier and product publication boundary (178.914542ms)
+✔ traffic deduplicates concurrent events, counts distinct sessions, and isolates preview from production (63.293542ms)
+✔ owner visits and unpublished suppliers/products do not count (57.5635ms)
+✔ analytics raw data and RPCs cannot be accessed with the public key (4.432708ms)
+✔ monitoring API isolates supplier scope, denies clients, and never trusts environment query parameters (334.328583ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4078.343541

@@ -285,7 +285,7 @@
     "cookieConsent": "Stores cookie consent preference (localStorage)",
     "cookiePersistent": "Persistent",
     "s2_2Title": "2.2 Analytics cookies",
-    "s2_2Text": "Gym Builder counters use a random identifier in sessionStorage to count visits to public pages. The identifier is hashed on the server; reports show totals and sessions without emails, search terms or token-bearing URLs. The detailed report counts page accesses, source categories (such as Facebook or Instagram), and clicks on phone or WhatsApp links. It does not collect phone numbers or message contents. Product history retains one view per session and UTC day. <strong class=\"text-white\">Analytics is activated only with your explicit consent.</strong>",
+    "s2_2Text": "Gym Builder counters use a random identifier in sessionStorage to count visits to public pages. The identifier is hashed on the server; reports show totals and sessions without emails, search terms or token-bearing URLs. The detailed report counts page accesses, source categories (such as Facebook or Instagram), and clicks on phone or WhatsApp links. It does not collect phone numbers or message contents. Product history retains its lifetime session count. <strong class=\"text-white\">Analytics is activated only with your explicit consent.</strong>",
     "analyticsScope": "Page, supplier profile and product views",
     "analyticsSession": "Identifier in sessionStorage: tab session; statistics stored on the server",
     "s2_3Title": "2.3 Marketing cookies",

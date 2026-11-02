@@ -14,7 +14,7 @@ const translations = {
     error: 'Statisticile nu au putut fi încărcate. Încearcă din nou.',
     views: 'Accesări pagini', sessions: 'Sesiuni unice', profiles: 'Vizualizări profil', products: 'Vizualizări produse',
     note: 'Accesările includ reveniri și reîncărcări; retrimiterea aceluiași eveniment nu se dublează. Traficul se măsoară numai cu acord pentru analiză. Sesiunile nu sunt persoane distincte. Administratorii și vizitele furnizorilor pe propriile materiale sunt excluse. Orele sunt afișate pentru București.',
-    history: 'Raportul detaliat începe de la activarea lui. Istoricul produselor din dashboard păstrează numărarea unică pe pagină, sesiune și zi UTC.',
+    history: 'Sursele și apăsările sunt disponibile de la activarea raportului detaliat. Tabelul produselor din dashboard păstrează istoricul sesiunilor cumulate.',
     empty: 'Nicio vizualizare în perioada selectată. Contoarele se vor actualiza după primele vizite cu acord pentru analiză.',
     daily: 'Evoluție zilnică', date: 'Data (București)', pages: 'Cele mai vizualizate pagini', since: 'Primele date înregistrate', open: 'Deschide raportul separat',
   },
@@ -24,7 +24,7 @@ const translations = {
     error: 'Statistics could not be loaded. Please try again.',
     views: 'Page accesses', sessions: 'Unique sessions', profiles: 'Profile views', products: 'Product views',
     note: 'Accesses include return visits and reloads; retries of the same event are not counted twice. Traffic is measured only with analytics consent. Sessions are not distinct people. Administrators and suppliers visiting their own content are excluded. Times use Bucharest time.',
-    history: 'The detailed report starts at activation. Product history in your dashboard retains one view per page, session and UTC day.',
+    history: 'Sources and contact clicks are available from detailed report activation. The product table in your dashboard retains lifetime session history.',
     empty: 'No views in the selected period. Counters will update after the first visits with analytics consent.',
     daily: 'Daily activity', date: 'Date (Bucharest)', pages: 'Most viewed pages', since: 'First recorded data', open: 'Open dedicated report',
   },
@@ -102,6 +102,7 @@ export default function TrafficCounters({ audience, standalone = false }: { audi
             </>}
             {summary.since && <p className="mb-2 text-xs text-anthracite-400">{copy.since}: {date(summary.since)}</p>}
           </>}
+      {summary && summary.environment !== 'production' && <p className="mb-2 text-xs text-gold-300">{locale === 'en' ? 'Test traffic is isolated from live traffic. Business results are shown only in production.' : 'Traficul de test este separat de traficul live. Rezultatele comerciale sunt afișate numai în producție.'}</p>}
       <p className="text-xs leading-relaxed text-anthracite-400">{copy.note}</p>
       {audience === 'supplier' && <p className="mt-2 text-xs leading-relaxed text-anthracite-400">{copy.history}</p>}
     </section>

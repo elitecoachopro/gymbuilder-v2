@@ -695,6 +695,7 @@ export default function SupplierDashboard() {
             </div>
           )}
 
+
           {/* Analytics Section */}
           <div id="analytics" className="mb-8 scroll-mt-[calc(var(--app-header-height)+1rem)]">
             <TrafficCounters audience="supplier" />

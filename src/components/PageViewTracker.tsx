@@ -13,12 +13,17 @@ export default function PageViewTracker() {
     const path = analyticsPath(pathname);
     if (!path) { currentView.current = null; return; }
     function record(kind: 'view' | 'phone' | 'whatsapp' = 'view') {
-      if (getCookieConsent() !== 'all') return;
       try {
-        let session = sessionStorage.getItem('gb_analytics_session');
+        if (getCookieConsent() !== 'all') {
+          sessionStorage.removeItem('gb_session_id');
+          sessionStorage.removeItem('gb_analytics_source');
+          currentView.current = null;
+          return;
+        }
+        let session = sessionStorage.getItem('gb_session_id');
         if (!session) {
           session = crypto.randomUUID();
-          sessionStorage.setItem('gb_analytics_session', session);
+          sessionStorage.setItem('gb_session_id', session);
         }
         let source = sessionStorage.getItem('gb_analytics_source');
         if (!source) {

@@ -462,6 +462,7 @@ export type Database = {
       }
       gym_traffic_events: {
         Row: {
+          environment: string
           event_id: string
           kind: string
           occurred_at: string
@@ -473,6 +474,7 @@ export type Database = {
           supplier_id: string | null
         }
         Insert: {
+          environment?: string
           event_id: string
           kind: string
           occurred_at?: string
@@ -484,6 +486,7 @@ export type Database = {
           supplier_id?: string | null
         }
         Update: {
+          environment?: string
           event_id?: string
           kind?: string
           occurred_at?: string
@@ -1367,11 +1370,11 @@ export type Database = {
     Functions: {
       catalog_market: { Args: { country: string }; Returns: string }
       record_gymbuilder_event: {
-        Args: { p_event_id: string; p_path: string; p_session_hash: string; p_kind: string; p_source: string; p_actor_id?: string }
+        Args: { p_event_id: string; p_path: string; p_session_hash: string; p_kind: string; p_source: string; p_actor_id?: string; p_environment?: string; p_session_id?: string }
         Returns: boolean
       }
       gymbuilder_detailed_report: {
-        Args: { p_user_id: string; p_days?: number; p_day?: string }
+        Args: { p_user_id: string; p_days?: number; p_day?: string; p_environment?: string }
         Returns: Json
       }
       record_public_page_view: {
@@ -1416,6 +1419,14 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      record_traffic_view: {
+        Args: { p_event_id: string; p_session_id: string; p_path: string; p_environment: string; p_actor_id?: string | null }
+        Returns: boolean
+      }
+      traffic_summary: {
+        Args: { p_days: number; p_environment: string; p_supplier_id?: string | null }
+        Returns: Json
       }
       supplier_product_analytics: {
         Args: { p_supplier_id: string }

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { randomUUID, createHmac } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import { api, db, origin, fixtureUser, fixtureSupplier, fixtureProduct, cleanupUsers, login } from './helpers.mjs';
 
@@ -18,7 +18,7 @@ test('navigation retries are idempotent while revisits count and legacy product 
   assert.equal(summary.totals.views, 2); assert.equal(summary.totals.sessions, 1);
   assert.equal(summary.sources[0].source, 'instagram'); assert.equal(summary.hourly.reduce((n,h) => n+h.views,0), 2);
   const { analytics } = await (await api('/api/supplier/analytics', { cookie: await login(supplier) })).json();
-  assert.equal(analytics[0].views_total, 1);
+  assert.equal(analytics.find(row=>row.product_id===product.id)?.views_total ?? 0, 0); // Development must not increase production lifetime counters.
 });
 
 test('reports isolate supplier actions and count enquiries as records rather than clicks', async t => {
@@ -31,7 +31,9 @@ test('reports isolate supplier actions and count enquiries as records rather tha
   const response = await api(`/api/analytics/report?days=7&supplier_id=${other.supplierId}`, { cookie: await login(supplier) });
   assert.equal(response.status, 200); assert.match(response.headers.get('cache-control'), /no-store/);
   const { summary } = await response.json();
-  assert.deepEqual(summary.actions, { phone: 1, whatsapp: 1 }); assert.equal(summary.business.requests, 1);
+  assert.deepEqual(summary.actions, { phone: 1, whatsapp: 1 }); assert.equal(summary.business.requests, null);
+  const live = await db.rpc('gymbuilder_detailed_report', {p_user_id:supplier.id,p_environment:'production',p_days:7});
+  assert.equal(live.error,null); assert.equal(live.data.business.requests,1);
   assert.equal(summary.business.projects_created, null); assert.equal(summary.business.messages, null);
   assert.ok(summary.recent.every(r => r.path === path)); assert.equal(summary.recent.length, 2);
   assert.equal(summary.totals.views, 0); assert.equal(summary.daily.length, 7); assert.equal(summary.hourly.length, 24);
@@ -42,6 +44,9 @@ test('private reports and event collection enforce role, consent, publication an
   const supplier = await fixtureSupplier(), client = await fixtureUser(); t.after(() => cleanupUsers([supplier,client]));
   const cookie = await login(supplier), path = `/suppliers/${supplier.supplierId}`, session = randomUUID();
   assert.equal((await api('/api/analytics/report')).status, 401);
+  const legacy=await fetch(`${origin}/api/analytics/views`,{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify({path,session_id:session,consent:'all'})});
+  assert.equal((await legacy.json()).recorded,false);
+  assert.equal((await api('/api/analytics/summary',{cookie})).status,503);
   assert.equal((await api('/api/analytics/report', { cookie: await login(client) })).status, 403);
   assert.equal((await (await event(path, session, { consent: 'essential' })).json()).recorded, false);
   assert.equal((await event(path, session, { source: 'private@example.test' })).status, 400);
@@ -66,10 +71,9 @@ test('hourly reporting uses Bucharest calendar days including the daylight-savin
   const supplier = await fixtureSupplier(); t.after(() => cleanupUsers([supplier]));
   const cookie = await login(supplier), session = randomUUID(), path = `/suppliers/${supplier.supplierId}`;
   await event(path,session);
-  const hash = createHmac('sha256',process.env.SUPABASE_SERVICE_ROLE_KEY).update(`analytics:${session}`).digest('hex');
-  const updated = await db.from('gym_traffic_events').update({ occurred_at: `${transitionDay}T00:20:00Z` }).eq('session_hash',hash);
+  const updated = await db.from('traffic_views').update({ viewed_at: `${transitionDay}T00:20:00Z` }).eq('session_id',session);
   assert.equal(updated.error,null);
-  const second = await db.from('gym_traffic_events').insert({ event_id:randomUUID(), path,kind:'view',source:'instagram',session_hash:hash,scope:'supplier',supplier_id:supplier.supplierId,occurred_at:`${transitionDay}T01:20:00Z` });
+  const second = await db.from('traffic_views').insert({ environment:'development',event_id:randomUUID(),path,session_id:session,supplier_id:supplier.supplierId,viewed_at:`${transitionDay}T01:20:00Z` });
   assert.equal(second.error,null);
   const { summary } = await (await api(`/api/analytics/report?days=90&day=${transitionDay}`,{cookie})).json();
   assert.equal(summary.timezone,'Europe/Bucharest'); assert.equal(summary.hourly.find(h=>h.hour===3).views,2);
@@ -80,10 +84,12 @@ test('hourly reporting uses Bucharest calendar days including the daylight-savin
 test('admin project results come from persisted projects with an explicit completion status', async t => {
   const admin = await fixtureUser('admin'), client = await fixtureUser(); t.after(()=>cleanupUsers([admin,client]));
   const cookie = await login(admin);
-  const before = (await (await api('/api/analytics/report',{cookie})).json()).summary.business;
+  const report=async()=>{const result=await db.rpc('gymbuilder_detailed_report',{p_user_id:admin.id,p_environment:'production'}); assert.equal(result.error,null); return result.data.business;};
+  const before = await report();
+  assert.equal((await (await api('/api/analytics/report?environment=production',{cookie})).json()).summary.business.projects_created,null);
   const inserted = await db.from('gym_projects').insert(['draft','completed'].map(status=>({ client_id:client.id,variant:'from_scratch',total_area:300,length_m:20,width_m:15,zones:[],status })));
   assert.equal(inserted.error,null);
-  const after = (await (await api('/api/analytics/report',{cookie})).json()).summary.business;
+  const after = await report();
   assert.equal(after.projects_created,before.projects_created+2); assert.equal(after.projects_completed,before.projects_completed+1);
 });
 
@@ -100,12 +106,33 @@ test('Bucharest midnight and closed-open period boundaries are correct for every
     const cookie = await login(supplier), session = randomUUID(), path = `/suppliers/${supplier.supplierId}`;
     const startDay = shifted(-(days-1)), start = midnight(startDay), end = midnight(shifted(1));
     await event(path,session);
-    const hash = createHmac('sha256',process.env.SUPABASE_SERVICE_ROLE_KEY).update(`analytics:${session}`).digest('hex');
-    assert.equal((await db.from('gym_traffic_events').update({occurred_at:new Date(start).toISOString()}).eq('session_hash',hash)).error,null);
-    assert.equal((await db.from('gym_traffic_events').insert([start-1,end].map(time=>({event_id:randomUUID(),path,kind:'view',source:'instagram',session_hash:hash,scope:'supplier',supplier_id:supplier.supplierId,occurred_at:new Date(time).toISOString()})))).error,null);
+      assert.equal((await db.from('traffic_views').update({viewed_at:new Date(start).toISOString()}).eq('session_id',session)).error,null);
+    assert.equal((await db.from('traffic_views').insert([start-1,end].map(time=>({environment:'development',event_id:randomUUID(),path,session_id:session,supplier_id:supplier.supplierId,viewed_at:new Date(time).toISOString()})))).error,null);
     const response = await api(`/api/analytics/report?days=${days}&day=${startDay}`,{cookie});
     assert.equal(response.status,200);
     const {summary}=await response.json();
     assert.equal(summary.totals.views,1); assert.equal(summary.daily[0].views,1); assert.equal(summary.hourly[0].views,1);
   }
+});
+
+
+test('production events retain both current lifetime history and the legacy daily report without double counting', async t=>{
+  const supplier=await fixtureSupplier(); t.after(()=>cleanupUsers([supplier]));
+  const product=await fixtureProduct(supplier.supplierId), session=randomUUID(), path=`/products/${product.id}`;
+  const {createHmac}=await import('node:crypto');
+  const hash=createHmac('sha256',process.env.SUPABASE_SERVICE_ROLE_KEY).update(`analytics:${session}`).digest('hex');
+  for(let n=0;n<2;n++) {
+    const result=await db.rpc('record_gymbuilder_event',{p_event_id:randomUUID(),p_session_id:session,p_session_hash:hash,p_path:path,p_kind:'view',p_source:'facebook',p_environment:'production'});
+    assert.equal(result.error,null); assert.equal(result.data,true);
+  }
+  const report=await db.rpc('gymbuilder_detailed_report',{p_user_id:supplier.id,p_environment:'production'});
+  assert.equal(report.data.totals.views,2); assert.equal(report.data.totals.sessions,1);
+  const legacy=await db.rpc('gymbuilder_traffic_summary',{p_user_id:supplier.id,p_days:7});
+  assert.equal(legacy.error,null); assert.equal(legacy.data.totals.views,1);
+  const history=await db.from('product_views').select('id',{count:'exact'}).eq('product_id',product.id);
+  assert.equal(history.error,null); assert.equal(history.count,1);
+  const preview=await db.rpc('record_gymbuilder_event',{p_event_id:randomUUID(),p_session_id:session,p_session_hash:hash,p_path:path,p_kind:'phone',p_source:'facebook',p_environment:'preview'});
+  assert.equal(preview.error,null);
+  const live=await db.rpc('gymbuilder_detailed_report',{p_user_id:supplier.id,p_environment:'production'});
+  assert.equal(live.data.actions.phone,0);
 });
