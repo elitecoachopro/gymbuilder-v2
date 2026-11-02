@@ -460,6 +460,71 @@ export type Database = {
           },
         ]
       }
+      gym_traffic_events: {
+        Row: {
+          event_id: string
+          kind: string
+          occurred_at: string
+          path: string
+          product_id: string | null
+          scope: string
+          session_hash: string
+          source: string
+          supplier_id: string | null
+        }
+        Insert: {
+          event_id: string
+          kind: string
+          occurred_at?: string
+          path: string
+          product_id?: string | null
+          scope: string
+          session_hash: string
+          source: string
+          supplier_id?: string | null
+        }
+        Update: {
+          event_id?: string
+          kind?: string
+          occurred_at?: string
+          path?: string
+          product_id?: string | null
+          scope?: string
+          session_hash?: string
+          source?: string
+          supplier_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gym_traffic_events_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gym_traffic_events_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "public_catalog_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gym_traffic_events_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "public_supplier_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gym_traffic_events_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -1301,6 +1366,14 @@ export type Database = {
     }
     Functions: {
       catalog_market: { Args: { country: string }; Returns: string }
+      record_gymbuilder_event: {
+        Args: { p_event_id: string; p_path: string; p_session_hash: string; p_kind: string; p_source: string; p_actor_id?: string }
+        Returns: boolean
+      }
+      gymbuilder_detailed_report: {
+        Args: { p_user_id: string; p_days?: number; p_day?: string }
+        Returns: Json
+      }
       record_public_page_view: {
         Args: { p_path: string; p_session_hash: string; p_actor_id?: string }
         Returns: boolean

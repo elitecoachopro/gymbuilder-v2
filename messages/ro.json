@@ -285,7 +285,7 @@
     "cookieConsent": "Stochează preferința de consimțământ cookie (localStorage)",
     "cookiePersistent": "Persistent",
     "s2_2Title": "2.2 Cookie-uri de analiză (analytics)",
-    "s2_2Text": "Contoarele Gym Builder folosesc un identificator aleator în sessionStorage pentru a număra paginile publice vizitate. Identificatorul este transformat pe server într-un hash; rapoartele afișează totaluri și sesiuni, fără emailuri, termeni de căutare sau linkuri cu tokenuri. O pagină se numără o singură dată pe sesiune și zi UTC. <strong class=\"text-white\">Analiza se activează numai cu acordul dumneavoastră explicit.</strong>",
+    "s2_2Text": "Contoarele Gym Builder folosesc un identificator aleator în sessionStorage pentru a număra paginile publice vizitate. Identificatorul este transformat pe server într-un hash; rapoartele afișează totaluri și sesiuni, fără emailuri, termeni de căutare sau linkuri cu tokenuri. Raportul detaliat numără accesările, categoriile de surse (de exemplu Facebook sau Instagram) și apăsările pe linkuri de telefon ori WhatsApp. Nu colectează numerele apelate sau conținutul mesajelor. Istoricul produselor păstrează numărarea unică pe sesiune și zi UTC. <strong class=\"text-white\">Analiza se activează numai cu acordul dumneavoastră explicit.</strong>",
     "analyticsScope": "Vizualizări ale paginilor, profilurilor furnizorilor și produselor",
     "analyticsSession": "Identificator în sessionStorage: sesiunea filei; statistici păstrate pe server",
     "s2_3Title": "2.3 Cookie-uri de marketing",

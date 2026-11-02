@@ -1,3 +1,5 @@
+import type { TrafficSource } from './traffic-attribution';
+
 const publicPages = new Set([
   '/', '/products', '/suppliers', '/pricing', '/about', '/faq', '/contact',
   '/consultation', '/cum-functioneaza', '/construieste-sala', '/configurator',
@@ -21,4 +23,14 @@ export interface TrafficSummary {
   totals: { views: number; sessions: number; profile_views: number; product_views: number };
   daily: { day: string; views: number; sessions: number }[];
   pages: { path: string; views: number }[];
+}
+
+export interface DetailedTrafficReport extends TrafficSummary {
+  day: string;
+  timezone: string;
+  hourly: { hour: number; views: number }[];
+  sources: { source: TrafficSource; views: number; sessions: number }[];
+  actions: { phone: number; whatsapp: number };
+  business: { projects_created: number | null; projects_completed: number | null; requests: number; messages: number | null };
+  recent: { path: string; kind: 'view' | 'phone' | 'whatsapp'; source: TrafficSource; occurred_at: string }[];
 }

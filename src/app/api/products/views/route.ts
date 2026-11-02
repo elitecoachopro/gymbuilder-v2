@@ -1,3 +1,3 @@
-import { recordPageView } from '@/lib/analytics-server';
+import { recordTraffic } from '@/lib/analytics-server';
 
-export async function POST(request: Request) { return recordPageView(request, true); }
+export async function POST(request: Request) { return recordTraffic(request, 'legacy-product'); }
