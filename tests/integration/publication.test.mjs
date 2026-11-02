@@ -26,10 +26,13 @@ test('active variants from an unapproved supplier are not public', async t => {
 test('promotions and views respect the supplier and product publication boundary', async t => {
   const supplier = await fixtureSupplier('pending'); t.after(() => cleanupUsers([supplier]));
   const product = await fixtureProduct(supplier.supplierId);
-  const { db, api } = await import('./helpers.mjs');
+  const { db } = await import('./helpers.mjs');
   const promotionStart = Date.now() - 1000;
   const { data: promotion, error } = await db.from('promotions').insert({ supplier_id: supplier.supplierId, product_id: product.id, title: 'Private promotion', price_eur: 90, type: 'oferta_zilei', status: 'active', starts_at: new Date(promotionStart).toISOString(), ends_at: new Date(promotionStart+86400000).toISOString() }).select('id').single();
   assert.ifError(error);
   const { data: visible } = await db.from('public_promotions').select('id').eq('id',promotion.id); assert.equal(visible.length,0);
-  const view = await api('/api/products/views',{body:{product_id:product.id,session_id:'audit-private-view'}});assert.equal(view.status,404);
+  const { origin } = await import('./helpers.mjs');
+  const view = await fetch(`${origin}/api/products/views`, { method: 'POST', headers: { origin, 'content-type': 'application/json' }, body: JSON.stringify({ product_id: product.id, session_id: 'audit-private-view', consent: 'all' }) });
+  assert.equal(view.status, 200);
+  assert.equal((await view.json()).recorded, false);
 });

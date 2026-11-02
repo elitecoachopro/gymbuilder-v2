@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-02",
+  "unitTests": 162,
+  "integrationTests": 15,
+  "focusedSupplierIsolationTest": "passed independently after review finding 1 fixed",
+  "lint": "passed",
+  "typecheck": "passed",
+  "build": "passed",
+  "browser": {
+    "admin": {
+      "views": 3,
+      "sessions": 1,
+      "profileViews": 1,
+      "productViews": 1
+    },
+    "supplier": {
+      "views": 2,
+      "sessions": 1,
+      "profileViews": 1,
+      "productViews": 1
+    },
+    "widths": [
+      1280,
+      390
+    ],
+    "horizontalOverflow": false,
+    "languages": [
+      "ro",
+      "en"
+    ],
+    "actualPhysicalPhone": false
+  },
+  "review": {
+    "status": "complete",
+    "runId": "20261102-061825-356c70cc",
+    "findingsFixed": [
+      1
+    ],
+    "unresolvedFindings": []
+  },
+  "migration": "Applied additively in transaction; existing data retained",
+  "productionBaseline": "dpl_7uBwCipCQgfYAvxjRVF5c5RaSM1x"
+}

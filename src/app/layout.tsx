@@ -8,6 +8,7 @@ import '@fontsource/barlow-condensed/700.css';
 import './globals.css';
 import GlobalHeader from '@/components/layout/GlobalHeader';
 import CookieConsent from '@/components/CookieConsent';
+import PageViewTracker from '@/components/PageViewTracker';
 import FloatingChatButton from '@/components/FloatingChatButton';
 import { cookies } from 'next/headers';
 import { LocaleProvider } from '@/i18n/LocaleProvider';
@@ -42,6 +43,7 @@ export default async function RootLayout({
             {children}
           </div>
           <CookieConsent />
+          <PageViewTracker />
           <FloatingChatButton />
         </LocaleProvider>
       </body>

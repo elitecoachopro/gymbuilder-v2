@@ -1,6 +1,7 @@
 'use client';
 
 import Modal from '@/components/Modal';
+import TrafficCounters from '@/components/TrafficCounters';
 import SupplierPublicContactEmail from '@/components/SupplierPublicContactEmail';
 import SuperPricePromotion, { SuperPriceRequest } from '@/components/SuperPricePromotion';
 import type { PromotionAvailability } from '@/lib/promotions';
@@ -695,7 +696,8 @@ export default function SupplierDashboard() {
           )}
 
           {/* Analytics Section */}
-          <div id="analytics" className="mb-8">
+          <div id="analytics" className="mb-8 scroll-mt-[calc(var(--app-header-height)+1rem)]">
+            <TrafficCounters audience="supplier" />
             <div className="flex items-center gap-3 mb-5">
               <BarChart3 className="w-5 h-5 text-gold-400" />
               <h2 className="text-xl font-bold text-white">{t('analytics.title')}</h2>

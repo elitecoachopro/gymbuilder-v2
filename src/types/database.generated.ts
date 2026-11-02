@@ -563,6 +563,68 @@ export type Database = {
           },
         ]
       }
+      page_views: {
+        Row: {
+          id: number
+          path: string
+          product_id: string | null
+          scope: string
+          session_hash: string
+          supplier_id: string | null
+          viewed_at: string
+          viewed_on: string
+        }
+        Insert: {
+          id?: never
+          path: string
+          product_id?: string | null
+          scope: string
+          session_hash: string
+          supplier_id?: string | null
+          viewed_at?: string
+          viewed_on?: string
+        }
+        Update: {
+          id?: never
+          path?: string
+          product_id?: string | null
+          scope?: string
+          session_hash?: string
+          supplier_id?: string | null
+          viewed_at?: string
+          viewed_on?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_views_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_views_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "public_catalog_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_views_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "public_supplier_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_views_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_variants: {
         Row: {
           created_at: string
@@ -1239,6 +1301,14 @@ export type Database = {
     }
     Functions: {
       catalog_market: { Args: { country: string }; Returns: string }
+      record_public_page_view: {
+        Args: { p_path: string; p_session_hash: string; p_actor_id?: string }
+        Returns: boolean
+      }
+      gymbuilder_traffic_summary: {
+        Args: { p_user_id: string; p_days?: number }
+        Returns: Json
+      }
       consume_request_quota: {
         Args: { p_key_hash: string; p_limit: number; p_window_ms: number }
         Returns: Json
