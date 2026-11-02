@@ -104,26 +104,6 @@ export default function ProductDetailPage() {
     const controller = new AbortController();
     setError('');
     setProduct(null); setVariants([]); setReviews([]); setSelectedVariant(null); setSelectedImage(0);
-    function trackView(pid: string) {
-      // Generate or retrieve a session ID from sessionStorage
-      let sessionId = '';
-      try {
-        sessionId = sessionStorage.getItem('gb_session_id') || '';
-        if (!sessionId) {
-          sessionId = crypto.randomUUID();
-          sessionStorage.setItem('gb_session_id', sessionId);
-        }
-      } catch {
-        sessionId = Math.random().toString(36).slice(2);
-      }
-      // Fire-and-forget view tracking
-      fetch('/api/products/views', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product_id: pid, session_id: sessionId }),
-      }).catch(() => {});
-    }
-
     async function fetchVariants() {
       try {
         const res = await fetch(`/api/supplier/products/variants?product_id=${productId}`, { signal: controller.signal });
@@ -176,7 +156,6 @@ export default function ProductDetailPage() {
     }
     fetchProduct();
     fetchVariants();
-    trackView(productId);
     return () => controller.abort();
   }, [productId]);
 

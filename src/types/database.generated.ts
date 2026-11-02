@@ -1274,6 +1274,14 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      record_traffic_view: {
+        Args: { p_event_id: string; p_session_id: string; p_path: string; p_environment: string; p_actor_id?: string | null }
+        Returns: boolean
+      }
+      traffic_summary: {
+        Args: { p_days: number; p_environment: string; p_supplier_id?: string | null }
+        Returns: Json
+      }
       supplier_product_analytics: {
         Args: { p_supplier_id: string }
         Returns: Json

@@ -1,3 +1,5 @@
+import { analyticsEnvironment } from '@/lib/analytics/server';
+import { getSessionUser } from '@/lib/session-server';
 import type { Database } from '@/types/database.generated';
 import { localizedJson } from '@/lib/json-response';
 import { NextRequest } from 'next/server';
@@ -22,8 +24,13 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabase();
 
-    const { data: product } = await supabase.from('products').select('id, supplier_profiles!inner(status)').eq('id', product_id).in('status', ['active', 'featured']).eq('supplier_profiles.status', 'approved').maybeSingle();
+    const { data: product } = await supabase.from('products').select('id, supplier_profiles!inner(status,user_id)').eq('id', product_id).in('status', ['active', 'featured']).eq('supplier_profiles.status', 'approved').maybeSingle();
     if (!product) return await localizedJson({ error: 'Produs negăsit.' }, { status: 404 });
+
+    // Preview/development traffic must never alter the live legacy counters.
+    if (analyticsEnvironment() !== 'production') return localizedJson({ recorded: false, reason: 'isolated_environment' });
+    const actor = await getSessionUser();
+    if (actor?.userId === product.supplier_profiles.user_id) return localizedJson({ recorded: false, reason: 'own_product' });
 
     // Use upsert with the unique constraint on (product_id, session_id)
     // This ensures only one view per session per product

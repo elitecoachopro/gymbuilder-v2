@@ -1,4 +1,5 @@
 'use client';
+import TrafficStats from '@/components/TrafficStats';
 
 import Modal from '@/components/Modal';
 import SupplierPublicContactEmail from '@/components/SupplierPublicContactEmail';
@@ -693,6 +694,8 @@ export default function SupplierDashboard() {
               </div>
             </div>
           )}
+
+          <TrafficStats audience="supplier" />
 
           {/* Analytics Section */}
           <div id="analytics" className="mb-8">
