@@ -122,3 +122,13 @@ The isolated fixture at `/chat-check` renders the real shared RequestChat with m
 - Toggle slowPost and Send: Send and Reload must remain disabled while pending. After success, reload and confirm the message remains exactly once.
 
 For full integration tests against `next start`, the loopback-only test server must explicitly use `TRUSTED_PROXY_IP_HEADER=x-forwarded-for`, matching the simulated client IP headers emitted by tests/integration/helpers.mjs. This is a test-proxy configuration, never an automatic production setting. Without a trusted proxy header, production intentionally aggregates untrusted requests and the rapid fixture suite reaches its real rate limits. Keep external email, payment and live AI credentials disabled in this isolated server.
+
+## Traffic consent lifecycle
+
+Start the full application on `127.0.0.1:3042` against local Supabase, then start this fixture on a fresh origin:
+
+```sh
+node node_modules/next/dist/bin/next dev tests/browser --hostname 127.0.0.1 --port 3104
+```
+
+Open `/products`. It mounts the real TrafficTracker and CookieConsent; its POST proxy forwards to the real local application API and database. The journal records actual response status/recorded values, not simulated successes. Before consent the journal is empty. Accept all: one recorded event. Follow the supplier link: a second event with the same session. Reload: another event with the same session. Revoke using the fixture-only control, then navigate: no new event. The controls and proxy remain under tests/ and are excluded from deployment. Stop the fixture and full application afterwards. No hosted services, customer accounts or payment/email providers are used.

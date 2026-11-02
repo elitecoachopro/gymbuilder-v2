@@ -1,6 +1,7 @@
 'use client';
 import type { Database } from '@/types/database.generated';
 import Modal from '@/components/Modal';
+import TrafficStats from '@/components/TrafficStats';
 
 import { logoutClient } from '@/lib/logout-client';
 import { useUiText } from '@/i18n/useUiText';
@@ -640,6 +641,8 @@ export default function AdminDashboard() {
               </button>
             </div>
           </div>
+
+          <TrafficStats audience="admin" />
 
           {/* Section Switch */}
           <div className="flex gap-1 bg-anthracite-900 rounded-lg p-1 mb-6 w-full sm:w-fit overflow-x-auto">

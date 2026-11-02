@@ -70,7 +70,7 @@ export default function CookiePolicyPage() {
                   </thead>
                   <tbody className="divide-y divide-anthracite-700">
                     <tr>
-                      <td className="px-4 py-2">Vercel Analytics</td>
+                      <td className="px-4 py-2">GymBuilder · gb_session_id (sessionStorage)</td>
                       <td className="px-4 py-2">{t('analyticsScope')}</td>
                       <td className="px-4 py-2">{t('analyticsSession')}</td>
                     </tr>
