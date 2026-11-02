@@ -13,3 +13,7 @@ The current live baseline is PR4 (`7c9600c`), which already uses `traffic_views`
 167 unit tests and 18 scoped integration tests passed. Lint and typecheck passed. Tests cover retry deduplication, revisits, supplier isolation, source validation, consent, anonymous access, Bucharest midnight for all four periods, repeated DST hour, persisted project outcomes, production/preview separation and compatibility with lifetime/daily histories. Full review `20261102-detail-ca954a01` plus incremental reconciliation review completed; findings were fixed and checked. Mobile width 390 and desktop were inspected in the browser in Romanian/English; physical phone and authenticated production usage remain unverified.
 
 No production test accounts or messages were created. Temporary local fixtures are removed after verification. Source files unrelated to analytics (existing email sender and mobile billing work) are excluded from commits.
+
+## Published
+
+Live at https://www.gymbuilder.app/statistici (application sign-in required). Deployment `dpl_EWvuvcPBeUv5rS8aJGLtK5k8sVU3`, source `a35341c`, PR #5. Public homepage, health and studio return 200; private report returns login redirect and both analytics endpoints return 401 anonymously. Production table/RPC privileges explicitly deny anonymous access. Local fixture accounts and temporary configuration were removed, and only test server3104 was stopped.

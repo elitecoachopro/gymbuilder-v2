@@ -1,0 +1,12 @@
+{
+  "deployment_id": "dpl_EWvuvcPBeUv5rS8aJGLtK5k8sVU3",
+  "deployment_url": "https://gymbuilder-v2-gh17zxhee-elitecoachopros-projects.vercel.app",
+  "live_url": "https://www.gymbuilder.app/statistici",
+  "source_commit": "a35341c",
+  "baseline_commit": "7c9600cc453d8526904b5f81b5c5ffb774e160e0",
+  "previous_deployment": "dpl_958aDLZxdeagXwE45F4bLx6j16ri",
+  "pull_request": "https://github.com/elitecoachopro/gymbuilder-v2/pull/5",
+  "migration_applied": "20261102000200_detailed_traffic_report.sql",
+  "production_data_deleted": false,
+  "fonts_and_configurator_changed": false
+}

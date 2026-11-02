@@ -1,0 +1,58 @@
+[
+  {
+    "path": "/",
+    "status": 200,
+    "location": null,
+    "bytes": 50116
+  },
+  {
+    "path": "/api/health",
+    "status": 200,
+    "location": null,
+    "bytes": 235,
+    "health": {
+      "status": "healthy",
+      "timestamp": "2026-11-02T17:01:15.539Z",
+      "version": "1.0.0",
+      "checks": {
+        "environment": {
+          "status": "ok"
+        },
+        "database": {
+          "status": "ok"
+        },
+        "email": {
+          "status": "ok"
+        },
+        "payments": {
+          "status": "skipped",
+          "message": "Stripe not configured"
+        }
+      }
+    }
+  },
+  {
+    "path": "/statistici",
+    "status": 307,
+    "location": "/login?redirect=%2Fstatistici",
+    "bytes": 10793
+  },
+  {
+    "path": "/api/analytics/report",
+    "status": 401,
+    "location": null,
+    "bytes": 24
+  },
+  {
+    "path": "/api/analytics",
+    "status": 401,
+    "location": null,
+    "bytes": 36
+  },
+  {
+    "path": "/configurator/studio",
+    "status": 200,
+    "location": null,
+    "bytes": 57579
+  }
+]

@@ -1,5 +1,5 @@
 {
-  "status": "verified locally; publication pending",
+  "status": "published; live unauthenticated smoke checks passed",
   "date": "2026-11-02",
   "baseline": "7c9600cc453d8526904b5f81b5c5ffb774e160e0",
   "unit_tests": 167,
@@ -37,5 +37,9 @@
     "Legacy source metadata unavailable; represented as unknown",
     "Completed projects are current completed status among projects created in period",
     "No live authenticated account available for browser test"
-  ]
+  ],
+  "production_build": "passed",
+  "cleanup": "three local fixture accounts removed; port3104 stopped; temporary env removed",
+  "live_authenticated_browser": "not tested; no live account session",
+  "production_schema": "new table and RPCs present; anonymous table and RPC access false"
 }
