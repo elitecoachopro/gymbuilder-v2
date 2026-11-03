@@ -1,0 +1,45 @@
+{
+  "status": "published; live unauthenticated smoke checks passed",
+  "date": "2026-11-02",
+  "baseline": "7c9600cc453d8526904b5f81b5c5ffb774e160e0",
+  "unit_tests": 167,
+  "integration_tests": 18,
+  "lint": "passed",
+  "typecheck": "passed",
+  "browser": {
+    "admin_and_supplier": "local fixtures",
+    "mobile_width": 390,
+    "horizontal_overflow": false,
+    "languages": [
+      "ro",
+      "en"
+    ],
+    "date_error_recovery": "verified",
+    "physical_device": false
+  },
+  "review": {
+    "initial_run": "20261102-detail-ca954a01",
+    "followup": "completed read-only reconciliation review; no remaining defect",
+    "resolved": [
+      "Persistent date control during errors",
+      "DST fixture expiration guarded and always-on boundaries added",
+      "Legacy writes blocked outside production",
+      "Production-only daily page report bridge without product double count",
+      "HMAC retained for event metadata",
+      "Duplicate supplier report mount removed"
+    ],
+    "contract_resolution": "Preserve already-published PR4 lifetime product session counts; earlier PR3 daily product semantics superseded."
+  },
+  "limitations": [
+    "Only analytics-consenting public visits measured",
+    "Phone and WhatsApp clicks are intents, not confirmed calls/messages",
+    "Sessions are browser tabs, not identified persons",
+    "Legacy source metadata unavailable; represented as unknown",
+    "Completed projects are current completed status among projects created in period",
+    "No live authenticated account available for browser test"
+  ],
+  "production_build": "passed",
+  "cleanup": "three local fixture accounts removed; port3104 stopped; temporary env removed",
+  "live_authenticated_browser": "not tested; no live account session",
+  "production_schema": "new table and RPCs present; anonymous table and RPC access false"
+}

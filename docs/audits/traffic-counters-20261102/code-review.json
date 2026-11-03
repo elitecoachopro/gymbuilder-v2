@@ -1,0 +1,206 @@
+{
+  "status": "complete",
+  "verdict": "Ready with fixes",
+  "scope": {
+    "base": "HEAD",
+    "branch": "main",
+    "head_sha": "a6fe3e45b7259ef56c23fd7ba0ab1affb60b51a7",
+    "pr_url": null,
+    "files_changed": 22
+  },
+  "intent": "Administrators monitor public page views and unique tab sessions; suppliers monitor only their own profile/product traffic. Use 7/30/90 UTC days, one view per path/session/day, all consent, hashed session IDs, public paths only, exclude admin/self visits, and preserve legacy product history. Verified server sessions authorize reports; service_role alone calls SQL RPCs. Migration additive and not deployed.",
+  "intent_confidence": "explicit",
+  "reviewers": [
+    "correctness",
+    "testing",
+    "maintainability",
+    "security",
+    "performance",
+    "api-contract",
+    "data-migration",
+    "reliability",
+    "adversarial",
+    "julik-frontend-races"
+  ],
+  "findings": [
+    {
+      "#": 1,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "evidence": [
+        "tests/integration/traffic-counters.test.mjs:59 --   assert.equal(summary.totals.views, 2); assert.equal(summary.totals.profile_views, 1); assert.equal(summary.totals.product_views, 1);",
+        "tests/integration/traffic-counters.test.mjs:43 --   const responses = await Promise.all(Array.from({ length: 8 }, () => record(`/products/${product.id}`, id)));",
+        "tests/integration/traffic-counters.test.mjs:53 --   assert.equal((await (await record(`/suppliers/${supplier.supplierId}`, id)).json()).recorded, true);",
+        "tests/integration/traffic-counters.test.mjs:54 --   assert.equal((await (await record(`/suppliers/${other.supplierId}`, id)).json()).recorded, true);"
+      ],
+      "file": "tests/integration/traffic-counters.test.mjs",
+      "first_evidence": "tests/integration/traffic-counters.test.mjs:59 --   assert.equal(summary.totals.views, 2); assert.equal(summary.totals.profile_views, 1); assert.equal(summary.totals.product_views, 1);",
+      "independent_reviewers": [
+        "testing"
+      ],
+      "line": 59,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "testing"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Create a separate supplier/product fixture for the summary test and record its product view with a second session inside that test before checking totals. Verify both the full file and the isolated --test-name-pattern run.",
+      "title": "Make supplier summary test independent of preceding test",
+      "why_it_matters": "Running the supplier isolation test alone with --test-name-pattern fails against correct production code. It creates one view for its supplier but expects two views, a product view, and a second session created by the preceding concurrency test. Seed those records within an independent fixture so focused supplier-isolation checks work.",
+      "validation_status": "confirmed",
+      "validation_reason": "Selecting the supplier summary test alone records only its supplier profile view at traffic-counters.test.mjs:53\u201354 but asserts two views, one product and two sessions at :59\u201360; the missing product/session is created only by the preceding test at :41\u201343, and caller reproduction /tmp/gym-analytics-filter-red-20261102.log confirms the isolated run fails at :59 with actual 1 versus expected 2.",
+      "protected_subject": null
+    }
+  ],
+  "actionable_findings": [
+    {
+      "#": 1,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "evidence": [
+        "tests/integration/traffic-counters.test.mjs:59 --   assert.equal(summary.totals.views, 2); assert.equal(summary.totals.profile_views, 1); assert.equal(summary.totals.product_views, 1);",
+        "tests/integration/traffic-counters.test.mjs:43 --   const responses = await Promise.all(Array.from({ length: 8 }, () => record(`/products/${product.id}`, id)));",
+        "tests/integration/traffic-counters.test.mjs:53 --   assert.equal((await (await record(`/suppliers/${supplier.supplierId}`, id)).json()).recorded, true);",
+        "tests/integration/traffic-counters.test.mjs:54 --   assert.equal((await (await record(`/suppliers/${other.supplierId}`, id)).json()).recorded, true);"
+      ],
+      "file": "tests/integration/traffic-counters.test.mjs",
+      "first_evidence": "tests/integration/traffic-counters.test.mjs:59 --   assert.equal(summary.totals.views, 2); assert.equal(summary.totals.profile_views, 1); assert.equal(summary.totals.product_views, 1);",
+      "independent_reviewers": [
+        "testing"
+      ],
+      "line": 59,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "testing"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Create a separate supplier/product fixture for the summary test and record its product view with a second session inside that test before checking totals. Verify both the full file and the isolated --test-name-pattern run.",
+      "title": "Make supplier summary test independent of preceding test",
+      "why_it_matters": "Running the supplier isolation test alone with --test-name-pattern fails against correct production code. It creates one view for its supplier but expects two views, a product view, and a second session created by the preceding concurrency test. Seed those records within an independent fixture so focused supplier-isolation checks work.",
+      "validation_status": "confirmed",
+      "validation_reason": "Selecting the supplier summary test alone records only its supplier profile view at traffic-counters.test.mjs:53\u201354 but asserts two views, one product and two sessions at :59\u201360; the missing product/session is created only by the preceding test at :41\u201343, and caller reproduction /tmp/gym-analytics-filter-red-20261102.log confirms the isolated run fails at :59 with actual 1 versus expected 2.",
+      "protected_subject": null
+    }
+  ],
+  "triage_groups": [],
+  "pre_existing_findings": [],
+  "requirements_completeness": null,
+  "learnings": [],
+  "agent_native_gaps": [],
+  "deployment_notes": [],
+  "residual_risks": [],
+  "testing_gaps": [
+    "PageViewTracker has no checked-in lifecycle tests for denied consent, consent granted after mount, revocation before navigation, blocked storage, or listener cleanup on path changes; the supplied browser evidence covers only positive consent.",
+    "Traffic tests do not seed historical viewed_on values: the UTC next-day deduplication behavior and inclusive 7/30/90-day cutoff boundaries remain unverified.",
+    "The legacy history test starts with an empty product_views table for its product, so it proves new traffic mirroring but not preservation and aggregation of pre-existing legacy product history."
+  ],
+  "coverage": {
+    "depth": "full",
+    "notes": [
+      "Full depth mandatory: migrations and large executable diff.",
+      "Project standards not run: no applicable criteria files.",
+      "Review scope is sanitized 22-file snapshot; unrelated canonical user WIP excluded.",
+      "Parent reports 162 unit tests and 14 local HTTP/Supabase integration tests passing; lint/typecheck rerunning and browser positive consent/3-page summary exercised. Reviewers did not rerun DB tests.",
+      "Migration has not been applied to production.",
+      "Untracked node_modules symlink excluded.",
+      "Cross-model pass not run: no different-provider CLI installed (claude, grok, antigravity absent); in-process adversarial reviewer covered the lens.",
+      "Settlement suppression not evaluated: no plan discovered.",
+      "Ten selected reviewers completed; no failed or timed-out reviewers.",
+      "One P2 test-isolation defect admitted; no semantic duplicates, settlement conflicts, or mode-aware demotions.",
+      "Reviewers performed read-only inspection; no database calls or isolated integration execution.",
+      "Caller browser qualification: actual consent + three public pages produced admin 3 views/1 session; supplier 2 views/1 session; desktop and 390px responsive no overflow; RO/EN good.",
+      "Bounded post-snapshot layout-only canonical delta: supplier analytics panel adds scroll-mt-[calc(var(--app-header-height)+1rem)] so anchored title clears header. This receipt reviews original snapshot; no source mutation.",
+      "Caller reproduced isolated supplier summary failure: /tmp/gym-analytics-filter-red-20261102.log."
+    ],
+    "first_evidence_backfilled": 0,
+    "first_evidence_demoted": 0,
+    "suppressed_by_confidence": {},
+    "malformed_findings": 0,
+    "malformed_returns": 0,
+    "mode_aware_demotions": 0,
+    "failed_reviewers": [],
+    "bound_exceeded": [],
+    "semantic_duplicates_merged": 0,
+    "validator": {
+      "batches": 1,
+      "confirmed": 1,
+      "rejected": 0,
+      "unresolved": 0,
+      "malformed": 0,
+      "failed": 0,
+      "shortcut_skipped": 0,
+      "bound_exceeded": false,
+      "protected_subject_reclassifications": 0,
+      "outcome": "One batch landed within the bound; independent inspection and caller isolated-run reproduction confirmed finding #1."
+    },
+    "source_mutations": false,
+    "reviewer_reasons": [
+      {
+        "reviewer": "correctness",
+        "tier": "session",
+        "reason": "always-on"
+      },
+      {
+        "reviewer": "testing",
+        "tier": "mid",
+        "reason": "test changes and new runtime behavior"
+      },
+      {
+        "reviewer": "maintainability",
+        "tier": "mid",
+        "reason": "367 executable non-test lines and new modules"
+      },
+      {
+        "reviewer": "security",
+        "tier": "session",
+        "reason": "public collector, consent, session and role authorization"
+      },
+      {
+        "reviewer": "performance",
+        "tier": "mid",
+        "reason": "SQL aggregation/indexes"
+      },
+      {
+        "reviewer": "api-contract",
+        "tier": "mid",
+        "reason": "new public collection and authenticated summary routes"
+      },
+      {
+        "reviewer": "data-migration",
+        "tier": "mid",
+        "reason": "additive page_views migration and RPC grants"
+      },
+      {
+        "reviewer": "reliability",
+        "tier": "mid",
+        "reason": "storage/fetch failures and error responses"
+      },
+      {
+        "reviewer": "adversarial",
+        "tier": "session",
+        "reason": "persistence, authorization, cross-component session flows"
+      },
+      {
+        "reviewer": "julik-frontend-races",
+        "tier": "mid",
+        "reason": "consent listeners and async tracker/report effects"
+      }
+    ],
+    "not_assessed": [
+      "Project standards: no applicable criteria files",
+      "Agent-native and learnings: no applicable surface or corpus",
+      "Deployment verification: migration is additive and does not meet risky-migration selection gate"
+    ]
+  },
+  "peer": {
+    "outcome": "in-process-fallback",
+    "coverage": "Cross-model pass not run: no different-provider CLI installed (claude, grok, antigravity absent); in-process adversarial reviewer covered the lens."
+  },
+  "verdict_reason": "Make the supplier summary integration test independent and rerun it both alone and with the full file. No production defect was retained from the ten review lenses.",
+  "artifact_path": "/tmp/compound-engineering-501/ce-code-review/20261102-061825-356c70cc",
+  "run_id": "20261102-061825-356c70cc"
+}

@@ -11,8 +11,10 @@ export type CookieConsentValue = 'all' | 'essential' | null;
 
 export function getCookieConsent(): CookieConsentValue {
   if (typeof window === 'undefined') return null;
-  const value = localStorage.getItem(COOKIE_CONSENT_KEY);
-  if (value === 'all' || value === 'essential') return value;
+  try {
+    const value = localStorage.getItem(COOKIE_CONSENT_KEY);
+    if (value === 'all' || value === 'essential') return value;
+  } catch { /* Storage restrictions must not break rendering or enable tracking. */ }
   return null;
 }
 

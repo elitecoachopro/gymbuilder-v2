@@ -1,0 +1,23 @@
+✔ review average covers all verified reviews even when only one is displayed (334.419959ms)
+✔ supplier analytics counts views past the REST 1000-row ceiling (232.651875ms)
+✔ variant limit cannot be bypassed by concurrent inserts (43.063125ms)
+✔ public gallery does not expose unapproved supplier material (184.685833ms)
+✔ public variants respect inactive product visibility (226.91775ms)
+✔ active variants from an unapproved supplier are not public (41.781667ms)
+✔ promotions and views respect the supplier and product publication boundary (145.550375ms)
+✔ traffic reports require an authenticated administrator or supplier (202.712ms)
+✔ consent, public paths and same-origin are enforced before recording (29.163584ms)
+✔ concurrent reloads count one product view and preserve legacy product statistics (73.802334ms)
+✔ supplier counters are isolated and include profiles, products and daily zero buckets (131.968417ms)
+✔ self visits, administrators and unpublished products do not inflate counters (49.893833ms)
+✔ admin totals include public traffic while unsupported periods are rejected (55.562584ms)
+✔ UTC daily deduplication and inclusive reporting boundaries hold across 7, 30 and 90 days (149.893583ms)
+✔ anonymous database clients cannot read visitor records or call private report functions (5.766458ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2250.762041

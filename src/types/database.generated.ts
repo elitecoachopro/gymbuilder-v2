@@ -460,6 +460,74 @@ export type Database = {
           },
         ]
       }
+      gym_traffic_events: {
+        Row: {
+          environment: string
+          event_id: string
+          kind: string
+          occurred_at: string
+          path: string
+          product_id: string | null
+          scope: string
+          session_hash: string
+          source: string
+          supplier_id: string | null
+        }
+        Insert: {
+          environment?: string
+          event_id: string
+          kind: string
+          occurred_at?: string
+          path: string
+          product_id?: string | null
+          scope: string
+          session_hash: string
+          source: string
+          supplier_id?: string | null
+        }
+        Update: {
+          environment?: string
+          event_id?: string
+          kind?: string
+          occurred_at?: string
+          path?: string
+          product_id?: string | null
+          scope?: string
+          session_hash?: string
+          source?: string
+          supplier_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gym_traffic_events_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gym_traffic_events_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "public_catalog_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gym_traffic_events_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "public_supplier_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gym_traffic_events_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -559,6 +627,68 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      page_views: {
+        Row: {
+          id: number
+          path: string
+          product_id: string | null
+          scope: string
+          session_hash: string
+          supplier_id: string | null
+          viewed_at: string
+          viewed_on: string
+        }
+        Insert: {
+          id?: never
+          path: string
+          product_id?: string | null
+          scope: string
+          session_hash: string
+          supplier_id?: string | null
+          viewed_at?: string
+          viewed_on?: string
+        }
+        Update: {
+          id?: never
+          path?: string
+          product_id?: string | null
+          scope?: string
+          session_hash?: string
+          supplier_id?: string | null
+          viewed_at?: string
+          viewed_on?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_views_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_views_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "public_catalog_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_views_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "public_supplier_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "page_views_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1239,6 +1369,22 @@ export type Database = {
     }
     Functions: {
       catalog_market: { Args: { country: string }; Returns: string }
+      record_gymbuilder_event: {
+        Args: { p_event_id: string; p_path: string; p_session_hash: string; p_kind: string; p_source: string; p_actor_id?: string; p_environment?: string; p_session_id?: string }
+        Returns: boolean
+      }
+      gymbuilder_detailed_report: {
+        Args: { p_user_id: string; p_days?: number; p_day?: string; p_environment?: string }
+        Returns: Json
+      }
+      record_public_page_view: {
+        Args: { p_path: string; p_session_hash: string; p_actor_id?: string }
+        Returns: boolean
+      }
+      gymbuilder_traffic_summary: {
+        Args: { p_user_id: string; p_days?: number }
+        Returns: Json
+      }
       consume_request_quota: {
         Args: { p_key_hash: string; p_limit: number; p_window_ms: number }
         Returns: Json

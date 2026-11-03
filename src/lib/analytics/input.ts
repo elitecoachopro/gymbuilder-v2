@@ -1,5 +1,5 @@
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const publicPaths = new Set(['/', '/products', '/suppliers', '/contact', '/about', '/pricing', '/blog', '/faq', '/cum-functioneaza', '/construieste-sala', '/estimator-buget', '/compare', '/consultation']);
+const publicPaths = new Set(['/', '/products', '/suppliers', '/contact', '/about', '/pricing', '/blog', '/faq', '/cum-functioneaza', '/construieste-sala', '/estimator-buget', '/compare', '/consultation', '/configurator', '/configurator/studio']);
 export type AnalyticsTarget = { path: string; kind: 'application' | 'supplier' | 'product'; targetId: string | null };
 
 export function analyticsTarget(path: unknown): AnalyticsTarget | null {
