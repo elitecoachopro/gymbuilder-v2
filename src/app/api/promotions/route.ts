@@ -1,7 +1,8 @@
+import { catalogOfferSelections, type CatalogOfferProduct } from '@/lib/catalog-offers';
 import type { Database } from '@/types/database.generated';
 import { localizedJson } from '@/lib/json-response';
 import { createClient } from '@supabase/supabase-js';
-import type { PromotionListing, PromotionResponse } from '@/lib/promotions';
+import type { CatalogOfferSelections, PromotionListing, PromotionResponse } from '@/lib/promotions';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,8 +44,38 @@ export async function GET() {
       .select('id', { count: 'exact', head: true }).eq('type', 'oferta_zilei')
       .in('status', ['pending', 'active']).lte('starts_at', now).gt('ends_at', now);
     if (reservationError) throw reservationError;
+    let selections: CatalogOfferSelections = {superPret:[],ofertaZilei:[],oferteleSaptamanii:[]};
+    let catalogUnavailable = false;
+    try {
+      const catalog: CatalogOfferProduct[] = [];
+      if (!daily || !weekly.length || !superPrice.length) {
+        let afterId: string | null = null;
+        while (true) {
+          let query = supabase.from('public_catalog_products')
+            .select('id,name,supplier_id,brand_id,brand_name,condition,price_eur,listed_price_amount,listed_price_currency,images,description')
+            .in('status',['active','featured']).order('id',{ascending:true}).limit(batchSize);
+          if (afterId) query = query.gt('id',afterId);
+          const {data: products,error: catalogError} = await query;
+          if (catalogError) throw catalogError;
+          catalog.push(...(products || []));
+          if (!products || products.length < batchSize) break;
+          afterId = products[products.length-1].id;
+          if (!afterId) throw new Error('Invalid catalog cursor');
+        }
+      }
+      const supplierIds = [...new Set(catalog.map(product=>product.supplier_id).filter((id): id is string=>!!id))];
+      const {data: suppliers,error: supplierError} = supplierIds.length
+        ? await supabase.from('supplier_profiles').select('id,company_name,country').eq('status','approved').in('id',supplierIds)
+        : {data:[],error:null};
+      if (supplierError) throw supplierError;
+      selections = catalogOfferSelections(catalog,suppliers || [],Date.parse(now));
+    } catch (catalogError) {
+      catalogUnavailable = true;
+      console.error('Catalog selections unavailable:',catalogError);
+    }
     const occupied = Math.min(1, count || 0);
     const response: PromotionResponse = {
+      catalogSelections: selections, catalogUnavailable,
       ofertaZilei: daily, oferteleSaptamanii: weekly, superPret: superPrice,
       slots: { ofertaZilei: { total: 1, occupied, available: 1 - occupied }, oferteleSaptamanii: { occupied: weekly.length } },
     };

@@ -109,3 +109,24 @@ test('weekly placements beyond the first database page are included once each', 
   assert.equal(mine.length, 501);
   assert.equal(new Set(mine.map(offer => offer.id)).size, 501);
 });
+
+test('catalog rotations only expose published equipment and preserve the source price and manufacturer', async t => {
+  const supplier=await fixtureSupplier(), pending=await fixtureSupplier('pending');
+  t.after(()=>cleanupUsers([supplier,pending]));
+  await fixtureProduct(supplier.supplierId);
+  const hidden=await fixtureProduct(pending.supplierId), inactive=await fixtureProduct(supplier.supplierId,{status:'inactive'});
+  const response=await api('/api/promotions'); assert.equal(response.status,200);
+  const body=await response.json();
+  const selections=Object.values(body.catalogSelections);
+  assert.equal(selections.length,3); assert.ok(selections.every(section=>section.length>0));
+  const cards=selections.flat();
+  assert.ok(cards.every(card=>card.selection==='catalog' && card.product_id!==hidden.id && card.product_id!==inactive.id));
+  const {data:published,error}=await db.from('public_catalog_products').select('id,supplier_id,price_eur,listed_price_amount,listed_price_currency,brand_name').in('id',cards.map(card=>card.product_id));
+  assert.ifError(error);
+  const catalog=new Map(published.map(product=>[product.id,product]));
+  for(const card of cards) {
+    const source=catalog.get(card.product_id); assert.ok(source);
+    assert.equal(card.price_eur,source.price_eur); assert.equal(card.listed_price_amount,source.listed_price_amount); assert.equal(card.listed_price_currency,source.listed_price_currency);
+    assert.equal(card.brand_name,source.brand_name); assert.equal(card.supplier_id,source.supplier_id); assert.equal(card.product.id,source.id);
+  }
+});

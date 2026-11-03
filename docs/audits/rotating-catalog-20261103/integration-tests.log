@@ -1,0 +1,16 @@
+✔ paid promotions enforce exactly 24 hours, 7 days or 12 hours for Super price (112.388875ms)
+✔ Super price publishes new and used products for 12 hours separately from weekly offers (523.645583ms)
+✔ only one daily promotion can reserve an overlapping time, including concurrent reservations (38.106042ms)
+✔ Super price preserves price on request without inventing a zero equipment price (68.952167ms)
+✔ public weekly offers include all active placements, product links and supplier information (61.236208ms)
+✔ a pending daily reservation occupies the slot without publishing its private announcement (59.574083ms)
+✔ weekly placements beyond the first database page are included once each (85.878584ms)
+✔ catalog rotations only expose published equipment and preserve the source price and manufacturer (100.320917ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1184.711833

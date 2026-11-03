@@ -1,0 +1,212 @@
+{
+  "status": "complete",
+  "verdict": "Ready with fixes",
+  "scope": {
+    "base": "603f143755844b3ac02521391653eec2f6a46f48",
+    "branch": "main",
+    "head_sha": "603f143755844b3ac02521391653eec2f6a46f48",
+    "pr_url": null,
+    "files_changed": 6
+  },
+  "intent": "Add published manufacturers\u2019 catalog products as clearly labeled rotating fallback in Super price, daily and weekly homepage sections. Preserve paid API fields, paid placement priority, exclusive daily slot and durations; retain published currency and quote-only prices, deterministic Bucharest daily balanced and disjoint picks, accessible 6-second viewport-only carousels respecting focus and reduced motion. No database changes; preserve routes, fonts and configurator.",
+  "intent_confidence": "explicit",
+  "reviewers": [
+    "correctness",
+    "testing",
+    "security",
+    "performance",
+    "api-contract",
+    "reliability",
+    "adversarial",
+    "julik-frontend-races"
+  ],
+  "findings": [
+    {
+      "#": 1,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "evidence": [
+        "src/app/api/promotions/route.ts:56 -- if (catalogError) throw catalogError;",
+        "src/app/api/promotions/route.ts:48 -- if (!daily || !weekly.length || !superPrice.length) {",
+        "src/app/api/promotions/route.ts:67 -- if (supplierError) throw supplierError;",
+        "src/app/api/promotions/route.ts:78 -- return await localizedJson({ error: 'Promov\u0103rile nu au putut fi \u00eenc\u0103rcate.' }, { status: 503, headers: { 'Cache-Control': 'no-store' } });"
+      ],
+      "file": "src/app/api/promotions/route.ts",
+      "first_evidence": "src/app/api/promotions/route.ts:56 -- if (catalogError) throw catalogError;",
+      "independent_reviewers": [
+        "reliability"
+      ],
+      "line": 56,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "reliability"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Initialize empty catalog selections and put catalog pagination, supplier lookup and selection construction in a dedicated try/catch. Log fallback errors and return the already loaded paid fields and slot availability with empty catalog selections; retain the outer failure handling for paid queries. Add a route test where catalog or supplier loading fails after a paid placement loads successfully.",
+      "title": "Isolate catalog failures from paid placements",
+      "why_it_matters": "When any section has no paid placement, a failed catalog request now hides every successfully loaded paid placement: the optional fallback throws into the route-wide catch and returns 503. The supplier lookup has the same failure propagation. Isolating fallback loading lets paid Super price, daily and weekly placements remain available when the catalog query fails.",
+      "validation_status": "confirmed",
+      "validation_reason": "With a successful paid placement and any empty paid section, newly added route.ts:48 enters catalog loading and route.ts:56 or :67 throws catalog/supplier errors into :76\u201378, replacing paid response fields with 503; the browser fetch consumer at PromotedOffers.tsx:23\u201327 rejects that response, and failure incidence was not measured.",
+      "protected_subject": "public-contract"
+    },
+    {
+      "#": 2,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "evidence": [
+        "src/components/PromotedOffers.tsx:156 --     const observer = new IntersectionObserver(entries=>setInViewport(entries.some(entry=>entry.isIntersecting)));",
+        "src/components/PromotedOffers.tsx:194 --     if (!playing || hovered || !inViewport || offers.length <= position.visible) return;",
+        "tests/unit/catalog-offers.test.mjs:3 -- import { catalogOfferSelections } from '../../src/lib/catalog-offers.ts';",
+        "tests/integration/promotions.test.mjs:118 --   const response=await api('/api/promotions'); assert.equal(response.status,200);"
+      ],
+      "file": "src/components/PromotedOffers.tsx",
+      "first_evidence": "src/components/PromotedOffers.tsx:156 --     const observer = new IntersectionObserver(entries=>setInViewport(entries.some(entry=>entry.isIntersecting)));",
+      "independent_reviewers": [
+        "testing"
+      ],
+      "line": 156,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "testing"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Add a rendered PromotedOffers browser/component regression using a fixed API response and controlled time: assert no advance before intersection, one advance after six visible seconds, no further advance after exit, and observer/timer cleanup on unmount. Include focus pause and reduced-motion behavior for the newly shared carousel entry points.",
+      "title": "Cover viewport carousel lifecycle through the rendered component",
+      "why_it_matters": "The new viewport observer and interval gate determine whether all three sections rotate only while visible, but neither added test file renders PromotedOffers. Removing the viewport gate or observer cleanup would therefore leave the supplied tests green while breaking an explicit accessibility and lifecycle requirement. A rendered test with controlled intersection notifications and time can prove that entering starts rotation, leaving stops it, and unmount disconnects the observer and clears the interval.",
+      "validation_status": "confirmed",
+      "validation_reason": "The new observer and viewport timer gate at PromotedOffers.tsx:153\u2013159 and :193\u2013197 execute when a returned section mounts with enough offers, while catalog-offers unit tests exercise only the helper and promotions integration tests assert HTTP/data behavior; an exhaustive tests/scripts text search found no rendered PromotedOffers, intersection, focus, or reduced-motion carousel coverage, and browser verification is pending.",
+      "protected_subject": null
+    }
+  ],
+  "actionable_findings": [
+    {
+      "#": 1,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "evidence": [
+        "src/app/api/promotions/route.ts:56 -- if (catalogError) throw catalogError;",
+        "src/app/api/promotions/route.ts:48 -- if (!daily || !weekly.length || !superPrice.length) {",
+        "src/app/api/promotions/route.ts:67 -- if (supplierError) throw supplierError;",
+        "src/app/api/promotions/route.ts:78 -- return await localizedJson({ error: 'Promov\u0103rile nu au putut fi \u00eenc\u0103rcate.' }, { status: 503, headers: { 'Cache-Control': 'no-store' } });"
+      ],
+      "file": "src/app/api/promotions/route.ts",
+      "first_evidence": "src/app/api/promotions/route.ts:56 -- if (catalogError) throw catalogError;",
+      "independent_reviewers": [
+        "reliability"
+      ],
+      "line": 56,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "reliability"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Initialize empty catalog selections and put catalog pagination, supplier lookup and selection construction in a dedicated try/catch. Log fallback errors and return the already loaded paid fields and slot availability with empty catalog selections; retain the outer failure handling for paid queries. Add a route test where catalog or supplier loading fails after a paid placement loads successfully.",
+      "title": "Isolate catalog failures from paid placements",
+      "why_it_matters": "When any section has no paid placement, a failed catalog request now hides every successfully loaded paid placement: the optional fallback throws into the route-wide catch and returns 503. The supplier lookup has the same failure propagation. Isolating fallback loading lets paid Super price, daily and weekly placements remain available when the catalog query fails.",
+      "validation_status": "confirmed",
+      "validation_reason": "With a successful paid placement and any empty paid section, newly added route.ts:48 enters catalog loading and route.ts:56 or :67 throws catalog/supplier errors into :76\u201378, replacing paid response fields with 503; the browser fetch consumer at PromotedOffers.tsx:23\u201327 rejects that response, and failure incidence was not measured.",
+      "protected_subject": "public-contract"
+    },
+    {
+      "#": 2,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "evidence": [
+        "src/components/PromotedOffers.tsx:156 --     const observer = new IntersectionObserver(entries=>setInViewport(entries.some(entry=>entry.isIntersecting)));",
+        "src/components/PromotedOffers.tsx:194 --     if (!playing || hovered || !inViewport || offers.length <= position.visible) return;",
+        "tests/unit/catalog-offers.test.mjs:3 -- import { catalogOfferSelections } from '../../src/lib/catalog-offers.ts';",
+        "tests/integration/promotions.test.mjs:118 --   const response=await api('/api/promotions'); assert.equal(response.status,200);"
+      ],
+      "file": "src/components/PromotedOffers.tsx",
+      "first_evidence": "src/components/PromotedOffers.tsx:156 --     const observer = new IntersectionObserver(entries=>setInViewport(entries.some(entry=>entry.isIntersecting)));",
+      "independent_reviewers": [
+        "testing"
+      ],
+      "line": 156,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "testing"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Add a rendered PromotedOffers browser/component regression using a fixed API response and controlled time: assert no advance before intersection, one advance after six visible seconds, no further advance after exit, and observer/timer cleanup on unmount. Include focus pause and reduced-motion behavior for the newly shared carousel entry points.",
+      "title": "Cover viewport carousel lifecycle through the rendered component",
+      "why_it_matters": "The new viewport observer and interval gate determine whether all three sections rotate only while visible, but neither added test file renders PromotedOffers. Removing the viewport gate or observer cleanup would therefore leave the supplied tests green while breaking an explicit accessibility and lifecycle requirement. A rendered test with controlled intersection notifications and time can prove that entering starts rotation, leaving stops it, and unmount disconnects the observer and clears the interval.",
+      "validation_status": "confirmed",
+      "validation_reason": "The new observer and viewport timer gate at PromotedOffers.tsx:153\u2013159 and :193\u2013197 execute when a returned section mounts with enough offers, while catalog-offers unit tests exercise only the helper and promotions integration tests assert HTTP/data behavior; an exhaustive tests/scripts text search found no rendered PromotedOffers, intersection, focus, or reduced-motion carousel coverage, and browser verification is pending.",
+      "protected_subject": null
+    }
+  ],
+  "triage_groups": [],
+  "pre_existing_findings": [],
+  "requirements_completeness": null,
+  "learnings": [],
+  "agent_native_gaps": [],
+  "deployment_notes": [],
+  "residual_risks": [],
+  "testing_gaps": [],
+  "coverage": {
+    "depth": "full",
+    "first_evidence_backfilled": 0,
+    "quote_gate_demotions": 0,
+    "suppressed_by_confidence": {},
+    "malformed_findings": 0,
+    "malformed_returns": 0,
+    "mode_aware_demotions": 0,
+    "settlement_suppression_evaluated": false,
+    "validator_shortcut_skipped": 0,
+    "validator": {
+      "outcome": "verdicts",
+      "selected": 2,
+      "confirmed": 2,
+      "rejected": 0,
+      "unresolved": 0,
+      "malformed": 0,
+      "failed": 0,
+      "shortcut_skipped": 0,
+      "bound_exceeded": false,
+      "protected_subject_reclassifications": 0
+    },
+    "notes": [
+      "Frozen review snapshot /tmp/gym-rotation-review-abkiyueg has a synthetic baseline commit faithful to canonical c7e4de8; only the six owned file overlays are staged.",
+      "Full depth selected because the public promotions API and paid placement contract require specialist review.",
+      "No applicable project standards, plan, learnings corpus, agent-native surface or migration changes.",
+      "Caller reports 174 unit tests, typecheck and lint passing; integration8 passed /tmp/gym-rotating-integration.log. Reviewers independently reran only checks recorded in their artifacts. Browser validation remains pending; do not claim completed.",
+      "No source files mutated. All reviewer artifacts collected in bounded batches.",
+      "Cross-model pass: not run; no attested different-provider CLI route installed (claude, grok, cursor-agent, antigravity unavailable). In-process adversarial reviewer covered the lens.",
+      "All eight selected reviewer artifacts were present and parsed. No reviewer failures or collection bounds exceeded.",
+      "No semantic duplicates, pre-existing findings, settled-decision conflicts, confidence suppressions or mode-aware demotions. Settlement suppression was not evaluated because no plan was discovered.",
+      "first_evidence_backfilled: 0; quote-gate demotions: 0; malformed findings: 0; malformed returns: 0.",
+      "Two P2 findings retain concrete code/test responses; one umbrella testing finding covers the shared carousel subsystem.",
+      "No verified cross-model corroboration; validator shortcut skipped 0 findings. Both actionable findings selected for one validator batch.",
+      "Browser-pending notes from correctness, testing and frontend-races are coverage limits overlapping the retained testing finding, not additional residual-risk findings.",
+      "Hydration corrected the testing artifact secondary viewport-gate reference from line196 to actual line194; motivating line156 unchanged.",
+      "One independent validator batch returned inside the collection bound; both findings confirmed. Finding #1 is a public-contract concern; catalog/supplier failure incidence was not measured.",
+      "Local apply skipped: mode:agent is report-only. Fix #1 first to preserve paid placements during catalog failures, then add the rendered carousel regression (#2)."
+    ],
+    "reviewer_reasons": {
+      "correctness": "always-on",
+      "testing": "changed helper and integration tests plus carousel behavior",
+      "security": "public catalog endpoint and supplier exposure",
+      "performance": "catalog pagination and balancing transforms",
+      "api-contract": "additive public promotions response",
+      "reliability": "catalog and supplier I/O error coupling",
+      "adversarial": "141 executable changed lines with cross-component composition",
+      "julik-frontend-races": "new IntersectionObserver and carousel timer gating"
+    },
+    "failed_reviewers": []
+  },
+  "peer": {
+    "outcome": "in-process-fallback",
+    "coverage": "Cross-model pass: not run; no attested different-provider CLI route installed (claude, grok, cursor-agent, antigravity unavailable). In-process adversarial reviewer covered the lens."
+  },
+  "artifact_path": "/tmp/compound-engineering-501/ce-code-review/20261103-120501-aa00e435",
+  "run_id": "20261103-120501-aa00e435"
+}
