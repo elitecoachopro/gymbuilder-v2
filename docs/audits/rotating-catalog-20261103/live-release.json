@@ -1,0 +1,12 @@
+{
+  "deployment_id": "dpl_EvskCXp3RhKbt9SvY6dYryLaEUKw",
+  "live_url": "https://www.gymbuilder.app/#super-pret",
+  "source_commit": "e987d08ebca8e40c42844e694d1c1229a2ba7c7c",
+  "baseline_commit": "c7e4de82ca4112cef7a1fd6d46d37b84abfc7043",
+  "previous_deployment": "dpl_J7oNTeEti7f5onpULmwAD5AxXxCC",
+  "pull_request": "https://github.com/elitecoachopro/gymbuilder-v2/pull/7",
+  "production_product_or_promotion_records_modified": false,
+  "schema_changes": false,
+  "temporary_server_and_proxy_stopped": true,
+  "temporary_credentials_removed": true
+}

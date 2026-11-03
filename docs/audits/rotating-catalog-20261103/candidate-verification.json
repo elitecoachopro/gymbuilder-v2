@@ -1,0 +1,12 @@
+{
+  "sections": {
+    "superPret": 12,
+    "ofertaZilei": 12,
+    "oferteleSaptamanii": 12
+  },
+  "distinct_products": 36,
+  "manufacturers": 22,
+  "source_count": 59,
+  "prices_and_currencies_match": true,
+  "no_catalog_error": true
+}

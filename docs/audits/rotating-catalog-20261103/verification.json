@@ -49,5 +49,16 @@
   "limitations": [
     "No automated rendered lifecycle/reduced-motion suite or controlled-time/unmount cleanup test",
     "Physical phone not tested"
-  ]
+  ],
+  "published": true,
+  "live_browser": {
+    "desktop_width": 1280,
+    "document_width": 1272,
+    "sections": [
+      12,
+      12,
+      12
+    ],
+    "visible_photographs_loaded": true
+  }
 }

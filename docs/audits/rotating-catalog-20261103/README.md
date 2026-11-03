@@ -17,3 +17,7 @@ Browser checks exercised EN/RO, three12-card sections, automatic movement while 
 Full review completed (`20261103-120501-aa00e435`) with8 lenses and an independent validator. Catalog dependency failure isolation was fixed and its source delta reviewed again. Reuse/quality simplification unified the response type and renamed the former grid; efficiency/test-value passes had no findings. Proof tests were retained.
 
 Deferred P2 testing improvement: a checked-in automated rendered lifecycle/reduced-motion regression suite (controlled intersection/time and unmount cleanup). This is a coverage gap, not a demonstrated runtime defect; rendered manual checks were completed using the supported browser tool. No extra browser test dependencies were introduced for this presentation change.
+
+## Live verification
+
+Published at https://www.gymbuilder.app/#super-pret, deployment `dpl_EvskCXp3RhKbt9SvY6dYryLaEUKw`, source `e987d08ebca8e40c42844e694d1c1229a2ba7c7c`, PR7. Live API has three12-card sections with36 distinct products representing all22 existing manufacturers. Prices and currencies were compared with the complete59-product public catalog. Browser confirmed loaded real photos and all three sections; screenshot `live-desktop.png`. Homepage/health/studio return200; analytics/private report endpoints remain401 anonymously. Temporary fault proxy, server and credentials were removed.
