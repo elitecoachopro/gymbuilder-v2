@@ -15,8 +15,9 @@ export interface CatalogOfferProduct {
 }
 export type CatalogOfferSupplier = NonNullable<PromotionListing['supplier']>;
 export function catalogOfferSelections(products: CatalogOfferProduct[], suppliers: CatalogOfferSupplier[], now: number): CatalogOfferSelections {
-  const date = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Bucharest', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
-  const day = Math.floor(Date.parse(date) / 86400000);
+  const epoch = Date.parse('2026-01-01T00:00:00+02:00');
+  const day = Math.floor((now-epoch)/86400000);
+  const halfDay = Math.floor((now-epoch)/43200000);
   const supplierMap = new Map(suppliers.map(supplier => [supplier.id, supplier]));
   const groups = new Map<string, PromotionListing[]>();
   for (const product of [...products].sort((a,b) => (a.id || '').localeCompare(b.id || ''))) {
@@ -34,12 +35,21 @@ export function catalogOfferSelections(products: CatalogOfferProduct[], supplier
     groups.set(key,cards);
   }
   const rotate = <T,>(items: T[], offset: number): T[] => items.length ? [...items.slice(offset % items.length), ...items.slice(0,offset % items.length)] : [];
-  const queues = rotate([...groups.entries()].sort(([a],[b]) => a.localeCompare(b)),day).map(([,cards]) => rotate(cards,day));
+  const queues = [...groups.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([,cards])=>cards);
   const ordered: PromotionListing[] = [];
   for (let round=0; queues.some(queue=>round<queue.length); round++) {
     for (const queue of queues) if (queue[round]) ordered.push(queue[round]);
   }
-  const size = Math.min(12,Math.max(1,Math.floor(ordered.length/3)));
-  const take = (offset: number) => ordered.length ? Array.from({length:Math.min(size,ordered.length)},(_,n)=>ordered[(offset+n)%ordered.length]) : [];
-  return { superPret:take(0), ofertaZilei:take(size), oferteleSaptamanii:take(size*2) };
+  const dailyIndex = ordered.length ? day % ordered.length : 0;
+  const daily = ordered[dailyIndex];
+  const step = ordered.length>=3 && halfDay%2===0 ? 2 : 1;
+  const superOffer = ordered.length ? ordered[(dailyIndex+step)%ordered.length] : undefined;
+  const windowed = (offer: PromotionListing | undefined, hours: number) => {
+    if (!offer) return [];
+    const duration = hours*3600000;
+    const start = epoch+Math.floor((now-epoch)/duration)*duration;
+    return [{...offer,starts_at:new Date(start).toISOString(),ends_at:new Date(start+duration).toISOString()}];
+  };
+  const weekly = ordered.filter(item=>item.product_id!==daily?.product_id && item.product_id!==superOffer?.product_id);
+  return {superPret:windowed(superOffer,12),ofertaZilei:windowed(daily,24),oferteleSaptamanii:rotate(weekly.length?weekly:ordered,day).slice(0,12)};
 }

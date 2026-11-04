@@ -14,38 +14,38 @@ export default function PromotedOffers() {
   const [data, setData] = useState<PromotionResponse | null>(null);
   const [error, setError] = useState(false);
   const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    let controller: AbortController | undefined;
-    const load = async () => {
-      controller?.abort(); controller = new AbortController();
-      const signal = controller.signal;
-      try {
-        const response = await fetch('/api/promotions', { cache: 'no-store', signal });
-        if (!response.ok) throw new Error('Promotions unavailable');
-        const next: PromotionResponse = await response.json();
-        if (!signal.aborted) { setData(next); setError(false); setNow(Date.now()); }
-      } catch { if (!signal.aborted) setError(true); }
-    };
-    load();
-    const refresh = window.setInterval(load, 30000);
-    window.addEventListener('focus', load);
-    return () => { controller?.abort(); window.clearInterval(refresh); window.removeEventListener('focus', load); };
-  }, []);
+  const pending = useRef<AbortController | null>(null);
+  const load = useCallback(async () => {
+    pending.current?.abort();
+    const controller = new AbortController();pending.current=controller;
+    try {
+      const response = await fetch('/api/promotions',{cache:'no-store',signal:controller.signal});
+      if (!response.ok) throw new Error('Promotions unavailable');
+      const next: PromotionResponse = await response.json();
+      if (!controller.signal.aborted) {setData(next);setError(false);setNow(Date.now());}
+    } catch {if (!controller.signal.aborted) setError(true);}
+  },[]);
+  useEffect(()=>{
+    void load();
+    const refresh=window.setInterval(load,30000);
+    window.addEventListener('focus',load);
+    return ()=>{pending.current?.abort();window.clearInterval(refresh);window.removeEventListener('focus',load);};
+  },[load]);
   useEffect(() => {
     if (!data) return;
     const ends = [data.ofertaZilei, ...data.oferteleSaptamanii, ...(data.superPret ?? []), ...Object.values(data.catalogSelections || {}).flat()].filter((offer): offer is PromotionListing => !!offer)
       .map(offer => Date.parse(offer.ends_at)).filter(end => end > now);
     if (!ends.length) return;
-    const timer = window.setTimeout(() => setNow(Date.now()), Math.min(Math.max(1, Math.min(...ends) - Date.now() + 1), 2147483647));
+    const timer = window.setTimeout(() => {setNow(Date.now());void load();}, Math.min(Math.max(1, Math.min(...ends) - Date.now() + 1), 2147483647));
     return () => window.clearTimeout(timer);
-  }, [data, now]);
+  }, [data, now, load]);
   const daily = data?.ofertaZilei && Date.parse(data.ofertaZilei.ends_at) > now ? data.ofertaZilei : null;
   const valid = (offers: PromotionListing[] = []) => offers.filter(offer => Date.parse(offer.ends_at) > now);
   const paidWeekly = valid(data?.oferteleSaptamanii);
   const paidSuper = valid(data?.superPret);
   const weekly = paidWeekly.length ? paidWeekly : valid(data?.catalogSelections?.oferteleSaptamanii);
-  const superPrice = paidSuper.length ? paidSuper : valid(data?.catalogSelections?.superPret);
-  const dailyChoices = valid(data?.catalogSelections?.ofertaZilei);
+  const superPrice = (paidSuper.length ? paidSuper : valid(data?.catalogSelections?.superPret))[0];
+  const dailyChoice = daily || valid(data?.catalogSelections?.ofertaZilei)[0];
   const catalogCopy = en ? 'Equipment from our published catalog, rotating automatically. Catalog prices are shown; no discount is implied.' : 'Echipamente din catalogul publicat, în rotație automată. Afișăm prețul din catalog, fără reduceri presupuse.';
   const empty = (kind: 'daily' | 'weekly' | 'super') => {
     const unavailableMessage = en ? 'Promotions are temporarily unavailable.' : 'Promovările nu pot fi încărcate momentan.';
@@ -62,17 +62,17 @@ export default function PromotedOffers() {
     <section id="super-pret" aria-labelledby="super-price-heading" className="mx-auto max-w-7xl scroll-mt-[calc(var(--app-header-height)+1rem)] px-4 py-12 sm:py-16">
       <div className="mb-6 flex items-start gap-3"><Zap className="mt-1 h-6 w-6 shrink-0 text-gold-400" aria-hidden="true" /><div>
         <h2 id="super-price-heading" className="text-2xl font-bold text-white sm:text-3xl">{en ? 'Super price' : 'Super preț'}</h2>
-        <p className="mt-2 text-sm text-anthracite-300">{superPrice.some(offer=>offer.selection==='catalog') ? catalogCopy : en ? `New and used equipment promoted for ${SUPER_PRICE_HOURS} hours. The countdown shows the time remaining.` : `Echipamente noi și second-hand promovate timp de ${SUPER_PRICE_HOURS} ore. Cronometrul arată timpul rămas.`}</p>
+        <p className="mt-2 text-sm text-anthracite-300">{en ? 'One exclusive product for 12 hours. A new selection appears when its display period ends.' : 'Un singur produs exclusiv timp de 12 ore. Selecția se schimbă la încheierea perioadei de afișare.'}</p>
       </div></div>
-      {superPrice.length ? <SuperPriceCarousel offers={superPrice} /> : empty('super')}
+      {superPrice ? <ExclusiveOffer key={superPrice.id} offer={superPrice} superPrice /> : empty('super')}
     </section>
     <section id="oferta-zilei" aria-labelledby="daily-offer-heading" className="scroll-mt-[calc(var(--app-header-height)+1rem)] bg-anthracite-900/50 px-4 py-12 sm:py-16">
       <div className="mx-auto max-w-6xl">
         <div className="mb-6 flex items-start gap-3"><Crown className="mt-1 h-6 w-6 shrink-0 text-gold-400" aria-hidden="true" /><div>
           <h2 id="daily-offer-heading" className="text-2xl font-bold text-white sm:text-3xl">{en ? 'Offer of the day' : 'Oferta zilei'}</h2>
-          <p className="mt-2 text-sm text-anthracite-300">{!daily && dailyChoices.length ? catalogCopy : en ? 'One exclusive paid placement, displayed for 24 hours.' : 'Un singur loc de promovare premium, cu afișare timp de 24 de ore.'}</p>
+          <p className="mt-2 text-sm text-anthracite-300">{en ? 'One exclusive product for 24 hours. The countdown shows the remaining display time.' : 'Un singur produs exclusiv timp de 24 de ore. Cronometrul arată timpul de afișare rămas.'}</p>
         </div></div>
-        {daily ? <PromotionCard key={daily.id} offer={daily} featured /> : dailyChoices.length ? <OfferCarousel offers={dailyChoices} featured label={en ? 'Daily catalog selection' : 'Selecția zilei din catalog'} /> : empty('daily')}
+        {dailyChoice ? <ExclusiveOffer key={dailyChoice.id} offer={dailyChoice} /> : empty('daily')}
       </div>
     </section>
     <section id="ofertele-saptamanii" aria-labelledby="weekly-offers-heading" className="mx-auto max-w-7xl scroll-mt-[calc(var(--app-header-height)+1rem)] px-4 pt-12 sm:pt-16">
@@ -85,27 +85,26 @@ export default function PromotedOffers() {
   </div>;
 }
 
-const SuperPriceClock = createContext(0);
+const PromotionClock = createContext(0);
 
-function SuperPriceCarousel({ offers }: { offers: PromotionListing[] }) {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    if (offers.every(offer=>offer.selection==='catalog')) return;
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, [offers]);
-  const en = useClientLocale() === 'en';
-  return <SuperPriceClock.Provider value={now}><OfferCarousel offers={offers.filter(offer=>Date.parse(offer.ends_at)>now)} superPrice label={en ? 'Super price equipment' : 'Echipamente Super preț'} /></SuperPriceClock.Provider>;
+function ExclusiveOffer({offer,superPrice=false}:{offer:PromotionListing;superPrice?:boolean}) {
+  const [now,setNow]=useState(()=>Date.now());
+  useEffect(()=>{
+    const timer=window.setInterval(()=>setNow(Date.now()),1000);
+    return ()=>window.clearInterval(timer);
+  },[]);
+  if (Date.parse(offer.ends_at)<=now) return null;
+  return <PromotionClock.Provider value={now}><PromotionCard offer={offer} featured superPrice={superPrice} countdown /></PromotionClock.Provider>;
 }
 
-const PromotionCard = memo(function PromotionCard({ offer, featured = false, superPrice = false }: { offer: PromotionListing; featured?: boolean; superPrice?: boolean }) {
+const PromotionCard = memo(function PromotionCard({ offer, featured = false, superPrice = false, countdown = false }: { offer: PromotionListing; featured?: boolean; superPrice?: boolean; countdown?: boolean }) {
   const locale = useClientLocale();
   const en = locale === 'en';
   let promotionBadge = en ? 'Promoted · 7 days' : 'Promovat · 7 zile';
   if (featured) promotionBadge = en ? 'Premium promotion · 24 hours' : 'Promovare premium · 24 de ore';
   if (superPrice) promotionBadge = en ? `Super price · ${SUPER_PRICE_HOURS} hours` : `Super preț · ${SUPER_PRICE_HOURS} ore`;
   const catalog = offer.selection === 'catalog';
-  if (catalog) promotionBadge = en ? 'Catalog selection' : 'Selecție din catalog';
+  if (catalog) promotionBadge = `${en ? 'Catalog selection' : 'Selecție din catalog'}${countdown ? ` · ${superPrice ? 12 : 24} ${en ? 'hours' : 'ore'}` : ''}`;
   const href = offer.product_id ? `/products/${offer.product_id}` : `/suppliers/${offer.supplier_id}`;
   const image = offer.image_url || offer.product?.images[0];
   const galleryImages = image ? [image, ...(offer.product?.images || []).filter(photo => photo !== image)] : [];
@@ -121,29 +120,29 @@ const PromotionCard = memo(function PromotionCard({ offer, featured = false, sup
       <p className="mt-2 text-sm text-anthracite-300">{offer.brand_name && offer.brand_name !== offer.supplier?.company_name ? `${offer.brand_name} · ` : ''}{offer.supplier?.company_name}{offer.supplier?.country ? ` · ${offer.supplier.country}` : ''}</p>
       {offer.description && <p className={`mt-3 text-sm leading-relaxed text-anthracite-200 ${featured ? '' : 'line-clamp-3'}`}>{offer.description}</p>}
       <p className="my-4 text-2xl font-bold text-gold-400">{formatCatalogPrice(offer.price_eur, locale, catalog ? offer : undefined)}</p>
-      {superPrice && !catalog && <>
+      {superPrice && <>
         <p className="mb-3 text-sm text-anthracite-200">{offer.product?.condition === 'used' ? (en ? 'Second-hand equipment' : 'Echipament second-hand') : (en ? 'New equipment' : 'Echipament nou')}</p>
-        <SuperPriceCountdown endsAt={offer.ends_at} />
       </>}
-      {!catalog && <p className="mb-4 text-xs text-anthracite-300">{en ? 'Promotion ends: ' : 'Promovat până la: '}<time dateTime={offer.ends_at}>{new Date(offer.ends_at).toLocaleString(en ? 'en-GB' : 'ro-RO', { dateStyle: 'short', timeStyle: 'short' })}</time></p>}
+      {countdown && <PromotionCountdown endsAt={offer.ends_at} catalog={catalog} />}
+      {(!catalog || countdown) && <p className="mb-4 text-xs text-anthracite-300">{catalog ? (en ? 'Displayed until: ' : 'Afișat până la: ') : (en ? 'Promotion ends: ' : 'Promovat până la: ')}<time dateTime={offer.ends_at}>{new Date(offer.ends_at).toLocaleString(en ? 'en-GB' : 'ro-RO', { dateStyle: 'short', timeStyle: 'short' })}</time></p>}
       <Link href={href} className="mt-auto inline-flex min-h-11 w-fit items-center gap-2 rounded-lg bg-gold-400 px-5 py-2 text-sm font-bold text-anthracite-950 hover:bg-gold-300">{catalog ? (en ? 'View equipment' : 'Vezi echipamentul') : (en ? 'View offer' : 'Vezi oferta')}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
     </div>
   </article>;
 });
 
-function SuperPriceCountdown({ endsAt }: { endsAt: string }) {
+function PromotionCountdown({ endsAt, catalog }: { endsAt: string; catalog: boolean }) {
   const en = useClientLocale() === 'en';
-  const now = useContext(SuperPriceClock);
+  const now = useContext(PromotionClock);
   return (
         <div role="timer" aria-live="off" aria-label={en ? 'Time remaining' : 'Timp rămas'} className="mb-4 rounded-xl border border-gold-400/30 bg-gold-400/10 p-3 text-gold-300">
-          <span className="flex items-center gap-2 text-xs"><Clock3 className="h-4 w-4" aria-hidden="true" />{en ? 'Ends in' : 'Expiră în'}</span>
+          <span className="flex items-center gap-2 text-xs"><Clock3 className="h-4 w-4" aria-hidden="true" />{catalog ? (en ? 'Next selection in' : 'Următoarea selecție în') : (en ? 'Ends in' : 'Expiră în')}</span>
           <span className="mt-1 block font-mono text-2xl font-bold tabular-nums">{promotionCountdown(endsAt, now)}</span>
           <span className="text-xs">{en ? 'hours : minutes : seconds' : 'ore : minute : secunde'}</span>
         </div>
   );
 }
 
-function OfferCarousel({ offers, label, featured = false, superPrice = false }: { offers: PromotionListing[]; label: string; featured?: boolean; superPrice?: boolean }) {
+function OfferCarousel({ offers, label }: { offers: PromotionListing[]; label: string }) {
   const en = useClientLocale() === 'en';
   const track = useRef<HTMLDivElement>(null);
   const carousel = useRef<HTMLDivElement>(null);
@@ -214,7 +213,7 @@ function OfferCarousel({ offers, label, featured = false, superPrice = false }: 
       </div>
     </div>
     <div ref={track} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} onPointerDown={() => setPlaying(false)} className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4">
-      {offers.map((offer, index) => <div key={offer.id} role="group" aria-roledescription={en ? 'slide' : 'diapozitiv'} aria-label={`${index + 1} / ${offers.length}`} className={`min-w-0 shrink-0 basis-full snap-start ${featured ? '' : 'sm:basis-[calc(50%_-_0.5rem)] lg:basis-[calc(33.333%_-_0.667rem)]'}`}><PromotionCard offer={offer} featured={featured} superPrice={superPrice} /></div>)}
+      {offers.map((offer, index) => <div key={offer.id} role="group" aria-roledescription={en ? 'slide' : 'diapozitiv'} aria-label={`${index + 1} / ${offers.length}`} className="min-w-0 shrink-0 basis-full snap-start sm:basis-[calc(50%_-_0.5rem)] lg:basis-[calc(33.333%_-_0.667rem)]"><PromotionCard offer={offer} /></div>)}
     </div>
   </div>;
 }

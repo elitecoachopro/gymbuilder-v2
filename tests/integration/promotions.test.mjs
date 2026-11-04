@@ -19,27 +19,35 @@ test('paid promotions enforce exactly 24 hours, 7 days or 12 hours for Super pri
   assert.ifError(error);
 });
 
-test('Super price publishes new and used products for 12 hours separately from weekly offers', async t => {
+test('Super price publishes one12-hour placement and excludes future, expired and unpaid records', async t => {
   const supplier = await fixtureSupplier(); t.after(() => cleanupUsers([supplier]));
   const products = await Promise.all(['new','used'].map(condition => fixtureProduct(supplier.supplierId, { condition })));
   const start = Date.now() - hour;
   const { error } = await db.from('promotions').insert([
-    ...products.map(p => promotion(supplier,p,'super_pret',start,12)),
-    promotion(supplier,products[0],'super_pret',Date.now()-13*hour,12,{title:'Expired Super price'}),
-    promotion(supplier,products[0],'super_pret',Date.now()+hour,12,{title:'Future Super price'}),
-    promotion(supplier,products[0],'super_pret',start,12,{status:'pending',title:'Unpaid Super price'}),
+    promotion(supplier,products[0],'super_pret',start,12),
+    promotion(supplier,products[1],'super_pret',start-12*hour,12,{title:'Expired Super price'}),
+    promotion(supplier,products[1],'super_pret',start+12*hour,12,{title:'Future Super price'}),
+    promotion(supplier,products[0],'super_pret',start+24*hour,12,{status:'pending',title:'Unpaid Super price'}),
   ]);
   assert.ifError(error);
   const response = await api('/api/promotions'); assert.equal(response.status,200);
   const body = await response.json();
   const mine = body.superPret.filter(p => p.supplier_id === supplier.supplierId);
-  assert.equal(mine.length,2);
-  assert.deepEqual(mine.map(p=>p.product.condition).sort(),['new','used']);
-  assert.ok(mine.every(p=>Date.parse(p.ends_at)-Date.parse(p.starts_at)===12*hour));
+  assert.equal(mine.length,1); assert.equal(mine[0].product.condition,'new');
+  assert.equal(Date.parse(mine[0].ends_at)-Date.parse(mine[0].starts_at),12*hour);
   assert.ok(!body.oferteleSaptamanii.some(p=>p.supplier_id===supplier.supplierId));
-  assert.ok(!JSON.stringify(body).includes('Unpaid Super price'));
+  for(const title of ['Expired Super price','Future Super price','Unpaid Super price']) assert.ok(!JSON.stringify(body).includes(title));
   const noProduct = await db.from('promotions').insert(promotion(supplier,products[0],'super_pret',start,12,{product_id:null}));
   assert.equal(noProduct.error?.code,'23514');
+});
+
+test('only one Super price placement can reserve an overlapping12-hour window', async t=>{
+  const supplier=await fixtureSupplier();t.after(()=>cleanupUsers([supplier]));
+  const product=await fixtureProduct(supplier.supplierId),start=Date.now()+366*24*hour;
+  const attempts=await Promise.all([0,1].map(()=>db.from('promotions').insert(promotion(supplier,product,'super_pret',start,12,{status:'pending'}))));
+  assert.equal(attempts.filter(result=>!result.error).length,1);
+  assert.ok(['23P01','40P01'].includes(attempts.find(result=>result.error)?.error.code));
+  assert.ifError((await db.from('promotions').insert(promotion(supplier,product,'super_pret',start+12*hour,12))).error);
 });
 
 test('only one daily promotion can reserve an overlapping time, including concurrent reservations', async t => {
@@ -129,4 +137,13 @@ test('catalog rotations only expose published equipment and preserve the source 
     assert.equal(card.price_eur,source.price_eur); assert.equal(card.listed_price_amount,source.listed_price_amount); assert.equal(card.listed_price_currency,source.listed_price_currency);
     assert.equal(card.brand_name,source.brand_name); assert.equal(card.supplier_id,source.supplier_id); assert.equal(card.product.id,source.id);
   }
+});
+
+test('a current unpaid Super price reservation stays private while occupying its interval', async t=>{
+ const supplier=await fixtureSupplier();t.after(()=>cleanupUsers([supplier]));
+ const product=await fixtureProduct(supplier.supplierId);
+ const {data,error}=await db.from('promotions').insert(promotion(supplier,product,'super_pret',Date.now()-hour,12,{status:'pending',title:'Private current unpaid Super price'})).select('id').single();
+ assert.ifError(error);
+ const response=await api('/api/promotions');assert.equal(response.status,200);const body=await response.json();
+ assert.ok(!body.superPret.some(item=>item.id===data.id));assert.ok(!JSON.stringify(body).includes('Private current unpaid Super price'));
 });
