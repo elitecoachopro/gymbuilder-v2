@@ -1,0 +1,13 @@
+{
+  "deployment_id": "dpl_5qqnm68F1ocaPLNDEBUCifgShN4X",
+  "live_url": "https://www.gymbuilder.app/#super-pret",
+  "source_commit": "6eb17c3bb73c06b764da27810091f64f6f505ca5",
+  "previous_deployment": "dpl_EvskCXp3RhKbt9SvY6dYryLaEUKw",
+  "pull_request": "https://github.com/elitecoachopro/gymbuilder-v2/pull/7",
+  "migration": "20261104000100_exclusive_super_price.sql",
+  "migration_atomic": true,
+  "rows_or_prices_deleted": false,
+  "historical_overlaps_before": 1,
+  "historical_overlaps_after": 0,
+  "local_test_server_and_credentials_removed": true
+}

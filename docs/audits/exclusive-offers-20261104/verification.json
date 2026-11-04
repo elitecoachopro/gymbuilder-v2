@@ -39,5 +39,14 @@
     "future_or_current_reservations": 0,
     "historical_overlap_pairs": 1,
     "resolution": "mark only alreadyelapsedSuperpendingactiveperiodsexpired; preserve rows/prices andfutureperiods;applyexclusionatomically"
+  },
+  "published": true,
+  "live_browser": {
+    "super_cards": 1,
+    "daily_cards": 1,
+    "weekly_cards": 12,
+    "exclusive_carousels": 0,
+    "weekly_carousel": 1,
+    "both_countdowns_visible": true
   }
 }

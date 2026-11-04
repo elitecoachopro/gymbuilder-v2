@@ -11,3 +11,7 @@ The migration completes only alreadyelapsed Super pending/active periods by mark
 Rendered local check: a valid12-hour paid placement was seeded with35secondsremaining. Browser observed its31-secondcountdown, then withoutnavigation the real API refreshed and a catalog card replaced it. It kept1Super,1daily and12weeklycards. Fixture account was removed. Reload preserved product/deadline for the unchanged catalog.390px mobile documentwidth382. Physicalphone nottested.
 
 Full review completed (20261104-exclusive-d029028c). The repeated-product andcurrentpendingtest findings were fixed. Real rendered expiry was verified; checked-in controlled-clock,unmount andfailed-boundary-recovery automation remains a deferred testing improvement.
+
+## Published
+
+Live at https://www.gymbuilder.app/#super-pret. Deployment `dpl_5qqnm68F1ocaPLNDEBUCifgShN4X`, runtime source `6eb17c3bb73c06b764da27810091f64f6f505ca5`, PR7. Public API and browser confirm1Super/12hours,1daily/24hours and12weeklycarouselitems, with visible countdowns and no carousels in the exclusive sections. Homepage,health,studio return200; private analytics/export stay401 anonymously. Migration ran in explicit BEGIN/COMMIT; exclusion exists and historical overlap count is0. No rows or prices were deleted. Temporary local fixture account, server, credentials and generated caches were removed.

@@ -1,0 +1,29 @@
+{
+  "super_products": 1,
+  "super_hours": 12,
+  "daily_products": 1,
+  "daily_hours": 24,
+  "weekly_products": 12,
+  "http": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/api/health",
+      "status": 200
+    },
+    {
+      "path": "/configurator/studio",
+      "status": 200
+    },
+    {
+      "path": "/api/analytics/report",
+      "status": 401
+    },
+    {
+      "path": "/api/private-reports",
+      "status": 401
+    }
+  ]
+}
