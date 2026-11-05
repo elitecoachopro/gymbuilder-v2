@@ -1,0 +1,12 @@
+{
+  "src/lib/gym-catalog.ts": "0bae9bed3fbcf9f15b40e5e46e421d216979557b08b1197c7816039f8590aaed",
+  "src/components/studio/Cryosauna.tsx": "3a2f34d264c098b9cd7bba112bda2a523d8ba6f43d2eb36e4deddbb65c961248",
+  "src/components/studio/Sauna.tsx": "15acc1d01cfa1c7afdb943dfe6e54d674238947c43cf7d08777efcf7487fa925",
+  "src/components/studio/EquipmentModel.tsx": "5cebd203fd6d1dc156405bd877ec37a6fb7b7b9b6bcd177c52eaf0b61872c6ec",
+  "src/components/studio/SpaceScene.tsx": "9f7c298afdb9b9633e50ce241cc1c5cd78823cc8ede7877b332146d3124bbd05",
+  "src/components/studio/StudioWorkbench.tsx": "8ecb927dacec3d5d118c3de89daaa3090d651ec34ce5124eeb1d72c7420f7dc0",
+  "src/i18n/ui.en.json": "4f006c07d83aa22041ac9fa1705be3573abacc9b12a9c0b55e8a06dd20b3889a",
+  "tests/browser/app/demo/TourEquipment.tsx": "0f75faa6c1e3cc38035a47d8fbdfd97f97f3c3b19116e661282c7385f59993cd",
+  "tests/browser/app/result-tour/page.tsx": "00141545f0a89cad440c70893f76113d8943dae366e43eeea715f058a29177c2",
+  "tests/fixtures/gym-600m2-demonstration.json": "4abd6e001803de14bc16b75caf63cb4b3dc83e88a6a44780472c72126196d985"
+}

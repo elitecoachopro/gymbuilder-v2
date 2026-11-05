@@ -1,0 +1,27 @@
+{
+  "checks": {
+    "unit_tests": "178/178 pass",
+    "lint": "pass",
+    "typecheck": "pass",
+    "production_build": "pass",
+    "full_video_decode": "both pass",
+    "review": "complete, no actionable findings"
+  },
+  "review_run": "20261105-181828-fbec26ac",
+  "source_hashes_match_reviewed_tree": true,
+  "geometry": "600m²,70objects,cost154060EUR<=180000EUR; production validation passes",
+  "real_browser": [
+    "24views inspected",
+    "JSON import into realStudioWorkbench",
+    "save/reopen isolated fixture server",
+    "realWebGLloss desktop and390px responsiveiframe",
+    "70objects preserved",
+    "post-recovery JSON deep-equal original full space",
+    "DPR1, shadowsfalse",
+    "portrait overview fit; no horizontaloverflow"
+  ],
+  "mobile_scope": "Responsive same-originiframe390×844; not physicalphone or touchhardware",
+  "ai_scope": "600m² hand-authored demonstrative concept, no new providerAIcall",
+  "publication": "not deployed; local code and artifacts only",
+  "new_unit_test_exception": "Catalog/model and explicit camera-pose additions verified through existing178tests, actualrenderercaptures, productiongeometryvalidator, UIimport/save/reload/exportroundtrip and realcontextloss. Existing camera sphere-containment tests used unchanged. No mockonly or implementationmirror tests added."
+}

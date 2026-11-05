@@ -1,0 +1,94 @@
+{
+  "status": "complete",
+  "verdict": "Ready to merge",
+  "scope": {
+    "base": "d17befee2fec7e7bf8404a7927c8639552ed70ed",
+    "branch": "codex/rotating-catalog-offers",
+    "head_sha": "d17befee2fec7e7bf8404a7927c8639552ed70ed",
+    "pr_url": null,
+    "files_changed": 10,
+    "mode": "base: scoped frozen working-tree snapshot",
+    "reviewed_snapshot_sha": "aaf70d7d35baf9a198df45e165e3c2b795e818a9",
+    "files": [
+      "src/lib/gym-catalog.ts",
+      "src/components/studio/Cryosauna.tsx",
+      "src/components/studio/Sauna.tsx",
+      "src/components/studio/EquipmentModel.tsx",
+      "src/components/studio/SpaceScene.tsx",
+      "src/components/studio/StudioWorkbench.tsx",
+      "src/i18n/ui.en.json",
+      "tests/browser/app/demo/TourEquipment.tsx",
+      "tests/browser/app/result-tour/page.tsx",
+      "tests/fixtures/gym-600m2-demonstration.json"
+    ]
+  },
+  "intent": "Provide interior 3D closeups and local films/photos for the existing 300 m\u00b2 project and a clearly labeled hand-composed 600 m\u00b2 concept with a 180000 EUR equipment budget. Share sauna/cryosauna models and add a camera pose command without changing the economic graphics profile or automatic 2D recovery.",
+  "intent_confidence": "explicit",
+  "reviewers": [
+    "correctness",
+    "adversarial"
+  ],
+  "findings": [],
+  "actionable_findings": [],
+  "triage_groups": [],
+  "pre_existing_findings": [],
+  "requirements_completeness": null,
+  "learnings": [],
+  "agent_native_gaps": [],
+  "deployment_notes": [],
+  "residual_risks": [],
+  "testing_gaps": [
+    "Physical phone performance and touch interaction for the expanded 70-object scene remain untested; supplied browser evidence does not establish physical-device behavior."
+  ],
+  "coverage": {
+    "depth": "focused",
+    "summary": "Focused correctness review and one separately dispatched local adversarial read completed. Cross-model pass not run: no supported different-provider CLI installed; only Codex was found. No code left the machine. No other reviewer agents or validator ran. No criteria files govern the ten scoped paths in the reviewed tree; no instruction-file fallback applies. Compound Packs, learnings, agent-native gaps, and deployment notes were not assessed.",
+    "criteria_mapping": {},
+    "scope_signals": {
+      "agent_surface": false,
+      "changed_files": [
+        "src/components/studio/Cryosauna.tsx",
+        "src/components/studio/EquipmentModel.tsx",
+        "src/components/studio/Sauna.tsx",
+        "src/components/studio/SpaceScene.tsx",
+        "src/components/studio/StudioWorkbench.tsx",
+        "src/i18n/ui.en.json",
+        "src/lib/gym-catalog.ts",
+        "tests/browser/app/demo/TourEquipment.tsx",
+        "tests/browser/app/result-tour/page.tsx",
+        "tests/fixtures/gym-600m2-demonstration.json"
+      ],
+      "changed_lines": 875,
+      "declared_packs": null,
+      "exec_lines": 147,
+      "exec_nontest_lines": 63,
+      "hard_block_classes": [],
+      "hard_block_full": false,
+      "has_learnings_corpus": false,
+      "pack_roots": 0,
+      "reason": null,
+      "signals": [
+        "frontend"
+      ],
+      "silent_pass_classes": [],
+      "size_band": "small",
+      "status": "complete",
+      "test_files_changed": true,
+      "unclassified_lines": {
+        ".json": 1
+      },
+      "uncounted_files": 0
+    },
+    "excluded": "All changes outside the ten explicitly owned paths, preexisting unpushed commits 25f66f6/d17befe, and docs/demos output were excluded from source review. Supplied docs/demos evidence was read only as verification context.",
+    "validation": "Read-only source review; no builds, tests, or browser servers launched. Existing recovery-comparison.json and media-verification.json attest 70 objects, 180000 EUR budget, identical exported geometry after save/reload and WebGL context loss, and 24 actual configurator angles. Author reported 178 passing tests and passing lint/typecheck; not independently rerun.",
+    "plan": "No explicit plan; no unambiguous rotating/catalog/offers plan found.",
+    "snapshot": "Private temporary index/repository froze owned tracked and new files. Canonical checkout and index were not mutated. Owned files were confirmed identical to snapshot before receipt.",
+    "supplemental_review": "Completed correctness and separately dispatched adversarial review of the five added portrait-overview fitting lines. Existing camera sphere-containment tests read, not run. Portrait overview expands distance without reducing original distance; desktop and interior pose behavior unchanged. No additional findings."
+  },
+  "peer": {
+    "outcome": "in-process-fallback",
+    "coverage": "Cross-model pass not run: no supported different-provider CLI installed; the adversarial lens was covered by one separately dispatched local reviewer from the same serving family. No peer artifact was folded."
+  },
+  "artifact_path": "/tmp/compound-engineering-501/ce-code-review/20261105-181828-fbec26ac",
+  "run_id": "20261105-181828-fbec26ac"
+}

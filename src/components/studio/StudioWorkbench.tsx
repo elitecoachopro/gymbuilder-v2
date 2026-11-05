@@ -99,7 +99,7 @@ export default function StudioWorkbench() {
   const [expanded, setExpanded] = useState(false);
   const [navigation, setNavigation] = useState<'orbit' | 'pan'>('orbit');
   const [cameraCommand, setCameraCommand] = useState<CameraCommand>({ kind: 'fit', id: 0 });
-  const commandCamera = (kind: Exclude<CameraCommand['kind'], 'focus'>) => setCameraCommand(c => ({ kind, id: c.id + 1 }));
+  const commandCamera = (kind: 'fit' | 'in' | 'out') => setCameraCommand(c => ({ kind, id: c.id + 1 }));
   const [mode, setMode] = useState<'2d' | '3d'>(INITIAL_GYM_VIEW), [view, setView] = useState<StudioView>('orbit');
   const [graphicsProfile, setGraphicsProfile] = useState<GymGraphicsProfile>(INITIAL_GYM_GRAPHICS);
   const [graphicsFailed, setGraphicsFailed] = useState(false);

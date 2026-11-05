@@ -1,0 +1,14 @@
+{
+  "space_deep_equal": true,
+  "objects": 70,
+  "budget_eur": 180000,
+  "verified_steps": [
+    "UI import",
+    "save to in-memory fixture server",
+    "page reload with project id",
+    "economic3D",
+    "real WEBGL_lose_context",
+    "automatic2D",
+    "UI JSON export with identical full geometry"
+  ]
+}
