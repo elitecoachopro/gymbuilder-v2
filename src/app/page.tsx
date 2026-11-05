@@ -163,6 +163,7 @@ export default function HomePage() {
           <div className="home-supplier-photo"><Image src="/design/homepage/cardio-studio.webp" alt="" fill sizes="(max-width: 767px) 100vw, 450px" /></div>
         </div>
       </section>
+      <section aria-labelledby="gym-service-heading" className="mx-auto max-w-7xl px-4 pb-12"><div className="rounded-2xl border border-gold-400/20 bg-anthracite-800 p-6 sm:p-8"><h2 id="gym-service-heading" className="text-3xl font-bold text-white">Gym Service {locale === 'en' ? '& Maintenance' : 'și Mentenanță'}</h2><p className="mt-3 max-w-2xl text-anthracite-300">{locale === 'en' ? 'Keep your gym running: repairs, maintenance, installation and spare parts. Find a provider or register your services.' : 'Ține sala în mișcare: reparații, mentenanță, montaj și piese de schimb. Găsește un prestator sau înscrie serviciile tale.'}</p><div className="mt-5 flex flex-wrap gap-3"><Link href="/gym-service" className="btn-primary min-h-12">{locale === 'en' ? 'Find a service provider' : 'Găsește un prestator'}</Link><Link href="/register/service" className="btn-secondary min-h-12">{locale === 'en' ? 'Offer gym services' : 'Oferă servicii pentru săli'}</Link></div></div></section>
       <Footer />
     </main>
   );

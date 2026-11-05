@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const { data: supplier } = await supabase
     .from('supplier_profiles')
-    .select('id, company_name, description, logo_url, country, city')
+    .select('id, company_name, description, logo_url, country, city, business_type')
     .eq('id', id)
     .eq('status', 'approved')
     .single();
@@ -33,10 +33,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const title = `${supplier.company_name} - ${english ? "Fitness equipment supplier" : "Furnizor echipamente fitness"} | Gym Builder`;
+  const services = supplier.business_type === 'service';
+  const title = `${supplier.company_name} - ${services ? (english ? "Gym service and maintenance" : "Service și mentenanță fitness") : (english ? "Fitness equipment supplier" : "Furnizor echipamente fitness")} | Gym Builder`;
   const description = supplier.description
     ? supplier.description.substring(0, 155) + (supplier.description.length > 155 ? '...' : '')
-    : `${supplier.company_name} - ${english ? "fitness equipment supplier from" : "furnizor de echipamente fitness din"} ${supplier.city || supplier.country} ${english ? "on" : "pe"} Gym Builder.`;
+    : `${supplier.company_name} - ${services ? (english ? "gym service provider from" : "prestator de service fitness din") : (english ? "fitness equipment supplier from" : "furnizor de echipamente fitness din")} ${supplier.city || supplier.country} ${english ? "on" : "pe"} Gym Builder.`;
   const imageUrl = supplier.logo_url || null;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://gymbuilder.app';
 

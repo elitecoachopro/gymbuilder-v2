@@ -1565,5 +1565,7 @@
   "Accesul la conversație nu mai este disponibil. Autentifică-te din nou.": "Access to this conversation is no longer available. Sign in again.",
   "Mesajele nu au putut fi actualizate. Reîncercăm automat.": "Messages could not be updated. Retrying automatically.",
   "Răspuns invalid. Reîncercăm automat.": "Invalid response. Retrying automatically.",
-  "Conexiunea a expirat. Reîncercăm automat.": "The connection timed out. Retrying automatically."
+  "Conexiunea a expirat. Reîncercăm automat.": "The connection timed out. Retrying automatically.",
+  "Selectează serviciile și completează zona de acoperire.": "Select your services and enter the coverage area.",
+  "Profilul de service nu a putut fi salvat.": "The service profile could not be saved."
 }

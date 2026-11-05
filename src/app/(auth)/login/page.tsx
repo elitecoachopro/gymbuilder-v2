@@ -15,6 +15,8 @@ export default function LoginPage() {
   const { t } = useClientTranslations('auth');
   const router = useRouter();
   const searchParams = useSearchParams();
+  const returnTarget = safeReturnPath(searchParams?.get('redirect'));
+  const registrationHref = returnTarget?.startsWith('/supplier/services') ? '/register/service' : returnTarget ? `/register/client?redirect=${encodeURIComponent(returnTarget)}` : '/register/client';
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -65,9 +67,8 @@ export default function LoginPage() {
 
 
       // Only this explicit internal return destination is allowed.
-      const returnTo = safeReturnPath(searchParams?.get('redirect'));
-      if (returnTo) {
-        router.push(returnTo);
+      if (returnTarget) {
+        router.push(returnTarget);
       } else if (data.user.role === 'admin') {
         router.push('/admin');
       } else if (data.user.role === 'supplier') {
@@ -196,7 +197,7 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-anthracite-400">
               {t('noAccount')}{ui(' ')}
-              <Link href={safeReturnPath(searchParams?.get("redirect")) ? `/register/client?redirect=${encodeURIComponent(safeReturnPath(searchParams?.get("redirect"))!)}` : "/register/client"} className="text-gold-400 hover:text-gold-300 font-medium">
+              <Link href={registrationHref} className="text-gold-400 hover:text-gold-300 font-medium">
                 {t('register')}
               </Link>
             </p>

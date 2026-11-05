@@ -1,0 +1,141 @@
+   ▲ Next.js 15.5.28
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 3.8s
+   Linting and checking validity of types ...
+
+ ⚠ The Next.js plugin was not detected in your ESLint configuration. See https://nextjs.org/docs/app/api-reference/config/eslint#migrating-existing-config
+   Collecting page data ...
+   Generating static pages (0/74) ...
+   Generating static pages (18/74)
+   Generating static pages (36/74)
+   Generating static pages (55/74)
+ ✓ Generating static pages (74/74)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                      Size  First Load JS
+┌ ƒ /                                         13.9 kB         198 kB
+├ ƒ /_not-found                                 308 B         103 kB
+├ ƒ /about                                      888 B         185 kB
+├ ƒ /admin                                    10.6 kB         223 kB
+├ ƒ /api/account/delete-request                 308 B         103 kB
+├ ƒ /api/admin/contact-messages                 308 B         103 kB
+├ ƒ /api/admin/contact-requests                 308 B         103 kB
+├ ƒ /api/admin/newsletter                       308 B         103 kB
+├ ƒ /api/admin/reviews                          308 B         103 kB
+├ ƒ /api/admin/suppliers                        308 B         103 kB
+├ ƒ /api/analytics                              308 B         103 kB
+├ ƒ /api/analytics/events                       308 B         103 kB
+├ ƒ /api/analytics/report                       308 B         103 kB
+├ ƒ /api/analytics/summary                      308 B         103 kB
+├ ƒ /api/analytics/view                         308 B         103 kB
+├ ƒ /api/analytics/views                        308 B         103 kB
+├ ƒ /api/auth/forgot-password                   308 B         103 kB
+├ ƒ /api/auth/login                             308 B         103 kB
+├ ƒ /api/auth/logout                            308 B         103 kB
+├ ƒ /api/auth/me                                308 B         103 kB
+├ ƒ /api/auth/register/client                   308 B         103 kB
+├ ƒ /api/auth/register/supplier                 308 B         103 kB
+├ ƒ /api/auth/resend-verification               308 B         103 kB
+├ ƒ /api/auth/reset-password                    308 B         103 kB
+├ ƒ /api/auth/verify-email                      308 B         103 kB
+├ ƒ /api/budget-estimates                       308 B         103 kB
+├ ƒ /api/client/dashboard                       308 B         103 kB
+├ ƒ /api/client/favorites                       308 B         103 kB
+├ ƒ /api/client/gym-projects                    308 B         103 kB
+├ ƒ /api/configurator/ai                        308 B         103 kB
+├ ƒ /api/consultation                           308 B         103 kB
+├ ƒ /api/contact                                308 B         103 kB
+├ ƒ /api/contact/reply                          308 B         103 kB
+├ ƒ /api/contact/supplier                       308 B         103 kB
+├ ƒ /api/gym-projects                           308 B         103 kB
+├ ƒ /api/health                                 308 B         103 kB
+├ ƒ /api/locale                                 308 B         103 kB
+├ ƒ /api/messages                               308 B         103 kB
+├ ƒ /api/mobile/billing/catalog                 308 B         103 kB
+├ ƒ /api/mobile/billing/intents                 308 B         103 kB
+├ ƒ /api/mobile/billing/notifications/apple     308 B         103 kB
+├ ƒ /api/mobile/billing/notifications/google    308 B         103 kB
+├ ƒ /api/mobile/billing/products                308 B         103 kB
+├ ƒ /api/mobile/billing/verify                  308 B         103 kB
+├ ƒ /api/newsletter/subscribe                   308 B         103 kB
+├ ƒ /api/newsletter/unsubscribe                 308 B         103 kB
+├ ƒ /api/notifications                          308 B         103 kB
+├ ƒ /api/private-reports                        308 B         103 kB
+├ ƒ /api/products                               308 B         103 kB
+├ ƒ /api/products/[id]                          308 B         103 kB
+├ ƒ /api/products/count                         308 B         103 kB
+├ ƒ /api/products/views                         308 B         103 kB
+├ ƒ /api/promotions                             308 B         103 kB
+├ ƒ /api/reviews                                308 B         103 kB
+├ ƒ /api/search                                 308 B         103 kB
+├ ƒ /api/search/autocomplete                    308 B         103 kB
+├ ƒ /api/stats                                  308 B         103 kB
+├ ƒ /api/supplier/analytics                     308 B         103 kB
+├ ƒ /api/supplier/dashboard                     308 B         103 kB
+├ ƒ /api/supplier/gallery                       308 B         103 kB
+├ ƒ /api/supplier/products                      308 B         103 kB
+├ ƒ /api/supplier/products/import               308 B         103 kB
+├ ƒ /api/supplier/products/variants             308 B         103 kB
+├ ƒ /api/supplier/services                      308 B         103 kB
+├ ƒ /api/suppliers                              308 B         103 kB
+├ ƒ /api/suppliers/[id]                         308 B         103 kB
+├ ƒ /api/upload                                 308 B         103 kB
+├ ƒ /api/upload/registration                    308 B         103 kB
+├ ƒ /api/upload/registration/session            308 B         103 kB
+├ ƒ /blog                                     1.19 kB         186 kB
+├ ƒ /client/configurator                        308 B         103 kB
+├ ƒ /client/dashboard                         10.9 kB         215 kB
+├ ƒ /compare                                  3.73 kB         191 kB
+├ ƒ /configurator                               148 B         245 kB
+├ ƒ /configurator/classic                     15.2 kB         220 kB
+├ ƒ /configurator/studio                        147 B         245 kB
+├ ƒ /construieste-sala                          143 B         193 kB
+├ ● /construieste-sala/[category]               143 B         193 kB
+├   ├ /construieste-sala/proiectare
+├   ├ /construieste-sala/pardoseli
+├   ├ /construieste-sala/finisaje
+├   └ [+16 more paths]
+├ ƒ /consultation                             3.54 kB         188 kB
+├ ƒ /contact                                  3.13 kB         188 kB
+├ ƒ /cookie-policy                            1.57 kB         186 kB
+├ ƒ /cos-cerere                                  5 kB         184 kB
+├ ƒ /cum-functioneaza                         2.71 kB         187 kB
+├ ƒ /delete-account                           2.25 kB         187 kB
+├ ƒ /estimator-buget                          5.17 kB         190 kB
+├ ƒ /faq                                      2.11 kB         187 kB
+├ ƒ /forgot-password                          2.48 kB         179 kB
+├ ƒ /gym-service                                185 B         206 kB
+├ ƒ /login                                     6.2 kB         206 kB
+├ ƒ /mobile/promotions                        2.48 kB         109 kB
+├ ƒ /pricing                                  4.91 kB         189 kB
+├ ƒ /privacy                                  1.86 kB         186 kB
+├ ƒ /products                                 16.4 kB         227 kB
+├ ƒ /products/[id]                            8.88 kB         195 kB
+├ ƒ /register/client                          4.67 kB         181 kB
+├ ƒ /register/service                           179 B         207 kB
+├ ƒ /register/supplier                          180 B         207 kB
+├ ƒ /report                                   2.35 kB         187 kB
+├ ƒ /reset-password                           3.36 kB         180 kB
+├ ƒ /return-policy                            1.58 kB         186 kB
+├ ƒ /statistici                               1.16 kB         142 kB
+├ ƒ /supplier/dashboard                       14.6 kB         227 kB
+├ ƒ /supplier/products                        11.5 kB         212 kB
+├ ƒ /supplier/products/new                    5.58 kB         182 kB
+├ ƒ /supplier/services                        3.33 kB         193 kB
+├ ƒ /suppliers                                  183 B         206 kB
+├ ƒ /suppliers/[id]                           6.92 kB         203 kB
+├ ƒ /terms                                      814 B         185 kB
+└ ƒ /unsubscribe                              1.91 kB         178 kB
++ First Load JS shared by all                  103 kB
+  ├ chunks/1255-60d8dc7c8c9309a1.js           46.3 kB
+  ├ chunks/4bd1b696-100b9d70ed4e49c1.js       54.2 kB
+  └ other shared chunks (total)               2.17 kB
+
+
+ƒ Middleware                                  34.2 kB
+
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand

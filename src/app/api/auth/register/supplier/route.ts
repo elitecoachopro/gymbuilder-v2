@@ -6,6 +6,8 @@ import crypto from 'crypto';
 import { registrationSession, registrationBucket, registrationCookie } from '@/lib/registration-upload-server';
 import { hashPassword } from '@/lib/password';
 import { parsePublicContactEmail } from '@/lib/supplier-contact';
+import { serviceProfileSchema, serviceProfileColumns } from '@/lib/gym-services';
+import { requestedPlan } from '@/lib/journeys';
 import { sendVerificationEmail, sendSupplierWelcomeEmail } from '@/lib/email';
 import { checkRateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 import { sanitizeEmail, sanitizeString, sanitizePhone, sanitizeUrl, isValidEmail, isStrongPassword } from '@/lib/sanitize';
@@ -42,6 +44,9 @@ export async function POST(request: NextRequest) {
       plan,
       verificationPhotos,
     } = body;
+
+    const serviceProfile = serviceProfileSchema.safeParse({ businessType: body.businessType, serviceCategories: body.serviceCategories, serviceAreas: body.serviceAreas, serviceBrands: body.serviceBrands });
+    if (!serviceProfile.success) return localizedJson({ error: 'Selectează serviciile și completează zona de acoperire.' }, { status: 400 });
 
     // Validation
     if (!email || !password || !firstName || !lastName || !companyName || !country || !city || !phone) {
@@ -118,8 +123,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const validPlans = ['free', 'starter', 'professional', 'enterprise'];
-    const selectedPlan = validPlans.includes(plan) ? plan : 'free';
+    const selectedPlan = serviceProfile.data.businessType === 'service' ? 'free' : requestedPlan(plan);
 
     const supabase = getSupabaseAdmin();
 
@@ -182,6 +186,7 @@ export async function POST(request: NextRequest) {
         plan: 'free',
         requested_plan: selectedPlan,
         verification_photos: cleanPhotos,
+        ...serviceProfileColumns(serviceProfile.data),
       });
 
     if (profileError) {

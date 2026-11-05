@@ -27,7 +27,7 @@ export async function GET(request: Request) {
     // Get supplier profile for logged-in user
     const { data: supplier, error: supplierError } = await supabase
       .from('supplier_profiles')
-      .select('id, company_name, status, plan, plan_expires_at, contact_email')
+      .select('id, company_name, status, plan, plan_expires_at, contact_email, business_type, service_categories')
       .eq('user_id', session.userId)
       .single();
 
@@ -109,6 +109,8 @@ export async function GET(request: Request) {
       supplier: {
         id: supplier.id,
         companyName: supplier.company_name,
+        businessType: supplier.business_type,
+        serviceCount: supplier.service_categories.length,
         contactEmail: supplier.contact_email,
         status: supplier.status,
         plan: supplier.plan,

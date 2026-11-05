@@ -1,0 +1,30 @@
+{
+  "mode": "pipeline",
+  "lenses": [
+    "reuse",
+    "quality",
+    "efficiency",
+    "test-value",
+    "comments"
+  ],
+  "applied": {
+    "reuse": 1,
+    "quality": 2,
+    "efficiency": 1,
+    "tests": 0,
+    "comments": 0
+  },
+  "changes": [
+    "Reuse requestedPlan with service-only free override",
+    "Remove unused ServiceProfileInput type",
+    "Share typed row-to-form mapping",
+    "Lazily initialize default form state"
+  ],
+  "skipped": [
+    {
+      "finding": "Omit product-count enrichment for service searches",
+      "reason": "The public supplier API currently returns product_count for every supplier, including both-mode suppliers. Retained the existing batched-count response contract; adding a caller opt-out solely for this optimization is outside the requested feature."
+    }
+  ],
+  "proof_tests_unchanged": true
+}

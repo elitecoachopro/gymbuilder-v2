@@ -5,6 +5,7 @@ import { safeReturnPath, loginHref, requestedPlan } from '../../src/lib/journeys
 test('authentication returns to the exact internal project, never to an external URL', () => {
   assert.equal(safeReturnPath('/configurator?id=project-1'), '/configurator?id=project-1');
   assert.equal(safeReturnPath('/supplier/dashboard#promotions'), '/supplier/dashboard#promotions');
+  assert.equal(loginHref('/supplier/services'), '/login?redirect=%2Fsupplier%2Fservices');
   for (const url of ['https://evil.test', '//evil.test', '/\\evil.test', '/api/auth/logout', '/login', '/configurator\n']) assert.equal(safeReturnPath(url), null);
   assert.equal(loginHref('/configurator?id=one'), '/login?redirect=%2Fconfigurator%3Fid%3Done');
 });

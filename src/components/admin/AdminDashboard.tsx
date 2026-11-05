@@ -2,6 +2,7 @@
 import type { Database } from '@/types/database.generated';
 import Modal from '@/components/Modal';
 import TrafficCounters from '@/components/TrafficCounters';
+import ServiceDetails, { type ServiceDetailsData } from '@/components/ServiceDetails';
 
 import { logoutClient } from '@/lib/logout-client';
 import { useUiText } from '@/i18n/useUiText';
@@ -12,7 +13,7 @@ import { Shield, Users, Package, BarChart3, CheckCircle, XCircle, Loader2, Bell,
 import { useRouter } from 'next/navigation';
 import NotificationBell from '@/components/NotificationBell';
 
-interface Supplier {
+interface Supplier extends ServiceDetailsData {
   id: string;
   user_id: string;
   company_name: string;
@@ -1042,6 +1043,7 @@ export default function AdminDashboard() {
                         </div>
                       </div>
 
+                      <ServiceDetails profile={supplier} />
                       {supplier.description && (
                         <p className="text-sm text-anthracite-400 mt-3 line-clamp-2">{supplier.description}</p>
                       )}

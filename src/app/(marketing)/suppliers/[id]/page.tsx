@@ -11,13 +11,14 @@ import { useClientLocale } from '@/i18n/client';
 
 import { createContactSender } from '@/lib/contact-sender';
 import { useUiText } from '@/i18n/useUiText';
+import ServiceDetails, { type ServiceDetailsData } from '@/components/ServiceDetails';
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Globe, MapPin, Star, Package, Send, X, Loader2, Building2, Phone, MessageSquare, Camera } from 'lucide-react';
 
-interface SupplierProfile extends SupplierSourceInfo {
+interface SupplierProfile extends SupplierSourceInfo, ServiceDetailsData {
   id: string;
   company_name: string;
   country: string;
@@ -268,7 +269,7 @@ export default function SupplierProfilePage() {
                       value={form.message}
                       onChange={(e) => setForm({ ...form, message: e.target.value })}
                       className="w-full bg-anthracite-900 border border-anthracite-600 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold-400/50 resize-none h-28"
-                      placeholder={ui("Descrie ce echipamente cauți, cantitate, buget estimat...")}
+                      placeholder={supplier.business_type === 'service' ? (locale === 'en' ? 'Describe the equipment, fault, location and work needed…' : 'Descrie aparatul, defecțiunea, locația și intervenția dorită…') : ui("Descrie ce echipamente cauți, cantitate, buget estimat...")}
                     />
                   </div>
                   <button
@@ -288,9 +289,9 @@ export default function SupplierProfilePage() {
       {/* Header */}
       <div className="border-b border-anthracite-800">
         <div className="max-w-6xl mx-auto px-4 py-4">
-          <Link href="/suppliers" className="inline-flex items-center gap-2 text-sm text-anthracite-400 hover:text-gold-400 transition-colors">
+          <Link href={supplier.business_type === 'service' ? '/gym-service' : '/suppliers'} className="inline-flex items-center gap-2 text-sm text-anthracite-400 hover:text-gold-400 transition-colors">
             <ArrowLeft className="w-4 h-4" />
-            {ui("Înapoi la furnizori")}</Link>
+            {supplier.business_type === 'service' ? (locale === 'en' ? 'Back to gym services' : 'Înapoi la service') : ui("Înapoi la furnizori")}</Link>
         </div>
       </div>
 
@@ -350,6 +351,7 @@ export default function SupplierProfilePage() {
 
               <div className="mt-5 space-y-4"><SupplierContactLinks supplierId={supplier.id} phone={supplier.phone} website={supplier.website} email={supplier.contact_email} /><SupplierSourceDetails supplier={supplier} /></div>
 
+              <ServiceDetails profile={supplier} />
               {supplier.description && (
                 <p className="text-anthracite-300 mt-4 leading-relaxed">{supplier.description}</p>
               )}
@@ -358,8 +360,8 @@ export default function SupplierProfilePage() {
               <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-5 pt-5 border-t border-anthracite-700">
                 <div className="flex items-center gap-2">
                   <Package className="w-4 h-4 text-gold-400" />
-                  <span className="text-sm text-white font-medium">{stats.totalProducts}</span>
-                  <span className="text-sm text-anthracite-400">{ui("produse")}</span>
+                  <span className="text-sm text-white font-medium">{supplier.business_type === 'service' ? supplier.service_categories?.length || 0 : stats.totalProducts}</span>
+                  <span className="text-sm text-anthracite-400">{supplier.business_type === 'service' ? (locale === 'en' ? 'services' : 'servicii') : ui("produse")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Star className="w-4 h-4 text-gold-400 fill-gold-400" />
@@ -508,7 +510,7 @@ export default function SupplierProfilePage() {
                     value={reviewForm.title}
                     onChange={(e) => setReviewForm({ ...reviewForm, title: e.target.value })}
                     className="w-full bg-anthracite-900 border border-anthracite-600 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold-400/50"
-                    placeholder={ui("Ex: Echipamente de calitate, livrare rapidă")}
+                    placeholder={supplier.business_type === 'service' ? (locale === 'en' ? 'e.g. Timely repair and clear communication' : 'Ex: Intervenție promptă și comunicare clară') : ui("Ex: Echipamente de calitate, livrare rapidă")}
                   />
                 </div>
 
@@ -552,7 +554,7 @@ export default function SupplierProfilePage() {
         )}
 
         {/* Products Section */}
-        <div className="mb-8">
+        {supplier.business_type !== 'service' && <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-white">{ui("Produse (")}{products.length})</h2>
           </div>
@@ -592,9 +594,9 @@ export default function SupplierProfilePage() {
               ))}
             </div>
           )}
-        </div>
+        </div>}
       </div>
-      <div className="max-w-6xl mx-auto px-4 pb-12"><BuyingGuide /></div>
+      {supplier.business_type !== 'service' && <div className="max-w-6xl mx-auto px-4 pb-12"><BuyingGuide /></div>}
       <ReportContentLink kind="suppliers" id={supplier.id} />
     </main>
   );

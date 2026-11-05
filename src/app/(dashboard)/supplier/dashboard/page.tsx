@@ -21,6 +21,8 @@ import { useClientTranslations } from '@/i18n/client';
 interface SupplierData {
   id: string;
   companyName: string;
+  businessType?: string;
+  serviceCount?: number;
   contactEmail: string | null;
   status: string;
   plan: string;
@@ -104,15 +106,18 @@ export default function SupplierDashboard() {
   const [recentRequests, setRecentRequests] = useState<ContactRequest[]>([]);
   const [error, setError] = useState('');
 
+  const serviceOnly = supplier?.businessType === 'service';
+
   // Sidebar links (inside component to use t())
   const sidebarLinks = [
     { href: '/supplier/dashboard', label: t('sidebar.dashboard'), icon: BarChart3, active: true },
     { href: null, label: ui('Mesaje și cereri'), icon: MessageSquare, active: false, scrollTo: 'cereri' },
+    { href: '/supplier/services', label: locale === 'en' ? 'Service and maintenance' : 'Service și mentenanță', icon: PackagePlus, active: false },
     { href: '/supplier/products', label: t('sidebar.myProducts'), icon: Package, active: false },
     { href: null, label: t('sidebar.analytics'), icon: TrendingUp, active: false, scrollTo: 'analytics' },
     { href: null, label: t('sidebar.gallery'), icon: Camera, active: false, scrollTo: 'gallery' },
     { href: null, label: t('sidebar.promotions'), icon: Megaphone, active: false, scrollTo: 'promotions' },
-  ];
+  ].filter(link => !serviceOnly || (link.href !== '/supplier/products' && link.scrollTo !== 'promotions'));
 
   useEffect(() => {
     const controller = new AbortController();
@@ -418,7 +423,7 @@ export default function SupplierDashboard() {
               {t('sidebar.plan')}: {ui(supplier?.plan === 'free' ? t('sidebar.planFree') : supplier?.plan === 'professional' ? t('sidebar.planProfessional') : supplier?.plan || t('sidebar.planFree'))}
             </p>
             <p className="text-xs text-anthracite-400">
-              {stats?.activeProducts || 0} {t('sidebar.activeProducts')}
+              {serviceOnly ? `${supplier?.serviceCount || 0} ${locale === 'en' ? 'services' : 'servicii'}` : <>{stats?.activeProducts || 0} {t('sidebar.activeProducts')}</>}
             </p>
           </div>
         </div>
@@ -442,8 +447,8 @@ export default function SupplierDashboard() {
               <a href="#cereri" className="btn-primary min-h-12 inline-flex items-center gap-2">
                 <MessageSquare className="w-5 h-5" aria-hidden="true" /> {ui('Mesaje și cereri')}
               </a>
-              <Link href="/supplier/products/new" className="btn-primary flex items-center gap-2">
-                <Plus className="w-4 h-4" /> {t('products.addProduct')}
+              <Link href={serviceOnly ? '/supplier/services' : '/supplier/products/new'} className="btn-primary min-h-12 flex items-center gap-2">
+                <Plus className="w-4 h-4" /> {serviceOnly ? (locale === 'en' ? 'Edit my services' : 'Editează serviciile mele') : t('products.addProduct')}
               </Link>
               <button
                 onClick={handleLogout}
@@ -607,8 +612,8 @@ export default function SupplierDashboard() {
                   <Package className="w-5 h-5 text-gold-400" />
                 </div>
               </div>
-              <div className="text-2xl font-bold text-white">{stats?.activeProducts || 0}</div>
-              <div className="text-xs text-anthracite-400 mt-1">{t('stats.activeProducts')}</div>
+              <div className="text-2xl font-bold text-white">{serviceOnly ? supplier?.serviceCount || 0 : stats?.activeProducts || 0}</div>
+              <div className="text-xs text-anthracite-400 mt-1">{serviceOnly ? (locale === 'en' ? 'Services offered' : 'Servicii oferite') : t('stats.activeProducts')}</div>
             </div>
 
             <div className="card">
@@ -647,7 +652,7 @@ export default function SupplierDashboard() {
           </div>
 
           {/* Products Section */}
-          <div className="card mb-8">
+          {!serviceOnly && <div className="card mb-8">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-white">{t('products.title')}</h3>
               <Link href="/supplier/products/new" className="text-sm text-gold-400 hover:text-gold-300">
@@ -706,13 +711,14 @@ export default function SupplierDashboard() {
                 </table>
               </div>
             )}
-          </div>
+          </div>}
 
           {/* Recent Contact Requests */}
 
           {/* Analytics Section */}
           <div id="analytics" className="mb-8 scroll-mt-[calc(var(--app-header-height)+1rem)]">
             <TrafficCounters audience="supplier" />
+            {!serviceOnly && <>
             <div className="flex items-center gap-3 mb-5">
               <BarChart3 className="w-5 h-5 text-gold-400" />
               <h2 className="text-xl font-bold text-white">{t('analytics.title')}</h2>
@@ -790,6 +796,7 @@ export default function SupplierDashboard() {
                 </div>
               </div>
             )}
+            </>}
           </div>
 
           {/* Galerie Foto Section */}
@@ -839,7 +846,7 @@ export default function SupplierDashboard() {
           </div>
 
           {/* Promovează-te Section */}
-          <div id="promotions" className="mb-8">
+          {!serviceOnly && <div id="promotions" className="mb-8">
             <div className="flex items-center gap-3 mb-5">
               <Megaphone className="w-5 h-5 text-gold-400" />
               <h2 className="text-xl font-bold text-white">{t('promotions.title')}</h2>
@@ -956,7 +963,7 @@ export default function SupplierDashboard() {
                 </div>
               </div>
             </div>
-          </div>
+          </div>}
         </div>
 
         {/* Setări Cont */}

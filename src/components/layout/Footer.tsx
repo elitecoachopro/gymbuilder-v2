@@ -22,6 +22,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li><Link href="/products?condition=new" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">{t('newEquipment')}</Link></li>
               <li><Link href="/products?condition=used" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">{t('usedEquipment')}</Link></li>
+              <li><Link href="/gym-service" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">Gym Service {locale === 'en' ? '& Maintenance' : 'și Mentenanță'}</Link></li>
               <li><Link href="/suppliers" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">{t('suppliers')}</Link></li>
               <li><Link href="/#super-pret" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">{locale === 'en' ? 'Super Price' : 'Super Preț'}</Link></li>
               <li><Link href="/construieste-sala" className="text-anthracite-400 hover:text-gold-400 text-sm transition-colors">{locale === 'en' ? 'Gym services' : 'Servicii pentru sală'}</Link></li>

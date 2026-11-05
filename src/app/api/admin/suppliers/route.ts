@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
   // Get suppliers with the requested status (no join to avoid FK detection issues)
   const { data: suppliers, error } = await supabase
     .from('supplier_profiles')
-    .select('id, user_id, company_name, country, city, website, phone, description, status, plan, verified, created_at, verification_photos, requested_plan')
+    .select('id, user_id, company_name, country, city, website, phone, description, status, plan, verified, created_at, verification_photos, requested_plan, business_type, service_categories, service_areas, service_brands')
     .eq('status', status as Database['public']['Enums']['supplier_status'])
     .order('created_at', { ascending: false });
 
@@ -137,7 +137,7 @@ export async function PATCH(request: NextRequest) {
     // Get supplier info before updating
     const { data: supplierInfo } = await supabase
       .from('supplier_profiles')
-      .select('id, company_name, user_id')
+      .select('id, company_name, user_id, business_type')
       .eq('id', supplierId)
       .single();
 
@@ -189,7 +189,7 @@ export async function PATCH(request: NextRequest) {
               </p>
               <p style="color: #d1d5db; line-height: 1.6;">Acum poti:</p>
               <ul style="color: #d1d5db; line-height: 2;">
-                <li>Adauga produse si echipamente pe platforma</li>
+                <li>${supplierInfo.business_type === 'service' ? 'Prezinta serviciile de service si mentenanta' : supplierInfo.business_type === 'both' ? 'Prezinta echipamentele si serviciile oferite' : 'Adauga produse si echipamente pe platforma'}</li>
                 <li>Primi cereri de oferta de la clienti</li>
                 <li>Gestiona profilul tau de furnizor</li>
               </ul>

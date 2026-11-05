@@ -1,0 +1,17 @@
+✔ database defaults preserve equipment suppliers and reject incomplete service profiles (156.744291ms)
+✔ service metadata is owner-only and cannot change ownership, approval or plan (632.861583ms)
+✔ approved service providers are filtered separately and both-mode suppliers remain in equipment (1384.4745ms)
+✔ service registration keeps private photos, email verification, pending approval and free activation (1105.73125ms)
+✔ conversation links retrieve an old request for its participants without exposing it to another account (534.766833ms)
+✔ client and administrator can reach history beyond the first page, with real totals (455.148375ms)
+✔ a recorded request does not claim email delivery without an email provider (89.773916ms)
+✔ a supplier reaching product capacity receives a useful conflict instead of generic 500 (294.638291ms)
+✔ the admin page gates anonymous visitors before mounting management controls (304.201125ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5310.984
