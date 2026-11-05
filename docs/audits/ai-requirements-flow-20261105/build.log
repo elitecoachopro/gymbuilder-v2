@@ -1,0 +1,153 @@
+
+> gymbuilder@1.0.0 prebuild
+> node --experimental-strip-types scripts/verify-gym-pilot.mjs
+
+Pilot publication gate: 10 assets verified. Unbranded CC0 models; dimensions are not manufacturer-certified.
+
+> gymbuilder@1.0.0 build
+> next build
+
+   ▲ Next.js 15.5.28
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Parsing of /Users/idris2024/Documents/ChatGPT/gymbuilder/node_modules/next-intl/dist/esm/production/extractor/format/index.js for build dependencies failed at 'import(t(c).href)'.
+<w> Build dependencies behind this expression are ignored and might cause incorrect cache invalidation.
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Parsing of /Users/idris2024/Documents/ChatGPT/gymbuilder/node_modules/next-intl/dist/esm/production/extractor/format/index.js for build dependencies failed at 'import(t(c).href)'.
+<w> Build dependencies behind this expression are ignored and might cause incorrect cache invalidation.
+<w> [webpack.cache.PackFileCacheStrategy/webpack.FileSystemInfo] Parsing of /Users/idris2024/Documents/ChatGPT/gymbuilder/node_modules/next-intl/dist/esm/production/extractor/format/index.js for build dependencies failed at 'import(t(c).href)'.
+<w> Build dependencies behind this expression are ignored and might cause incorrect cache invalidation.
+ ✓ Compiled successfully in 10.2s
+   Linting and checking validity of types ...
+
+ ⚠ The Next.js plugin was not detected in your ESLint configuration. See https://nextjs.org/docs/app/api-reference/config/eslint#migrating-existing-config
+   Collecting page data ...
+   Generating static pages (0/73) ...
+   Generating static pages (18/73) 
+   Generating static pages (36/73) 
+   Generating static pages (54/73) 
+ ✓ Generating static pages (73/73)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                      Size  First Load JS
+┌ ƒ /                                         13.6 kB         198 kB
+├ ƒ /_not-found                                 303 B         103 kB
+├ ƒ /about                                      888 B         185 kB
+├ ƒ /admin                                    9.64 kB         222 kB
+├ ƒ /api/account/delete-request                 303 B         103 kB
+├ ƒ /api/admin/contact-messages                 303 B         103 kB
+├ ƒ /api/admin/contact-requests                 303 B         103 kB
+├ ƒ /api/admin/newsletter                       303 B         103 kB
+├ ƒ /api/admin/reviews                          303 B         103 kB
+├ ƒ /api/admin/suppliers                        303 B         103 kB
+├ ƒ /api/analytics                              303 B         103 kB
+├ ƒ /api/analytics/events                       303 B         103 kB
+├ ƒ /api/analytics/report                       303 B         103 kB
+├ ƒ /api/analytics/summary                      303 B         103 kB
+├ ƒ /api/analytics/view                         303 B         103 kB
+├ ƒ /api/analytics/views                        303 B         103 kB
+├ ƒ /api/auth/forgot-password                   303 B         103 kB
+├ ƒ /api/auth/login                             303 B         103 kB
+├ ƒ /api/auth/logout                            303 B         103 kB
+├ ƒ /api/auth/me                                303 B         103 kB
+├ ƒ /api/auth/register/client                   303 B         103 kB
+├ ƒ /api/auth/register/supplier                 303 B         103 kB
+├ ƒ /api/auth/resend-verification               303 B         103 kB
+├ ƒ /api/auth/reset-password                    303 B         103 kB
+├ ƒ /api/auth/verify-email                      303 B         103 kB
+├ ƒ /api/budget-estimates                       303 B         103 kB
+├ ƒ /api/client/dashboard                       303 B         103 kB
+├ ƒ /api/client/favorites                       303 B         103 kB
+├ ƒ /api/client/gym-projects                    303 B         103 kB
+├ ƒ /api/configurator/ai                        303 B         103 kB
+├ ƒ /api/consultation                           303 B         103 kB
+├ ƒ /api/contact                                303 B         103 kB
+├ ƒ /api/contact/reply                          303 B         103 kB
+├ ƒ /api/contact/supplier                       303 B         103 kB
+├ ƒ /api/gym-projects                           303 B         103 kB
+├ ƒ /api/health                                 303 B         103 kB
+├ ƒ /api/locale                                 303 B         103 kB
+├ ƒ /api/messages                               303 B         103 kB
+├ ƒ /api/mobile/billing/catalog                 303 B         103 kB
+├ ƒ /api/mobile/billing/intents                 303 B         103 kB
+├ ƒ /api/mobile/billing/notifications/apple     303 B         103 kB
+├ ƒ /api/mobile/billing/notifications/google    303 B         103 kB
+├ ƒ /api/mobile/billing/products                303 B         103 kB
+├ ƒ /api/mobile/billing/verify                  303 B         103 kB
+├ ƒ /api/newsletter/subscribe                   303 B         103 kB
+├ ƒ /api/newsletter/unsubscribe                 303 B         103 kB
+├ ƒ /api/notifications                          303 B         103 kB
+├ ƒ /api/private-reports                        303 B         103 kB
+├ ƒ /api/products                               303 B         103 kB
+├ ƒ /api/products/[id]                          303 B         103 kB
+├ ƒ /api/products/count                         303 B         103 kB
+├ ƒ /api/products/views                         303 B         103 kB
+├ ƒ /api/promotions                             303 B         103 kB
+├ ƒ /api/reviews                                303 B         103 kB
+├ ƒ /api/search                                 303 B         103 kB
+├ ƒ /api/search/autocomplete                    303 B         103 kB
+├ ƒ /api/stats                                  303 B         103 kB
+├ ƒ /api/supplier/analytics                     303 B         103 kB
+├ ƒ /api/supplier/dashboard                     303 B         103 kB
+├ ƒ /api/supplier/gallery                       303 B         103 kB
+├ ƒ /api/supplier/products                      303 B         103 kB
+├ ƒ /api/supplier/products/import               303 B         103 kB
+├ ƒ /api/supplier/products/variants             303 B         103 kB
+├ ƒ /api/suppliers                              303 B         103 kB
+├ ƒ /api/suppliers/[id]                         303 B         103 kB
+├ ƒ /api/upload                                 303 B         103 kB
+├ ƒ /api/upload/registration                    303 B         103 kB
+├ ƒ /api/upload/registration/session            303 B         103 kB
+├ ƒ /blog                                     1.19 kB         186 kB
+├ ƒ /client/configurator                        303 B         103 kB
+├ ƒ /client/dashboard                         10.9 kB         215 kB
+├ ƒ /compare                                  3.73 kB         191 kB
+├ ƒ /configurator                               148 B         245 kB
+├ ƒ /configurator/classic                     15.2 kB         220 kB
+├ ƒ /configurator/studio                        147 B         245 kB
+├ ƒ /construieste-sala                          143 B         193 kB
+├ ● /construieste-sala/[category]               143 B         193 kB
+├   ├ /construieste-sala/proiectare
+├   ├ /construieste-sala/pardoseli
+├   ├ /construieste-sala/finisaje
+├   └ [+16 more paths]
+├ ƒ /consultation                             3.54 kB         188 kB
+├ ƒ /contact                                  3.13 kB         187 kB
+├ ƒ /cookie-policy                            1.57 kB         186 kB
+├ ƒ /cos-cerere                                  5 kB         184 kB
+├ ƒ /cum-functioneaza                         2.71 kB         187 kB
+├ ƒ /delete-account                           2.25 kB         187 kB
+├ ƒ /estimator-buget                          5.17 kB         189 kB
+├ ƒ /faq                                      2.11 kB         186 kB
+├ ƒ /forgot-password                          2.48 kB         179 kB
+├ ƒ /login                                    6.18 kB         206 kB
+├ ƒ /mobile/promotions                        2.48 kB         109 kB
+├ ƒ /pricing                                  4.91 kB         189 kB
+├ ƒ /privacy                                  1.86 kB         186 kB
+├ ƒ /products                                 16.4 kB         227 kB
+├ ƒ /products/[id]                            8.88 kB         195 kB
+├ ƒ /register/client                          4.68 kB         181 kB
+├ ƒ /register/supplier                        9.93 kB         192 kB
+├ ƒ /report                                   2.35 kB         187 kB
+├ ƒ /reset-password                           3.36 kB         180 kB
+├ ƒ /return-policy                            1.58 kB         186 kB
+├ ƒ /statistici                               1.16 kB         142 kB
+├ ƒ /supplier/dashboard                       14.4 kB         227 kB
+├ ƒ /supplier/products                        11.5 kB         212 kB
+├ ƒ /supplier/products/new                    5.58 kB         182 kB
+├ ƒ /suppliers                                7.23 kB         192 kB
+├ ƒ /suppliers/[id]                           5.72 kB         189 kB
+├ ƒ /terms                                      814 B         185 kB
+└ ƒ /unsubscribe                              1.91 kB         178 kB
++ First Load JS shared by all                  103 kB
+  ├ chunks/1255-60d8dc7c8c9309a1.js           46.3 kB
+  ├ chunks/4bd1b696-100b9d70ed4e49c1.js       54.2 kB
+  └ other shared chunks (total)               2.17 kB
+
+
+ƒ Middleware                                  34.2 kB
+
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

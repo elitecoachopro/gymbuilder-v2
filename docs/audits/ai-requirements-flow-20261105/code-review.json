@@ -1,0 +1,59 @@
+{
+  "status": "complete",
+  "verdict": "Ready to merge",
+  "scope": {
+    "base": "HEAD (faithful selected baseline from 25f66f628e2705450716022940961715775b944d)",
+    "branch": "codex/rotating-catalog-offers",
+    "head_sha": "25f66f628e2705450716022940961715775b944d",
+    "pr_url": null,
+    "files_changed": 7
+  },
+  "intent": "Make client project requirements traceable from AI interpretation through validated placement and explicit preview/application. Enforce unique correctly zoned inventory and exact requested=placed+omitted accounting; preserve geometry, budget, stale-review protection, economic graphics and2D recovery.",
+  "intent_confidence": "explicit",
+  "reviewers": [
+    "correctness",
+    "adversarial"
+  ],
+  "findings": [],
+  "actionable_findings": [],
+  "triage_groups": [],
+  "pre_existing_findings": [],
+  "requirements_completeness": null,
+  "learnings": [],
+  "agent_native_gaps": [],
+  "deployment_notes": [],
+  "residual_risks": [
+    "Quantity accounting validates the AI interpretation against the actual plan, not semantic equivalence between arbitrary natural-language requirements and that interpretation; the new UI explicitly requests client review and unsupported positional instructions remain manual."
+  ],
+  "testing_gaps": [
+    "No automated mounted React test for partial-acceptance checkbox or reset on a new review. Manual realUI verification confirmed disabled-until-checked, then enabled application, at390x844; reference identity resets acceptance by inspection."
+  ],
+  "coverage": {
+    "depth": "focused",
+    "scope_mode": "local-aligned selected faithful snapshot",
+    "criteria_files": [],
+    "criteria_note": "No CODING_STANDARDS.md, CLAUDE.md or AGENTS.md governs these paths; mobile/AGENTS.md is outside scope.",
+    "plan": "No explicit task plan supplied; unrelated rotating-catalog branch has no matching plan for this task. Conversation intent verified.",
+    "not_assessed": [
+      "learnings corpus",
+      "agent-native gaps",
+      "deployment notes",
+      "Compound Packs",
+      "full specialist roster"
+    ],
+    "checks": [
+      "Independently ran7/7focused unit tests",
+      "Read actual API/context, review/apply and React state lifecycle",
+      "Caller reports178fullunit/typecheck/lint/buildpass",
+      "Caller manual UI proof:23placed,3Dapplication,actualcontextlossretains23in2D,Undoto0;390x844partial7placed16omittedat5000EURblockeduntilack"
+    ],
+    "validator": "No separate validator on focused path.",
+    "excluded": "All unrelated dirty/untracked files and prior branch commits; only seven owned paths frozen. No root files or Git index modified."
+  },
+  "peer": {
+    "outcome": "in-process-fallback",
+    "coverage": "Cross-model pass not run: no different-provider CLI installed (claude,grok,cursor-agent,opencode,antigravity absent). Independent in-process adversarial reviewer completed; no cross-model independence claim."
+  },
+  "artifact_path": "/tmp/compound-engineering-501/ce-code-review/20261105-ai-flow-9b88f7f1",
+  "run_id": "20261105-ai-flow-9b88f7f1"
+}

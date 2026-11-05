@@ -1,0 +1,64 @@
+✔ server context uses current active geometry, stairwell, equipment and reserved inactive-storey cost (2.947875ms)
+✔ preview is immutable, reports full replacement, and apply is one undoable active-floor action within the reserved budget (1.389417ms)
+✔ changed floor or revision blocks a proposal even if document bytes match, and malformed or physically invalid responses never apply (1.170375ms)
+✔ upper-floor generation reserves ground equipment and applies only upstairs through Undo/Redo (0.647583ms)
+✔ proposal guards reject changes to preserved architecture even with valid equipment placement (1.400333ms)
+✖ review accounts for every AI-requested item as placed or explicitly omitted and rejects unexplained differences (1.10225ms)
+✖ AI design rejects duplicate zones, duplicate equipment and equipment assigned to the wrong zone (0.373583ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 5
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 163.899583
+
+✖ failing tests:
+
+test at tests/unit/gym-ai-proposal.test.mjs:96:1
+✖ review accounts for every AI-requested item as placed or explicitly omitted and rejects unexplained differences (1.10225ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + undefined
+  - [
+  -   {
+  -     omitted: 2,
+  -     placed: 1,
+  -     requested: 3,
+  -     templateId: 'banda_alergare'
+  -   }
+  - ]
+  
+      at TestContext.<anonymous> (file:///Users/idris2024/Documents/ChatGPT/gymbuilder/tests/unit/gym-ai-proposal.test.mjs:99:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: [ { templateId: 'banda_alergare', requested: 3, placed: 1, omitted: 2 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/unit/gym-ai-proposal.test.mjs:111:1
+✖ AI design rejects duplicate zones, duplicate equipment and equipment assigned to the wrong zone (0.373583ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///Users/idris2024/Documents/ChatGPT/gymbuilder/tests/unit/gym-ai-proposal.test.mjs:121:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

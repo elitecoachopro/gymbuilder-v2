@@ -1,0 +1,80 @@
+{
+  "summary": "Propunere conceptuală pentru parterul de 300 m², cu dimensiunile păstrate de 20 × 15 m și înălțimea de 3,5 m. Include exclusiv dotările solicitate, în cantități totale. Costul orientativ al echipamentelor este de 42.000 EUR, sub plafonul de 60.000 EUR, cu o diferență disponibilă de 18.000 EUR. Sunt prevăzute două vestiare separate, femei și bărbați, fiecare cu un modul de dulapuri, o bancă, un duș, un WC și un lavoar. Compartimentarea automată va genera recepția, vestiarele și coridorul comun de 1,2 m; geometria rezultată va determina amplasarea efectivă și eventualele omisiuni. Ponderile zonelor sunt orientative, după o rezervă de circulație de 15%, și nu reprezintă suprafețe deja desenate. Costurile sunt indicative și nu includ compartimentările, instalațiile, transportul sau montajul. Accesibilitatea, racordurile sanitare și conformitatea necesită verificare de specialitate.",
+  "questions": [],
+  "length_m": 20,
+  "width_m": 15,
+  "total_area": 300,
+  "height_m": 3.5,
+  "budget_eur": 60000,
+  "profile": "balanced",
+  "zones": [
+    {
+      "zoneId": "receptie",
+      "weight": 0.06,
+      "equipment": [
+        {
+          "templateId": "desk_receptie",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "zoneId": "vestiare",
+      "weight": 0.27,
+      "equipment": [
+        {
+          "templateId": "dulap_vestiar",
+          "quantity": 2
+        },
+        {
+          "templateId": "banca_vestiar",
+          "quantity": 2
+        },
+        {
+          "templateId": "dus",
+          "quantity": 2
+        },
+        {
+          "templateId": "wc",
+          "quantity": 2
+        },
+        {
+          "templateId": "lavoar",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "zoneId": "cardio",
+      "weight": 0.3,
+      "equipment": [
+        {
+          "templateId": "banda_alergare",
+          "quantity": 4
+        },
+        {
+          "templateId": "bicicleta_spinning",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "zoneId": "aparate",
+      "weight": 0.37,
+      "equipment": [
+        {
+          "templateId": "aparat_picioare",
+          "quantity": 2
+        },
+        {
+          "templateId": "aparat_lat",
+          "quantity": 2
+        },
+        {
+          "templateId": "aparat_piept",
+          "quantity": 2
+        }
+      ]
+    }
+  ]
+}

@@ -21,8 +21,16 @@ export function createGymAiReview(value: unknown, snapshot: EditorSnapshot, revi
     if (generated && (original.walls.length || original.openings.length || original.areas.length || original.columns.length || original.stairwell)) throw Error('INVALID_PROPOSAL');
     if (!generated) for (const key of ['walls', 'openings', 'areas'] as const) if (JSON.stringify(proposal.space[key]) !== JSON.stringify(original[key])) throw Error('INVALID_PROPOSAL');
   }
+  const requested = new Map(response.design.zones.flatMap(zone => zone.equipment.map(item => [item.templateId, item.quantity] as const)));
+  const fulfillment = [...new Set([...requested.keys(), ...(proposal?.space.items.map(item => item.templateId) ?? []), ...(proposal?.omitted.map(item => item.templateId) ?? [])])].map(templateId => ({
+    templateId,
+    requested: requested.get(templateId) ?? 0,
+    placed: proposal?.space.items.filter(item => item.templateId === templateId).length ?? 0,
+    omitted: proposal?.omitted.filter(item => item.templateId === templateId).reduce((sum, item) => sum + item.quantity, 0) ?? 0,
+  }));
+  if (proposal && fulfillment.some(item => item.requested !== item.placed + item.omitted)) throw Error('INVALID_PROPOSAL');
   const changes = [...new Set([...original.items, ...(proposal?.space.items ?? [])].map(item => item.templateId))].map(templateId => ({ templateId, before: original.items.filter(item => item.templateId === templateId).length, after: proposal?.space.items.filter(item => item.templateId === templateId).length ?? 0 }));
-  return { design: response.design, proposal, source: { fingerprint: JSON.stringify(document), storey, revision }, replacedCount: original.items.length, changes, budget };
+  return { design: response.design, proposal, fulfillment, source: { fingerprint: JSON.stringify(document), storey, revision }, replacedCount: original.items.length, changes, budget };
 }
 export function gymAiReviewCurrent(review: GymAiReview, snapshot: EditorSnapshot, revision: number) {
   return review.source.revision === revision && review.source.storey === snapshot.storey && review.source.fingerprint === JSON.stringify(snapshot.document);
