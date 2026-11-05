@@ -1551,5 +1551,18 @@
   "Proiectează sala": "Design your gym",
   "Proiectul nu a fost găsit.": "Project not found.",
   "Perioadă invalidă.": "Invalid period.",
-  "Înregistrarea vizualizării nu este disponibilă.": "View recording is unavailable."
+  "Înregistrarea vizualizării nu este disponibilă.": "View recording is unavailable.",
+  "Mesaje și cereri": "Messages and requests",
+  "Mesaje și cereri de ofertă": "Messages and quotation requests",
+  "Aici primești răspunsurile furnizorilor. Deschide conversația de sub cerere pentru a citi și trimite mesaje.": "Supplier replies appear here. Open the conversation below a request to read and send messages.",
+  "Deschide conversația unei cereri pentru a discuta cu clientul. Mesajele se actualizează automat.": "Open a request conversation to talk to the client. Messages update automatically.",
+  "Nu ai primit încă cereri de ofertă. Conversațiile cu clienții vor apărea aici.": "You have not received any quotation requests yet. Client conversations will appear here.",
+  "Mesajele conversației": "Conversation messages",
+  "Actualizare automată activă": "Automatic updates active",
+  "Actualizare întreruptă cât timp ești offline sau aplicația este în fundal.": "Updates pause while you are offline or the app is in the background.",
+  "Conexiune întreruptă": "Connection interrupted",
+  "Accesul la conversație nu mai este disponibil. Autentifică-te din nou.": "Access to this conversation is no longer available. Sign in again.",
+  "Mesajele nu au putut fi actualizate. Reîncercăm automat.": "Messages could not be updated. Retrying automatically.",
+  "Răspuns invalid. Reîncercăm automat.": "Invalid response. Retrying automatically.",
+  "Conexiunea a expirat. Reîncercăm automat.": "The connection timed out. Retrying automatically."
 }
