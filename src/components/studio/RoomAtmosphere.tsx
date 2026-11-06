@@ -46,23 +46,24 @@ function AreaSurface({ area }: { area: GymSpace['areas'][number] }) {
   const maps = useFloorMaps(mode, area.w / FLOOR_SURFACES[mode].tileMetres, area.d / FLOOR_SURFACES[mode].tileMetres);
   const label = String(ui(area.name));
   const labelTexture = useMemo(() => {
+    if (area.id === 'functional') return null;
     const canvas = document.createElement('canvas'); canvas.width = 768; canvas.height = 96;
     const ctx = canvas.getContext('2d')!;
     ctx.fillStyle = mode === 'concrete' || mode === 'oak' ? '#293c3b' : '#e2d5b8'; ctx.font = '600 42px sans-serif'; ctx.textAlign = 'center';
     ctx.fillText(label.toLocaleUpperCase(), 384, 62, 740);
     const map = new THREE.CanvasTexture(canvas); map.colorSpace = THREE.SRGBColorSpace; return map;
-  }, [label, mode]);
-  useEffect(() => () => labelTexture.dispose(), [labelTexture]);
+  }, [label, mode,area.id]);
+  useEffect(() => () => labelTexture?.dispose(), [labelTexture]);
   const labelWidth = Math.min(3.5, area.w * 0.85);
   return <group>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[area.x + area.w / 2, 0.008, area.y + area.d / 2]} receiveShadow>
       <planeGeometry args={[area.w, area.d]} /><meshStandardMaterial {...maps} bumpScale={FLOOR_SURFACES[mode].bumpScale} roughness={FLOOR_SURFACES[mode].roughness} />
     </mesh>
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[area.x + area.w / 2, 0.015, area.y + area.d - 0.18]}>
+    {area.id !== 'functional' && <mesh rotation={[-Math.PI / 2, 0, 0]} position={[area.x + area.w / 2, 0.015, area.y + area.d - 0.18]}>
       <planeGeometry args={[labelWidth, labelWidth / 8]} /><meshBasicMaterial map={labelTexture} transparent depthWrite={false} toneMapped={false} />
-    </mesh>
-    {area.id === 'functional' && area.d >= 8 && <SledTrack area={area}/>}
-    {area.id === 'functional' && area.d < 8 && [0, 1, 2, 3].map(i => <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[area.x + 0.2 + i * (area.w - 0.4) / 3, 0.012, area.y + area.d / 2]}>
+    </mesh>}
+    {area.id === 'functional' && Math.max(area.w,area.d) >= 8 && <SledTrack area={area}/>}
+    {area.id === 'functional' && Math.max(area.w,area.d) < 8 && [0, 1, 2, 3].map(i => <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[area.x + 0.2 + i * (area.w - 0.4) / 3, 0.012, area.y + area.d / 2]}>
       <planeGeometry args={[0.025, area.d - 0.25]} /><meshStandardMaterial color="#bfcbb7" roughness={1} />
     </mesh>)}
   </group>;

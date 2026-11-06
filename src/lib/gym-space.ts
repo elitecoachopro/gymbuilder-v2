@@ -198,11 +198,12 @@ export function demoSpace(): GymSpace {
   space.areas = [
     { id: 'receptie', name: 'Recepție', colour: '#b08d57', x: 0.2, y: 0.2, w: 4.6, d: 3.6 },
     { id: 'vestiare', name: 'Vestiare', colour: '#728185', x: 5.2, y: 0.2, w: 9.6, d: 3.6 },
-    { id: 'functional', name: 'Funcțional', colour: '#8c917b', x: 15.3, y: 0.3, w: 4.4, d: 3.4 },
+    { id: 'rig', name: 'CrossFit', colour: '#8c917b', x: 15.3, y: 0.3, w: 4.4, d: 3.4 },
+    { id: 'functional', name: 'Pistă CrossFit · 9 m', colour: '#3f7653', x: 10.3, y: 12.8, w: 9.3, d: 1.6 },
     { id: 'cardio', name: 'Cardio', colour: '#748b97', x: 0.3, y: 4.3, w: 7.3, d: 4.3 },
     { id: 'aparate', name: 'Forță', colour: '#9c826c', x: 8, y: 4.3, w: 11.6, d: 4 },
     { id: 'greutati', name: 'Greutăți libere', colour: '#7c858e', x: 0.3, y: 9.3, w: 9.2, d: 5.3 },
-    { id: 'stretching', name: 'Stretching', colour: '#8a9b83', x: 10.3, y: 10, w: 9.3, d: 4.6 },
+    { id: 'stretching', name: 'Stretching', colour: '#8a9b83', x: 10.3, y: 9.8, w: 9.3, d: 2.7 },
   ];
   space.finishes = { floor: 'tartan', wall: '#303940', frame: '#455159', upholstery: '#9b4036' };
   space.visualization = { lighting:'studio', interiorStyle:'industrial', eyeHeight:1.65, fov:50, snap:.1, dimensions:false };
@@ -221,13 +222,13 @@ export function demoSpace(): GymSpace {
     { templateId: 'aparat_piept', positions: [[11.4, 6.1, 90]] },
     { templateId: 'cad_leg_press', positions: [[14.1, 6.2, 90]] },
     { templateId: 'real_cable_crossover', positions: [[17.4, 6.1, 90]] },
-    { templateId: 'real_rower', positions: [[18.7, 12.9, 90]] },
+    { templateId: 'real_rower', positions: [[18.7, 10.9, 90]] },
     { templateId: 'real_power_rack', positions: [[1.6, 10.8, 90], [4.5, 10.8, 90]] },
     { templateId: 'real_adjustable_bench', positions: [[1.5, 13.1, 90], [4.2, 13.1, 90], [7.2, 13.1, 90]] },
     { templateId: 'cad_dumbbell_rack', positions: [[7.5, 10, 90], [7.5, 11.5, 90]] },
     { templateId: 'rig_crossfit', positions: [[17.4, 1.9]] },
     { templateId: 'box_pliometric', positions: [[15.8, 3.1], [19.1, 3.1]] },
-    { templateId: 'saltea_stretching', positions: [[11.9, 11.4], [15.1, 11.4], [11.9, 13.5], [15.1, 13.5]] },
+    { templateId: 'saltea_stretching', positions: [[11.9, 10.3], [15.1, 10.3], [11.9, 11.6], [15.1, 11.6]] },
   ];
   space.items = groups.flatMap(({ templateId, positions }) => positions.map(([x, y, rotation = 0], i) => ({ id: `demo-${templateId}-${i + 1}`, templateId, x, y, rotation })));
   return space;

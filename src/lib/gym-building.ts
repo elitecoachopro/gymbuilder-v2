@@ -42,6 +42,7 @@ export function demoBuildingSpace(): GymSpace {
     rotation: 135,
   });
   ground.stairwell = { x: 16.6, y: 9.8, w: 3, d: 4.8, opening: false };
+  ground.areas = ground.areas.map(area => area.id === 'functional' ? {...area,w:6,name:'Pistă CrossFit · 6 m'} : area);
   const upper = emptySpace();
   upper.finishes = { floor: 'tartan', wall: '#d8d9d3', frame: '#252d30', upholstery: '#805f4d' };
   upper.stairwell = { ...ground.stairwell, opening: true };

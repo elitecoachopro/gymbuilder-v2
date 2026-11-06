@@ -1,0 +1,38 @@
+{
+  "base": "cf11ba9662e001c923235e8099ad44558e9e330e",
+  "unit_tests": 188,
+  "failures": 0,
+  "lint": "pass,zero warnings",
+  "typecheck": "pass",
+  "build": "pass",
+  "lane": {
+    "surface_metres": [
+      9.3,
+      1.6
+    ],
+    "measured_markers": "0\u20139,one-metre spacing",
+    "free_of_equipment": true,
+    "objects_preserved": 39
+  },
+  "browser_mobile": {
+    "viewport": [
+      390,
+      844
+    ],
+    "scrollWidth": 382,
+    "dpr": 1,
+    "shadows": false,
+    "context_loss_to_2d": true,
+    "remaining_canvases": 0,
+    "serialized_document_preserved": true,
+    "manual_3d_retry": "pass"
+  },
+  "visual": "Desktop inspection of both strength models and lane;updated last eye-level tour stop",
+  "physical_device": "not tested",
+  "paid_requests_or_database_mutations": "none",
+  "two_level_tracks_metres": [
+    6,
+    10
+  ],
+  "review_resolution": "all findings fixed"
+}

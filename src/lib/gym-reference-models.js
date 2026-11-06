@@ -203,6 +203,17 @@ export function createEquipmentModel(type,{texture=()=>null,upholstery='#a94b3f'
    cyl(x,y,z,r,length,rubber,'z',24);
    for(const side of [-1,1]){const edge=z+side*(length/2+.002);cyl(x,y,edge,r*.74,.006,plastic,'z',18);cyl(x,y,edge+side*.004,.013,.008,silver,'z',12);}
   }
+  rounded(-.08,.34,0,.075,.25,.075,steel,.008);
+  for(const y of [.25,.30,.35,.40])cyl(-.036,y,0,.005,.004,plastic,'x',8);
+  cyl(-.005,.35,0,.014,.06,silver,'x',12);
+  cyl(.032,.35,0,.022,.025,red,'x',12);
+  for(const side of [-1,1]){
+   tube([[-.12,1.18,side*.18],[.05,1.18,side*.32],[.20,1.12,side*.44]],.014,steel);
+   beam([.06,1.18,side*.33],[.20,1.12,side*.44],.035,.035,rubber);
+   nut(-.22,.82,side*.175,'z',.012);
+   rounded(.35,.12,side*.19,.16,.018,.10,rubber,.008);
+   for(let i=0;i<5;i++)box(.295+i*.025,.131,side*.19,.008,.004,.08,plastic);
+  }
   for(const centre of [[-.3362,.1315,-.05],[-.5712,1.704,.068],[-.5712,2.1,0],[-.4293,2.1,-.05],[-.5712,2.1,-.05],[.2357,2.1,0]])bearing(centre,[0,0,1]);
   for(const side of [-1,1]){
    cyl(.1422,1.157,side*.29,.017,.009,silver,'y',14);
@@ -218,6 +229,16 @@ export function createEquipmentModel(type,{texture=()=>null,upholstery='#a94b3f'
    cyl(.310,1.3,side*1.52,.014,.042,silver,'x',14);
    cyl(.338,1.3,side*1.52,.021,.023,red,'x',16);
    for(const y of [1.235,1.365])nut(.286,y,side*1.57,'x',.010);
+   for(let i=0;i<12;i++)cyl(.283,.34+i*.125,side*1.56,.006,.006,plastic,'x',8);
+   rounded(.292,1.30,side*1.52,.06,.18,.16,paint,.012);
+   for(const y of [1.24,1.36])cyl(.33,y,side*1.52,.018,.025,silver,'x',12);
+   for(const y of [.18,1.89]){
+    cyl(-.075,y,side*1.43,.023,.025,steel,'y',12);
+    cyl(-.075,y,side*1.61,.023,.025,steel,'y',12);
+   }
+   for(const x of [-.30,.28])nut(x,.065,side*1.52,'y',.012);
+
+
   }
  }
  if(type==='cad_treadmill')treadmill();else if(type==='cad_leg_press')legPress();else if(type==='real_multigym')multiGymDetails();else if(type==='real_cable_crossover')cableStationDetails();else throw Error('Unsupported equipment model: '+type);

@@ -1,0 +1,10 @@
+[
+  "src/lib/gym-reference-models.js",
+  "src/lib/gym-space.ts",
+  "src/lib/gym-walkthrough.ts",
+  "src/lib/gym-sled-track.ts",
+  "src/components/studio/SledTrack.tsx",
+  "src/components/studio/RoomAtmosphere.tsx",
+  "tests/unit/gym-sled-track.test.mjs",
+  "src/lib/gym-building.ts"
+]

@@ -1,0 +1,9 @@
+{
+  "review_status": "complete",
+  "run_id": "20261106-strength-track",
+  "finding": 1,
+  "resolution": "applied inline: ground demoBuilding functional lane6m clear of stairs; upper10m unchanged; standalone9m unchanged",
+  "regression": "new both-floor stairwell overlap test observed red before fix, green after",
+  "remaining_findings": 0,
+  "simplification": "unused functional label texture removed; no other findings"
+}
