@@ -1,3 +1,4 @@
+import { webBillingConfig } from '@/lib/web-billing/config';
 import { catalogOfferSelections, type CatalogOfferProduct } from '@/lib/catalog-offers';
 import type { Database } from '@/types/database.generated';
 import { localizedJson } from '@/lib/json-response';
@@ -9,6 +10,10 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const supabase = createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+    if(webBillingConfig().configured){
+      const {error:expiryError}=await supabase.rpc('release_expired_web_promotions');
+      if(expiryError)throw expiryError;
+    }
     const now = new Date().toISOString();
     const weekly: PromotionListing[] = [];
     const superPrice: PromotionListing[] = [];

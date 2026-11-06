@@ -1,3 +1,4 @@
+import { sendSupplierApprovalEmail } from '@/lib/email';
 import type { Database } from '@/types/database.generated';
 import { localizedJson } from '@/lib/json-response';
 import { registrationBucket } from '@/lib/registration-upload-server';
@@ -174,38 +175,7 @@ export async function PATCH(request: NextRequest) {
     let emailSent = false;
     if (userEmail) {
       if (action === 'approve') {
-        emailSent = await sendSupplierEmail(
-          userEmail,
-          'Contul tau Gym Builder a fost aprobat',
-          `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background: #1a1a1a; color: #ffffff;">
-            <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #f5c542; font-size: 28px; margin: 0;">Gym Builder</h1>
-            </div>
-            <div style="background: #2a2a2a; border-radius: 12px; padding: 32px; border: 1px solid #3a3a3a;">
-              <h2 style="color: #4ade80; margin-top: 0;">Felicitari, ${escapeHtml(userName)}!</h2>
-              <p style="color: #d1d5db; line-height: 1.6;">
-                Contul tau de furnizor <strong style="color: #f5c542;">${escapeHtml(companyName)}</strong> a fost aprobat cu succes pe platforma Gym Builder.
-              </p>
-              <p style="color: #d1d5db; line-height: 1.6;">Acum poti:</p>
-              <ul style="color: #d1d5db; line-height: 2;">
-                <li>${supplierInfo.business_type === 'service' ? 'Prezinta serviciile de service si mentenanta' : supplierInfo.business_type === 'both' ? 'Prezinta echipamentele si serviciile oferite' : 'Adauga produse si echipamente pe platforma'}</li>
-                <li>Primi cereri de oferta de la clienti</li>
-                <li>Gestiona profilul tau de furnizor</li>
-              </ul>
-              <div style="text-align: center; margin-top: 24px;">
-                <a href="${appUrl}/login" style="display: inline-block; background: #f5c542; color: #1a1a1a; font-weight: bold; padding: 14px 28px; border-radius: 8px; text-decoration: none;">
-                  Acceseaza Dashboard-ul
-                </a>
-              </div>
-            </div>
-            <p style="color: #6b7280; font-size: 12px; text-align: center; margin-top: 24px;">
-              &copy; ${new Date().getFullYear()} Gym Builder. Toate drepturile rezervate.
-            </p>
-          </div>
-          `,
-          process.env.RESEND_API_KEY
-        );
+        try { await sendSupplierApprovalEmail(userEmail,userName,companyName,supplierInfo.business_type); emailSent=true; } catch { emailSent=false; }
       } else {
         emailSent = await sendSupplierEmail(
           userEmail,
