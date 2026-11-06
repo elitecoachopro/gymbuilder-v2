@@ -326,7 +326,7 @@ async function notifyPriceDrop(
   for (const user of users) {
     try {
       await resend.emails.send({
-        from: 'Gym Builder <noreply@gymbuilder.app>',
+        from: 'Gym Builder <contact@gymbuilder.app>',
         to: user.email,
         subject: 'Prețul a scăzut la un produs din favoritele tale — Gym Builder',
         html: `

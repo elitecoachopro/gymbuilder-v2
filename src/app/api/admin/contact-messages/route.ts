@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Gym Builder <noreply@gymbuilder.app>',
+        from: 'Gym Builder <contact@gymbuilder.app>',
         to: [msg.email],
         reply_to: 'contact@gymbuilder.app',
         subject: `Re: ${msg.subject}`,
