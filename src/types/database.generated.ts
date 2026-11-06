@@ -34,6 +34,85 @@ export type Database = {
   }
   public: {
     Tables: {
+      web_promotion_orders: {
+        Row: {
+          amount_cents: number
+          checkout_session: string | null
+          created_at: string
+          currency: string
+          expires_at: string
+          id: string
+          livemode: boolean
+          paid_at: string | null
+          payment_intent: string | null
+          promotion_id: string | null
+          request_key: string
+          review_reason: string | null
+          state: string
+          stripe_account: string
+          type: Database["public"]["Enums"]["promotion_type"]
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          checkout_session?: string | null
+          created_at?: string
+          currency?: string
+          expires_at?: string
+          id?: string
+          livemode: boolean
+          paid_at?: string | null
+          payment_intent?: string | null
+          promotion_id?: string | null
+          request_key: string
+          review_reason?: string | null
+          state?: string
+          stripe_account: string
+          type: Database["public"]["Enums"]["promotion_type"]
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          checkout_session?: string | null
+          created_at?: string
+          currency?: string
+          expires_at?: string
+          id?: string
+          livemode?: boolean
+          paid_at?: string | null
+          payment_intent?: string | null
+          promotion_id?: string | null
+          request_key?: string
+          review_reason?: string | null
+          state?: string
+          stripe_account?: string
+          type?: Database["public"]["Enums"]["promotion_type"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "web_promotion_orders_promotion_id_fkey"
+            columns: ["promotion_id"]
+            isOneToOne: true
+            referencedRelation: "promotions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "web_promotion_orders_promotion_id_fkey"
+            columns: ["promotion_id"]
+            isOneToOne: true
+            referencedRelation: "public_promotions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "web_promotion_orders_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       account_deletion_requests: {
         Row: {
           created_at: string
@@ -1392,6 +1471,46 @@ export type Database = {
       }
     }
     Functions: {
+      reserve_web_promotion: {
+        Args: {
+          p_account: string
+          p_key: string
+          p_live: boolean
+          p_product: string
+          p_type: Database["public"]["Enums"]["promotion_type"]
+          p_user: string
+        }
+        Returns: Json
+      }
+      release_expired_web_promotions: { Args: never; Returns: undefined }
+      refund_web_promotion: {
+        Args: {
+          p_account: string
+          p_amount: number
+          p_currency: string
+          p_live: boolean
+          p_payment: string
+        }
+        Returns: undefined
+      }
+      fulfill_web_promotion: {
+        Args: {
+          p_account: string
+          p_amount: number
+          p_currency: string
+          p_live: boolean
+          p_order: string
+          p_payment: string
+          p_refunded?: boolean
+          p_session: string
+        }
+        Returns: Json
+      }
+      expire_web_checkout: { Args: { p_session: string }; Returns: undefined }
+      attach_web_checkout: {
+        Args: { p_order: string; p_session: string }
+        Returns: undefined
+      }
       catalog_market: { Args: { country: string }; Returns: string }
       record_gymbuilder_event: {
         Args: { p_event_id: string; p_path: string; p_session_hash: string; p_kind: string; p_source: string; p_actor_id?: string; p_environment?: string; p_session_id?: string }

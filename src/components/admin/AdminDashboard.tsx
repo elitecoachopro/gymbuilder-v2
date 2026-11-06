@@ -1,4 +1,5 @@
 'use client';
+import PromotionPaymentReview from './PromotionPaymentReview';
 import type { Database } from '@/types/database.generated';
 import Modal from '@/components/Modal';
 import TrafficCounters from '@/components/TrafficCounters';
@@ -643,6 +644,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          <PromotionPaymentReview />
           <TrafficCounters audience="admin" />
           {/* Section Switch */}
           <div className="flex gap-1 bg-anthracite-900 rounded-lg p-1 mb-6 w-full sm:w-fit overflow-x-auto">

@@ -1,4 +1,5 @@
 'use client';
+import PromotionCheckout from '@/components/PromotionCheckout';
 
 import Modal from '@/components/Modal';
 import TrafficCounters from '@/components/TrafficCounters';
@@ -847,6 +848,7 @@ export default function SupplierDashboard() {
 
           {/* Promovează-te Section */}
           {!serviceOnly && <div id="promotions" className="mb-8">
+            <PromotionCheckout />
             <div className="flex items-center gap-3 mb-5">
               <Megaphone className="w-5 h-5 text-gold-400" />
               <h2 className="text-xl font-bold text-white">{t('promotions.title')}</h2>

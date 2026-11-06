@@ -1,0 +1,38 @@
+{
+  "production_base": "cf11ba9662e001c923235e8099ad44558e9e330e",
+  "unit": {
+    "passed": 192
+  },
+  "integration": {
+    "passed": 131,
+    "skipped": 2,
+    "failed": 0,
+    "skip_reason": "external AI calls intentionally excluded"
+  },
+  "lint": "passed zero warnings",
+  "typecheck": "passed",
+  "build": "passed",
+  "real_stripe_test": "blocked: owner has only Imperial Gym account; Gym Builder account not created",
+  "production_billing_enabled": false,
+  "production_migration_applied": false,
+  "email_1149_initial_placement": "Spam confirmed by owner",
+  "resend_reply": "No new reply; Forge not routing yet; existing verified SPF/DKIM/DMARC, reputation remains unresolved",
+  "security_review": "No signature, ownership, receipt amount-binding or replay bypass found; null receipt regression reproduced red and fixed green locally",
+  "simplification": {
+    "reuse": 0,
+    "quality": 1,
+    "efficiency": 1,
+    "tests": 0,
+    "comments": 1,
+    "proof_tests": "retained unchanged",
+    "test_slot_warning": "Stripe sandbox must use separate test database; test exclusive slots share placement constraints"
+  },
+  "private_env_pull": "automatic review rejected broad production secret retrieval; safer ordinary live recovery-email flow selected",
+  "mobile_browser": {
+    "viewport": 393,
+    "document_width": 385,
+    "product_selection": "pass",
+    "weekly_price_button": "10 EUR /168h",
+    "physical_iphone_payment_test": "not performed; real Stripe account absent"
+  }
+}

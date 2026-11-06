@@ -1,13 +1,8 @@
+import { sendTransactionalEmail } from './transactional-email.ts';
+
 export async function sendSupplierEmail(to: string, subject: string, html: string, apiKey: string | undefined): Promise<boolean> {
   if (!apiKey) return false;
-  try {
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'Gym Builder <contact@gymbuilder.app>', to: [to], subject, html }),
-    });
-    return response.ok;
-  } catch { return false; }
+  try { await sendTransactionalEmail(to, subject, html, apiKey); return true; } catch { return false; }
 }
 
 export function supplierDecisionResult(company: string, action: 'approve' | 'reject', emailSent: boolean) {

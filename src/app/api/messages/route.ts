@@ -1,3 +1,4 @@
+import { sendTransactionalEmail } from '@/lib/transactional-email';
 import type { Database } from '@/types/database.generated';
 import { localizedJson } from '@/lib/json-response';
 import { getSessionUser } from '@/lib/session-server';
@@ -25,26 +26,7 @@ function getSupabase() {
 async function getUserFromSession(_request?: unknown) { return getSessionUser(); }
 
 async function sendEmail(to: string, subject: string, html: string) {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return false;
-  try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'Gym Builder <contact@gymbuilder.app>',
-        to: [to],
-        subject,
-        html,
-      }),
-    });
-    return res.ok;
-  } catch {
-    return false;
-  }
+  try { await sendTransactionalEmail(to, subject, html); return true; } catch { return false; }
 }
 
 // GET - Fetch messages for a specific contact request
