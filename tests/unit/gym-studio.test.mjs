@@ -67,7 +67,7 @@ test('oversized requested models are reported as space omissions',()=>{
 
 test('metre-based demo and L-shaped proposals validate and keep fixed architecture', async () => {
  const { demoSpace, emptySpace, populateSpace, validateSpace, spaceArea } = await import('../../src/lib/gym-space.ts');
- const demo = demoSpace(); assert.equal(validateSpace(demo,3.5,null),null);assert.equal(demo.items.length,39);
+ const demo = demoSpace(); assert.equal(validateSpace(demo,3.5,null),null);assert.equal(demo.items.length,40);
  const room=emptySpace();room.outline=[{x:0,y:0},{x:20,y:0},{x:20,y:10},{x:15,y:10},{x:15,y:15},{x:0,y:15}];
  room.columns=[{id:'column',x:4,y:4,w:0.5,d:0.5}];
  const result=populateSpace(room,[{zoneId:'cardio',equipment:[{templateId:'banda_alergare',quantity:3}]},{zoneId:'greutati',equipment:[{templateId:'rack_squat',quantity:2}]}],2,8000);

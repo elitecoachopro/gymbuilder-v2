@@ -1,0 +1,14 @@
+[
+  "src/lib/gym-space.ts",
+  "src/lib/gym-sled-motion.ts",
+  "src/components/studio/SledMotion.tsx",
+  "src/components/studio/DetailedAthlete.tsx",
+  "src/components/studio/FitnessPeople.tsx",
+  "src/components/studio/SpaceScene.tsx",
+  "src/components/studio/StudioWorkbench.tsx",
+  "tests/browser/app/page.tsx",
+  "tests/unit/gym-sled-motion.test.mjs",
+  "tests/unit/gym-sled-track.test.mjs",
+  "tests/unit/gym-studio.test.mjs",
+  "src/lib/gym-walkthrough.ts"
+]

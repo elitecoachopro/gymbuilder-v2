@@ -40,7 +40,7 @@ export default function BrowserCheck() {
     const materials = new Set<THREE.Material>();
     let lights = 0;
     scene.traverse(object => { if (object instanceof THREE.Light) lights++; if (object instanceof THREE.Mesh) for (const material of Array.isArray(object.material) ? object.material : [object.material]) materials.add(material); });
-    setResult(JSON.stringify({ camera: state.camera.position.toArray(), calls: gl.info.render.calls, triangles: gl.info.render.triangles, geometries: gl.info.memory.geometries, textures: gl.info.memory.textures, materials: materials.size, programs: gl.info.programs?.length, lights, exposure: gl.toneMappingExposure, shadows: gl.shadowMap.enabled, dpr: gl.getPixelRatio(), width: gl.domElement.width, height: gl.domElement.height }));
+    setResult(JSON.stringify({ sledOffset: scene.getObjectByName('sled-demo-motion')?.position.z, camera: state.camera.position.toArray(), calls: gl.info.render.calls, triangles: gl.info.render.triangles, geometries: gl.info.memory.geometries, textures: gl.info.memory.textures, materials: materials.size, programs: gl.info.programs?.length, lights, exposure: gl.toneMappingExposure, shadows: gl.shadowMap.enabled, dpr: gl.getPixelRatio(), width: gl.domElement.width, height: gl.domElement.height }));
   };
   const [ready, setReady] = useState(false);
   useEffect(() => {

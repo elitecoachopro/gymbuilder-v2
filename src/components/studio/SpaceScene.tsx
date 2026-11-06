@@ -2,6 +2,8 @@
 
 import { Component, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import SledMotion, {type SledPlayback} from './SledMotion';
+import type {SledPushRoute} from '@/lib/gym-sled-motion';
 import { sampleGymTour, type GymTour } from '@/lib/gym-walkthrough';
 import { Environment, Lightformer, OrbitControls, TransformControls } from '@react-three/drei';
 import * as THREE from 'three';
@@ -35,6 +37,7 @@ interface Props {
   profile: GymGraphicsProfile;
   navigation: 'orbit' | 'pan'; cameraCommand: CameraCommand;
   onFailure: () => void;
+  sledRoute?: SledPushRoute | null; sledPlayback?: SledPlayback; onSledEnd?: () => void;
   onTourEnd?: (reason: 'complete' | 'hidden') => void;
 }
 function GraphicsMonitor({ onFailure }: Pick<Props, 'onFailure'>) {
@@ -165,11 +168,11 @@ function Wall({ wall, space, height, cutaway }: { wall: SpaceWall; space: GymSpa
     })}
   </group>;
 }
-function Item({ item, space, selected, onSelect, onMove }: { item: SpaceItem; space: GymSpace; selected: boolean; onSelect: Props['onSelect']; onMove: Props['onMove'] }) {
+function Item({ item, space, selected, onSelect, onMove, sledRoute, sledPlayback, onSledEnd, view }: Pick<Props, 'sledRoute' | 'sledPlayback' | 'onSledEnd' | 'view'> & { item: SpaceItem; space: GymSpace; selected: boolean; onSelect: Props['onSelect']; onMove: Props['onMove'] }) {
   const ref = useRef<THREE.Group>(null!);
   const t = EQUIPMENT_CATALOG.find(t => t.id === item.templateId)!;
   const model = <group ref={ref} position={[item.x, 0.025, item.y]} onClick={e => { e.stopPropagation(); onSelect(item.id); }}>
-    <group rotation={[0, -item.rotation * Math.PI / 180, 0]}><EquipmentModel templateId={item.templateId} frame={space.finishes.frame} upholstery={space.finishes.upholstery} />{selected && <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.012, 0]}><planeGeometry args={[t.length_m + 0.08, t.width_m + 0.08]} /><meshBasicMaterial color="#d6b16d" transparent opacity={0.45} depthWrite={false} /></mesh>}</group>
+    <group rotation={[0, -item.rotation * Math.PI / 180, 0]}>{!selected && sledRoute?.itemId === item.id && sledPlayback && onSledEnd ? <SledMotion route={sledRoute} playback={sledPlayback} onEnd={onSledEnd} follow={view==='inside'}/> : <EquipmentModel templateId={item.templateId} frame={space.finishes.frame} upholstery={space.finishes.upholstery} />}{selected && <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.012, 0]}><planeGeometry args={[t.length_m + 0.08, t.width_m + 0.08]} /><meshBasicMaterial color="#d6b16d" transparent opacity={0.45} depthWrite={false} /></mesh>}</group>
   </group>;
   return <>{model}{selected && <TransformControls object={ref} showY={false} mode="translate" translationSnap={(space.visualization ?? DEFAULT_VISUALIZATION).snap} size={0.7} onMouseUp={() => { if (!onMove(item.id, ref.current.position.x, ref.current.position.z)) ref.current.position.set(item.x, 0.025, item.y); }} />}</>;
 }
@@ -217,7 +220,7 @@ export default function SpaceScene(props: Props) {
     <EquipmentContactShadows space={space} />
     {visualization.dimensions && <SpaceDimensions space={space} selected={selected} />}
     <EquipmentMaterials frame={space.finishes.frame} upholstery={space.finishes.upholstery}>
-      {space.items.map(item => <Item key={item.id} item={item} space={space} selected={selected === item.id} onMove={props.onMove} onSelect={props.onSelect} />)}
+      {space.items.map(item => <Item key={item.id} item={item} space={space} selected={selected === item.id} onMove={props.onMove} onSelect={props.onSelect} sledRoute={props.sledRoute} sledPlayback={props.sledPlayback} onSledEnd={props.onSledEnd} view={props.view} />)}
     </EquipmentMaterials></SurfaceMaterials>
   </Canvas></Boundary>;
 }
