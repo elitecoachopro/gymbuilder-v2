@@ -204,7 +204,8 @@ export function demoSpace(): GymSpace {
     { id: 'greutati', name: 'Greutăți libere', colour: '#7c858e', x: 0.3, y: 9.3, w: 9.2, d: 5.3 },
     { id: 'stretching', name: 'Stretching', colour: '#8a9b83', x: 10.3, y: 10, w: 9.3, d: 4.6 },
   ];
-  space.finishes = { floor: 'tartan', wall: '#e3e2db', frame: '#333d46', upholstery: '#536c68' };
+  space.finishes = { floor: 'tartan', wall: '#303940', frame: '#455159', upholstery: '#9b4036' };
+  space.visualization = { lighting:'studio', interiorStyle:'industrial', eyeHeight:1.65, fov:50, snap:.1, dimensions:false };
   const groups: Array<{ templateId: string; positions: Array<[number, number, number?]> }> = [
     { templateId: 'desk_receptie', positions: [[2.5, 1.8, 180]] },
     { templateId: 'canapea', positions: [[3.7, 3.2, 180]] },

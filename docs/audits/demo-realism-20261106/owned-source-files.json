@@ -1,0 +1,11 @@
+[
+  "src/components/studio/SpaceScene.tsx",
+  "src/components/studio/StudioWorkbench.tsx",
+  "src/lib/gym-walkthrough.ts",
+  "src/lib/gym-pbr-textures.ts",
+  "src/lib/gym-reference-models.js",
+  "src/lib/gym-space.ts",
+  "src/lib/gym-visualization.ts",
+  "tests/unit/gym-walkthrough.test.mjs",
+  "tests/browser/app/page.tsx"
+]

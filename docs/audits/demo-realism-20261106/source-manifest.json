@@ -1,0 +1,11 @@
+{
+  "src/components/studio/SpaceScene.tsx": "159a4172c9d1e42f2da9db2e0f56772b9eb04603db604ad03e026cbe5517a13c",
+  "src/components/studio/StudioWorkbench.tsx": "d55e0095be2571aae076f0e7b913cfc02c752fe32f0d1b08906caea247f24592",
+  "src/lib/gym-walkthrough.ts": "b60372dec9f86b62ea2a29b9f2450fe387b880d5ca6fcb28327ea7c1fc5f8fc1",
+  "src/lib/gym-pbr-textures.ts": "1b8b6b5b4d47dfed648191c5255189988cb31849115991d07b0c6676fbb6b755",
+  "src/lib/gym-reference-models.js": "9f8b209e042ad1492e61d95f6ce33b46d1bcb97cb9bce83b49bb10d4688133f5",
+  "src/lib/gym-space.ts": "ff9d6886b0c34249bbb1126b9a087daa97b2ccab27be24d6e8a9a836d6320ec8",
+  "src/lib/gym-visualization.ts": "f093afe4b1e286974befdf7284bb30ceafb6ecae929f1102d71004500a46c3bb",
+  "tests/unit/gym-walkthrough.test.mjs": "c437e5e73378e0498cdbce96667ad563eb584285ad95c2c4c0c0e456a96ea33c",
+  "tests/browser/app/page.tsx": "c7961efb7a1f68920b6aa5d0b80439ce81c8c2c83f24e223bec00137de727f9b"
+}

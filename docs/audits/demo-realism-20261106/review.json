@@ -1,0 +1,109 @@
+{
+  "status": "complete",
+  "verdict": "Ready with fixes",
+  "scope": {
+    "base": "430b25cc88c197932b8a3efae1244df0fc045789",
+    "branch": "codex/rotating-catalog-offers",
+    "head_sha": "430b25cc88c197932b8a3efae1244df0fc045789",
+    "pr_url": null,
+    "files_changed": 8
+  },
+  "intent": "Improve 300m\u00b2 demo equipment detail, industrial materials and neutral lighting. Add explicit 1.65m eye-level walking tour with seven viewpoints, manual stops, reduced-motion behavior, background stop and completion; preserve economic rendering and automatic 2D fallback. Generic models, not manufacturer-certified.",
+  "intent_confidence": "explicit",
+  "reviewers": [
+    "correctness",
+    "adversarial"
+  ],
+  "findings": [
+    {
+      "title": "Entering fullscreen restarts the running tour",
+      "severity": "P2",
+      "file": "src/components/studio/SpaceScene.tsx",
+      "line": 74,
+      "why_it_matters": "Entering fullscreen, rotating a phone, or resizing the viewport during the tour jumps the visitor back to Reception and restarts its entire duration. The camera effect depends on canvas dimensions, but it resets the walking state and replays a tour command even when its ID has already been handled. Preserving elapsed tour state across size changes avoids this unexpected rewind.",
+      "autofix_class": "gated_auto",
+      "owner": "downstream-resolver",
+      "requires_verification": true,
+      "suggested_fix": "Start a tour only for a newly handled tour command; preserve walking.current and its elapsed time when only canvas dimensions change. Move the unconditional walking reset into actual command/view cancellation handling, and verify fullscreen and resize midway through a tour continue from the current stop.",
+      "confidence": 100,
+      "first_evidence": "src/components/studio/SpaceScene.tsx:74 -- walking.current = {tour:cameraCommand.tour,time:0};",
+      "evidence": [
+        "src/components/studio/SpaceScene.tsx:74 -- walking.current = {tour:cameraCommand.tour,time:0};",
+        "src/components/studio/SpaceScene.tsx:73 -- if (cameraCommand.kind === 'tour' && controls.current) {",
+        "src/components/studio/SpaceScene.tsx:115 -- }, [camera, length, width, view, height, size.width, size.height, invalidate, cameraCommand, eyeHeight, fov, space.outline, onNavigate]);",
+        "Scenario: start the tour and allow time to advance; use the existing Fullscreen button in StudioWorkbench.tsx:429; the canvas size changes, rerunning the camera effect with the same command ID; lines 69 and 74 clear the active walk and replace it with time 0; the next frame samples Reception again. No project edit or explicit restart is required."
+      ],
+      "pre_existing": false,
+      "#": 1,
+      "reviewers": [
+        "correctness",
+        "adversarial"
+      ],
+      "independent_reviewers": []
+    }
+  ],
+  "actionable_findings": [
+    {
+      "title": "Entering fullscreen restarts the running tour",
+      "severity": "P2",
+      "file": "src/components/studio/SpaceScene.tsx",
+      "line": 74,
+      "why_it_matters": "Entering fullscreen, rotating a phone, or resizing the viewport during the tour jumps the visitor back to Reception and restarts its entire duration. The camera effect depends on canvas dimensions, but it resets the walking state and replays a tour command even when its ID has already been handled. Preserving elapsed tour state across size changes avoids this unexpected rewind.",
+      "autofix_class": "gated_auto",
+      "owner": "downstream-resolver",
+      "requires_verification": true,
+      "suggested_fix": "Start a tour only for a newly handled tour command; preserve walking.current and its elapsed time when only canvas dimensions change. Move the unconditional walking reset into actual command/view cancellation handling, and verify fullscreen and resize midway through a tour continue from the current stop.",
+      "confidence": 100,
+      "first_evidence": "src/components/studio/SpaceScene.tsx:74 -- walking.current = {tour:cameraCommand.tour,time:0};",
+      "evidence": [
+        "src/components/studio/SpaceScene.tsx:74 -- walking.current = {tour:cameraCommand.tour,time:0};",
+        "src/components/studio/SpaceScene.tsx:73 -- if (cameraCommand.kind === 'tour' && controls.current) {",
+        "src/components/studio/SpaceScene.tsx:115 -- }, [camera, length, width, view, height, size.width, size.height, invalidate, cameraCommand, eyeHeight, fov, space.outline, onNavigate]);",
+        "Scenario: start the tour and allow time to advance; use the existing Fullscreen button in StudioWorkbench.tsx:429; the canvas size changes, rerunning the camera effect with the same command ID; lines 69 and 74 clear the active walk and replace it with time 0; the next frame samples Reception again. No project edit or explicit restart is required."
+      ],
+      "pre_existing": false,
+      "#": 1,
+      "reviewers": [
+        "correctness",
+        "adversarial"
+      ],
+      "independent_reviewers": []
+    }
+  ],
+  "triage_groups": [],
+  "pre_existing_findings": [],
+  "requirements_completeness": null,
+  "learnings": [],
+  "agent_native_gaps": [],
+  "deployment_notes": [],
+  "residual_risks": [
+    "Physical phone behavior remains untested; supplied mobile browser verification covered a 390\u00d7844 viewport."
+  ],
+  "testing_gaps": [
+    "Reduced-motion preference and actual hidden-document event behavior were inspected in source but not exercised in the supplied browser evidence."
+  ],
+  "coverage": {
+    "depth": "focused",
+    "scope_mode": "local-aligned exact eight-file snapshot",
+    "snapshot": "/tmp/compound-engineering-501/ce-code-review/20261106-180143-realism/snapshot",
+    "source_manifest": "/tmp/compound-engineering-501/ce-code-review/20261106-180143-realism/source-manifest.json",
+    "all_eight_hashes_match_tested_manifest": true,
+    "criteria": "No governing CODING_STANDARDS.md, AGENTS.md or CLAUDE.md; mobile/AGENTS.md does not govern these paths.",
+    "plan": "No explicit plan, PR body or unambiguous branch-keyword plan found.",
+    "review": "Correctness in this context plus one collected adversarial subagent; no other reviewers or validators dispatched.",
+    "verification": "Isolated walkthrough tests rerun: 3/3 passed after linking existing dependencies; supplied frozen-export evidence records 188/188 units, lint, typecheck, production build, complete tour, mobile viewport and real WebGL loss recovery. No build or production/DB operations run by this review.",
+    "not_assessed": [
+      "learnings",
+      "agent-native gaps",
+      "deployment notes",
+      "Compound Packs (none declared)"
+    ],
+    "excluded": "All paths outside owned-source-files.json, independent email/package/mobile changes and pre-existing commits; two new files explicitly included and staged only in isolated snapshot."
+  },
+  "peer": {
+    "outcome": "in-process-fallback",
+    "coverage": "Cross-model pass: not run because caller restricted review to same-family agents; a separately dispatched same-family adversarial reviewer supplied the independent read, with no cross-model agreement promotion."
+  },
+  "artifact_path": "/tmp/compound-engineering-501/ce-code-review/20261106-180143-realism",
+  "run_id": "20261106-180143-realism"
+}

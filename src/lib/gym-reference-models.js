@@ -16,7 +16,7 @@ export function createEquipmentModel(type,{texture=()=>null,upholstery='#a94b3f'
  const red=material('Red adjustment control','#b32f25',.43,.02);
  const amber=material('Emergency switch surround','#c7a04b',.57,.05);
  const silver=material('Brushed fasteners','#9ba8ad',.38,.75,'steel');
- const stitch=material('Upholstery seam','#bcb1a1',.9,0);
+ const stitch=material('Upholstery seam','#67514b',.9,0);
  const add=(g,m,x,y,z,parent=root)=>{const mesh=new THREE.Mesh(g,m);mesh.position.set(x,y,z);parent.add(mesh);return mesh;};
  const rounded=(x,y,z,w,h,d,m,r=.015,parent=root)=>add(new RoundedBoxGeometry(w,h,d,1,Math.min(r,w/3,h/3,d/3)),m,x,y,z,parent);
  const box=(x,y,z,w,h,d,m,parent=root)=>add(new THREE.BoxGeometry(w,h,d),m,x,y,z,parent);
@@ -66,6 +66,11 @@ export function createEquipmentModel(type,{texture=()=>null,upholstery='#a94b3f'
   }
   for(let i=0;i<65;i++)box(-.815+i*.021,.234,0,.0013,.001,.54,tread);
   for(const side of [-1,1]){
+   box(-.14,.236,side*.265,1.39,.0015,.004,silver);
+   for(const x of [.57,.84])nut(x,.401,side*.25,'y',.007);
+   rounded(-.75,.28,side*.368,.09,.006,.045,amber,.003);
+  }
+  for(const side of [-1,1]){
    const z=side*.335;
    beam([.48,.28,z],[.735,1.15,z],.065,.072,paint);
    rounded(.49,.33,z,.17,.12,.12,plastic,.03);
@@ -89,6 +94,10 @@ export function createEquipmentModel(type,{texture=()=>null,upholstery='#a94b3f'
   }
   for(const z of [-.17,-.10,.10,.17])cyl(.492,1.125,z,.015,.012,silver);
   cyl(.474,1.13,0,.029,.015,amber);cyl(.474,1.145,0,.021,.02,red);
+  for(const side of [-1,1]){
+   tube([[.70,1.07,side*.30],[.695,1.10,side*.27],[.69,1.10,side*.18]],.005,steel);
+   rounded(.695,1.105,side*.23,.045,.012,.10,rubber,.005);
+  }
   tube([[.474,1.13,0],[.426,1.06,.025],[.40,.92,.025],[.37,.89,.012]],.0025,red);
  }
  function legPress(){
@@ -147,6 +156,16 @@ export function createEquipmentModel(type,{texture=()=>null,upholstery='#a94b3f'
    tube([[.57,.89,side*.45],[.52,.75,side*.48],[.37,.69,side*.49]],.013,steel);
    cyl(.36,.69,side*.49,.023,.09,red,'x',12);
    rounded(.08,.86,side*.49,.10,.05,.13,plastic,.012);
+  }
+  const loadMap=texture(256,128,ctx=>{
+   ctx.fillStyle='#292f2d';ctx.fillRect(0,0,256,128);ctx.fillStyle='#d4d9d3';ctx.textAlign='center';ctx.font='600 56px sans-serif';ctx.fillText('20 KG',128,82);
+  });
+  const loadLabel=new THREE.MeshStandardMaterial({name:'Printed load plate labels',color:loadMap?'#ffffff':'#292f2d',map:loadMap,roughness:.9});
+  for(const side of [-1,1]){
+   const label=add(new THREE.PlaneGeometry(.16,.08),loadLabel,.365,1.105,side*.639);
+   if(side<0)label.rotation.y=Math.PI;
+   rounded(.65,1.44,side*.49,.12,.045,.12,rubber,.012);
+   beam([.27,.91,side*.45],[.43,1.09,side*.40],.035,.035,paint);
   }
  }
  function bearing(point,axis,radius=.05){

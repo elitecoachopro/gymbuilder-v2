@@ -1,7 +1,8 @@
 'use client';
 
 import { Component, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { sampleGymTour, type GymTour } from '@/lib/gym-walkthrough';
 import { Environment, Lightformer, OrbitControls, TransformControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { spaceBounds, spaceWalls, type GymSpace, type SpaceItem, type SpaceWall } from '@/lib/gym-space';
@@ -24,7 +25,7 @@ import { roomShape } from '@/lib/gym-room-shape';
 import { DEFAULT_VISUALIZATION, FLOOR_SURFACES, LIGHTING_PRESETS } from '@/lib/gym-visualization';
 
 export type StudioView = 'orbit' | 'top' | 'inside';
-export type CameraCommand = { kind: 'fit' | 'in' | 'out'; id: number } | { kind: 'pose'; id: number; position: [number, number, number]; lookAt: [number, number, number] } | { kind: 'focus'; id: number; target: { x: number; y: number; length: number; width: number; height: number; direction?: [number, number] } };
+export type CameraCommand = { kind: 'fit' | 'in' | 'out' | 'stop'; id: number } | { kind: 'tour'; id: number; tour: GymTour } | { kind: 'pose'; id: number; position: [number, number, number]; lookAt: [number, number, number] } | { kind: 'focus'; id: number; target: { x: number; y: number; length: number; width: number; height: number; direction?: [number, number] } };
 const floorExtrusion = { depth: 0.25, bevelEnabled: false };
 interface Props {
   space: GymSpace; height: number; selected: string | null; view: StudioView; cutaway: boolean; showAreas: boolean;
@@ -34,22 +35,47 @@ interface Props {
   profile: GymGraphicsProfile;
   navigation: 'orbit' | 'pan'; cameraCommand: CameraCommand;
   onFailure: () => void;
+  onTourEnd?: (reason: 'complete' | 'hidden') => void;
 }
 function GraphicsMonitor({ onFailure }: Pick<Props, 'onFailure'>) {
   const { gl } = useThree();
   useEffect(() => watchGraphicsContext(gl.domElement, onFailure), [gl, onFailure]);
   return null;
 }
-function CameraRig({ space, view, height, onCaptureReady, navigation, cameraCommand, onNavigate }: Pick<Props, 'space' | 'view' | 'height' | 'onCaptureReady' | 'navigation' | 'cameraCommand'> & { onNavigate: (moving: boolean) => void }) {
+function CameraRig({ space, view, height, onCaptureReady, navigation, cameraCommand, onNavigate, onTourEnd }: Pick<Props, 'space' | 'view' | 'height' | 'onCaptureReady' | 'navigation' | 'cameraCommand' | 'onTourEnd'> & { onNavigate: (moving: boolean) => void }) {
   const { camera, size, gl, scene, invalidate } = useThree();
   const controls = useRef<React.ComponentRef<typeof OrbitControls>>(null);
+  const walking = useRef<{ tour: GymTour; time: number } | null>(null);
+  useEffect(() => {
+    const pause = () => { if (document.hidden && walking.current) { walking.current = null; onTourEnd?.('hidden'); } };
+    document.addEventListener('visibilitychange', pause);
+    return () => document.removeEventListener('visibilitychange', pause);
+  }, [onTourEnd]);
+  useFrame((_state, delta) => {
+    const walk = walking.current;
+    if (!walk || !controls.current) return;
+    walk.time = Math.min(walk.tour.duration, walk.time + Math.min(delta,.1));
+    const pose = sampleGymTour(walk.tour,walk.time);
+    camera.position.set(...pose.position); controls.current.target.set(...pose.lookAt); controls.current.update();
+    if (walk.time >= walk.tour.duration) { walking.current = null; onTourEnd?.('complete'); }
+    else invalidate();
+  });
   const { length, width } = spaceBounds(space);
   const { eyeHeight, fov } = space.visualization ?? DEFAULT_VISUALIZATION;
   const handledCommand = useRef(cameraCommand.kind === 'focus' ? cameraCommand.id - 1 : cameraCommand.id);
   useEffect(() => {
     const isCommand = handledCommand.current !== cameraCommand.id;
     handledCommand.current = cameraCommand.id;
+    if (cameraCommand.kind === 'tour' && !isCommand && walking.current) { invalidate(); return; }
+    walking.current = null;
+    if (controls.current) { controls.current.enabled = true; controls.current.enableDamping = true; }
     if (camera instanceof THREE.PerspectiveCamera) { camera.fov = fov; camera.updateProjectionMatrix(); }
+    if (cameraCommand.kind === 'stop' && isCommand) { onNavigate(false); invalidate(); return; }
+    if (cameraCommand.kind === 'tour' && controls.current) {
+      walking.current = {tour:cameraCommand.tour,time:0};
+      controls.current.enabled = false; controls.current.enableDamping = false;
+      onNavigate(true); invalidate(); return;
+    }
     if (cameraCommand.kind === 'pose' && controls.current) {
       camera.position.set(...cameraCommand.position);
       controls.current.target.set(...cameraCommand.lookAt);
@@ -87,7 +113,7 @@ function CameraRig({ space, view, height, onCaptureReady, navigation, cameraComm
       controls.current?.target.copy(centre);
     }
     controls.current?.update(); invalidate();
-  }, [camera, length, width, view, height, size.width, size.height, invalidate, cameraCommand, eyeHeight, fov, space.outline]);
+  }, [camera, length, width, view, height, size.width, size.height, invalidate, cameraCommand, eyeHeight, fov, space.outline, onNavigate]);
   useEffect(() => {
     onCaptureReady(() => { gl.render(scene, camera); return gl.domElement.toDataURL('image/png'); });
     return () => onCaptureReady(null);
@@ -186,7 +212,7 @@ export default function SpaceScene(props: Props) {
     </Environment>}
     <directionalLight position={[bounds.length * light.sunX, light.sunHeight, bounds.width * light.sunZ]} intensity={light.strength} color={light.sun} castShadow={quality.shadows} shadow-mapSize={[1024, 1024]} shadow-camera-far={300} shadow-camera-left={-bounds.length} shadow-camera-right={bounds.length} shadow-camera-top={bounds.width} shadow-camera-bottom={-bounds.width} shadow-normalBias={0.025} shadow-bias={-0.0001} />
     <directionalLight position={[bounds.length, 8, -4]} intensity={light.fillStrength} color={light.fill} />
-    <CameraRig onNavigate={setMoving} navigation={props.navigation} cameraCommand={props.cameraCommand} space={space} view={props.view} height={height} onCaptureReady={props.onCaptureReady} />
+    <CameraRig onNavigate={setMoving} onTourEnd={props.onTourEnd} navigation={props.navigation} cameraCommand={props.cameraCommand} space={space} view={props.view} height={height} onCaptureReady={props.onCaptureReady} />
     <SurfaceMaterials><StudioRoom space={space} height={height} cutaway={cutaway} showAreas={showAreas} view={props.view} />
     <EquipmentContactShadows space={space} />
     {visualization.dimensions && <SpaceDimensions space={space} selected={selected} />}

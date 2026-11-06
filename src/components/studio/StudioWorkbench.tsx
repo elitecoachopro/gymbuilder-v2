@@ -16,6 +16,7 @@ import { importedEquipment } from '@/lib/gym-imported-equipment';
 import { EQUIPMENT_PILOT_IDS, pilotEquipmentEvidence } from '@/lib/gym-equipment-pilot';
 import { equipmentPilotSpace } from '@/lib/gym-equipment-pilot-space';
 import { initialGymCameraView } from '@/lib/gym-camera';
+import { demoGymTour } from '@/lib/gym-walkthrough';
 import { INITIAL_GYM_VIEW, INITIAL_GYM_GRAPHICS, type GymGraphicsProfile } from '@/lib/gym-graphics';
 import { floorSpace, buildingArea, demoBuildingSpace, floorBudget, FLOOR_RISE_M, type Storey } from '@/lib/gym-building';
 import { DEFAULT_VISUALIZATION, type GymVisualization } from '@/lib/gym-visualization';
@@ -99,6 +100,8 @@ export default function StudioWorkbench() {
   const [expanded, setExpanded] = useState(false);
   const [navigation, setNavigation] = useState<'orbit' | 'pan'>('orbit');
   const [cameraCommand, setCameraCommand] = useState<CameraCommand>({ kind: 'fit', id: 0 });
+  const [tourOpen, setTourOpen] = useState(false);
+  const tourRunning = cameraCommand.kind === 'tour';
   const commandCamera = (kind: 'fit' | 'in' | 'out') => setCameraCommand(c => ({ kind, id: c.id + 1 }));
   const [mode, setMode] = useState<'2d' | '3d'>(INITIAL_GYM_VIEW), [view, setView] = useState<StudioView>('orbit');
   const [graphicsProfile, setGraphicsProfile] = useState<GymGraphicsProfile>(INITIAL_GYM_GRAPHICS);
@@ -121,6 +124,11 @@ export default function StudioWorkbench() {
   const [projectsState, setProjectsState] = useState<'loading' | 'ready' | 'error' | 'guest'>('loading');
   const [projectsRetry, setProjectsRetry] = useState(0);
   const [error, setError] = useState(''), [notice, setNotice] = useState('');
+  const endTour = useCallback((reason?: 'complete' | 'hidden') => {
+    setCameraCommand(c => c.kind === 'tour' ? {kind:'stop',id:c.id+1} : c);
+    if (reason === 'complete') setNotice(locale === 'en' ? 'The eye-level tour is complete.' : 'Turul la nivelul ochilor s-a încheiat.');
+    if (reason === 'hidden') setNotice(locale === 'en' ? 'Tour stopped because the tab was hidden.' : 'Turul s-a oprit deoarece fila a fost ascunsă.');
+  }, [locale]);
   const [saving, setSaving] = useState(false), [projectId, setProjectId] = useState<string | null>(null);
   const [projects, setProjects] = useState<SavedProject[]>([]), [savedFingerprint, setSavedFingerprint] = useState(() => JSON.stringify(fresh()));
   const [pending, setPending] = useState<(() => void) | null>(null);
@@ -156,6 +164,16 @@ export default function StudioWorkbench() {
   const visualization = doc.space.visualization ?? DEFAULT_VISUALIZATION;
   const eyeHeight = Math.min(visualization.eyeHeight, doc.height - 0.2);
   const dirty = fingerprint !== savedFingerprint;
+  const tour = useMemo(() => demoGymTour(doc.space,doc.height), [doc.space,doc.height]);
+  useEffect(() => {
+    if (tourRunning && (mode !== '3d' || view !== 'inside' || cutaway || busy || !tour)) endTour();
+  }, [mode,view,cutaway,busy,tour,tourRunning,endTour]);
+  useEffect(() => { endTour(); setTourOpen(false); }, [fingerprint,storey,endTour]);
+  const showTourStop = (index: number) => {
+    const stop = tour?.stops[index]; if (!stop) return;
+    setView('inside'); setCutaway(false); setSelected(null);
+    setCameraCommand(c => ({kind:'pose',id:c.id+1,position:stop.position,lookAt:stop.lookAt}));
+  };
   const item = doc.space.items.find(i => i.id === selected), template = EQUIPMENT_CATALOG.find(e => e.id === item?.templateId);
   const focusItem = (id = selected) => {
     const item = doc.space.items.find(candidate => candidate.id === id);
@@ -423,7 +441,7 @@ export default function StudioWorkbench() {
           <summary className="min-h-11 flex items-center gap-2 cursor-pointer text-sm text-anthracite-200"><Settings2 size={15} />{t('Setări de afișare și aliniere', 'Display and alignment settings')}</summary>
           <div className="space-y-3 pb-3">
         <div className="flex flex-wrap items-center gap-3 text-xs text-anthracite-300">
-          <label className="flex items-center gap-2">{t('Profil 3D', '3D profile')}<select className={`${field} w-auto`} value={graphicsProfile} onChange={e => setGraphicsProfile(e.target.value as GymGraphicsProfile)}><option value="low">{t('Economic', 'Low power')}</option><option value="auto">{t('Claritate automată', 'Automatic clarity')}</option><option value="standard">{t('Standard', 'Standard')}</option></select></label>
+          <label className="flex items-center gap-2">{t('Profil 3D', '3D profile')}<select className={`${field} w-auto`} value={graphicsProfile} onChange={e => { endTour(); setGraphicsProfile(e.target.value as GymGraphicsProfile); }}><option value="low">{t('Economic', 'Low power')}</option><option value="auto">{t('Claritate automată', 'Automatic clarity')}</option><option value="standard">{t('Standard', 'Standard')}</option></select></label>
           <span>{t('Pornire în 2D · 3D la cerere', 'Starts in 2D · 3D on request')}</span>
         </div>
         <fieldset disabled={busy} className="flex flex-wrap items-end gap-3 rounded-lg border border-white/10 bg-anthracite-800 p-3">
@@ -438,9 +456,23 @@ export default function StudioWorkbench() {
         </details>
         {graphicsFailed && <p role="status" className="rounded-lg border border-amber-300/30 bg-amber-300/10 p-3 text-sm text-amber-100">{t('Vizualizarea 3D a întâmpinat o problemă. Am revenit la planul 2D; proiectul este păstrat. Poți reîncerca 3D în profilul economic.', 'The 3D view encountered a problem. We switched to the 2D plan; your project is preserved. You can retry 3D in the low power profile.')}</p>}
         <div className={`relative ${expanded ? 'h-[52dvh] min-h-[280px] md:h-[calc(100dvh-240px)]' : 'h-[64dvh] min-h-[360px] lg:h-[66dvh] lg:min-h-[500px]'} rounded-xl bg-[#c3cbc9] border border-white/10 overflow-hidden`} inert={busy}>
-          {mode === '3d' ? <SpaceScene key={storey} navigation={navigation} cameraCommand={cameraCommand} profile={graphicsProfile} onFailure={recoverGraphics} space={doc.space} height={doc.height} selected={selected} view={view} cutaway={cutaway} showAreas={showAreas} onSelect={setSelected} onMove={moveItem} onCaptureReady={readyCapture} fallback={t('Scena 3D nu este disponibilă. Folosește planul 2D.', '3D is unavailable. Use the 2D plan.')} /> : <SpacePlan key={storey} space={doc.space} height={doc.height} budget={doc.budget} disabled={busy} onEdit={editStructureCommand} selected={selected} onSelect={setSelected} onMove={moveItem} label={t('Planul sălii în metri', 'Gym floor plan in metres')} />}
+          {mode === '3d' ? <SpaceScene key={storey} navigation={navigation} cameraCommand={cameraCommand} profile={graphicsProfile} onTourEnd={endTour} onFailure={recoverGraphics} space={doc.space} height={doc.height} selected={selected} view={view} cutaway={cutaway} showAreas={showAreas} onSelect={setSelected} onMove={moveItem} onCaptureReady={readyCapture} fallback={t('Scena 3D nu este disponibilă. Folosește planul 2D.', '3D is unavailable. Use the 2D plan.')} /> : <SpacePlan key={storey} space={doc.space} height={doc.height} budget={doc.budget} disabled={busy} onEdit={editStructureCommand} selected={selected} onSelect={setSelected} onMove={moveItem} label={t('Planul sălii în metri', 'Gym floor plan in metres')} />}
           <span className="absolute bottom-3 left-3 text-[10px] tracking-widest text-slate-700 bg-white/65 rounded px-2 py-1 pointer-events-none">Imperial Gym · {spaceArea(doc.space).toFixed(0)} m²</span>
         </div>
+        {mode === '3d' && doc.space.items.some(item => item.id === 'demo-desk_receptie-1') && <div className="rounded-xl border border-white/10 bg-anthracite-800 p-3 space-y-3">
+          <button className={iconButton} disabled={!tour || busy} aria-expanded={tourOpen} onClick={() => { if (tourOpen) endTour(); else showTourStop(0); setTourOpen(!tourOpen); }}><Eye size={16}/>{t('Tur la nivelul ochilor · 1,65 m','Eye-level tour · 1.65 m')}</button>
+          {!tour && <p className="text-xs text-anthracite-300">{t('Traseul demonstrativ este blocat de configurația actuală. Poți naviga manual în Interior.','The current layout blocks the demo route. You can navigate manually in Interior view.')}</p>}
+          {tourOpen && tour && <>
+            <div className="flex flex-wrap gap-2"><button className={iconButton} disabled={busy} aria-pressed={tourRunning} onClick={() => {
+              if (tourRunning) { endTour(); return; }
+              if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { showTourStop(0); setNotice(t('Mișcare redusă activă: alege un unghi din butoanele turului.','Reduced motion is enabled: choose a view using the tour buttons.')); return; }
+              setView('inside'); setCutaway(false); setSelected(null); setNotice('');
+              setCameraCommand(c => ({kind:'tour',id:c.id+1,tour}));
+            }}>{tourRunning ? t('Oprește turul','Stop tour') : t('Pornește turul','Start tour')}</button><span className="flex items-center text-xs text-anthracite-300">{t('Aproximativ','Approximately')} {Math.round(tour.duration)} s · {t('Oprire automată la final','Stops automatically at the end')}</span></div>
+            <div className="flex flex-wrap gap-2" aria-label={t('Unghiurile turului','Tour viewpoints')}>{tour.stops.map((stop,index) => <button key={stop.ro} className={iconButton} disabled={busy} onClick={() => showTourStop(index)}>{locale === 'en' ? stop.en : stop.ro}</button>)}</div>
+            <p className="text-xs text-anthracite-300">{t('Turul se oprește când schimbi planul, ieși din 3D sau părăsești fila. Nu modifică proiectul.','The tour stops when you edit the layout, leave 3D or hide the tab. It does not change your project.')}</p>
+          </>}
+        </div>}
         {mode === '3d' && <div className="flex flex-wrap items-center gap-2" aria-label={t('Navigare 3D', '3D navigation')}>
           <button className={iconButton} aria-pressed={navigation === 'orbit'} onClick={() => setNavigation('orbit')}>{t('Rotire', 'Rotate')}</button>
           <button className={iconButton} aria-pressed={navigation === 'pan'} onClick={() => setNavigation('pan')}>{t('Deplasare', 'Pan')}</button>

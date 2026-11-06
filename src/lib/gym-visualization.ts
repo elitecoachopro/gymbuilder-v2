@@ -15,7 +15,7 @@ export const DEFAULT_VISUALIZATION: GymVisualization = { lighting: 'daylight', e
 export const LIGHTING_PRESETS = {
   daylight: { background: '#c3cbc9', sky: '#f3f5f1', ground: '#7b868a', sun: '#fff3e5', fill: '#dce7ef', ambient: 0.3, hemisphere: 1.1, strength: 2.4, fillStrength: 1.35, exposure: 1.08, sunX: 0.2, sunZ: 0.6, sunHeight: 15 },
   evening: { background: '#727c91', sky: '#f4d8bc', ground: '#414b60', sun: '#ffb96b', fill: '#a5b5d2', ambient: 0.25, hemisphere: 0.85, strength: 1.7, fillStrength: 0.85, exposure: 0.98, sunX: -0.4, sunZ: 0.8, sunHeight: 5 },
-  studio: { background: '#c3c8cf', sky: '#f0f3f6', ground: '#869094', sun: '#faf8f2', fill: '#e5edf2', ambient: 0.3, hemisphere: 1.2, strength: 2, fillStrength: 1.55, exposure: 1.12, sunX: 0.5, sunZ: 0.5, sunHeight: 18 },
+  studio: { background: '#b8c2ca', sky: '#f1f5f7', ground: '#606e79', sun: '#fff5e8', fill: '#dbeafa', ambient: 0.38, hemisphere: 1.25, strength: 2.15, fillStrength: 1.65, exposure: 1.08, sunX: 0.2, sunZ: 0.4, sunHeight: 12 },
 } as const;
 export const FLOOR_SURFACES = {
   tartan: { tileMetres: 0.5, roughness: 0.98, bumpScale: 0.002 },

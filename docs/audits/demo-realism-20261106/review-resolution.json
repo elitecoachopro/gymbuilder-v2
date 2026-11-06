@@ -1,0 +1,7 @@
+{
+  "finding": 1,
+  "applied": "inline",
+  "fix": "Preserve active runtime for repeated tour command on canvas resize; explicitly stop before graphics profile remount",
+  "verification": "Fullscreen enter/exit mid-tour advances camera instead of returning to Reception; final3unit route tests and isolated188unit/lint/type/build pass",
+  "remaining_findings": 0
+}
