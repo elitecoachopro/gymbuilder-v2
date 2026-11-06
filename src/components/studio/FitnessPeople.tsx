@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useMemo, useRef } from 'react';
-import { useThree } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
   createPersonGeometry,
@@ -14,9 +14,11 @@ import DetailedAthlete from './DetailedAthlete';
 function ProceduralPerson({
   pose = 'coach',
   gait = 0,
+  motionTime,
 }: {
   pose?: PersonPose;
   gait?: number;
+  motionTime?: {current:number};
 }) {
   const geometry = useMemo(() => {
     const base = createPersonGeometry(pose);
@@ -39,6 +41,10 @@ function ProceduralPerson({
     });
     invalidate();
   }, [gait, invalidate]);
+  useFrame(() => {
+    if (!motionTime) return;
+    meshes.current?.traverse(object => { if (object instanceof THREE.Mesh && object.morphTargetInfluences) object.morphTargetInfluences[0]=(Math.sin(motionTime.current*Math.PI*2)+1)/2; });
+  });
   const materials = useMemo(() => {
     const colours = {
       skin: '#ffffff',
@@ -72,11 +78,11 @@ function ProceduralPerson({
     </group>
   );
 }
-export function FictionalPerson({pose='coach',gait=0,time=0}:{pose?:PersonPose;gait?:number;time?:number}) {
-  const fallback=<ProceduralPerson pose={pose} gait={gait}/>;
-  return pose==='push'?<DetailedAthlete time={time} fallback={fallback}/>:<DetailedPerson pose={pose} fallback={fallback}/>;
+export function FictionalPerson({pose='coach',gait=0,time=0,motionTime}:{pose?:PersonPose;gait?:number;time?:number;motionTime?:{current:number}}) {
+  const fallback=<ProceduralPerson pose={pose} gait={gait} motionTime={motionTime}/>;
+  return pose==='push'?<DetailedAthlete time={time} motionTime={motionTime} fallback={fallback}/>:<DetailedPerson pose={pose} fallback={fallback}/>;
 }
-export function SledTraining({ time = 0 }: { time?: number }) {
+export function SledTraining({ time = 0, motionTime }: { time?: number;motionTime?:{current:number} }) {
   return (
     <group position={[0, 0, 0.74]}>
       {[-1, 1].map((side) => (
@@ -99,8 +105,8 @@ export function SledTraining({ time = 0 }: { time?: number }) {
           <Wheel p={[0, 0, 0]} radius={0.225} depth={0.055} finish="rubber" hub={false} />
         </group>
       ))}
-      <group position={[0, 0, -1.3]}>
-        <FictionalPerson pose="push" time={time} gait={(Math.sin(time*Math.PI*2.2)+1)/2} />
+      <group position={[0, 0, -1.2]}>
+        <FictionalPerson pose="push" time={time} motionTime={motionTime} gait={(Math.sin(time*Math.PI*2.2)+1)/2} />
       </group>
     </group>
   );

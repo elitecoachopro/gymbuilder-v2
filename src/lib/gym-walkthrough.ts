@@ -22,14 +22,14 @@ export function demoGymTour(space: GymSpace, height: number): GymTour | null {
     return polygonFits(foot, space.outline) && obstacles.every(obstacle => !polygonsOverlap(foot, obstacle));
   };
   const frames: TourFrame[] = [], stops: GymTour['stops'] = [];
-  const visit = (x: number, z: number, lookX: number, lookZ: number, label?: [string,string]) => {
+  const visit = (x: number, z: number, lookX: number, lookZ: number, label?: [string,string], targetHeight = 1.15) => {
     const previous = frames.at(-1), distance = previous ? Math.hypot(x-previous.position[0], z-previous.position[2]) : 0;
     if (previous) for (let i=0;i<=Math.ceil(distance/.1);i++) {
       const t = i/Math.max(1,Math.ceil(distance/.1));
       if (!clear(previous.position[0]+(x-previous.position[0])*t,previous.position[2]+(z-previous.position[2])*t)) return false;
     }
     if (!clear(x,z)) return false;
-    const frame: TourFrame = { at:(previous?.at ?? 0)+distance/.95, position:[x,eye,z], lookAt:[lookX,1.15,lookZ] };
+    const frame: TourFrame = { at:(previous?.at ?? 0)+distance/.95, position:[x,eye,z], lookAt:[lookX,targetHeight,lookZ] };
     frames.push(frame);
     if (label) { stops.push({...frame,ro:label[0],en:label[1]}); frames.push({...frame,at:frame.at+3}); }
     return true;
@@ -42,8 +42,8 @@ export function demoGymTour(space: GymSpace, height: number): GymTour | null {
     [12.5,8.2,14.1,6.2,['Presa pentru picioare','Leg press']],
     [15.5,8.2,17.4,6.1,['Stația cu cabluri','Cable station']],
     [10.5,8.2,4.5,10.8], [10.5,9.6,4.5,10.8,['Greutăți libere','Free weights']],
-    [10.5,8.2,17.4,6.1], [19.5,8.2,17.4,6.1], [19.5,12.5,15,13.6],
-    [17,12.5,13,13.6,['Pistă CrossFit','CrossFit track']],
+    [10.5,8.2,17.4,6.1], [19.5,8.2,17.4,6.1], [19.5,11.8,15,13.6],
+    [19.3,9.4,17.85,13.6,['Pistă CrossFit','CrossFit track'],.85],
   ];
   if (!itinerary.every(point => visit(...point))) return null;
   return {frames,stops,duration:frames.at(-1)!.at};

@@ -228,6 +228,7 @@ export function demoSpace(): GymSpace {
     { templateId: 'cad_dumbbell_rack', positions: [[7.5, 10, 90], [7.5, 11.5, 90]] },
     { templateId: 'rig_crossfit', positions: [[17.4, 1.9]] },
     { templateId: 'box_pliometric', positions: [[15.8, 3.1], [19.1, 3.1]] },
+    { templateId: 'sled_training', positions: [[17.5, 13.6, 90]] },
     { templateId: 'saltea_stretching', positions: [[11.9, 10.3], [15.1, 10.3], [11.9, 11.6], [15.1, 11.6]] },
   ];
   space.items = groups.flatMap(({ templateId, positions }) => positions.map(([x, y, rotation = 0], i) => ({ id: `demo-${templateId}-${i + 1}`, templateId, x, y, rotation })));

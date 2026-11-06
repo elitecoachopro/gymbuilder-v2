@@ -1,0 +1,43 @@
+{
+  "base": "978ae43518702526aa39cfe70a806c26d68e3158",
+  "checks": {
+    "unit": 198,
+    "failures": 0,
+    "lint": "pass,zero warnings",
+    "typecheck": "pass",
+    "build": "pass"
+  },
+  "demo": {
+    "items": 40,
+    "cost_eur": 56480,
+    "athlete": "existing2.2MB CC0 skinned model",
+    "sled_travel_metres": 5.7,
+    "speed_mps": 0.6,
+    "automatic_end_hold": true,
+    "saved_placement_mutated": false
+  },
+  "render": "Demand mode;24Hz while playing and visible;hidden/reduced-motion stop;low dpr1/shadowsfalse",
+  "browser": {
+    "source": "exactmain-basedreleasecopy",
+    "viewport": [
+      390,
+      844
+    ],
+    "scrollWidth": 382,
+    "real_context_loss_while_playing": true,
+    "2d_canvases": 0,
+    "document_preserved": true,
+    "3d_retry": "pass",
+    "end_offset": 5.700000000000001,
+    "interior_camera": "portrait fullathlete framing checked",
+    "physical_phone": "not tested",
+    "hidden_reduced_motion_events": "inspected,not simulated"
+  },
+  "review": {
+    "status": "complete",
+    "run_id": "20261106-sled-athlete",
+    "findings": 0
+  },
+  "simplification": "No code findings; strengthened test for .6m progress at1s and5.7m endpoint",
+  "live_database_mutations": false
+}

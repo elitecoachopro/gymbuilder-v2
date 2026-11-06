@@ -1,0 +1,14 @@
+{
+  "src/lib/gym-space.ts": "9425773949e5fea123bf0d1a0ee327c621c2e5f60ec41bd71f8193fab5473487",
+  "src/lib/gym-sled-motion.ts": "e9252c76f14687ae83aa18d9420e9b600a0f6c070e1117ea3c2391739d7525a1",
+  "src/components/studio/SledMotion.tsx": "4aa4e1a300e07bdbdfd0ef28f01e9ed29bc2397dd6fb71909ec0b5bba8e8d8eb",
+  "src/components/studio/DetailedAthlete.tsx": "a5682e33338233ca5e954675bec3b05163fbb6a7aa7524aad73be93f065425e1",
+  "src/components/studio/FitnessPeople.tsx": "6fd5f3948e84e750ae73a4456479ef7738bb80fdd0631c39103d356b98bc48ae",
+  "src/components/studio/SpaceScene.tsx": "f9734f14659035c3d66b471ea0dca5e23c70dd78e290db50829ca05cca9f4162",
+  "src/components/studio/StudioWorkbench.tsx": "42bb953262bc7532eaf79a62ac7ea259814c1d804124fe38d8e6da0ee9ef4137",
+  "tests/browser/app/page.tsx": "aaf8a969ca65c0b8e4fcf200ab2fed0e4b25dcd9c48a8fcc0bbe8c6af0d2ceb6",
+  "tests/unit/gym-sled-motion.test.mjs": "8f20a58c1d30ea9d0f7cf0c1e5bd8c00b22706e943a50e6b6095867f1ec2a381",
+  "tests/unit/gym-sled-track.test.mjs": "b8c64da0210cfd5f9bc29c19d4488011b8e5e4e132ec5405e9fbdf2517a51f58",
+  "tests/unit/gym-studio.test.mjs": "aaaf00b891ed7c918848b5c363eab574b202263679fc0f54df906d1aec1ae02b",
+  "src/lib/gym-walkthrough.ts": "97bbcd4a6a958057cd7fe63a199afa3747fd6321b16e3acd877d208f7002b349"
+}

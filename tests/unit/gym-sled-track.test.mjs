@@ -5,9 +5,9 @@ import {demoSpace,itemPolygon,boxPolygon,polygonsOverlap} from '../../src/lib/gy
 test('demo has a clear long green track, without deleting equipment',()=>{
  const space=demoSpace(),area=space.areas.find(a=>a.id==='functional');
  assert.ok(area&&Math.max(area.w,area.d)>=9);
- assert.equal(space.items.length,39);
+ assert.equal(space.items.length,40);
  const lane=boxPolygon(area);
- for(const item of space.items)assert.ok(!polygonsOverlap(lane,itemPolygon(item)),item.id);
+ for(const item of space.items.filter(i=>i.templateId!=='sled_training'))assert.ok(!polygonsOverlap(lane,itemPolygon(item)),item.id);
 });
 test('metre marks retain true spacing in either orientation and fractional lengths',()=>{
  for(const [w,d] of [[9.3,1.6],[2,12.4],[.8,.7]]){
