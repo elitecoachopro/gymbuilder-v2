@@ -3,8 +3,8 @@ import * as THREE from 'three';
 export type FloorFinish = 'tartan' | 'rubber' | 'oak' | 'concrete' | 'turf';
 type EquipmentRelief = 'paint' | 'upholstery' | 'rubber' | 'steel';
 export const EQUIPMENT_FINISH = {
-  paint: { roughness: 0.55, metalness: 0.12, bumpScale: 0.00025 },
-  upholstery: { roughness: 0.55, metalness: 0, bumpScale: 0.0009 },
+  paint: { roughness: 0.44, metalness: 0.18, bumpScale: 0.0002 },
+  upholstery: { roughness: 0.66, metalness: 0, bumpScale: 0.0007 },
   rubber: { roughness: 0.98, metalness: 0, bumpScale: 0.0012 },
   steel: { roughness: 0.35, metalness: 0.9, bumpScale: 0.00012 },
 } as const;

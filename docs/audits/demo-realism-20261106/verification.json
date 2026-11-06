@@ -1,0 +1,31 @@
+{
+  "status": "complete, locally verified",
+  "source_base": "430b25cc88c197932b8a3efae1244df0fc045789",
+  "checks": {
+    "isolated_unit": 188,
+    "failures": 0,
+    "lint": "passed,zero warnings",
+    "typecheck": "passed",
+    "production_build": "passed on isolated HEAD plus9owned source files"
+  },
+  "geometry": {
+    "treadmill_triangles": 9118,
+    "leg_press_triangles": 12908,
+    "draw_meshes_per_model": 9,
+    "catalog_footprints_unchanged": true
+  },
+  "browser": {
+    "actual_application": "http://127.0.0.1:3121/configurator/studio checked desktop demo,3D,manual viewpoints,fullscreen",
+    "fault_harness": "Existing tests/browser app renders actual production StudioWorkbench/SpaceScene; localhost3100; public assets static3121",
+    "tour": "69-second validated route at1.65m; prior full route completion checked; final resize regression camera advanced from [4.7476,1.65,4.6] to [7.95,1.65,5.0106] across enter/exit fullscreen; no restart",
+    "mobile": "390\u00d7844;document width382;all7viewpoint buttons44px",
+    "graphics": "Low profile,dpr1,shadowsfalse;manual3Dretry after failure passed",
+    "recovery": "Real WEBGL_lose_context while touring;automatic2D with no remaining canvas;39items and renamedproject preserved;serializeddraftexactlyequal",
+    "physical_phone": "not tested",
+    "reduced_motion_preference": "implementation inspected;not simulated",
+    "tab_visibility": "IAB reports all test tabs visible;actual hidden-event path not exercised"
+  },
+  "database": "No DB mutations,new accounts,email or paidAI calls during this task",
+  "deployment": "Not published;pre-existingunpublished commits and independent WIP preserved",
+  "review": "Completed focused ce-code-review; finding #1 applied inline, verified in browser;0unresolved findings"
+}
