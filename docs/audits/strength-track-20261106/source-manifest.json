@@ -1,0 +1,10 @@
+{
+  "src/lib/gym-reference-models.js": "4bb6b3139c514d075bc2342189037e9f3c8dd7b158fd5ce8635135dc7061c2eb",
+  "src/lib/gym-space.ts": "7448a34c0982feca28c2609642d6fe4238c85864b6a39d59542ed2243acbbdd3",
+  "src/lib/gym-walkthrough.ts": "faf1fe54b61f4974c9f543cd52aab6ffa32838caeb11315a75787c3426edb18e",
+  "src/lib/gym-sled-track.ts": "480e58d651666d629771a54ba9cb4d4a81966383d63dc74a03c2240e28f5b65c",
+  "src/components/studio/SledTrack.tsx": "4ad7ea1db4adb41b601d0b90e646997e81b3b7f64a1f63b1300ee9c15bdfdb83",
+  "src/components/studio/RoomAtmosphere.tsx": "4a182984cad00c6943cc329c5d88af5d844fce0b1fd2c86fbd6037da17cd9888",
+  "tests/unit/gym-sled-track.test.mjs": "d3b39f8bcc452794d833ac1c566292d45518b69e4a0a2061f81c99b8a4748bfb",
+  "src/lib/gym-building.ts": "340138acc509b1a403af5fb040e8eb448b458c1129306cde94013e296f9075b9"
+}
