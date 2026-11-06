@@ -1,0 +1,264 @@
+{
+  "status": "complete",
+  "verdict": "Ready with fixes",
+  "scope": {
+    "base": "f687e86c4ad85ca563457c04fabe1f7de978b531",
+    "branch": "main",
+    "head_sha": "f687e86c4ad85ca563457c04fabe1f7de978b531",
+    "pr_url": null,
+    "files_changed": 6
+  },
+  "intent": "Replace Super price and daily carousels with one exclusive product for exact 12-hour and 24-hour display windows; preserve weekly carousel. Catalog windows are deterministic fixed durations from 2026-01-01T00:00:00+02:00 and keep fallback products distinct when possible. Preserve paid booking durations and prevent overlapping pending/active Super price bookings without deleting or repricing data; refresh selections at expiry.",
+  "intent_confidence": "explicit",
+  "reviewers": [
+    "correctness",
+    "testing",
+    "data-migration",
+    "reliability",
+    "adversarial",
+    "julik-frontend-races"
+  ],
+  "findings": [
+    {
+      "#": 1,
+      "autofix_class": "gated_auto",
+      "confidence": 100,
+      "evidence": [
+        "src/lib/catalog-offers.ts:45 --   const superOffer = superPool.length ? superPool[halfDay % superPool.length] : daily;",
+        "src/lib/catalog-offers.ts:38 --   const queues = rotate([...groups.entries()].sort(([a],[b]) => a.localeCompare(b)),day).map(([,cards]) => rotate(cards,day));",
+        "Executed frozen function with three products under one brand: daily/Super pairs were 1/3 at 2026-11-03T12:00:00+02:00 and 2/3 at 2026-11-04T00:00:00+02:00; ends_at moved from 2026-11-03T22:00Z to 2026-11-04T10:00Z.",
+        "src/components/PromotedOffers.tsx:65 promises: One exclusive product for 12 hours. A new selection appears when its display period ends."
+      ],
+      "file": "src/lib/catalog-offers.ts",
+      "first_evidence": "src/lib/catalog-offers.ts:45 --   const superOffer = superPool.length ? superPool[halfDay % superPool.length] : daily;",
+      "independent_reviewers": [
+        "correctness"
+      ],
+      "line": 45,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "correctness"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Select each half-day slot from a stable catalog order while excluding that day\u2019s daily product and the previous slot\u2019s Super price product when at least three distinct products are available. Add a three-product regression covering the second-half-day to next-day boundary.",
+      "title": "Avoid repeating Super price across consecutive windows",
+      "why_it_matters": "With three eligible products, the Super price card repeats across the overnight boundary and remains the same product for 24 hours while its countdown resets. For example, one-brand products 1/2/3 select product 3 at both 2026-11-03 12:00 +02 and 2026-11-04 00:00 +02, despite another product being available and the UI promising a new selection when the display period ends. Coordinating the half-day selection with the daily ordering avoids consecutive duplicates while preserving distinct daily and Super price cards.",
+      "validation_status": "confirmed",
+      "validation_reason": "With three eligible products under one brand and no paid Super price, the frozen catalogOfferSelections function reproduces product 3 in both the November 3 noon and November 4 midnight windows with different ends_at values; the new halfDay indexing and daily rotation introduce this reachable contradiction of PromotedOffers.tsx:65, although production incidence was not measured."
+    },
+    {
+      "#": 2,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "evidence": [
+        "src/components/PromotedOffers.tsx:39 -- const timer = window.setTimeout(() => {setNow(Date.now());void load();}, Math.min(Math.max(1, Math.min(...ends) - Date.now() + 1), 2147483647));",
+        "src/components/PromotedOffers.tsx:96 -- if (Date.parse(offer.ends_at)<=now) return null;",
+        "tests/unit/catalog-offers.test.mjs:12 -- const first=catalogOfferSelections(products,suppliers,start+3600000);",
+        "The reviewed tests contain no imports or rendered fixture for PromotedOffers; browser fixtures cover configurator/chat/persistence rather than promotion lifecycle. The targeted catalog and countdown suite passed all four tests without exercising React."
+      ],
+      "file": "src/components/PromotedOffers.tsx",
+      "first_evidence": "src/components/PromotedOffers.tsx:39 -- const timer = window.setTimeout(() => {setNow(Date.now());void load();}, Math.min(Math.max(1, Math.min(...ends) - Date.now() + 1), 2147483647));",
+      "independent_reviewers": [
+        "testing"
+      ],
+      "line": 39,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "testing"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Add a rendered PromotedOffers test with mocked promotion responses and controlled time: verify one Super and daily card plus the weekly carousel, advance across the earliest expiry, verify another request and replacement card, and verify unmount clears timers and aborts the pending request. Cover a failed boundary refresh followed by recovery as well.",
+      "title": "Exercise expiry refresh through the rendered promotions component",
+      "why_it_matters": "The central promise that a new product appears at expiry has no executable coverage. The added unit tests call only catalogOfferSelections, so they still pass if the new expiry fetch is removed or the expired ExclusiveOffer stays blank. A component or browser test with a controlled clock must exercise the actual timer and returned replacement, including cleanup when the view unmounts.",
+      "validation_status": "confirmed",
+      "validation_reason": "The diff adds expiry-triggered loading and ExclusiveOffer lifecycle behavior in PromotedOffers.tsx:18-40 and 90-97, but inspection of tests finds only pure catalog-selection assertions and API tests, so the reachable mounted-component expiry/refresh path has no executable coverage; production incidence is inapplicable to this coverage gap."
+    },
+    {
+      "#": 3,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "evidence": [
+        "tests/integration/promotions.test.mjs:30 -- promotion(supplier,products[0],'super_pret',start+24*hour,12,{status:'pending',title:'Unpaid Super price'}),",
+        "tests/integration/promotions.test.mjs:25 -- const start = Date.now() - hour;",
+        "src/app/api/promotions/route.ts:21 -- .eq('status', 'active').lte('starts_at', now).gt('ends_at', now)",
+        "tests/integration/promotions.test.mjs:39 -- for(const title of ['Expired Super price','Future Super price','Unpaid Super price']) assert.ok(!JSON.stringify(body).includes(title));"
+      ],
+      "file": "tests/integration/promotions.test.mjs",
+      "first_evidence": "tests/integration/promotions.test.mjs:30 -- promotion(supplier,products[0],'super_pret',start+24*hour,12,{status:'pending',title:'Unpaid Super price'}),",
+      "independent_reviewers": [
+        "testing"
+      ],
+      "line": 30,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "testing"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Add a separate integration test with only a currently running pending Super price reservation, assert its title and ID are absent from the public response, then activate the same row and assert it appears. Keep it separate from the active-placement fixture so the new exclusion constraint permits setup.",
+      "title": "Test unpaid exclusion with a currently running reservation",
+      "why_it_matters": "The test now reports unpaid-record coverage even though its pending record starts 23 hours in the future. The start-time filter alone excludes it, so removing the active-status guard would still pass this assertion. The previous current-time pending fixture was displaced to satisfy exclusivity, leaving publication of unpaid current Super price reservations untested.",
+      "validation_status": "confirmed",
+      "validation_reason": "The diff moves the pending Super price fixture from the current window to start+24 hours in tests/integration/promotions.test.mjs:30, so its exclusion assertion at line 39 no longer exercises a currently running unpaid Super reservation; the existing daily pending test and active-only database view protect publication but do not restore this Super-specific coverage, and production incidence was not measured."
+    }
+  ],
+  "actionable_findings": [
+    {
+      "#": 1,
+      "autofix_class": "gated_auto",
+      "confidence": 100,
+      "evidence": [
+        "src/lib/catalog-offers.ts:45 --   const superOffer = superPool.length ? superPool[halfDay % superPool.length] : daily;",
+        "src/lib/catalog-offers.ts:38 --   const queues = rotate([...groups.entries()].sort(([a],[b]) => a.localeCompare(b)),day).map(([,cards]) => rotate(cards,day));",
+        "Executed frozen function with three products under one brand: daily/Super pairs were 1/3 at 2026-11-03T12:00:00+02:00 and 2/3 at 2026-11-04T00:00:00+02:00; ends_at moved from 2026-11-03T22:00Z to 2026-11-04T10:00Z.",
+        "src/components/PromotedOffers.tsx:65 promises: One exclusive product for 12 hours. A new selection appears when its display period ends."
+      ],
+      "file": "src/lib/catalog-offers.ts",
+      "first_evidence": "src/lib/catalog-offers.ts:45 --   const superOffer = superPool.length ? superPool[halfDay % superPool.length] : daily;",
+      "independent_reviewers": [
+        "correctness"
+      ],
+      "line": 45,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "correctness"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Select each half-day slot from a stable catalog order while excluding that day\u2019s daily product and the previous slot\u2019s Super price product when at least three distinct products are available. Add a three-product regression covering the second-half-day to next-day boundary.",
+      "title": "Avoid repeating Super price across consecutive windows",
+      "why_it_matters": "With three eligible products, the Super price card repeats across the overnight boundary and remains the same product for 24 hours while its countdown resets. For example, one-brand products 1/2/3 select product 3 at both 2026-11-03 12:00 +02 and 2026-11-04 00:00 +02, despite another product being available and the UI promising a new selection when the display period ends. Coordinating the half-day selection with the daily ordering avoids consecutive duplicates while preserving distinct daily and Super price cards.",
+      "validation_status": "confirmed",
+      "validation_reason": "With three eligible products under one brand and no paid Super price, the frozen catalogOfferSelections function reproduces product 3 in both the November 3 noon and November 4 midnight windows with different ends_at values; the new halfDay indexing and daily rotation introduce this reachable contradiction of PromotedOffers.tsx:65, although production incidence was not measured."
+    },
+    {
+      "#": 2,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "evidence": [
+        "src/components/PromotedOffers.tsx:39 -- const timer = window.setTimeout(() => {setNow(Date.now());void load();}, Math.min(Math.max(1, Math.min(...ends) - Date.now() + 1), 2147483647));",
+        "src/components/PromotedOffers.tsx:96 -- if (Date.parse(offer.ends_at)<=now) return null;",
+        "tests/unit/catalog-offers.test.mjs:12 -- const first=catalogOfferSelections(products,suppliers,start+3600000);",
+        "The reviewed tests contain no imports or rendered fixture for PromotedOffers; browser fixtures cover configurator/chat/persistence rather than promotion lifecycle. The targeted catalog and countdown suite passed all four tests without exercising React."
+      ],
+      "file": "src/components/PromotedOffers.tsx",
+      "first_evidence": "src/components/PromotedOffers.tsx:39 -- const timer = window.setTimeout(() => {setNow(Date.now());void load();}, Math.min(Math.max(1, Math.min(...ends) - Date.now() + 1), 2147483647));",
+      "independent_reviewers": [
+        "testing"
+      ],
+      "line": 39,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "testing"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Add a rendered PromotedOffers test with mocked promotion responses and controlled time: verify one Super and daily card plus the weekly carousel, advance across the earliest expiry, verify another request and replacement card, and verify unmount clears timers and aborts the pending request. Cover a failed boundary refresh followed by recovery as well.",
+      "title": "Exercise expiry refresh through the rendered promotions component",
+      "why_it_matters": "The central promise that a new product appears at expiry has no executable coverage. The added unit tests call only catalogOfferSelections, so they still pass if the new expiry fetch is removed or the expired ExclusiveOffer stays blank. A component or browser test with a controlled clock must exercise the actual timer and returned replacement, including cleanup when the view unmounts.",
+      "validation_status": "confirmed",
+      "validation_reason": "The diff adds expiry-triggered loading and ExclusiveOffer lifecycle behavior in PromotedOffers.tsx:18-40 and 90-97, but inspection of tests finds only pure catalog-selection assertions and API tests, so the reachable mounted-component expiry/refresh path has no executable coverage; production incidence is inapplicable to this coverage gap."
+    },
+    {
+      "#": 3,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "evidence": [
+        "tests/integration/promotions.test.mjs:30 -- promotion(supplier,products[0],'super_pret',start+24*hour,12,{status:'pending',title:'Unpaid Super price'}),",
+        "tests/integration/promotions.test.mjs:25 -- const start = Date.now() - hour;",
+        "src/app/api/promotions/route.ts:21 -- .eq('status', 'active').lte('starts_at', now).gt('ends_at', now)",
+        "tests/integration/promotions.test.mjs:39 -- for(const title of ['Expired Super price','Future Super price','Unpaid Super price']) assert.ok(!JSON.stringify(body).includes(title));"
+      ],
+      "file": "tests/integration/promotions.test.mjs",
+      "first_evidence": "tests/integration/promotions.test.mjs:30 -- promotion(supplier,products[0],'super_pret',start+24*hour,12,{status:'pending',title:'Unpaid Super price'}),",
+      "independent_reviewers": [
+        "testing"
+      ],
+      "line": 30,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "testing"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Add a separate integration test with only a currently running pending Super price reservation, assert its title and ID are absent from the public response, then activate the same row and assert it appears. Keep it separate from the active-placement fixture so the new exclusion constraint permits setup.",
+      "title": "Test unpaid exclusion with a currently running reservation",
+      "why_it_matters": "The test now reports unpaid-record coverage even though its pending record starts 23 hours in the future. The start-time filter alone excludes it, so removing the active-status guard would still pass this assertion. The previous current-time pending fixture was displaced to satisfy exclusivity, leaving publication of unpaid current Super price reservations untested.",
+      "validation_status": "confirmed",
+      "validation_reason": "The diff moves the pending Super price fixture from the current window to start+24 hours in tests/integration/promotions.test.mjs:30, so its exclusion assertion at line 39 no longer exercises a currently running unpaid Super reservation; the existing daily pending test and active-only database view protect publication but do not restore this Super-specific coverage, and production incidence was not measured."
+    }
+  ],
+  "triage_groups": [
+    {
+      "title": "Make twelve-hour rotation observable",
+      "findings": [
+        1,
+        2
+      ],
+      "context": "The selector and its rendered expiry transition jointly implement the promised replacement.",
+      "preferred_resolution": "Fix consecutive-window selection in #1, then add the rendered boundary coverage in #2.",
+      "why": "A correct selection alone does not verify that an open page replaces its card."
+    }
+  ],
+  "pre_existing_findings": [],
+  "requirements_completeness": null,
+  "learnings": [],
+  "agent_native_gaps": [],
+  "deployment_notes": [],
+  "residual_risks": [
+    "The new exclusion constraint validates every pending/active Super price row, including intervals that already ended. The supplied zero-upcoming-bookings check does not establish that historical pending/active intervals are disjoint. Before rollout, inspect all overlapping pairs with SELECT a.id,b.id FROM public.promotions a JOIN public.promotions b ON a.id<b.id AND tstzrange(a.starts_at,a.ends_at,'[)') && tstzrange(b.starts_at,b.ends_at,'[)') WHERE a.type='super_pret' AND b.type='super_pret' AND a.status IN ('pending','active') AND b.status IN ('pending','active'); any result intentionally blocks this migration under its preservation policy. Production data was unavailable to this read-only frozen review."
+  ],
+  "testing_gaps": [],
+  "coverage": {
+    "depth": "full",
+    "first_evidence_backfilled": 0,
+    "quote_gate_demotions": 0,
+    "mode_aware_demotions": 0,
+    "validator_shortcut_skipped": 0,
+    "scope_mode": "standalone",
+    "review_repo": "/tmp/gym-exclusive-review-ujw43k8m",
+    "canonical_baseline": "c4e2991",
+    "validator": {
+      "outcome": "verdicts",
+      "confirmed": 3,
+      "rejected": 0,
+      "unresolved": 0,
+      "malformed": 0,
+      "failed": 0,
+      "shortcut_skipped": 0,
+      "bound_exceeded": false
+    },
+    "suppressed_by_confidence": {},
+    "failed_reviewers": [],
+    "protected_subject_reclassifications": 0,
+    "settlement_suppression_evaluated": false,
+    "notes": [
+      "Frozen baseline is canonical c4e2991 archived and committed in /tmp/gym-exclusive-review-ujw43k8m; overlay includes only six owned files.",
+      "Project standards: not run (no applicable standards files).",
+      "No independent cross-model pass: claude, grok and antigravity CLIs absent.",
+      "Review source must be read from /tmp/gym-exclusive-review-ujw43k8m.",
+      "Cross-model pass: not run (no different-provider CLI installed); adversarial lens covered by the in-process fallback.",
+      "Settlement suppression was not evaluated because no plan was discovered.",
+      "First evidence backfilled: 0; quote-gate demotions: 0; mode-aware demotions: 0.",
+      "No selected reviewer failed or exceeded its collection bound.",
+      "Integration tests were inspected in this frozen review without environment/secrets access or execution.",
+      "Validator shortcuts: 0; no finding has independently verified cross-model corroboration.",
+      "One independent validator batch returned valid verdicts for all three selected findings: confirmed 3, rejected 0, unresolved 0, malformed 0, failed 0, shortcut-skipped 0.",
+      "No fixes were applied; this receipt covers the frozen snapshot, not later canonical edits."
+    ]
+  },
+  "peer": {
+    "outcome": "in-process-fallback",
+    "coverage": "Cross-model pass: not run (no different-provider CLI installed); adversarial lens covered by the in-process fallback."
+  },
+  "artifact_path": "/tmp/compound-engineering-501/ce-code-review/20261104-exclusive-d029028c",
+  "run_id": "20261104-exclusive-d029028c"
+}

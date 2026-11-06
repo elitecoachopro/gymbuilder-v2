@@ -21,6 +21,8 @@ import { useClientTranslations } from '@/i18n/client';
 interface SupplierData {
   id: string;
   companyName: string;
+  businessType?: string;
+  serviceCount?: number;
   contactEmail: string | null;
   status: string;
   plan: string;
@@ -104,14 +106,18 @@ export default function SupplierDashboard() {
   const [recentRequests, setRecentRequests] = useState<ContactRequest[]>([]);
   const [error, setError] = useState('');
 
+  const serviceOnly = supplier?.businessType === 'service';
+
   // Sidebar links (inside component to use t())
   const sidebarLinks = [
     { href: '/supplier/dashboard', label: t('sidebar.dashboard'), icon: BarChart3, active: true },
+    { href: null, label: ui('Mesaje și cereri'), icon: MessageSquare, active: false, scrollTo: 'cereri' },
+    { href: '/supplier/services', label: locale === 'en' ? 'Service and maintenance' : 'Service și mentenanță', icon: PackagePlus, active: false },
     { href: '/supplier/products', label: t('sidebar.myProducts'), icon: Package, active: false },
     { href: null, label: t('sidebar.analytics'), icon: TrendingUp, active: false, scrollTo: 'analytics' },
     { href: null, label: t('sidebar.gallery'), icon: Camera, active: false, scrollTo: 'gallery' },
     { href: null, label: t('sidebar.promotions'), icon: Megaphone, active: false, scrollTo: 'promotions' },
-  ];
+  ].filter(link => !serviceOnly || (link.href !== '/supplier/products' && link.scrollTo !== 'promotions'));
 
   useEffect(() => {
     const controller = new AbortController();
@@ -417,7 +423,7 @@ export default function SupplierDashboard() {
               {t('sidebar.plan')}: {ui(supplier?.plan === 'free' ? t('sidebar.planFree') : supplier?.plan === 'professional' ? t('sidebar.planProfessional') : supplier?.plan || t('sidebar.planFree'))}
             </p>
             <p className="text-xs text-anthracite-400">
-              {stats?.activeProducts || 0} {t('sidebar.activeProducts')}
+              {serviceOnly ? `${supplier?.serviceCount || 0} ${locale === 'en' ? 'services' : 'servicii'}` : <>{stats?.activeProducts || 0} {t('sidebar.activeProducts')}</>}
             </p>
           </div>
         </div>
@@ -438,8 +444,11 @@ export default function SupplierDashboard() {
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <NotificationBell />
-              <Link href="/supplier/products/new" className="btn-primary flex items-center gap-2">
-                <Plus className="w-4 h-4" /> {t('products.addProduct')}
+              <a href="#cereri" className="btn-primary min-h-12 inline-flex items-center gap-2">
+                <MessageSquare className="w-5 h-5" aria-hidden="true" /> {ui('Mesaje și cereri')}
+              </a>
+              <Link href={serviceOnly ? '/supplier/services' : '/supplier/products/new'} className="btn-primary min-h-12 flex items-center gap-2">
+                <Plus className="w-4 h-4" /> {serviceOnly ? (locale === 'en' ? 'Edit my services' : 'Editează serviciile mele') : t('products.addProduct')}
               </Link>
               <button
                 onClick={handleLogout}
@@ -452,119 +461,10 @@ export default function SupplierDashboard() {
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="card">
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 bg-gold-400/10 rounded-lg flex items-center justify-center">
-                  <Package className="w-5 h-5 text-gold-400" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-white">{stats?.activeProducts || 0}</div>
-              <div className="text-xs text-anthracite-400 mt-1">{t('stats.activeProducts')}</div>
-            </div>
-
-            <div className="card">
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 bg-gold-400/10 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-gold-400" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-white">{stats?.contactRequestsThisMonth || 0}</div>
-              <div className="text-xs text-anthracite-400 mt-1">{t('stats.requestsThisMonth')}</div>
-            </div>
-
-            <div className="card">
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 bg-gold-400/10 rounded-lg flex items-center justify-center">
-                  <Inbox className="w-5 h-5 text-gold-400" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-white">{stats?.totalContactRequests || 0}</div>
-              <div className="text-xs text-anthracite-400 mt-1">{t('stats.totalRequests')}</div>
-            </div>
-
-            <div className="card">
-              <div className="flex items-center justify-between mb-3">
-                <div className="w-10 h-10 bg-gold-400/10 rounded-lg flex items-center justify-center">
-                  <Star className="w-5 h-5 text-gold-400" />
-                </div>
-              </div>
-              <div className="text-2xl font-bold text-white">
-                {ui(stats?.reviewCount ? `${stats.avgRating}` : '—')}
-              </div>
-              <div className="text-xs text-anthracite-400 mt-1">
-                {t('stats.avgRating')} {ui(stats?.reviewCount ? `(${stats.reviewCount} ${t('stats.reviews')})` : `(0 ${t('stats.reviews')})`)}
-              </div>
-            </div>
-          </div>
-
-          {/* Products Section */}
-          <div className="card mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-white">{t('products.title')}</h3>
-              <Link href="/supplier/products/new" className="text-sm text-gold-400 hover:text-gold-300">
-                + {t('products.addProduct')}
-              </Link>
-            </div>
-
-            {recentProducts.length === 0 ? (
-              /* Empty State */
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gold-400/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <PackagePlus className="w-8 h-8 text-gold-400" />
-                </div>
-                <h4 className="text-lg font-semibold text-white mb-2">{t('products.emptyTitle')}</h4>
-                <p className="text-anthracite-400 text-sm mb-6 max-w-sm mx-auto">
-                  {t('products.emptyDescription')}
-                </p>
-                <Link href="/supplier/products/new" className="btn-primary inline-flex items-center gap-2">
-                  <Plus className="w-4 h-4" /> {t('products.addFirstProduct')}
-                </Link>
-              </div>
-            ) : (
-              /* Products Table */
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-anthracite-700">
-                      <th className="text-left text-xs font-medium text-anthracite-400 pb-3">{t('products.tableProduct')}</th>
-                      <th className="text-left text-xs font-medium text-anthracite-400 pb-3">{t('products.tableCategory')}</th>
-                      <th className="text-left text-xs font-medium text-anthracite-400 pb-3">{t('products.tablePrice')}</th>
-                      <th className="text-left text-xs font-medium text-anthracite-400 pb-3">{t('products.tableStatus')}</th>
-                      <th className="text-left text-xs font-medium text-anthracite-400 pb-3">{t('products.tableAdded')}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-anthracite-800">
-                    {recentProducts.map((product) => (
-                      <tr key={product.id} className="hover:bg-anthracite-800/50">
-                        <td className="py-3 text-sm text-white font-medium">{product.name}</td>
-                        <td className="py-3 text-sm text-anthracite-300 capitalize">{ui(product.category)}</td>
-                        <td className="py-3 text-sm text-gold-400 font-medium">&euro;{Number(product.price_eur).toLocaleString()}</td>
-                        <td className="py-3">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                            product.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' :
-                            product.status === 'featured' ? 'bg-gold-400/10 text-gold-400' :
-                            'bg-anthracite-700 text-anthracite-400'
-                          }`}>
-                            {ui(product.status === 'active' ? t('products.statusActive') : product.status === 'featured' ? t('products.statusFeatured') : t('products.statusInactive'))}
-                          </span>
-                        </td>
-                        <td className="py-3 text-sm text-anthracite-400">
-                          {ui(new Date(product.created_at).toLocaleDateString(dateLocale))}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-
-          {/* Recent Contact Requests */}
-          {recentRequests.length > 0 && (
-            <div id="cereri" className="card mb-8">
-              <h3 className="font-semibold text-white mb-4">{t('requests.title')}</h3>
+          {recentRequests.length > 0 ? (
+            <div id="cereri" className="card mb-8 scroll-mt-24 border-gold-400/30">
+              <h3 className="font-semibold text-white mb-4">{ui('Mesaje și cereri de ofertă')}</h3>
+              <p className="text-sm text-anthracite-300 mb-4">{ui('Deschide conversația unei cereri pentru a discuta cu clientul. Mesajele se actualizează automat.')}</p>
               <div className="space-y-3">
                 {[...recentRequests].sort((a, b) => {
                   const isNewA = a.status === 'sent' || a.status === 'viewed' ? 0 : 1;
@@ -676,29 +576,149 @@ export default function SupplierDashboard() {
                       </div>
                     )}
                     {/* Chat toggle */}
-                    <div className="mt-2 ml-11">
+                    <div className="mt-4">
                       <button
                         onClick={() => setOpenChat(openChat === req.id ? null : req.id)}
-                        className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+                        aria-expanded={openChat === req.id}
+                        aria-controls={`conversation-${req.id}`}
+                        className="min-h-12 w-full sm:w-auto px-4 py-3 rounded-lg border border-gold-400/50 bg-gold-400/10 text-gold-400 font-semibold flex items-center justify-center gap-2 hover:bg-gold-400/20 transition-colors"
                       >
                         <MessageSquare className="w-3 h-3" />
                         {ui(openChat === req.id ? t('chat.hideConversation') : t('chat.openConversation'))}
                         {openChat === req.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                       </button>
                       {openChat === req.id && (
-                        <RequestChat requestId={req.id} userRole="supplier" />
+                        <div id={`conversation-${req.id}`}><RequestChat requestId={req.id} userRole="supplier" /></div>
                       )}
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+          ) : (
+            <section id="cereri" className="card mb-8 scroll-mt-24">
+              <h2 className="font-semibold text-white">{ui('Mesaje și cereri de ofertă')}</h2>
+              <p className="mt-2 text-sm text-anthracite-300">{ui('Nu ai primit încă cereri de ofertă. Conversațiile cu clienții vor apărea aici.')}</p>
+            </section>
           )}
 
+
+
+          {/* Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="card">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 bg-gold-400/10 rounded-lg flex items-center justify-center">
+                  <Package className="w-5 h-5 text-gold-400" />
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-white">{serviceOnly ? supplier?.serviceCount || 0 : stats?.activeProducts || 0}</div>
+              <div className="text-xs text-anthracite-400 mt-1">{serviceOnly ? (locale === 'en' ? 'Services offered' : 'Servicii oferite') : t('stats.activeProducts')}</div>
+            </div>
+
+            <div className="card">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 bg-gold-400/10 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-gold-400" />
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-white">{stats?.contactRequestsThisMonth || 0}</div>
+              <div className="text-xs text-anthracite-400 mt-1">{t('stats.requestsThisMonth')}</div>
+            </div>
+
+            <div className="card">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 bg-gold-400/10 rounded-lg flex items-center justify-center">
+                  <Inbox className="w-5 h-5 text-gold-400" />
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-white">{stats?.totalContactRequests || 0}</div>
+              <div className="text-xs text-anthracite-400 mt-1">{t('stats.totalRequests')}</div>
+            </div>
+
+            <div className="card">
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-10 h-10 bg-gold-400/10 rounded-lg flex items-center justify-center">
+                  <Star className="w-5 h-5 text-gold-400" />
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-white">
+                {ui(stats?.reviewCount ? `${stats.avgRating}` : '—')}
+              </div>
+              <div className="text-xs text-anthracite-400 mt-1">
+                {t('stats.avgRating')} {ui(stats?.reviewCount ? `(${stats.reviewCount} ${t('stats.reviews')})` : `(0 ${t('stats.reviews')})`)}
+              </div>
+            </div>
+          </div>
+
+          {/* Products Section */}
+          {!serviceOnly && <div className="card mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-white">{t('products.title')}</h3>
+              <Link href="/supplier/products/new" className="text-sm text-gold-400 hover:text-gold-300">
+                + {t('products.addProduct')}
+              </Link>
+            </div>
+
+            {recentProducts.length === 0 ? (
+              /* Empty State */
+              <div className="text-center py-12">
+                <div className="w-16 h-16 bg-gold-400/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <PackagePlus className="w-8 h-8 text-gold-400" />
+                </div>
+                <h4 className="text-lg font-semibold text-white mb-2">{t('products.emptyTitle')}</h4>
+                <p className="text-anthracite-400 text-sm mb-6 max-w-sm mx-auto">
+                  {t('products.emptyDescription')}
+                </p>
+                <Link href="/supplier/products/new" className="btn-primary inline-flex items-center gap-2">
+                  <Plus className="w-4 h-4" /> {t('products.addFirstProduct')}
+                </Link>
+              </div>
+            ) : (
+              /* Products Table */
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-anthracite-700">
+                      <th className="text-left text-xs font-medium text-anthracite-400 pb-3">{t('products.tableProduct')}</th>
+                      <th className="text-left text-xs font-medium text-anthracite-400 pb-3">{t('products.tableCategory')}</th>
+                      <th className="text-left text-xs font-medium text-anthracite-400 pb-3">{t('products.tablePrice')}</th>
+                      <th className="text-left text-xs font-medium text-anthracite-400 pb-3">{t('products.tableStatus')}</th>
+                      <th className="text-left text-xs font-medium text-anthracite-400 pb-3">{t('products.tableAdded')}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-anthracite-800">
+                    {recentProducts.map((product) => (
+                      <tr key={product.id} className="hover:bg-anthracite-800/50">
+                        <td className="py-3 text-sm text-white font-medium">{product.name}</td>
+                        <td className="py-3 text-sm text-anthracite-300 capitalize">{ui(product.category)}</td>
+                        <td className="py-3 text-sm text-gold-400 font-medium">&euro;{Number(product.price_eur).toLocaleString()}</td>
+                        <td className="py-3">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                            product.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' :
+                            product.status === 'featured' ? 'bg-gold-400/10 text-gold-400' :
+                            'bg-anthracite-700 text-anthracite-400'
+                          }`}>
+                            {ui(product.status === 'active' ? t('products.statusActive') : product.status === 'featured' ? t('products.statusFeatured') : t('products.statusInactive'))}
+                          </span>
+                        </td>
+                        <td className="py-3 text-sm text-anthracite-400">
+                          {ui(new Date(product.created_at).toLocaleDateString(dateLocale))}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>}
+
+          {/* Recent Contact Requests */}
 
           {/* Analytics Section */}
           <div id="analytics" className="mb-8 scroll-mt-[calc(var(--app-header-height)+1rem)]">
             <TrafficCounters audience="supplier" />
+            {!serviceOnly && <>
             <div className="flex items-center gap-3 mb-5">
               <BarChart3 className="w-5 h-5 text-gold-400" />
               <h2 className="text-xl font-bold text-white">{t('analytics.title')}</h2>
@@ -776,6 +796,7 @@ export default function SupplierDashboard() {
                 </div>
               </div>
             )}
+            </>}
           </div>
 
           {/* Galerie Foto Section */}
@@ -825,7 +846,7 @@ export default function SupplierDashboard() {
           </div>
 
           {/* Promovează-te Section */}
-          <div id="promotions" className="mb-8">
+          {!serviceOnly && <div id="promotions" className="mb-8">
             <div className="flex items-center gap-3 mb-5">
               <Megaphone className="w-5 h-5 text-gold-400" />
               <h2 className="text-xl font-bold text-white">{t('promotions.title')}</h2>
@@ -942,7 +963,7 @@ export default function SupplierDashboard() {
                 </div>
               </div>
             </div>
-          </div>
+          </div>}
         </div>
 
         {/* Setări Cont */}

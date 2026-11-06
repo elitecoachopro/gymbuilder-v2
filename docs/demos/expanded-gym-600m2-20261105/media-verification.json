@@ -1,0 +1,20 @@
+{
+  "source": "Actual local configurator3D screenshots, samegeometry across views",
+  "photos": 24,
+  "600m2": {
+    "perspectives": 16,
+    "duration_seconds": 58,
+    "objects": 70,
+    "budget_eur": 180000,
+    "indicative_equipment_cost_eur": 154060
+  },
+  "300m2": {
+    "perspectives": 8,
+    "duration_seconds": 32,
+    "objects": 23,
+    "geometry_changed": false
+  },
+  "encoding": "H264 Main,yuv420p,25fps,AAC silence,faststart",
+  "full_video_decode": "pass",
+  "publication": "local artifacts, not deployed"
+}

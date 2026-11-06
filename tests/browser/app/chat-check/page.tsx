@@ -14,6 +14,7 @@ export default function ChatCheck() {
     } finally { setBusy(false); }
   }
   return <LocaleProvider initialLocale="ro"><main className="p-5 max-w-2xl mx-auto text-white"><h1>Verificare conversații · date fictive</h1>
+    <button className="min-h-11 rounded border p-3" onClick={() => fetch('/api/chat-fixture', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ incoming: 'Mesaj primit automat de la furnizor' }) })}>Simulează mesaj primit</button>
     <div className="flex flex-wrap gap-3 py-5">{(['failGet', 'failPost', 'slowPost'] as const).map(key => <button className="min-h-11 rounded border p-3" key={key} aria-pressed={mode[key]} disabled={busy} onClick={() => toggle(key)}>{key}</button>)}</div>
     <RequestChat requestId="fixture-request" userRole="client" />
   </main></LocaleProvider>;

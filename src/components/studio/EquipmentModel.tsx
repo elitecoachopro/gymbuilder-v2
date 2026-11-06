@@ -1,6 +1,8 @@
 'use client';
 
 import { memo } from 'react';
+import Cryosauna from './Cryosauna';
+import Sauna from './Sauna';
 import { FictionalPerson, SledTraining } from './FitnessPeople';
 import { EQUIPMENT_CATALOG } from '@/lib/gym-catalog';
 import { Ball, Foot, Pad, Part, Rod, Wheel } from './EquipmentParts';
@@ -138,6 +140,7 @@ function Model({ templateId }: { templateId: string }) {
   const strength = STRENGTH_VARIANTS.find(model => model.id === templateId);
   if (strength) return <StrengthEquipment type={strength.id} />;
   switch (templateId) {
+    case 'cryosauna': return <Cryosauna />;
     case 'person_reception': return <FictionalPerson pose="reception"/>;
     case 'person_coach': return <FictionalPerson pose="coach"/>;
     case 'sled_training': return <SledTraining/>;
@@ -158,7 +161,7 @@ function Model({ templateId }: { templateId: string }) {
     case 'saltea_yoga': case 'saltea_stretching': return <group><Part p={[0, 0.02, 0]} s={[1.8, 0.04, 0.6]} finish="pad" />{[-0.76, 0.76].map(x => <Part key={x} p={[x, 0.041, 0]} s={[0.008, 0.001, 0.5]} finish="accent" sharp />)}</group>;
     case 'box_pliometric': return <group><Part p={[0, 0.3, 0]} s={[0.6, 0.6, 0.5]} finish="wood" />{[-1, 1].map(side => <Part key={side} p={[side * 0.302, 0.37, 0]} s={[0.002, 0.055, 0.15]} finish="rubber" />)}<Part p={[0, 0.604, 0]} s={[0.51, 0.008, 0.41]} finish="rubber" /></group>;
     case 'oglinda_perete': return <group><Part p={[0, 1, 0]} s={[2, 2, 0.08]} /><Part p={[0, 1, 0.045]} s={[1.93, 1.93, 0.008]} finish="chrome" /></group>;
-    case 'sauna': return <group><Part p={[0, 1.1, -0.96]} s={[2, 2.2, 0.08]} finish="wood" />{[-0.96, 0.96].map(x => <Part key={x} p={[x, 1.1, 0]} s={[0.08, 2.2, 2]} finish="wood" />)}<Part p={[0, 2.15, 0]} s={[2, 0.1, 2]} finish="wood" /><Part p={[0, 1.05, 0.96]} s={[1.9, 2.1, 0.02]} finish="glass" sharp /><Part p={[0, 0.45, -0.6]} s={[1.8, 0.09, 0.5]} finish="wood" /></group>;
+    case 'sauna': return <Sauna />;
     case 'jacuzzi': return <group><Part p={[0, 0.48, 0]} s={[2.2, 0.96, 2.2]} finish="wood" /><Part p={[0, 0.97, 0]} s={[2.1, 0.06, 2.1]} finish="ceramic" /><Part p={[0, 0.985, 0]} s={[1.75, 0.01, 1.75]} finish="screen" /></group>;
     default: return null;
   }

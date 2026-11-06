@@ -50,7 +50,7 @@ export async function POST(request: Request) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'Gym Builder <noreply@gymbuilder.app>',
+            from: 'Gym Builder <contact@gymbuilder.app>',
             to: [ADMIN_EMAIL],
             subject: `[GDPR] Cerere ștergere cont - ${user.email || user.userId}`,
             html: `

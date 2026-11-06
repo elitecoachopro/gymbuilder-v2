@@ -1,0 +1,27 @@
+{
+  "kind": "Responsive same-origin iframe, not physical device",
+  "frame": [
+    390,
+    844
+  ],
+  "bodyWidth": 382,
+  "scrollWidth": 382,
+  "objectsAfterReopen": 70,
+  "graphics": {
+    "calls": 429,
+    "triangles": 351414,
+    "geometries": 353,
+    "textures": 98,
+    "materials": 381,
+    "programs": 21,
+    "lights": 5,
+    "exposure": 1.08,
+    "shadows": false,
+    "dpr": 1,
+    "width": 348,
+    "height": 538
+  },
+  "automaticFallback": "Real WEBGL_lose_context ->2D with70objects",
+  "tourControls": "select, full-frame, next view verified",
+  "portraitOverview": "fitted complete room"
+}

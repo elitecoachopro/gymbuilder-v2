@@ -2,7 +2,9 @@
 
 import VerificationResult from '@/components/VerificationResult';
 import { requestedPlan } from '@/lib/journeys';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import ServiceProfileFields from '@/components/ServiceProfileFields';
+import { serviceProfileSchema, hasServices, type ServiceProfileValues } from '@/lib/gym-services';
 import { useUiText } from '@/i18n/useUiText';
 import { supplierCountries } from '@/lib/supplier-countries';
 import { isStrongPassword } from '@/lib/sanitize';
@@ -23,7 +25,10 @@ export default function SupplierRegisterPage() {
   useEffect(() => { stepHeadingRef.current?.focus(); }, [step]);
   const [showPassword, setShowPassword] = useState(false);
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const [services, setServices] = useState<ServiceProfileValues>(() => ({ businessType: pathname === '/register/service' ? 'service' : 'equipment', serviceCategories: [], serviceAreas: '', serviceBrands: '' }));
   const [selectedPlan, setSelectedPlan] = useState(() => requestedPlan(searchParams?.get('plan') ?? null));
+  const activePlan = services.businessType === 'service' ? 'free' : selectedPlan;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -103,6 +108,7 @@ export default function SupplierRegisterPage() {
   };
 
   const validateStep2 = () => {
+    if (!serviceProfileSchema.safeParse(services).success) { setError('Selectează serviciile și completează zona de acoperire.'); return false; }
     if (!form.companyName || !form.country || !form.city) {
       setError(t('companyRequired'));
       return false;
@@ -224,8 +230,9 @@ export default function SupplierRegisterPage() {
           phone: form.phone,
           contactEmail: form.contactEmail.trim() || undefined,
           description: form.description || undefined,
-          plan: selectedPlan,
+          plan: activePlan,
           verificationPhotos: photos.map(photo => photo.path),
+          ...services,
         }),
       });
 
@@ -236,7 +243,7 @@ export default function SupplierRegisterPage() {
         return;
       }
 
-      setSuccess(`${data.message || t('supplierRegisterSuccess')} ${selectedPlan !== 'free' ? t('paidPlanPending') : ''}`);
+      setSuccess(`${data.message || t('supplierRegisterSuccess')} ${activePlan !== 'free' ? t('paidPlanPending') : ''}`);
 
     } catch {
       setError(t('connectionError'));
@@ -251,9 +258,9 @@ export default function SupplierRegisterPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex"><Image src="/logo-bold-v2.png" alt="Gym Builder" width={1120} height={488} className="h-20 w-auto rounded object-contain" /></Link>
-          <h1 className="text-2xl font-bold text-white mt-6 mb-2">{t('becomeSupplier')}</h1>
-          <p className="text-anthracite-300">{locale === 'en' ? 'Create your account, verify your company and publish your equipment after approval.' : 'Creează contul, verifică firma și publică echipamentele după aprobare.'}</p>
-          <p className="mt-3 text-sm text-gold-400">{locale === 'en' ? `Requested plan: ${selectedPlan} · No payment at registration` : `Plan solicitat: ${selectedPlan} · Fără plată la înregistrare`}</p>
+          <h1 className="text-2xl font-bold text-white mt-6 mb-2">{hasServices(services.businessType) ? (locale === 'en' ? 'Join Gym Service & Maintenance' : 'Înscrie-te în Gym Service și Mentenanță') : t('becomeSupplier')}</h1>
+          <p className="text-anthracite-300">{hasServices(services.businessType) ? (locale === 'en' ? 'Create your account, describe your services and appear in the directory after approval.' : 'Creează contul, prezintă serviciile și apari în catalog după aprobare.') : (locale === 'en' ? 'Create your account, verify your company and publish your equipment after approval.' : 'Creează contul, verifică firma și publică echipamentele după aprobare.')}</p>
+          <p className="mt-3 text-sm text-gold-400">{locale === 'en' ? `Requested plan: ${activePlan} · No payment at registration` : `Plan solicitat: ${activePlan} · Fără plată la înregistrare`}</p>
         </div>
 
         {/* Progress Steps */}
@@ -401,7 +408,7 @@ export default function SupplierRegisterPage() {
           {step === 2 && (
             <form onSubmit={(e) => { e.preventDefault(); handleNext(3); }} className="space-y-5">
               <div>
-                <label htmlFor="auth-register-supplier-5" className="block text-sm font-medium text-anthracite-200 mb-1.5">{t('companyName')} *</label>
+                <label htmlFor="auth-register-supplier-5" className="block text-sm font-medium text-anthracite-200 mb-1.5">{hasServices(services.businessType) ? (locale === 'en' ? 'Company / provider name' : 'Denumire firmă / prestator') : t('companyName')} *</label>
                 <div className="relative">
                   <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-anthracite-400" />
                   <input id="auth-register-supplier-5"
@@ -475,6 +482,7 @@ export default function SupplierRegisterPage() {
                 <p id="supplier-public-email-help" className="mt-2 text-sm text-anthracite-300">{locale === 'en' ? 'Visible to customers on your profile and products. Leave empty to keep your login email private.' : 'Vizibil clienților pe profil și produse. Lasă gol dacă nu dorești să publici o adresă. Emailul de autentificare rămâne privat.'}</p>
               </div>
 
+              <ServiceProfileFields value={services} onChange={setServices} disabled={loading} />
               <details className="rounded-lg border border-anthracite-700 p-4">
                 <summary className="min-h-11 cursor-pointer text-gold-400">{locale === 'en' ? 'Website and company description (optional)' : 'Website și descrierea firmei (opțional)'}</summary>
                 <div className="mt-3 space-y-4">
@@ -535,10 +543,10 @@ export default function SupplierRegisterPage() {
                 <p className="text-sm text-anthracite-400 mb-1">
                   {ui("Încărcați minim ")}<strong className="text-gold-400">{ui("3 poze")}</strong> {ui("care demonstrează că sunteți un furnizor real:")}</p>
                 <ul className="text-xs text-anthracite-500 list-disc list-inside mb-4 space-y-0.5">
-                  <li>{ui("Showroom sau magazin fizic")}</li>
-                  <li>{ui("Depozit cu echipamente")}</li>
+                  <li>{hasServices(services.businessType) ? (locale === 'en' ? 'Workshop or service vehicle' : 'Atelier sau autoutilitară de service') : ui("Showroom sau magazin fizic")}</li>
+                  <li>{hasServices(services.businessType) ? (locale === 'en' ? 'Tools and equipment' : 'Scule și echipamente de intervenție') : ui("Depozit cu echipamente")}</li>
                   <li>{ui("Echipă sau birou")}</li>
-                  <li>{ui("Produse în stoc")}</li>
+                  <li>{hasServices(services.businessType) ? (locale === 'en' ? 'Completed work, with customer permission' : 'Lucrări efectuate, cu acordul clientului') : ui("Produse în stoc")}</li>
                 </ul>
               </div>
 
@@ -600,10 +608,10 @@ export default function SupplierRegisterPage() {
               </div>
 
               <div className="rounded-lg border border-gold-400/30 bg-gold-400/5 p-4">
-                <p className="font-medium text-white">{locale === 'en' ? 'Selected plan' : 'Plan selectat'}: {selectedPlan === 'free' ? (locale === 'en' ? 'Free · €0' : 'Gratuit · 0 €') : plans.find(plan => plan.id === selectedPlan)?.name}</p>
+                <p className="font-medium text-white">{locale === 'en' ? 'Selected plan' : 'Plan selectat'}: {activePlan === 'free' ? (locale === 'en' ? 'Free · €0' : 'Gratuit · 0 €') : plans.find(plan => plan.id === activePlan)?.name}</p>
                 <p className="mt-1 text-sm text-anthracite-300">{locale === 'en' ? 'Payment is not collected at registration. Paid plans require separate activation.' : 'Nu se încasează bani la înregistrare. Planurile plătite necesită activare separată.'}</p>
               </div>
-              <details className="rounded-lg border border-anthracite-700 p-4">
+              {services.businessType !== 'service' && <details className="rounded-lg border border-anthracite-700 p-4">
                 <summary className="min-h-11 cursor-pointer font-medium text-gold-400">{locale === 'en' ? 'Compare other plans (optional)' : 'Compară alte planuri (opțional)'}</summary>
               <div className="space-y-3">
                 {plans.map((plan) => (
@@ -638,7 +646,7 @@ export default function SupplierRegisterPage() {
                 ))}
               </div>
 
-              </details>
+              </details>}
 
               <div className="flex items-start gap-2 mt-4">
                 <input

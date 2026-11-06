@@ -1,5 +1,9 @@
 export interface PromotionListing {
   id: string;
+  selection?: 'catalog';
+  brand_name?: string | null;
+  listed_price_amount?: number | null;
+  listed_price_currency?: string | null;
   supplier_id: string;
   product_id: string | null;
   title: string;
@@ -12,6 +16,12 @@ export interface PromotionListing {
   product: { id: string; name: string; images: string[]; condition: string } | null;
 }
 
+export interface CatalogOfferSelections {
+  superPret: PromotionListing[];
+  ofertaZilei: PromotionListing[];
+  oferteleSaptamanii: PromotionListing[];
+}
+
 export interface PromotionAvailability {
   ofertaZilei: { total: number; occupied: number; available: number };
   oferteleSaptamanii: { occupied: number };
@@ -21,6 +31,8 @@ export interface PromotionResponse {
   ofertaZilei: PromotionListing | null;
   oferteleSaptamanii: PromotionListing[];
   superPret: PromotionListing[];
+  catalogSelections?: CatalogOfferSelections;
+  catalogUnavailable?: boolean;
   slots: PromotionAvailability;
 }
 export const SUPER_PRICE_FEE_EUR = 12;

@@ -24,7 +24,7 @@ import { roomShape } from '@/lib/gym-room-shape';
 import { DEFAULT_VISUALIZATION, FLOOR_SURFACES, LIGHTING_PRESETS } from '@/lib/gym-visualization';
 
 export type StudioView = 'orbit' | 'top' | 'inside';
-export type CameraCommand = { kind: 'fit' | 'in' | 'out'; id: number } | { kind: 'focus'; id: number; target: { x: number; y: number; length: number; width: number; height: number; direction?: [number, number] } };
+export type CameraCommand = { kind: 'fit' | 'in' | 'out'; id: number } | { kind: 'pose'; id: number; position: [number, number, number]; lookAt: [number, number, number] } | { kind: 'focus'; id: number; target: { x: number; y: number; length: number; width: number; height: number; direction?: [number, number] } };
 const floorExtrusion = { depth: 0.25, bevelEnabled: false };
 interface Props {
   space: GymSpace; height: number; selected: string | null; view: StudioView; cutaway: boolean; showAreas: boolean;
@@ -50,6 +50,16 @@ function CameraRig({ space, view, height, onCaptureReady, navigation, cameraComm
     const isCommand = handledCommand.current !== cameraCommand.id;
     handledCommand.current = cameraCommand.id;
     if (camera instanceof THREE.PerspectiveCamera) { camera.fov = fov; camera.updateProjectionMatrix(); }
+    if (cameraCommand.kind === 'pose' && controls.current) {
+      camera.position.set(...cameraCommand.position);
+      controls.current.target.set(...cameraCommand.lookAt);
+      if (view === 'orbit' && size.width < size.height) {
+        const offset = camera.position.clone().sub(controls.current.target);
+        const distance = gymCameraDistance(length, width, size.width / Math.max(1, size.height), fov, height);
+        camera.position.copy(controls.current.target).add(offset.setLength(Math.max(offset.length(), distance)));
+      }
+      controls.current.update(); invalidate(); return;
+    }
     if (isCommand && cameraCommand.kind === 'focus' && cameraCommand.target && controls.current) {
       const item = cameraCommand.target;
       const target = new THREE.Vector3(item.x, item.height * 0.45, item.y);

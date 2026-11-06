@@ -1,0 +1,136 @@
+{
+  "status": "complete",
+  "verdict": "Ready to merge",
+  "scope": {
+    "base": "6672eec",
+    "branch": "codex/rotating-catalog-offers",
+    "head_sha": "6672eec9d84668a058edd5c3b20628971bce0f42",
+    "pr_url": null,
+    "files_changed": 34
+  },
+  "intent": "Add service provider registration, owner-only service editing and an approved public service directory while preserving supplier verification, approval, enquiry privacy and equipment journeys. Existing profiles default equipment; service-only registration is free; no bookings, payments or role conversion.",
+  "intent_confidence": "explicit",
+  "reviewers": [
+    "correctness",
+    "testing",
+    "maintainability",
+    "security",
+    "performance",
+    "api-contract",
+    "data-migration",
+    "adversarial",
+    "julik-frontend-races"
+  ],
+  "findings": [],
+  "actionable_findings": [],
+  "triage_groups": [],
+  "pre_existing_findings": [],
+  "requirements_completeness": {
+    "plan": "docs/plans/2026-11-05-gym-service.md",
+    "source": "explicit",
+    "requirements": [],
+    "implementation_units": [
+      {
+        "id": "U1",
+        "status": "met",
+        "evidence": [
+          "supabase/migrations/20261105000100_gym_service_profiles.sql",
+          "src/lib/gym-services.ts",
+          "tests/integration/gym-services.test.mjs"
+        ]
+      },
+      {
+        "id": "U2",
+        "status": "met",
+        "evidence": [
+          "src/app/(auth)/register/service/page.tsx",
+          "src/app/(auth)/register/supplier/page.tsx",
+          "src/app/(dashboard)/supplier/services/page.tsx",
+          "src/app/api/supplier/services/route.ts",
+          "tests/integration/gym-services.test.mjs"
+        ]
+      },
+      {
+        "id": "U3",
+        "status": "met",
+        "evidence": [
+          "src/app/(marketing)/gym-service/page.tsx",
+          "src/app/(marketing)/suppliers/page.tsx",
+          "src/app/api/suppliers/route.ts",
+          "src/components/ServiceDetails.tsx",
+          "src/components/admin/AdminDashboard.tsx",
+          "src/components/layout/GlobalHeader.tsx",
+          "src/components/layout/Footer.tsx",
+          "src/app/page.tsx"
+        ]
+      },
+      {
+        "id": "U4",
+        "status": "met",
+        "evidence": [
+          "Supplied isolated Supabase migration and integration evidence: 119 pass, 2 live-AI skips, zero failures; post-simplification 9 pass.",
+          "Supplied unit evidence: 182 pass; lint/typecheck and production build pass.",
+          "Supplied CUA desktop and 390x844 responsive verification; full source review completed. No deployment."
+        ]
+      }
+    ],
+    "unrequested_behavior_rules": []
+  },
+  "learnings": [],
+  "agent_native_gaps": [],
+  "deployment_notes": [],
+  "residual_risks": [],
+  "testing_gaps": [
+    "The new service editor has no automated browser assertions for expired-session loading or a failed save. A focused browser regression could verify the login return target and that failed saves display an error while preserving entered service details. Happy-path registration and save/reopen flows were checked manually through CUA."
+  ],
+  "coverage": {
+    "depth": "full",
+    "mode": "agent report-only",
+    "reviewer_reasons": {
+      "correctness": "always-on",
+      "testing": "changed tests and runtime branches",
+      "maintainability": "406 executable non-test changed lines and shared abstractions",
+      "security": "owner mutation and public directory privacy",
+      "performance": "database directory filter/query shape",
+      "api-contract": "new owner API and public route contract",
+      "data-migration": "additive supplier columns and public view migration",
+      "adversarial": "auth/persistence composition and test proxy fidelity",
+      "julik-frontend-races": "async service editor and filter lifecycles"
+    },
+    "notes": [
+      "Full depth selected by helper: migration hard block and size_band large; exec_nontest_lines=406, changed_lines=581.",
+      "Exact frozen owned scope is 34 paths against 6672eec; unrelated WIP and prior unpushed commits excluded. All source inspection must use /tmp/compound-engineering-501/ce-code-review/20261105-204801-92e5be70/snapshot.",
+      "Author runtime evidence inspected: docs/audits/gym-service-20261105/unit-tests.log 182/182 pass; integration-all.log 121 total,119 pass,2 deliberate live-AI skips,zero fail; integration-after-simplify.log 9/9 pass; build.log successful production build. Lint/typecheck reported pass. Review did not rerun database or full checks.",
+      "Actual CUA browser verification reported: directory/category/area/brand filters, public profile/enquiry, guest login continuation, existing provider login, invalid empty categories, saved/reopened owner fields and service dashboard. mobile-verification.json inspected: actual production components in 390x844 iframe, real API local proxy, menu/filter/edit/save,48px category checkbox targets,no overflow. Physical phone and real email delivery untested.",
+      "Review-local journeys unit passed; gym-services unit could not load zod in dependency-free frozen snapshot. This does not contradict the authoritative full unit run in the canonical checkout.",
+      "Testing reviewer browser gaps distinguish absent automated assertions from completed manual CUA verification. Database static reviewer did not rerun migration; author verified all migrations in isolated Supabase and supplied integration logs.",
+      "Source unchanged throughout review; production build completed after devservers stopped. No production migration or deployment authorized.",
+      "Cross-model pass: not run (only same-family Codex CLI installed); adversarial lens covered by the in-process adversarial reviewer.",
+      "project standards: not run (no applicable standards files)",
+      "All nine selected reviewers returned valid artifacts; none produced a finding. Mechanical merge: 0 malformed findings/returns, 0 suppressed findings, 0 first_evidence backfills, 0 quote-gate demotions.",
+      "Validator selection: no primary findings, no selected batch, and no cross-model shortcut skips.",
+      "Review-local missing dependencies and prohibited database execution are coverage limits, not unresolved product risks; authoritative supplied runtime evidence remains valid. Automated happy-path browser coverage is absent, while the same registration/login/editor paths were manually checked."
+    ],
+    "validation": {
+      "outcome": "empty-batch",
+      "confirmed": 0,
+      "rejected": 0,
+      "unresolved": 0,
+      "malformed": 0,
+      "failed": 0,
+      "shortcut_skipped": 0,
+      "reason": "No primary findings selected for validation."
+    },
+    "suppressed_by_confidence": {},
+    "mode_aware_demotions": 0,
+    "first_evidence_backfilled": 0,
+    "quote_gate_demoted": 0,
+    "failed_reviewers": []
+  },
+  "peer": {
+    "outcome": "in-process-fallback",
+    "coverage": "Cross-model pass: not run (only same-family Codex CLI installed); adversarial lens covered by the in-process adversarial reviewer."
+  },
+  "artifact_path": "/tmp/compound-engineering-501/ce-code-review/20261105-204801-92e5be70",
+  "run_id": "20261105-204801-92e5be70"
+}

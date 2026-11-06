@@ -14,8 +14,14 @@ export default function AiProposalReview({ review, current, graphicsFailed, heig
   const t = (ro: string, en: string) => locale === 'en' ? en : ro;
   const [preview, setPreview] = useState(false), [selected, setSelected] = useState<string | null>(null);
   const proposal = review.proposal;
+  const [acceptedPartial, setAcceptedPartial] = useState<GymAiReview | null>(null);
+  const partial = Boolean(proposal?.omitted.length);
+  const canApply = current && (!partial || acceptedPartial === review);
   const applyLabel = graphicsFailed ? t('Aplică în 2D', 'Apply in 2D') : t('Aplică și deschide în 3D', 'Apply and open in 3D');
   const changes = proposal && <div className="space-y-2 text-sm">
+    <p className="font-medium">{t('Interpretarea AI → amplasarea în plan', 'AI interpretation → placement in the plan')}</p>
+    <p className="text-xs text-anthracite-300">{t('Compară această listă cu cerința ta înainte să aplici. Cantitățile interpretate de AI nu sunt o confirmare că toate cerințele din text au fost îndeplinite.', 'Compare this list with your brief before applying. AI-interpreted quantities do not confirm that every requirement in your text has been fulfilled.')}</p>
+    <ul aria-label={t('Echipamente cerute de AI și amplasate', 'AI-requested and placed equipment')} className="space-y-2">{review.fulfillment.filter(item => item.requested > 0 || item.placed > 0).map(item => <li key={item.templateId} className="rounded border border-white/10 p-2"><p>{ui(EQUIPMENT_CATALOG.find(model => model.id === item.templateId)?.name)}</p><p className="text-xs">{t('AI cere', 'AI requests')}: {item.requested} · {t('În plan', 'In plan')}: {item.placed} · {t('Neamplasate', 'Not placed')}: {item.omitted}</p></li>)}</ul>
     <p className="font-medium">{review.source.storey === 0 ? t('Parter', 'Ground floor') : t('Etaj 1', 'First floor')} · {proposal.space.items.length} {t('obiecte propuse', 'proposed objects')}</p>
     <p>{t('Se înlocuiesc toate dotările acestui nivel:', 'All equipment on this floor will be replaced:')} {review.replacedCount} → {proposal.space.items.length}. {t('Celălalt nivel este păstrat.', 'The other floor is preserved.')}</p>
     <p>€{spaceCost(proposal.space).toLocaleString(locale)} / {review.budget === null ? t('fără plafon', 'no cap') : `€${review.budget.toLocaleString(locale)}`} {t('disponibil pentru acest nivel', 'available for this floor')}</p>
@@ -37,7 +43,8 @@ export default function AiProposalReview({ review, current, graphicsFailed, heig
       <div className="h-[520px] sm:h-[420px]"><SpacePlan space={proposal.space} height={height} budget={review.budget} disabled selected={selected} onSelect={setSelected} onMove={() => false} onEdit={() => null} label={t('Plan AI propus, doar pentru vizualizare', 'Proposed AI plan, read only')} /></div>
       {changes}{stale}
       <p className="text-xs text-anthracite-300">{t('Aplicarea poate fi anulată cu Undo. Salvarea în cont rămâne o acțiune separată.', 'Applying can be undone with Undo. Saving to your account remains a separate action.')}</p>
-      <button className={`${button} w-full border-gold-400 text-gold-200`} disabled={!current} onClick={onApply}>{applyLabel}</button>
+      {partial && <label className="flex min-h-11 items-start gap-3 rounded border border-amber-400/30 p-3 text-amber-100"><input type="checkbox" className="mt-1 h-5 w-5 shrink-0 accent-gold-400" checked={acceptedPartial === review} onChange={event => setAcceptedPartial(event.target.checked ? review : null)} /><span>{t('Accept varianta parțială și echipamentele neamplasate afișate mai sus.', 'I accept this partial layout and the unplaced equipment listed above.')}</span></label>}
+      <button className={`${button} w-full border-gold-400 text-gold-200`} disabled={!canApply} onClick={onApply}>{applyLabel}</button>
     </section></Modal>}
   </section>;
 }

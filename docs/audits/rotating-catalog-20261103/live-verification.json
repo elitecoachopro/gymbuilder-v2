@@ -1,0 +1,35 @@
+{
+  "http": [
+    {
+      "path": "/",
+      "status": 200,
+      "bytes": 50116
+    },
+    {
+      "path": "/api/health",
+      "status": 200,
+      "bytes": 235
+    },
+    {
+      "path": "/configurator/studio",
+      "status": 200,
+      "bytes": 57579
+    },
+    {
+      "path": "/api/analytics/report",
+      "status": 401,
+      "bytes": 24
+    },
+    {
+      "path": "/api/private-reports",
+      "status": 401,
+      "bytes": 24
+    }
+  ],
+  "catalog_sections": {
+    "superPret": 12,
+    "ofertaZilei": 12,
+    "oferteleSaptamanii": 12
+  },
+  "manufacturers": 22
+}

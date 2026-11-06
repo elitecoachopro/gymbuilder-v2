@@ -1,4 +1,5 @@
 import { isMarket } from '@/lib/markets';
+import { SERVICE_CATEGORIES } from '@/lib/gym-services';
 import type { Database } from '@/types/database.generated';
 import { localizedJson } from '@/lib/json-response';
 import { NextRequest } from 'next/server';
@@ -15,6 +16,12 @@ function getSupabaseAdmin() {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const business = searchParams.get('business') || 'equipment';
+    const service = searchParams.get('service');
+    const area = searchParams.get('area');
+    if (!['equipment', 'service'].includes(business) || (service && !SERVICE_CATEGORIES.some(item => item.id === service)) || (area && area.length > 160)) {
+      return localizedJson({ error: 'Date invalide.' }, { status: 400 });
+    }
     const market = searchParams.get('market');
     if (market && !isMarket(market)) return await localizedJson({ error: 'Piață invalidă.' }, { status: 400 });
     const country = searchParams.get('country');
@@ -28,13 +35,16 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('public_supplier_directory')
       .select(`
-        id, company_name, country, city, website, phone, description, logo_url, status, plan, verified, created_at, contact_email, listing_source_url, catalog_url, listing_checked_at
+        id, company_name, country, city, website, phone, description, logo_url, status, plan, verified, created_at, contact_email, listing_source_url, catalog_url, listing_checked_at, business_type, service_categories, service_areas, service_brands
       `, { count: 'exact' })
       .eq('status', 'approved')
+      .in('business_type', business === 'service' ? ['service', 'both'] : ['equipment', 'both'])
       .order('created_at', { ascending: false })
       .order('id').range((page - 1) * limit, page * limit - 1);
 
     if (market) query = query.eq('market', market);
+    if (service) query = query.contains('service_categories', [service]);
+    if (area) query = query.ilike('service_areas', `%${sanitizePostgrestSearch(area)}%`);
 
     if (country && country !== 'Toate' && country !== 'all') {
       query = query.eq('country', country);
@@ -42,7 +52,7 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       const safeSearch = sanitizePostgrestSearch(search);
-      query = query.or(`company_name.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%,city.ilike.%${safeSearch}%`);
+      query = query.or(`company_name.ilike.%${safeSearch}%,description.ilike.%${safeSearch}%,city.ilike.%${safeSearch}%${business === 'service' ? `,service_brands.ilike.%${safeSearch}%,service_areas.ilike.%${safeSearch}%` : ''}`);
     }
 
     const { data: suppliers, error, count } = await query;

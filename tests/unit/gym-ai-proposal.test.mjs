@@ -92,3 +92,32 @@ test('proposal guards reject changes to preserved architecture even with valid e
   }
   assert.deepEqual(state, createEditorHistory(doc));
 });
+
+test('review accounts for every AI-requested item as placed or explicitly omitted and rejects unexplained differences', () => {
+  const doc = document(), state = createEditorHistory(doc), valid = response(doc);
+  const review = createGymAiReview(valid, state.present, 1);
+  assert.deepEqual(review.fulfillment, [{ templateId: 'banda_alergare', requested: 3, placed: 1, omitted: 2 }]);
+  for (const modify of [
+    candidate => { candidate.spaceProposal.omitted = []; },
+    candidate => { candidate.spaceProposal.omitted[0].quantity += 1; },
+    candidate => { candidate.design.zones[0].equipment[0].quantity = 0; },
+    candidate => { candidate.spaceProposal.omitted.push({templateId:'bicicleta_spinning',quantity:1,reason:'space'}); },
+  ]) {
+    const candidate = structuredClone(valid); modify(candidate);
+    assert.throws(() => createGymAiReview(candidate, state.present, 1), /INVALID_PROPOSAL/);
+  }
+});
+
+test('AI design rejects duplicate zones, duplicate equipment and equipment assigned to the wrong zone', async () => {
+  const { aiDesignSchema } = await import('../../src/lib/gym-ai.ts');
+  const valid = response(document()).design;
+  assert.equal(aiDesignSchema.safeParse(valid).success, true);
+  for (const change of [
+    design => { design.zones.push(structuredClone(design.zones[0])); },
+    design => { design.zones[0].equipment.push({...design.zones[0].equipment[0]}); },
+    design => { design.zones[0].equipment[0].templateId = 'desk_receptie'; },
+  ]) {
+    const candidate = structuredClone(valid); change(candidate);
+    assert.equal(aiDesignSchema.safeParse(candidate).success, false);
+  }
+});

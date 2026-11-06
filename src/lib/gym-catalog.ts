@@ -38,7 +38,8 @@ export const EQUIPMENT_CATALOG: EquipmentTemplate[] = [
   // Studio (2)
   { id: 'oglinda_perete', name: 'Oglindă Perete', zone: 'studio', length_m: 2.0, width_m: 0.1, label: 'Oglindă perete — 2m × 0.1m', height_m: 2, price_eur: 350 },
   { id: 'saltea_yoga', name: 'Saltea Yoga', zone: 'studio', length_m: 1.8, width_m: 0.6, label: 'Saltea yoga — 1.8m × 0.6m', height_m: 0.04, price_eur: 35 },
-  // Spa (2)
+  // Spa
+  { id: 'cryosauna', name: 'Criosaună', zone: 'spa', length_m: 1.5, width_m: 1.5, label: 'Criosaună — model conceptual, 1.5m × 1.5m', height_m: 2.2, price_eur: 30000 },
   { id: 'sauna', name: 'Cabină Saună', zone: 'spa', length_m: 2.0, width_m: 2.0, label: 'Cabină saună — 2m × 2m', height_m: 2.2, price_eur: 6000 },
   { id: 'jacuzzi', name: 'Jacuzzi', zone: 'spa', length_m: 2.2, width_m: 2.2, label: 'Jacuzzi — 2.2m × 2.2m', height_m: 1, price_eur: 7000 },
   // Recepție (2)

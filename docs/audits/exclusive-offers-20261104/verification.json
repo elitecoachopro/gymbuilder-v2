@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-04",
+  "super_price": {
+    "products": 1,
+    "hours": 12,
+    "carousel": false
+  },
+  "daily_offer": {
+    "products": 1,
+    "hours": 24,
+    "carousel": false
+  },
+  "weekly": {
+    "carousel": true,
+    "catalog_products_max": 12
+  },
+  "unit_tests": 175,
+  "integration_tests": 10,
+  "typecheck": "passed",
+  "lint": "passed",
+  "build": "passed",
+  "browser": {
+    "real_expiry_test": "12-hour local paid placement ended35secondsafterfixturecreation; actualrendered31secondscountdownchangedautomaticallytocatalogreplacement",
+    "reload_preserves_product_and_deadline": true,
+    "mobile_width": 390,
+    "document_width": 382,
+    "physical_phone": false
+  },
+  "review": {
+    "run_id": "20261104-exclusive-d029028c",
+    "fixed": [
+      "consecutiveovernightSuperduplicate",
+      "currentunpaidSuperprivacytest"
+    ],
+    "manual_rendered_expiry": "verified",
+    "deferred": "automatedcontrolledclock/unmount/failedboundaryrecovery coverage"
+  },
+  "rollout": {
+    "future_or_current_reservations": 0,
+    "historical_overlap_pairs": 1,
+    "resolution": "mark only alreadyelapsedSuperpendingactiveperiodsexpired; preserve rows/prices andfutureperiods;applyexclusionatomically"
+  },
+  "published": true,
+  "live_browser": {
+    "super_cards": 1,
+    "daily_cards": 1,
+    "weekly_cards": 12,
+    "exclusive_carousels": 0,
+    "weekly_carousel": 1,
+    "both_countdowns_visible": true
+  }
+}

@@ -1,0 +1,727 @@
+{
+  "format": "gymbuilder-space",
+  "version": 2,
+  "name": "Gym Builder · Concept extins 600 m²",
+  "height": 3.5,
+  "budget": 180000,
+  "brief": "Concept demonstrativ: 600 m² (30 × 20 m), buget dotări 180.000 EUR. Cardio, forță pentru toate grupele musculare, cabluri, greutăți libere, functional, studio, recepție, două vestiare și refacere cu saună și criosaună.",
+  "space": {
+    "version": 1,
+    "outline": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 30,
+        "y": 0
+      },
+      {
+        "x": 30,
+        "y": 20
+      },
+      {
+        "x": 0,
+        "y": 20
+      }
+    ],
+    "walls": [
+      {
+        "id": "services-front",
+        "x": 0.15,
+        "y": 14.5,
+        "length": 29.7,
+        "axis": "x",
+        "thickness": 0.12
+      },
+      {
+        "id": "service-divider-0",
+        "x": 6,
+        "y": 14.5,
+        "length": 5.35,
+        "axis": "y",
+        "thickness": 0.12
+      },
+      {
+        "id": "service-divider-1",
+        "x": 13.8,
+        "y": 14.5,
+        "length": 5.35,
+        "axis": "y",
+        "thickness": 0.12
+      },
+      {
+        "id": "service-divider-2",
+        "x": 21.5,
+        "y": 14.5,
+        "length": 5.35,
+        "axis": "y",
+        "thickness": 0.12
+      }
+    ],
+    "openings": [
+      {
+        "id": "service-door-0",
+        "wallId": "services-front",
+        "kind": "door",
+        "offset": 1.85,
+        "width": 1.3,
+        "height": 2.2,
+        "sill": 0
+      },
+      {
+        "id": "service-door-1",
+        "wallId": "services-front",
+        "kind": "door",
+        "offset": 6.55,
+        "width": 1.3,
+        "height": 2.2,
+        "sill": 0
+      },
+      {
+        "id": "service-door-2",
+        "wallId": "services-front",
+        "kind": "door",
+        "offset": 14.35,
+        "width": 1.3,
+        "height": 2.2,
+        "sill": 0
+      },
+      {
+        "id": "service-door-3",
+        "wallId": "services-front",
+        "kind": "door",
+        "offset": 21.950000000000003,
+        "width": 1.3,
+        "height": 2.2,
+        "sill": 0
+      },
+      {
+        "id": "main-entry",
+        "wallId": "edge-3",
+        "kind": "door",
+        "offset": 16.7,
+        "width": 1.6,
+        "height": 2.5,
+        "sill": 0
+      },
+      {
+        "id": "front-window-0",
+        "wallId": "edge-0",
+        "kind": "window",
+        "offset": 1,
+        "width": 7.5,
+        "height": 2.6,
+        "sill": 0.35
+      },
+      {
+        "id": "front-window-1",
+        "wallId": "edge-0",
+        "kind": "window",
+        "offset": 11,
+        "width": 7.5,
+        "height": 2.6,
+        "sill": 0.35
+      },
+      {
+        "id": "front-window-2",
+        "wallId": "edge-0",
+        "kind": "window",
+        "offset": 21,
+        "width": 7.5,
+        "height": 2.6,
+        "sill": 0.35
+      }
+    ],
+    "columns": [],
+    "areas": [
+      {
+        "id": "receptie",
+        "name": "Recepție și așteptare",
+        "colour": "#c7a96c",
+        "x": 0.2,
+        "y": 14.65,
+        "w": 5.65,
+        "d": 5.15
+      },
+      {
+        "id": "vestiare-f",
+        "name": "Vestiar femei",
+        "colour": "#ae9fb7",
+        "x": 6.1,
+        "y": 14.65,
+        "w": 7.6,
+        "d": 5.15
+      },
+      {
+        "id": "vestiare-m",
+        "name": "Vestiar bărbați",
+        "colour": "#8aabb8",
+        "x": 13.9,
+        "y": 14.65,
+        "w": 7.5,
+        "d": 5.15
+      },
+      {
+        "id": "spa",
+        "name": "Refacere · saună și criosaună",
+        "colour": "#8fa99e",
+        "x": 21.6,
+        "y": 14.65,
+        "w": 8.2,
+        "d": 5.15
+      },
+      {
+        "id": "cardio",
+        "name": "Cardio · 6 benzi, 4 biciclete, 2 eliptice",
+        "colour": "#aebbc4",
+        "x": 0.25,
+        "y": 0.25,
+        "w": 10.1,
+        "d": 8.1
+      },
+      {
+        "id": "aparate",
+        "name": "Forță · grupe musculare și cabluri",
+        "colour": "#87958f",
+        "x": 10.65,
+        "y": 0.25,
+        "w": 19.1,
+        "d": 9.4
+      },
+      {
+        "id": "greutati",
+        "name": "Greutăți libere",
+        "colour": "#8f959b",
+        "x": 0.25,
+        "y": 8.7,
+        "w": 10.1,
+        "d": 4.15
+      },
+      {
+        "id": "functional",
+        "name": "Functional · vâslit și rig",
+        "colour": "#7c9b73",
+        "x": 10.65,
+        "y": 10,
+        "w": 9.6,
+        "d": 2.85
+      },
+      {
+        "id": "studio",
+        "name": "Studio · clase și stretching",
+        "colour": "#c2aa88",
+        "x": 20.8,
+        "y": 10,
+        "w": 8.95,
+        "d": 2.85
+      }
+    ],
+    "items": [
+      {
+        "id": "demo600-1",
+        "templateId": "cad_treadmill",
+        "x": 2,
+        "y": 1.3,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-2",
+        "templateId": "cad_treadmill",
+        "x": 5,
+        "y": 1.3,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-3",
+        "templateId": "cad_treadmill",
+        "x": 8,
+        "y": 1.3,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-4",
+        "templateId": "cad_treadmill",
+        "x": 2,
+        "y": 3.6,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-5",
+        "templateId": "cad_treadmill",
+        "x": 5,
+        "y": 3.6,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-6",
+        "templateId": "cad_treadmill",
+        "x": 8,
+        "y": 3.6,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-7",
+        "templateId": "real_spin_bike",
+        "x": 1.5,
+        "y": 5.7,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-8",
+        "templateId": "real_spin_bike",
+        "x": 3.8,
+        "y": 5.7,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-9",
+        "templateId": "real_spin_bike",
+        "x": 6.1,
+        "y": 5.7,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-10",
+        "templateId": "real_spin_bike",
+        "x": 8.4,
+        "y": 5.7,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-11",
+        "templateId": "cad_elliptical",
+        "x": 2.5,
+        "y": 7.5,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-12",
+        "templateId": "cad_elliptical",
+        "x": 6.5,
+        "y": 7.5,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-13",
+        "templateId": "plate_chest_press",
+        "x": 12.5,
+        "y": 1.7,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-14",
+        "templateId": "pec_fly",
+        "x": 16.8,
+        "y": 1.7,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-15",
+        "templateId": "aparat_lat",
+        "x": 21.1,
+        "y": 1.7,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-16",
+        "templateId": "seated_row",
+        "x": 25.4,
+        "y": 1.7,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-17",
+        "templateId": "shoulder_press",
+        "x": 12.5,
+        "y": 4,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-18",
+        "templateId": "lateral_raise",
+        "x": 16.8,
+        "y": 4,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-19",
+        "templateId": "cad_leg_press",
+        "x": 21.1,
+        "y": 4,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-20",
+        "templateId": "leg_extension",
+        "x": 25.4,
+        "y": 4,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-21",
+        "templateId": "hip_thrust",
+        "x": 12.5,
+        "y": 6.3,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-22",
+        "templateId": "glute_kickback",
+        "x": 16.8,
+        "y": 6.3,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-23",
+        "templateId": "biceps_curl",
+        "x": 21.1,
+        "y": 6.3,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-24",
+        "templateId": "triceps_press",
+        "x": 25.4,
+        "y": 6.3,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-25",
+        "templateId": "ab_crunch",
+        "x": 12.5,
+        "y": 8.6,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-26",
+        "templateId": "torso_rotation",
+        "x": 16.8,
+        "y": 8.6,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-27",
+        "templateId": "real_multigym",
+        "x": 21.1,
+        "y": 8.6,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-28",
+        "templateId": "real_multigym",
+        "x": 25.4,
+        "y": 8.6,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-29",
+        "templateId": "real_cable_crossover",
+        "x": 28.5,
+        "y": 3,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-30",
+        "templateId": "real_cable_crossover",
+        "x": 28.5,
+        "y": 8,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-31",
+        "templateId": "real_power_rack",
+        "x": 1.8,
+        "y": 10.65,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-32",
+        "templateId": "real_power_rack",
+        "x": 4.8,
+        "y": 10.65,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-33",
+        "templateId": "real_adjustable_bench",
+        "x": 7.2,
+        "y": 10.65,
+        "rotation": 90
+      },
+      {
+        "id": "demo600-34",
+        "templateId": "real_adjustable_bench",
+        "x": 9,
+        "y": 10.65,
+        "rotation": 90
+      },
+      {
+        "id": "demo600-35",
+        "templateId": "cad_dumbbell_rack",
+        "x": 2.2,
+        "y": 12.5,
+        "rotation": 90
+      },
+      {
+        "id": "demo600-36",
+        "templateId": "cad_dumbbell_rack",
+        "x": 5.2,
+        "y": 12.5,
+        "rotation": 90
+      },
+      {
+        "id": "demo600-37",
+        "templateId": "real_rower",
+        "x": 12.2,
+        "y": 11.8,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-38",
+        "templateId": "real_rower",
+        "x": 15.3,
+        "y": 11.8,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-39",
+        "templateId": "rig_crossfit",
+        "x": 18.4,
+        "y": 11.65,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-40",
+        "templateId": "box_pliometric",
+        "x": 11.7,
+        "y": 10.4,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-41",
+        "templateId": "box_pliometric",
+        "x": 14.8,
+        "y": 10.4,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-42",
+        "templateId": "saltea_yoga",
+        "x": 22.2,
+        "y": 10.65,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-43",
+        "templateId": "saltea_yoga",
+        "x": 24.8,
+        "y": 10.65,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-44",
+        "templateId": "saltea_yoga",
+        "x": 27.4,
+        "y": 10.65,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-45",
+        "templateId": "saltea_yoga",
+        "x": 22.2,
+        "y": 12,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-46",
+        "templateId": "saltea_yoga",
+        "x": 24.8,
+        "y": 12,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-47",
+        "templateId": "saltea_yoga",
+        "x": 27.4,
+        "y": 12,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-48",
+        "templateId": "oglinda_perete",
+        "x": 29.5,
+        "y": 11.5,
+        "rotation": 90
+      },
+      {
+        "id": "demo600-49",
+        "templateId": "desk_receptie",
+        "x": 3.2,
+        "y": 16.1,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-50",
+        "templateId": "canapea",
+        "x": 2.3,
+        "y": 18.6,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-51",
+        "templateId": "dulap_vestiar",
+        "x": 7.7,
+        "y": 19.25,
+        "rotation": 180
+      },
+      {
+        "id": "demo600-52",
+        "templateId": "dulap_vestiar",
+        "x": 10.6,
+        "y": 19.25,
+        "rotation": 180
+      },
+      {
+        "id": "demo600-53",
+        "templateId": "banca_vestiar",
+        "x": 8.2,
+        "y": 17.65,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-54",
+        "templateId": "dus",
+        "x": 12.7,
+        "y": 17.5,
+        "rotation": 90
+      },
+      {
+        "id": "demo600-55",
+        "templateId": "dus",
+        "x": 12.7,
+        "y": 19,
+        "rotation": 90
+      },
+      {
+        "id": "demo600-56",
+        "templateId": "wc",
+        "x": 11,
+        "y": 16.1,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-57",
+        "templateId": "lavoar",
+        "x": 8.5,
+        "y": 16.1,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-58",
+        "templateId": "lavoar",
+        "x": 9.4,
+        "y": 16.1,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-59",
+        "templateId": "dulap_vestiar",
+        "x": 15.5,
+        "y": 19.25,
+        "rotation": 180
+      },
+      {
+        "id": "demo600-60",
+        "templateId": "dulap_vestiar",
+        "x": 18.4,
+        "y": 19.25,
+        "rotation": 180
+      },
+      {
+        "id": "demo600-61",
+        "templateId": "banca_vestiar",
+        "x": 16,
+        "y": 17.65,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-62",
+        "templateId": "dus",
+        "x": 20.5,
+        "y": 17.5,
+        "rotation": 90
+      },
+      {
+        "id": "demo600-63",
+        "templateId": "dus",
+        "x": 20.5,
+        "y": 19,
+        "rotation": 90
+      },
+      {
+        "id": "demo600-64",
+        "templateId": "wc",
+        "x": 18.8,
+        "y": 16.1,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-65",
+        "templateId": "lavoar",
+        "x": 16.3,
+        "y": 16.1,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-66",
+        "templateId": "lavoar",
+        "x": 17.2,
+        "y": 16.1,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-67",
+        "templateId": "sauna",
+        "x": 24,
+        "y": 18.4,
+        "rotation": 180
+      },
+      {
+        "id": "demo600-68",
+        "templateId": "cryosauna",
+        "x": 27.5,
+        "y": 18.5,
+        "rotation": 130
+      },
+      {
+        "id": "demo600-69",
+        "templateId": "canapea_lounge",
+        "x": 26,
+        "y": 16.1,
+        "rotation": 0
+      },
+      {
+        "id": "demo600-70",
+        "templateId": "dus",
+        "x": 28.7,
+        "y": 16.1,
+        "rotation": 0
+      }
+    ],
+    "finishes": {
+      "floor": "tartan",
+      "wall": "#e7e5df",
+      "frame": "#353b43",
+      "upholstery": "#945c39"
+    },
+    "visualization": {
+      "lighting": "daylight",
+      "eyeHeight": 1.65,
+      "fov": 60,
+      "snap": 0.1,
+      "dimensions": false,
+      "interiorStyle": "warm"
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-03",
+  "baseline": "c7e4de8",
+  "source_catalog": {
+    "published_products": 59,
+    "manufacturers": 22
+  },
+  "selection": {
+    "per_section_max": 12,
+    "manufacturer_balance": "round robin, daily offset in Europe/Bucharest",
+    "rotation_seconds": 6,
+    "paused_offscreen": true,
+    "manual_navigation": true,
+    "paid_priority": true,
+    "invented_discounts": false,
+    "schema_changed": false
+  },
+  "verification": {
+    "unit_tests": 174,
+    "promotion_integration_tests": 8,
+    "typecheck": "passed",
+    "lint": "passed",
+    "build": "passed",
+    "catalog_fault": {
+      "before": 503,
+      "after": 200,
+      "paid_placement_retained": true,
+      "fixture_cleaned": true
+    },
+    "browser": {
+      "languages": [
+        "en",
+        "ro"
+      ],
+      "mobile_width": 390,
+      "document_width": 382,
+      "manual_next": "advances and pauses",
+      "pause_7_seconds": "scroll position unchanged",
+      "automatic_rotation": "observed in visible sections",
+      "physical_phone": false
+    }
+  },
+  "review": {
+    "status": "complete",
+    "run_id": "20261103-120501-aa00e435",
+    "finding_1": "fixed and verified with real route through local HTTP fault proxy",
+    "finding_2": "manual rendered checks completed; automated lifecycle/reduced-motion coverage deferred"
+  },
+  "limitations": [
+    "No automated rendered lifecycle/reduced-motion suite or controlled-time/unmount cleanup test",
+    "Physical phone not tested"
+  ],
+  "published": true,
+  "live_browser": {
+    "desktop_width": 1280,
+    "document_width": 1272,
+    "sections": [
+      12,
+      12,
+      12
+    ],
+    "visible_photographs_loaded": true
+  }
+}

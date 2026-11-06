@@ -1,0 +1,18 @@
+✔ paid promotions enforce exactly 24 hours, 7 days or 12 hours for Super price (134.673667ms)
+✔ Super price publishes one12-hour placement and excludes future, expired and unpaid records (150.536125ms)
+✔ only one Super price placement can reserve an overlapping12-hour window (45.36225ms)
+✔ only one daily promotion can reserve an overlapping time, including concurrent reservations (46.872041ms)
+✔ Super price preserves price on request without inventing a zero equipment price (76.077167ms)
+✔ public weekly offers include all active placements, product links and supplier information (78.103416ms)
+✔ a pending daily reservation occupies the slot without publishing its private announcement (75.038916ms)
+✔ weekly placements beyond the first database page are included once each (103.215ms)
+✔ catalog rotations only expose published equipment and preserve the source price and manufacturer (120.498ms)
+✔ a current unpaid Super price reservation stays private while occupying its interval (82.913542ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1040.059541

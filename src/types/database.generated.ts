@@ -1081,6 +1081,7 @@ export type Database = {
       }
       supplier_profiles: {
         Row: {
+          business_type: string
           catalog_url: string | null
           city: string
           company_name: string
@@ -1096,6 +1097,9 @@ export type Database = {
           plan: Database["public"]["Enums"]["supplier_plan"]
           plan_expires_at: string | null
           requested_plan: Database["public"]["Enums"]["supplier_plan"] | null
+          service_areas: string
+          service_brands: string
+          service_categories: string[]
           status: Database["public"]["Enums"]["supplier_status"]
           updated_at: string | null
           user_id: string | null
@@ -1104,6 +1108,7 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          business_type?: string
           catalog_url?: string | null
           city: string
           company_name: string
@@ -1119,6 +1124,9 @@ export type Database = {
           plan?: Database["public"]["Enums"]["supplier_plan"]
           plan_expires_at?: string | null
           requested_plan?: Database["public"]["Enums"]["supplier_plan"] | null
+          service_areas?: string
+          service_brands?: string
+          service_categories?: string[]
           status?: Database["public"]["Enums"]["supplier_status"]
           updated_at?: string | null
           user_id?: string | null
@@ -1127,6 +1135,7 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          business_type?: string
           catalog_url?: string | null
           city?: string
           company_name?: string
@@ -1142,6 +1151,9 @@ export type Database = {
           plan?: Database["public"]["Enums"]["supplier_plan"]
           plan_expires_at?: string | null
           requested_plan?: Database["public"]["Enums"]["supplier_plan"] | null
+          service_areas?: string
+          service_brands?: string
+          service_categories?: string[]
           status?: Database["public"]["Enums"]["supplier_status"]
           updated_at?: string | null
           user_id?: string | null
@@ -1308,6 +1320,7 @@ export type Database = {
       }
       public_supplier_directory: {
         Row: {
+          business_type: string | null
           catalog_url: string | null
           city: string | null
           company_name: string | null
@@ -1322,11 +1335,15 @@ export type Database = {
           market: string | null
           phone: string | null
           plan: Database["public"]["Enums"]["supplier_plan"] | null
+          service_areas: string | null
+          service_brands: string | null
+          service_categories: string[] | null
           status: Database["public"]["Enums"]["supplier_status"] | null
           verified: boolean | null
           website: string | null
         }
         Insert: {
+          business_type?: string | null
           catalog_url?: string | null
           city?: string | null
           company_name?: string | null
@@ -1341,11 +1358,15 @@ export type Database = {
           market?: never
           phone?: string | null
           plan?: Database["public"]["Enums"]["supplier_plan"] | null
+          service_areas?: string | null
+          service_brands?: string | null
+          service_categories?: string[] | null
           status?: Database["public"]["Enums"]["supplier_status"] | null
           verified?: boolean | null
           website?: string | null
         }
         Update: {
+          business_type?: string | null
           catalog_url?: string | null
           city?: string | null
           company_name?: string | null
@@ -1360,6 +1381,9 @@ export type Database = {
           market?: never
           phone?: string | null
           plan?: Database["public"]["Enums"]["supplier_plan"] | null
+          service_areas?: string | null
+          service_brands?: string | null
+          service_categories?: string[] | null
           status?: Database["public"]["Enums"]["supplier_status"] | null
           verified?: boolean | null
           website?: string | null

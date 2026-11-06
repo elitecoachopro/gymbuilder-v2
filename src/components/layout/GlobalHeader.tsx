@@ -23,6 +23,7 @@ export default function GlobalHeader() {
 
   const navLinks = [
     { href: '/products', label: ui('Echipamente') },
+    { href: '/gym-service', label: 'Gym Service' },
     { href: '/suppliers', label: locale === 'en' ? 'Suppliers' : 'Furnizori' },
     { href: '/configurator/studio', label: locale === 'en' ? 'Design your gym' : 'Proiectează sala' },
     { href: '/construieste-sala', label: locale === 'en' ? 'Gym services' : 'Servicii pentru sală' },

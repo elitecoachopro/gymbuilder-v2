@@ -1,0 +1,10 @@
+{
+  "area_m2": 600,
+  "objects": 70,
+  "indicative_cost_eur": 154060,
+  "budget_eur": 180000,
+  "remaining_eur": 25940,
+  "geometry_validation": "pass",
+  "source": "Hand-authored demonstration using the configurator catalog; not a new AI response.",
+  "cost_scope": "Equipment catalogue estimates only; excludes VAT, building works, installations, transport and assembly. Cryosauna is a generic conceptual model with an indicative allowance."
+}

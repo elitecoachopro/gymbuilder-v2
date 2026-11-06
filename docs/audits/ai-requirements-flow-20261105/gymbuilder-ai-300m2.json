@@ -1,0 +1,319 @@
+{
+  "format": "gymbuilder-space",
+  "version": 2,
+  "name": "Gym Builder · Proba AI 300 m²",
+  "height": 3.5,
+  "budget": 60000,
+  "brief": "Sală de fitness 300 m²,20m lungime,15m lățime,3.5m înălțime,buget echipamente60000EUR. Vreau exact4benzi de alergare,2biciclete spinning,2prese de picioare,2aparate de tracțiuni la helcometru,2prese pentru piept,1desk recepție,2module de dulapuri vestiar,2bănci de vestiar,2dușuri,2WC și2lavoare. Două vestiare separate femei și bărbați. Nu adăuga alte aparate,personaje sau zone opționale. Respectă spațiul și bugetul. Cantitățile sunt totale,nu pentru fiecare vestiar.",
+  "space": {
+    "version": 1,
+    "outline": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 20,
+        "y": 0
+      },
+      {
+        "x": 20,
+        "y": 15
+      },
+      {
+        "x": 0,
+        "y": 15
+      }
+    ],
+    "walls": [
+      {
+        "id": "zoning-back",
+        "x": 0.08,
+        "y": 4.8,
+        "length": 19.84,
+        "axis": "x",
+        "thickness": 0.12
+      },
+      {
+        "id": "zoning-divider-1",
+        "x": 4,
+        "y": 0.08,
+        "length": 4.72,
+        "axis": "y",
+        "thickness": 0.12
+      },
+      {
+        "id": "zoning-divider-2",
+        "x": 12,
+        "y": 0.08,
+        "length": 4.72,
+        "axis": "y",
+        "thickness": 0.12
+      }
+    ],
+    "openings": [
+      {
+        "id": "zoning-door-receptie",
+        "wallId": "zoning-back",
+        "kind": "door",
+        "offset": 1.42,
+        "width": 1,
+        "height": 2.1,
+        "sill": 0
+      },
+      {
+        "id": "zoning-door-vestiare-femei",
+        "wallId": "zoning-back",
+        "kind": "door",
+        "offset": 7.42,
+        "width": 1,
+        "height": 2.1,
+        "sill": 0
+      },
+      {
+        "id": "zoning-door-vestiare-barbati",
+        "wallId": "zoning-back",
+        "kind": "door",
+        "offset": 15.42,
+        "width": 1,
+        "height": 2.1,
+        "sill": 0
+      },
+      {
+        "id": "zoning-entry",
+        "wallId": "edge-0",
+        "kind": "door",
+        "offset": 1.5,
+        "width": 1,
+        "height": 2.1,
+        "sill": 0
+      }
+    ],
+    "columns": [],
+    "areas": [
+      {
+        "id": "circulatie",
+        "name": "Circulație principală",
+        "colour": "#64748b",
+        "x": 0.2,
+        "y": 4.8999999999999995,
+        "w": 19.6,
+        "d": 1.2
+      },
+      {
+        "id": "receptie",
+        "name": "Recepție",
+        "colour": "#f59e0b",
+        "x": 0.2,
+        "y": 0.2,
+        "w": 3.6,
+        "d": 4.4
+      },
+      {
+        "id": "vestiare-femei",
+        "name": "Vestiar femei · dușuri și WC",
+        "colour": "#8b5cf6",
+        "x": 4.2,
+        "y": 0.2,
+        "w": 7.6,
+        "d": 4.4
+      },
+      {
+        "id": "vestiare-barbati",
+        "name": "Vestiar bărbați · dușuri și WC",
+        "colour": "#6366f1",
+        "x": 12.2,
+        "y": 0.2,
+        "w": 7.6,
+        "d": 4.4
+      },
+      {
+        "id": "cardio",
+        "name": "Cardio",
+        "colour": "#EF4444",
+        "x": 0.2,
+        "y": 6.3,
+        "w": 8.78,
+        "d": 8.5
+      },
+      {
+        "id": "aparate",
+        "name": "Aparate Forță",
+        "colour": "#10B981",
+        "x": 9.38,
+        "y": 6.3,
+        "w": 10.42,
+        "d": 8.5
+      }
+    ],
+    "items": [
+      {
+        "id": "zoned-1",
+        "templateId": "desk_receptie",
+        "x": 0.65,
+        "y": 1.3,
+        "rotation": 90
+      },
+      {
+        "id": "zoned-2",
+        "templateId": "wc",
+        "x": 5.05,
+        "y": 0.9,
+        "rotation": 0
+      },
+      {
+        "id": "zoned-3",
+        "templateId": "wc",
+        "x": 13.05,
+        "y": 0.9,
+        "rotation": 0
+      },
+      {
+        "id": "zoned-4",
+        "templateId": "dulap_vestiar",
+        "x": 11.45,
+        "y": 3.25,
+        "rotation": 90
+      },
+      {
+        "id": "zoned-5",
+        "templateId": "dulap_vestiar",
+        "x": 19.45,
+        "y": 3.25,
+        "rotation": 90
+      },
+      {
+        "id": "zoned-6",
+        "templateId": "dus",
+        "x": 6.82,
+        "y": 4,
+        "rotation": 0
+      },
+      {
+        "id": "zoned-7",
+        "templateId": "dus",
+        "x": 14.82,
+        "y": 4,
+        "rotation": 0
+      },
+      {
+        "id": "zoned-8",
+        "templateId": "banca_vestiar",
+        "x": 8.83,
+        "y": 1.05,
+        "rotation": 90
+      },
+      {
+        "id": "zoned-9",
+        "templateId": "banca_vestiar",
+        "x": 16.7,
+        "y": 1.05,
+        "rotation": 90
+      },
+      {
+        "id": "zoned-10",
+        "templateId": "lavoar",
+        "x": 11.45,
+        "y": 0.6,
+        "rotation": 90
+      },
+      {
+        "id": "zoned-11",
+        "templateId": "lavoar",
+        "x": 19.4,
+        "y": 0.55,
+        "rotation": 0
+      },
+      {
+        "id": "zoned-12",
+        "templateId": "banda_alergare",
+        "x": 1.3,
+        "y": 6.8,
+        "rotation": 0
+      },
+      {
+        "id": "zoned-13",
+        "templateId": "banda_alergare",
+        "x": 7.88,
+        "y": 14.3,
+        "rotation": 0
+      },
+      {
+        "id": "zoned-14",
+        "templateId": "banda_alergare",
+        "x": 8.48,
+        "y": 7.4,
+        "rotation": 90
+      },
+      {
+        "id": "zoned-15",
+        "templateId": "banda_alergare",
+        "x": 0.7,
+        "y": 13.7,
+        "rotation": 90
+      },
+      {
+        "id": "zoned-16",
+        "templateId": "bicicleta_spinning",
+        "x": 4.59,
+        "y": 10.38,
+        "rotation": 0
+      },
+      {
+        "id": "zoned-17",
+        "templateId": "bicicleta_spinning",
+        "x": 4.93,
+        "y": 6.7,
+        "rotation": 0
+      },
+      {
+        "id": "zoned-18",
+        "templateId": "aparat_picioare",
+        "x": 9.98,
+        "y": 7.5,
+        "rotation": 90
+      },
+      {
+        "id": "zoned-19",
+        "templateId": "aparat_picioare",
+        "x": 19.2,
+        "y": 13.6,
+        "rotation": 90
+      },
+      {
+        "id": "zoned-20",
+        "templateId": "aparat_piept",
+        "x": 16.86,
+        "y": 7,
+        "rotation": 0
+      },
+      {
+        "id": "zoned-21",
+        "templateId": "aparat_piept",
+        "x": 12.32,
+        "y": 14.1,
+        "rotation": 0
+      },
+      {
+        "id": "zoned-22",
+        "templateId": "aparat_lat",
+        "x": 13.57,
+        "y": 10.03,
+        "rotation": 0
+      },
+      {
+        "id": "zoned-23",
+        "templateId": "aparat_lat",
+        "x": 19.2,
+        "y": 9.86,
+        "rotation": 90
+      }
+    ],
+    "finishes": {
+      "floor": "rubber",
+      "wall": "#e7e5df",
+      "frame": "#353b43",
+      "upholstery": "#945c39"
+    }
+  }
+}

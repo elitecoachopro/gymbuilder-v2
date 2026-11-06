@@ -12,11 +12,14 @@ import SupplierContactLinks from '@/components/SupplierContactLinks';
 import BuyingGuide from '@/components/BuyingGuide';
 import SupplierSourceDetails, { type SupplierSourceInfo } from '@/components/SupplierSourceDetails';
 import { isMarket, marketName } from '@/lib/markets';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useClientLocale } from '@/i18n/client';
+import { SERVICE_CATEGORIES } from '@/lib/gym-services';
+import ServiceDetails, { type ServiceDetailsData } from '@/components/ServiceDetails';
 import { Search, MapPin, Building2, Mail, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-interface SupplierItem extends SupplierSourceInfo {
+interface SupplierItem extends SupplierSourceInfo, ServiceDetailsData {
   id: string;
   contact_email: string | null;
   phone: string | null;
@@ -32,6 +35,10 @@ interface SupplierItem extends SupplierSourceInfo {
 
 export default function SuppliersPage() {
   const ui = useUiText();
+  const en = useClientLocale() === 'en';
+  const servicesDirectory = usePathname() === '/gym-service';
+  const [serviceFilter, setServiceFilter] = useState('');
+  const [areaFilter, setAreaFilter] = useState('');
   const params = useSearchParams();
   const marketParam = params?.get('market') || '';
   const market = isMarket(marketParam) ? marketParam : '';
@@ -56,12 +63,16 @@ export default function SuppliersPage() {
         const params = new URLSearchParams({ page: String(page) });
         if (searchQuery) params.set('search', searchQuery);
         if (market) params.set('market', market);
+        if (servicesDirectory) params.set('business', 'service');
+        if (serviceFilter) params.set('service', serviceFilter);
+        if (areaFilter) params.set('area', areaFilter);
         const res = await fetch(`/api/suppliers?${params.toString()}`, { signal: controller.signal });
         if (res.ok) {
           const data = await res.json();
           setPages(data.pages || 1);
-          const mapped = (data.suppliers || []).map((s: Pick<SupplierProfile, 'id' | 'company_name' | 'country' | 'city' | 'plan' | 'description' | 'verified' | 'phone' | 'website' | 'contact_email' | 'listing_source_url' | 'listing_checked_at' | 'catalog_url'> & { product_count: number }) => ({
+          const mapped = (data.suppliers || []).map((s: Pick<SupplierProfile, 'id' | 'company_name' | 'country' | 'city' | 'plan' | 'description' | 'verified' | 'phone' | 'website' | 'contact_email' | 'listing_source_url' | 'listing_checked_at' | 'catalog_url' | 'business_type' | 'service_categories' | 'service_areas' | 'service_brands'> & { product_count: number }) => ({
             id: s.id, name: s.company_name, country: s.country || '', city: s.city || '',
+            business_type: s.business_type, service_categories: s.service_categories, service_areas: s.service_areas, service_brands: s.service_brands,
             plan: s.plan || 'free', products: s.product_count || 0,
             description: s.description || '', verified: s.verified || false, phone: s.phone, website: s.website, contact_email: s.contact_email, listing_source_url: s.listing_source_url, listing_checked_at: s.listing_checked_at, catalog_url: s.catalog_url,
           }));
@@ -75,7 +86,7 @@ export default function SuppliersPage() {
     }
     const debounce = setTimeout(fetchSuppliers, 300);
     return () => { clearTimeout(debounce); controller.abort(); };
-  }, [searchQuery, page, market]);
+  }, [searchQuery, page, market, servicesDirectory, serviceFilter, areaFilter]);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -131,7 +142,7 @@ export default function SuppliersPage() {
               </div>
               <div>
                 <label htmlFor="field-marketingsuppliers-3526" className="block text-sm font-medium text-anthracite-200 mb-1.5">{ui("Mesaj *")}</label>
-                <textarea id="field-marketingsuppliers-3526" name="message" maxLength={5000} className="input-field min-h-[100px] resize-y" placeholder={ui("Descrie ce echipamente cauți...")} required />
+                <textarea id="field-marketingsuppliers-3526" name="message" maxLength={5000} className="input-field min-h-[100px] resize-y" placeholder={servicesDirectory ? (en ? 'Describe the equipment fault, location and the work needed…' : 'Descrie aparatul, defecțiunea, locația și intervenția dorită…') : ui("Descrie ce echipamente cauți...")} required />
               </div>
               <button type="submit" disabled={sending} className="btn-primary w-full py-3">
                 {ui("Trimite Cererea")}</button>
@@ -143,14 +154,14 @@ export default function SuppliersPage() {
       <section className="pt-24 pb-8 px-4">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Catalog <span className="gold-gradient">{ui(marketName(market) || "Furnizori")}</span>
+            {servicesDirectory ? <span className="gold-gradient">Gym Service {en ? '& Maintenance' : 'și Mentenanță'}</span> : <>Catalog <span className="gold-gradient">{ui(marketName(market) || "Furnizori")}</span></>}
           </h1>
           <p className="text-anthracite-300 text-lg max-w-2xl">
-            {ui("Descoperă furnizori de echipamente fitness din România, Asia și restul lumii. Contactează-i direct pentru achiziție.")}</p>
+            {servicesDirectory ? (en ? 'Repairs, preventive maintenance and installation for your gym. Find a provider by service and coverage area, then contact them directly.' : 'Reparații, mentenanță preventivă și montaj pentru sala ta. Găsește un prestator după serviciu și zona de acoperire, apoi contactează-l direct.') : ui("Descoperă furnizori de echipamente fitness din România, Asia și restul lumii. Contactează-i direct pentru achiziție.")}</p>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 pb-8"><MarketNavigation selected={market} directory /></div>
+      {servicesDirectory ? <div className="mx-auto flex max-w-7xl flex-wrap gap-3 px-4 pb-8"><Link className="btn-primary min-h-12" href="/register/service">{en ? 'Register as a service provider' : 'Înscrie-te ca prestator service'}</Link><Link className="btn-secondary min-h-12" href="/supplier/services">{en ? 'Manage my services' : 'Gestionează serviciile mele'}</Link></div> : <div className="max-w-7xl mx-auto px-4 pb-8"><MarketNavigation selected={market} directory /></div>}
 
       {/* Filters */}
       <section className="py-6 px-4 border-b border-anthracite-800">
@@ -159,12 +170,13 @@ export default function SuppliersPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-anthracite-400" />
             <input
               type="text"
-              aria-label={ui("Caută furnizori...")} placeholder={ui("Caută furnizori...")}
+              aria-label={servicesDirectory ? (en ? 'Search service providers' : 'Caută prestatori service') : ui("Caută furnizori...")} placeholder={servicesDirectory ? (en ? 'Company, brand or description…' : 'Firmă, marcă sau descriere…') : ui("Caută furnizori...")}
               className="input-field pl-12"
               value={searchQuery}
               onChange={(e) => { setPage(1); setSearchQuery(e.target.value); }}
             />
           </div>
+          {servicesDirectory && <div className="mt-4 grid gap-4 sm:grid-cols-2"><label className="text-sm text-anthracite-200">{en ? 'Service' : 'Serviciu'}<select className="input-field mt-2 min-h-12" value={serviceFilter} onChange={e => { setServiceFilter(e.target.value); setPage(1); }}><option value="">{en ? 'All services' : 'Toate serviciile'}</option>{SERVICE_CATEGORIES.map(c => <option key={c.id} value={c.id}>{en ? c.en : c.ro}</option>)}</select></label><label className="text-sm text-anthracite-200">{en ? 'Declared coverage area' : 'Zona de acoperire declarată'}<input className="input-field mt-2 min-h-12" maxLength={160} value={areaFilter} onChange={e => { setAreaFilter(e.target.value); setPage(1); }} placeholder={en ? 'e.g. Ilfov, Bucharest, nationwide' : 'ex. Ilfov, București, național'} /></label></div>}
         </div>
       </section>
 
@@ -178,7 +190,7 @@ export default function SuppliersPage() {
           ) : fetchError ? <p role="alert" className="text-red-400">{ui(fetchError)}</p> : suppliers.length === 0 ? (
             <div className="text-center py-16">
               <Building2 className="w-12 h-12 text-anthracite-600 mx-auto mb-4" />
-              <p className="text-anthracite-400">{ui("Nu s-au găsit furnizori")}{ui(searchQuery ? ' cu aceste filtre' : ' momentan')}.</p>
+              <p className="text-anthracite-400">{servicesDirectory ? (en ? 'No approved service providers match these filters' : 'Nu există prestatori aprobați pentru aceste filtre') : <>{ui("Nu s-au găsit furnizori")}{ui(searchQuery ? ' cu aceste filtre' : ' momentan')}</>}.</p>
             </div>
           ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -213,19 +225,20 @@ export default function SuppliersPage() {
                 <p className="text-sm text-anthracite-400 mb-4 line-clamp-2 flex-1">{supplier.description}</p>
 
                 <div className="flex items-center justify-end pt-4 border-t border-anthracite-700 mb-4">
-                  <span className="text-sm text-anthracite-400">{supplier.products} {ui("produse")}</span>
+                  <span className="text-sm text-anthracite-400">{servicesDirectory ? `${supplier.service_categories?.length || 0} ${en ? 'services' : 'servicii'}` : <>{supplier.products} {ui("produse")}</>}</span>
                 </div>
 
+                {servicesDirectory && <ServiceDetails profile={supplier} />}
                 <div className="mb-4"><SupplierSourceDetails supplier={supplier} /></div>
                 <div className="mb-4"><SupplierContactLinks supplierId={supplier.id} phone={supplier.phone} website={supplier.website} email={supplier.contact_email} /></div>
 
                 {/* Action Buttons */}
                 <div className="flex gap-2">
                   <Link
-                    href={`/products?supplier=${supplier.id}${market ? `&market=${market}` : ""}`}
+                    href={servicesDirectory ? `/suppliers/${supplier.id}` : `/products?supplier=${supplier.id}${market ? `&market=${market}` : ""}`}
                     className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium border border-anthracite-600 text-anthracite-200 hover:border-gold-400 hover:text-gold-400 transition-colors"
                   >
-                    {ui("Vezi Produse")}</Link>
+                    {servicesDirectory ? (en ? 'View profile' : 'Vezi profilul') : ui("Vezi Produse")}</Link>
                   {!supplier.listing_source_url && <button
                     onClick={() => { setFormError(''); setShowContactModal(supplier.id); }}
                     className="flex-1 btn-primary py-2.5 text-sm flex items-center justify-center gap-1"
@@ -240,7 +253,7 @@ export default function SuppliersPage() {
       </section>
 
 {pages > 1 && <nav aria-label={ui("Paginare furnizori")} className="flex justify-center items-center gap-4 py-8"><button className="btn-secondary" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>{ui("Înapoi")}</button><span>{page} / {pages}</span><button className="btn-secondary" disabled={page >= pages} onClick={() => setPage(p => p + 1)}>{ui("Înainte")}</button></nav>}
-      <div className="max-w-7xl mx-auto px-4 pb-12"><BuyingGuide /></div>
+      {!servicesDirectory && <div className="max-w-7xl mx-auto px-4 pb-12"><BuyingGuide /></div>}
       <Footer />
     </main>
   );

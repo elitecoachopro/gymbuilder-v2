@@ -177,6 +177,9 @@ export default function ClientDashboard() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <NotificationBell />
+            <a href="#cereri" className="btn-primary min-h-12 inline-flex items-center gap-2">
+              <MessageSquare className="w-5 h-5" aria-hidden="true" /> {ui('Mesaje și cereri')}
+            </a>
 {/* Configurator Sală - hidden temporarily, code preserved on develop */}
             {<Link
               href="/configurator"
@@ -200,6 +203,74 @@ export default function ClientDashboard() {
             </button>
           </div>
         </div>
+
+        <section id="cereri" className="mb-8 scroll-mt-24 rounded-xl border border-gold-400/30 bg-anthracite-900 p-4 sm:p-6">
+          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-blue-400" />
+            {ui("Mesaje și cereri de ofertă")}</h2>
+          <p className="text-sm text-anthracite-300 mb-4">{ui("Aici primești răspunsurile furnizorilor. Deschide conversația de sub cerere pentru a citi și trimite mesaje.")}</p>
+          {data.contactRequests.length === 0 ? (
+            <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-8 text-center">
+              <MessageSquare className="w-10 h-10 text-anthracite-600 mx-auto mb-3" />
+              <p className="text-anthracite-400 text-sm">{ui("Nu ai trimis nicio cerere de ofertă.")}</p>
+              <Link href="/suppliers" className="text-gold-400 text-sm hover:underline mt-2 inline-block">
+                {ui("Contactează un furnizor →")}</Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {data.contactRequests.map((cr) => {
+                const status = getDisplayStatus(cr);
+                return (
+                  <div key={cr.id} id={`request-${cr.id}`} className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4">
+                    <div className="flex items-center justify-between gap-4 flex-wrap">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 bg-anthracite-700 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Building2 className="w-4 h-4 text-anthracite-500" />
+                        </div>
+                        <div className="min-w-0">
+                          <Link href={`/suppliers/${cr.supplier_profiles?.id}`} className="text-sm font-medium text-white hover:text-gold-400 transition-colors">
+                            {cr.supplier_profiles?.company_name}
+                          </Link>
+                          {cr.products && (
+                            <p className="text-xs text-anthracite-400 truncate">{ui("Produs: ")}{cr.products?.name}</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${status.color}`}>
+                          {status.icon} {ui(status.text)}
+                        </span>
+                        <span className="text-xs text-anthracite-500">
+                          {ui(new Date(cr.created_at).toLocaleDateString(ui('ro-RO')))}
+                        </span>
+                      </div>
+                    </div>
+                    {cr.message && (
+                      <p className="text-xs text-anthracite-400 mt-2 pl-12 line-clamp-2">{cr.message}</p>
+                    )}
+                    {/* Chat toggle */}
+                    <button
+                      onClick={() => setOpenChat(openChat === cr.id ? null : cr.id)}
+                      aria-expanded={openChat === cr.id}
+                      aria-controls={`conversation-${cr.id}`}
+                      className="mt-4 min-h-12 w-full sm:w-auto px-4 py-3 rounded-lg border border-gold-400/50 bg-gold-400/10 text-gold-400 font-semibold flex items-center justify-center gap-2 hover:bg-gold-400/20 transition-colors"
+                    >
+                      <MessageSquare className="w-3 h-3" />
+                      {ui(openChat === cr.id ? 'Ascunde conversația' : 'Deschide conversația')}
+                      {openChat === cr.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                    </button>
+                    {openChat === cr.id && (
+                      <div id={`conversation-${cr.id}`}><RequestChat requestId={cr.id} userRole="client" /></div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {error && <div role="alert" className="border border-red-400/30 p-3 rounded-lg mb-4"><p>{ui(error)}</p><button className="btn-secondary" onClick={fetchDashboard}>{ui('Reîncearcă')}</button></div>}
+        <nav aria-label={ui('Pagini istoric')} className="flex flex-wrap items-center gap-4 mb-6"><button className="btn-secondary" disabled={loading || page === 1} onClick={() => setPage(p => p - 1)}>{ui('Pagina anterioară')}</button><span>{ui('Pagina')} {data.pagination?.page ?? page}</span><button className="btn-secondary" disabled={loading || !data.pagination?.hasNext} onClick={() => setPage(p => p + 1)}>{ui('Pagina următoare')}</button></nav>
 
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -326,69 +397,6 @@ export default function ClientDashboard() {
 
         {/* Contact Requests */}
         <MyGymProjects />
-        {error && <div role="alert" className="border border-red-400/30 p-3 rounded-lg mb-4"><p>{ui(error)}</p><button className="btn-secondary" onClick={fetchDashboard}>{ui('Reîncearcă')}</button></div>}
-        <nav aria-label={ui('Pagini istoric')} className="flex flex-wrap items-center gap-4 mb-6"><button className="btn-secondary" disabled={loading || page === 1} onClick={() => setPage(p => p - 1)}>{ui('Pagina anterioară')}</button><span>{ui('Pagina')} {data.pagination?.page ?? page}</span><button className="btn-secondary" disabled={loading || !data.pagination?.hasNext} onClick={() => setPage(p => p + 1)}>{ui('Pagina următoare')}</button></nav>
-        <section id="cereri" className="mb-8">
-          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-blue-400" />
-            {ui("Cereri de Ofertă")}</h2>
-          {data.contactRequests.length === 0 ? (
-            <div className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-8 text-center">
-              <MessageSquare className="w-10 h-10 text-anthracite-600 mx-auto mb-3" />
-              <p className="text-anthracite-400 text-sm">{ui("Nu ai trimis nicio cerere de ofertă.")}</p>
-              <Link href="/suppliers" className="text-gold-400 text-sm hover:underline mt-2 inline-block">
-                {ui("Contactează un furnizor →")}</Link>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {data.contactRequests.map((cr) => {
-                const status = getDisplayStatus(cr);
-                return (
-                  <div key={cr.id} className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4">
-                    <div className="flex items-center justify-between gap-4 flex-wrap">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-9 h-9 bg-anthracite-700 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Building2 className="w-4 h-4 text-anthracite-500" />
-                        </div>
-                        <div className="min-w-0">
-                          <Link href={`/suppliers/${cr.supplier_profiles?.id}`} className="text-sm font-medium text-white hover:text-gold-400 transition-colors">
-                            {cr.supplier_profiles?.company_name}
-                          </Link>
-                          {cr.products && (
-                            <p className="text-xs text-anthracite-400 truncate">{ui("Produs: ")}{cr.products?.name}</p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className={`text-xs px-2.5 py-1 rounded-full font-medium border ${status.color}`}>
-                          {status.icon} {ui(status.text)}
-                        </span>
-                        <span className="text-xs text-anthracite-500">
-                          {ui(new Date(cr.created_at).toLocaleDateString(ui('ro-RO')))}
-                        </span>
-                      </div>
-                    </div>
-                    {cr.message && (
-                      <p className="text-xs text-anthracite-400 mt-2 pl-12 line-clamp-2">{cr.message}</p>
-                    )}
-                    {/* Chat toggle */}
-                    <button
-                      onClick={() => setOpenChat(openChat === cr.id ? null : cr.id)}
-                      className="mt-3 ml-12 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
-                    >
-                      <MessageSquare className="w-3 h-3" />
-                      {ui(openChat === cr.id ? 'Ascunde conversația' : 'Deschide conversația')}
-                      {openChat === cr.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                    </button>
-                    {openChat === cr.id && (
-                      <RequestChat requestId={cr.id} userRole="client" />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
 
         {/* Reviews */}
         <section className="mb-8">
