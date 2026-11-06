@@ -42,8 +42,8 @@ export function demoGymTour(space: GymSpace, height: number): GymTour | null {
     [12.5,8.2,14.1,6.2,['Presa pentru picioare','Leg press']],
     [15.5,8.2,17.4,6.1,['Stația cu cabluri','Cable station']],
     [10.5,8.2,4.5,10.8], [10.5,9.6,4.5,10.8,['Greutăți libere','Free weights']],
-    [10.5,8.2,17.4,6.1], [19.5,8.2,17.4,6.1], [19.5,4.3,17.4,1.9],
-    [17,4.3,17.4,1.9,['Funcțional','Functional training']],
+    [10.5,8.2,17.4,6.1], [19.5,8.2,17.4,6.1], [19.5,12.5,15,13.6],
+    [17,12.5,13,13.6,['Pistă CrossFit','CrossFit track']],
   ];
   if (!itinerary.every(point => visit(...point))) return null;
   return {frames,stops,duration:frames.at(-1)!.at};

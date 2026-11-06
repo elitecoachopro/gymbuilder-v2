@@ -1,0 +1,101 @@
+{
+  "status": "complete",
+  "verdict": "Ready with fixes",
+  "scope": {
+    "base": "cf11ba9662e001c923235e8099ad44558e9e330e",
+    "branch": "codex/strength-track-live-20261106",
+    "head_sha": "cf11ba9662e001c923235e8099ad44558e9e330e",
+    "pr_url": null,
+    "files_changed": 7
+  },
+  "intent": "Refine generic multigym/cable equipment details and provide a clear9m numbered green CrossFit lane in the300m\u00b2 demo. Preserve model envelopes, low-power rendering, saved projects and automatic2D recovery.",
+  "intent_confidence": "explicit",
+  "reviewers": [
+    "correctness",
+    "adversarial"
+  ],
+  "findings": [
+    {
+      "title": "Two-level demo track runs into the stairwell",
+      "severity": "P2",
+      "file": "src/lib/gym-space.ts",
+      "line": 202,
+      "why_it_matters": "The existing Demo2niveluri composes demoBuildingSpace from demoSpace, then places its stairwell in the back-right corner. Moving the inherited ground-floor functional lane to that same corner makes its last3m pass through the staircase, so the numbered lane is not usable end-to-end in that demo.",
+      "autofix_class": "gated_auto",
+      "owner": "downstream-resolver",
+      "requires_verification": true,
+      "confidence": 100,
+      "evidence": [
+        "src/lib/gym-space.ts:202 -- { id: 'functional', name: 'Pist\u0103 CrossFit \u00b7 9 m', colour: '#3f7653', x: 10.3, y: 12.8, w: 9.3, d: 1.6 },",
+        "src/lib/gym-building.ts:25 -- const ground = demoSpace();",
+        "src/lib/gym-building.ts:47 -- ground.stairwell = { x: 16.6, y: 9.8, w: 3, d: 4.8, opening: false };",
+        "Reproduction on reviewed snapshot: polygonsOverlap(boxPolygon(demoBuildingSpace().areas.find(a=>a.id==='functional')),boxPolygon(demoBuildingSpace().stairwell)) returns true. Lane ends at x19.6,z14.4, while stairs occupy x16.6..19.6,z9.8..14.6."
+      ],
+      "pre_existing": false,
+      "suggested_fix": "Override the inherited ground functional area in demoBuildingSpace so it stays outside its stairwell; preserve the new9m lane in the single-floor demo and the existing upper10m lane. Add an assertion that demo building functional areas do not overlap their stairwell.",
+      "#": 1,
+      "reviewers": [
+        "correctness",
+        "adversarial"
+      ],
+      "independent_reviewers": []
+    }
+  ],
+  "actionable_findings": [
+    {
+      "title": "Two-level demo track runs into the stairwell",
+      "severity": "P2",
+      "file": "src/lib/gym-space.ts",
+      "line": 202,
+      "why_it_matters": "The existing Demo2niveluri composes demoBuildingSpace from demoSpace, then places its stairwell in the back-right corner. Moving the inherited ground-floor functional lane to that same corner makes its last3m pass through the staircase, so the numbered lane is not usable end-to-end in that demo.",
+      "autofix_class": "gated_auto",
+      "owner": "downstream-resolver",
+      "requires_verification": true,
+      "confidence": 100,
+      "evidence": [
+        "src/lib/gym-space.ts:202 -- { id: 'functional', name: 'Pist\u0103 CrossFit \u00b7 9 m', colour: '#3f7653', x: 10.3, y: 12.8, w: 9.3, d: 1.6 },",
+        "src/lib/gym-building.ts:25 -- const ground = demoSpace();",
+        "src/lib/gym-building.ts:47 -- ground.stairwell = { x: 16.6, y: 9.8, w: 3, d: 4.8, opening: false };",
+        "Reproduction on reviewed snapshot: polygonsOverlap(boxPolygon(demoBuildingSpace().areas.find(a=>a.id==='functional')),boxPolygon(demoBuildingSpace().stairwell)) returns true. Lane ends at x19.6,z14.4, while stairs occupy x16.6..19.6,z9.8..14.6."
+      ],
+      "pre_existing": false,
+      "suggested_fix": "Override the inherited ground functional area in demoBuildingSpace so it stays outside its stairwell; preserve the new9m lane in the single-floor demo and the existing upper10m lane. Add an assertion that demo building functional areas do not overlap their stairwell.",
+      "#": 1,
+      "reviewers": [
+        "correctness",
+        "adversarial"
+      ],
+      "independent_reviewers": []
+    }
+  ],
+  "triage_groups": [],
+  "pre_existing_findings": [],
+  "requirements_completeness": null,
+  "learnings": [],
+  "agent_native_gaps": [],
+  "deployment_notes": [],
+  "residual_risks": [],
+  "testing_gaps": [
+    "Physical phones were not tested; supplied browser coverage is390\u00d7844."
+  ],
+  "coverage": {
+    "depth": "focused",
+    "scope_mode": "local-aligned exact seven-file snapshot; new files staged only in review snapshot",
+    "criteria": "No governing CODING_STANDARDS.md,AGENTS.md orCLAUDE.md found in reviewed tree.",
+    "plan": "No explicitplan/PRbody;branchkeywordsstrength/track had no matching plan.",
+    "review": "Correctness in this context plus one collected same-family adversarial read;no other personas or validators.",
+    "verification": "Reran11/11 route,track and equipment tests; reproduced two-levellane/stair overlap with actual constructors and polygons. Parent reports187/187units,zero-warninglint,typecheck/build and mobile WebGL-loss recovery.",
+    "not_assessed": [
+      "learnings",
+      "agent-native gaps",
+      "deployment notes",
+      "Compound Packs (none declared)"
+    ]
+  },
+  "peer": {
+    "outcome": "in-process-fallback",
+    "coverage": "No cross-model egress per caller restriction; one separately dispatched same-family adversarial reviewer supplied the independent read. Agreement did not receive cross-model promotion."
+  },
+  "artifact_path": "/tmp/compound-engineering-501/ce-code-review/20261106-strength-track",
+  "run_id": "20261106-strength-track"
+}

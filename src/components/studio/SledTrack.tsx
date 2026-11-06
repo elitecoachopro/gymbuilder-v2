@@ -1,50 +1,33 @@
 'use client';
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
+import { sledTrackLayout } from '@/lib/gym-sled-track';
 import type { GymSpace } from '@/lib/gym-space';
 
 export default function SledTrack({ area }: { area: GymSpace['areas'][number] }) {
+  const {length,breadth,horizontal,marks} = useMemo(() => sledTrackLayout(area.w,area.d), [area.w,area.d]);
   const map = useMemo(() => {
     const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 1024;
+    canvas.width = 256; canvas.height = 2048;
     const context = canvas.getContext('2d')!;
-    context.strokeStyle = '#eee9d6';
-    context.fillStyle = '#eee9d6';
+    context.strokeStyle = '#f4f1df'; context.fillStyle = '#f4f1df';
     context.lineWidth = 4;
-    context.strokeRect(5, 5, 246, 1014);
-    context.font = '600 28px sans-serif';
-    context.textAlign = 'left';
-    const metres = Math.floor(area.d);
-    for (let i = 0; i <= metres; i++) {
-      const y = 12 + (i / metres) * 1000;
-      context.beginPath();
-      context.moveTo(7, y);
-      context.lineTo(44, y);
-      context.moveTo(211, y);
-      context.lineTo(249, y);
-      context.stroke();
-      if (i % 2 === 0) context.fillText(i + ' m', 50, Math.max(36, Math.min(1005, y + 9)));
+    context.strokeRect(8, 8, 240, 2032);
+    context.font = '700 44px sans-serif'; context.textAlign = 'center';
+    for (const mark of marks) {
+      const y = (mark.offset / length) * canvas.height;
+      context.beginPath(); context.moveTo(10,y); context.lineTo(246,y); context.stroke();
+      context.fillText(String(mark.metres),128,Math.max(48,Math.min(2010,y+52)));
     }
-    context.setLineDash([18, 18]);
-    context.lineWidth = 2;
-    context.beginPath();
-    context.moveTo(128, 10);
-    context.lineTo(128, 1014);
-    context.stroke();
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     return texture;
-  }, [area.d]);
+  }, [length,marks]);
   useEffect(() => () => map.dispose(), [map]);
-  return (
-    <mesh
-      rotation={[-Math.PI / 2, 0, 0]}
-      position={[area.x + area.w / 2, 0.013, area.y + area.d / 2]}
-      raycast={() => {}}
-    >
-      <planeGeometry args={[area.w, area.d]} />
+  return <group position={[area.x+area.w/2,0.017,area.y+area.d/2]} rotation={[0,horizontal ? Math.PI/2 : 0,0]}>
+    <mesh rotation={[-Math.PI/2,0,0]} raycast={() => {}}>
+      <planeGeometry args={[breadth,length]} />
       <meshBasicMaterial map={map} transparent depthWrite={false} toneMapped={false} />
     </mesh>
-  );
+  </group>;
 }
