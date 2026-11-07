@@ -82,7 +82,7 @@ export function FictionalPerson({pose='coach',gait=0,time=0,motionTime}:{pose?:P
   const fallback=<ProceduralPerson pose={pose} gait={gait} motionTime={motionTime}/>;
   return pose==='push'?<DetailedAthlete time={time} motionTime={motionTime} fallback={fallback}/>:<DetailedPerson pose={pose} fallback={fallback}/>;
 }
-export function SledTraining({ time = 0, motionTime }: { time?: number;motionTime?:{current:number} }) {
+export function SledTraining() {
   return (
     <group position={[0, 0, 0.74]}>
       {[-1, 1].map((side) => (
@@ -105,9 +105,6 @@ export function SledTraining({ time = 0, motionTime }: { time?: number;motionTim
           <Wheel p={[0, 0, 0]} radius={0.225} depth={0.055} finish="rubber" hub={false} />
         </group>
       ))}
-      <group position={[0, 0, -1.2]}>
-        <FictionalPerson pose="push" time={time} motionTime={motionTime} gait={(Math.sin(time*Math.PI*2.2)+1)/2} />
-      </group>
     </group>
   );
 }

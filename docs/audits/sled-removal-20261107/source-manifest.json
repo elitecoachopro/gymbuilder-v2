@@ -1,0 +1,12 @@
+{
+  "src/components/studio/FitnessPeople.tsx": "f1cad1108bf678ce5a7aee378331dd1646fdf9361d2e6a51a82f8f202255bd98",
+  "src/components/studio/SledMotion.tsx": null,
+  "src/components/studio/SpaceScene.tsx": "159a4172c9d1e42f2da9db2e0f56772b9eb04603db604ad03e026cbe5517a13c",
+  "src/components/studio/StudioWorkbench.tsx": "f853bd478c42f9cdcb3c2a491de47d36c1d24cf2368c3d767c652b6d8f462c75",
+  "src/i18n/ui.en.json": "d46aa4115f90e15ac1e0b36ddeb6a8a3bea15075d466c888e3e0717f49b98f35",
+  "src/lib/gym-catalog.ts": "3a94c7071872155ae3292fc0575cf3072dbd99370942dde939f3a2cbe3094bca",
+  "src/lib/gym-sled-motion.ts": null,
+  "tests/browser/app/demo/page.tsx": "a244800c4c5b61915e534f58bf1d6f8ab9222d1fedd3318a082384806c8ad747",
+  "tests/browser/app/page.tsx": "3f641f311905249c8261831e7311699848fcf536b0331c8448398f54c72a72a2",
+  "tests/unit/gym-sled-motion.test.mjs": null
+}
