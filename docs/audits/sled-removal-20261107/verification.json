@@ -1,0 +1,30 @@
+{
+  "scope": "Remove the sled athlete and playback; keep static sled with four plates, numbered lane, eye-level tour, economic profile and 2D recovery.",
+  "base": "cb91870157c6eceab5effbea7989c8fd63b85462",
+  "release_checks": {
+    "unit_tests": 195,
+    "lint": "pass, zero warnings",
+    "typecheck": "pass",
+    "production_build": "pass"
+  },
+  "browser": {
+    "desktop": "Four plates and sled visible, athlete absent, animation control absent.",
+    "viewport": [
+      390,
+      844
+    ],
+    "scroll_width": 382,
+    "dpr": 1,
+    "shadows": false,
+    "edit": "Sled moved from x17.5 to17.4 through normal inspector nudge.",
+    "webgl_loss": "Real WEBGL_lose_context triggered via isolated test harness; automatic2D, canvas0, serialized draft unchanged,40objects retained.",
+    "english": "Weighted sled label and recovered x17.4 verified."
+  },
+  "test_strategy": "Manual-only visual removal: browser inspection plus unchanged project, rendering budget, persistence, tour, geometry and translation tests. Deleted3 unit tests for deleted sled route API, no remaining runtime callers.",
+  "limits": [
+    "Responsive browser viewport; no physical phone tested.",
+    "No live database changes or account operations.",
+    "Legacy archived movie not regenerated."
+  ],
+  "excluded": "Pre-existing local mobile billing and email-payment audit changes and unmerged root commits excluded."
+}

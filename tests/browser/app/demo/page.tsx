@@ -68,7 +68,7 @@ function Scene({seconds}:{seconds:number}){
   {seconds>=57&&<group position={[0,elevation,0]}>
    <StudioRoom space={upperFloor} height={3.5} cutaway={seconds<64||seconds>=84} view={seconds>=64&&seconds<84?'inside':'orbit'} showAreas={false}/>
    <EquipmentContactShadows space={upstairs}/>
-   <EquipmentMaterials frame={upstairs.finishes.frame} upholstery={upstairs.finishes.upholstery}>{upstairs.items.map(item=><group key={item.id} position={[item.x,.025,item.y]} rotation={[0,-item.rotation*Math.PI/180,0]}>{item.templateId==='sled_training'?<SledTraining time={sled.time}/>:<EquipmentModel templateId={item.templateId} frame={upstairs.finishes.frame} upholstery={upstairs.finishes.upholstery}/>}</group>)}
+   <EquipmentMaterials frame={upstairs.finishes.frame} upholstery={upstairs.finishes.upholstery}>{upstairs.items.map(item=><group key={item.id} position={[item.x,.025,item.y]} rotation={[0,-item.rotation*Math.PI/180,0]}>{item.templateId==='sled_training'?<SledTraining/>:<EquipmentModel templateId={item.templateId} frame={upstairs.finishes.frame} upholstery={upstairs.finishes.upholstery}/>}</group>)}
    {seconds>=84&&<StairArchitecture space={{...upperFloor,stairwell:{...upperFloor.stairwell,opening:false}}}/>}
    </EquipmentMaterials>
   </group>}

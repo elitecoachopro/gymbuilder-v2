@@ -56,7 +56,7 @@ export const EQUIPMENT_CATALOG: EquipmentTemplate[] = [
   { id: 'canapea_lounge', name: 'Canapea lounge', zone: 'lounge', length_m: 1.8, width_m: 0.8, label: 'Lounge', height_m: 0.85, price_eur: 750 },
   { id: 'person_reception', name: 'Personaj fictiv · recepție', zone: 'receptie', length_m: 0.75, width_m: 0.65, height_m: 1.72, price_eur: 0, label: 'Recepționer' },
   { id: 'person_coach', name: 'Personaj fictiv · antrenor', zone: 'functional', length_m: 0.85, width_m: 0.75, height_m: 1.83, price_eur: 0, label: 'Antrenor' },
-  { id: 'sled_training', name: 'Sanie cu discuri și elev', zone: 'functional', length_m: 1.3, width_m: 2.8, height_m: 1.75, price_eur: 550, label: 'Sanie · elev în împingere' },
+  { id: 'sled_training', name: 'Sanie cu discuri', zone: 'functional', length_m: 1.3, width_m: 2.8, height_m: 1.75, price_eur: 550, label: 'Sanie cu discuri' },
   ...IMPORTED_EQUIPMENT.map(model => ({ ...model, usage: equipmentUsage(model.id) })),
   ...REAL_EQUIPMENT.map(model => ({ ...model, usage: equipmentUsage(model.id) })),
 ];
