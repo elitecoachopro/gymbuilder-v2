@@ -15,7 +15,7 @@ const brands = [
   'Life Fitness', 'Technogym', 'Matrix', 'Precor', 'Hammer Strength',
   'Cybex', 'Star Trac', 'Nautilus', 'Body-Solid', 'Rogue Fitness',
   'Eleiko', 'Assault Fitness', 'Concept2', 'Peloton', 'NordicTrack', 'Hoist',
-  'Altul',
+  'ZIVA', 'Altul',
 ];
 
 export default function NewProductPage() {
@@ -95,6 +95,7 @@ export default function NewProductPage() {
   const categories = [
     { value: 'cardio', label: t('categories.cardio') },
     { value: 'strength', label: t('categories.strength') },
+    { value: 'dumbbells', label: t('categories.dumbbells') },
     { value: 'functional', label: t('categories.functional') },
     { value: 'accessories', label: t('categories.accessories') },
     { value: 'wellness', label: t('categories.wellness') },

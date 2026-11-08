@@ -7,7 +7,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 
-const VALID_CATEGORIES = ['cardio', 'strength', 'functional', 'accessories', 'wellness', 'lockers', 'reception'];
+const VALID_CATEGORIES = ['cardio', 'strength', 'functional', 'dumbbells', 'accessories', 'wellness', 'lockers', 'reception'];
 const VALID_CONDITIONS = ['new', 'used'];
 
 function getSupabaseAdmin() {
@@ -73,6 +73,7 @@ function validateRow(headers: string[], values: string[], rowIndex: number): Val
   const normalizedCategory = category.toLowerCase().trim();
   const categoryMap: Record<string, string> = {
     'cardio': 'cardio',
+    'gantere': 'dumbbells', 'dumbbells': 'dumbbells',
     'forta': 'strength', 'forță': 'strength', 'strength': 'strength',
     'functional': 'functional', 'funcțional': 'functional',
     'accesorii': 'accessories', 'accessories': 'accessories',
@@ -82,7 +83,7 @@ function validateRow(headers: string[], values: string[], rowIndex: number): Val
   };
   const mappedCategory = categoryMap[normalizedCategory] || normalizedCategory;
   if (category && !VALID_CATEGORIES.includes(mappedCategory)) {
-    errors.push(`Categorie invalidă: "${category}" (valide: cardio, strength/forță, functional, accessories/accesorii, wellness, lockers/vestiare, reception/recepție)`);
+    errors.push(`Categorie invalidă: "${category}" (valide: dumbbells/gantere, cardio, strength/forță, functional, accessories/accesorii, wellness, lockers/vestiare, reception/recepție)`);
   }
 
   // Validate condition

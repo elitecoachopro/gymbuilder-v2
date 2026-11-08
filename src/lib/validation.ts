@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { studioConfigurationSchema } from './gym-studio';
 
 const money = z.number().finite().positive().max(99999999.99);
-const category = z.enum(['cardio', 'strength', 'functional', 'accessories', 'wellness', 'lockers', 'reception']);
+const category = z.enum(['cardio', 'strength', 'functional', 'dumbbells', 'accessories', 'wellness', 'lockers', 'reception']);
 const imageUrl = z.string().url().max(2048).refine(value => /^https?:\/\//.test(value));
 const productFields = z.object({
   name: z.string().trim().min(1).max(200), category, brand: z.string().trim().min(1).max(100),

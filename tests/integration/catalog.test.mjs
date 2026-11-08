@@ -65,3 +65,30 @@ test('catalog search includes the product brand', async t => {
   const response=await api(`/api/products?search=${name}`,{method:'GET'});assert.equal(response.status,200);
   assert.ok((await response.json()).products.some(row=>row.id===product.id));
 });
+
+
+test('suppliers publish new and used dumbbells and buyers filter them independently', async t => {
+  const supplier = await fixtureSupplier('approved', 'enterprise');
+  t.after(() => cleanupUsers([supplier]));
+  const cookie = await login(supplier);
+  const name = `Dumbbell-${randomUUID()}`;
+  const ids = {};
+  for (const condition of ['new', 'used']) {
+    const response = await api('/api/supplier/products', { cookie, body: { name: `${name}-${condition}`, category: 'dumbbells', brand: 'ZIVA', condition, price_eur: 150, images: [] } });
+    const body = await response.json();
+    assert.equal(response.status, 200, JSON.stringify(body));
+    ids[condition] = body.product.id;
+  }
+  const other = await fixtureProduct(supplier.supplierId, { name: `${name}-rack`, category: 'strength' });
+  for (const condition of ['new', 'used']) {
+    const response = await api(`/api/products?category=dumbbells&condition=${condition}&search=${name}`);
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.equal(body.count, 1);
+    assert.equal(body.products[0].id, ids[condition]);
+  }
+  const edited = await api('/api/supplier/products', { method: 'PATCH', cookie, body: { productId: other.id, category: 'dumbbells' } });
+  assert.equal(edited.status, 200);
+  const all = await (await api(`/api/products?category=dumbbells&search=${name}`)).json();
+  assert.equal(all.count, 3);
+});

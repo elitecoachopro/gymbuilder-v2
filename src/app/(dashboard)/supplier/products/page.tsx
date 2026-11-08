@@ -60,6 +60,7 @@ export default function SupplierProductsPage() {
   const categoryLabels: Record<string, string> = {
     cardio: t('categories.cardio'),
     strength: t('categories.strength'),
+    dumbbells: t('categories.dumbbells'),
     functional: t('categories.functional'),
     accessories: t('categories.accessories'),
     wellness: t('categories.wellness'),

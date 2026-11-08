@@ -751,7 +751,8 @@
       "accessories": "Accessories",
       "wellness": "Wellness & Spa",
       "lockers": "Lockers",
-      "reception": "Reception"
+      "reception": "Reception",
+      "dumbbells": "Dumbbells"
     },
     "variants": {
       "title": "Product Variants",
@@ -784,7 +785,7 @@
       "title": "Import Products from CSV",
       "templateDescription": "Download the CSV template with correct columns:",
       "downloadTemplate": "Download CSV Template",
-      "validCategories": "Valid categories: cardio, strength, functional, accessories, wellness, lockers, reception",
+      "validCategories": "Valid categories: cardio, strength, functional, accessories, wellness, lockers, reception, dumbbells/gantere",
       "validConditions": "Condition: new or used/second-hand",
       "uploadOrPaste": "Upload the CSV file or paste the content below",
       "pastePlaceholder": "Or paste CSV content here...\nname,description,price,category,condition,image_url\nPro Treadmill,Description,2500,cardio,new,https://...",
@@ -856,7 +857,8 @@
       "accessories": "Accessories",
       "wellness": "Wellness & Spa",
       "lockers": "Lockers",
-      "reception": "Reception"
+      "reception": "Reception",
+      "dumbbells": "Dumbbells"
     },
     "imagesTitle": "Product Images",
     "productImageAlt": "Product",
@@ -894,6 +896,7 @@
     "search": "Search",
     "searching": "Searching...",
     "noResults": "No results found",
-    "searchCount": "Search {count} Equipment"
+    "searchCount": "Search {count} Equipment",
+    "catDumbbells": "Dumbbells"
   }
 }

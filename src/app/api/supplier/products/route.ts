@@ -90,11 +90,6 @@ export async function POST(request: NextRequest) {
       return await localizedJson({ error: 'Completează toate câmpurile obligatorii.' }, { status: 400 });
     }
 
-    const validCategories = ['cardio', 'strength', 'functional', 'accessories', 'wellness', 'lockers', 'reception'];
-    if (!validCategories.includes(category)) {
-      return await localizedJson({ error: 'Categorie invalidă.' }, { status: 400 });
-    }
-
     const validConditions = ['new', 'used'];
     if (!validConditions.includes(condition)) {
       return await localizedJson({ error: 'Condiție invalidă.' }, { status: 400 });
