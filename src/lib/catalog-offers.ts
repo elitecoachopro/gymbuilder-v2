@@ -7,6 +7,7 @@ export interface CatalogOfferProduct {
   brand_id: string | null;
   brand_name: string | null;
   condition: string | null;
+  category?: string | null;
   price_eur: number | null;
   listed_price_amount?: number | null;
   listed_price_currency?: string | null;
@@ -50,6 +51,10 @@ export function catalogOfferSelections(products: CatalogOfferProduct[], supplier
     const start = epoch+Math.floor((now-epoch)/duration)*duration;
     return [{...offer,starts_at:new Date(start).toISOString(),ends_at:new Date(start+duration).toISOString()}];
   };
-  const weekly = ordered.filter(item=>item.product_id!==daily?.product_id && item.product_id!==superOffer?.product_id);
-  return {superPret:windowed(superOffer,12),ofertaZilei:windowed(daily,24),oferteleSaptamanii:rotate(weekly.length?weekly:ordered,day).slice(0,12)};
+  const dumbbellIds = new Set(products.filter(product=>product.category==='dumbbells').map(product=>product.id));
+  const dumbbells = ordered.filter(item=>dumbbellIds.has(item.product_id) && item.product_id!==daily?.product_id);
+  const superPret = dumbbells.length ? dumbbells.flatMap(offer=>windowed(offer,12)) : windowed(superOffer,12);
+  const superIds = new Set(superPret.map(offer=>offer.product_id));
+  const weekly = ordered.filter(item=>item.product_id!==daily?.product_id && !superIds.has(item.product_id));
+  return {superPret,ofertaZilei:windowed(daily,24),oferteleSaptamanii:rotate(weekly.length?weekly:ordered,day).slice(0,12)};
 }
