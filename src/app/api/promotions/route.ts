@@ -57,7 +57,7 @@ export async function GET() {
         let afterId: string | null = null;
         while (true) {
           let query = supabase.from('public_catalog_products')
-            .select('id,name,supplier_id,brand_id,brand_name,condition,price_eur,listed_price_amount,listed_price_currency,images,description')
+            .select('id,name,supplier_id,brand_id,brand_name,category,condition,price_eur,listed_price_amount,listed_price_currency,images,description')
             .in('status',['active','featured']).order('id',{ascending:true}).limit(batchSize);
           if (afterId) query = query.gt('id',afterId);
           const {data: products,error: catalogError} = await query;

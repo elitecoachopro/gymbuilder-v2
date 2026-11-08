@@ -56,3 +56,18 @@ test('each12-hour boundary selects a different product across midnight with at l
   }
  }
 });
+
+test('Super price catalog rotation includes new and used dumbbells with stable12-hour windows and source prices',()=>{
+ const rows=[product('01','A'),product('02','B',{category:'dumbbells'}),product('03','C',{category:'dumbbells',condition:'used',price_eur:null,listed_price_amount:2999,listed_price_currency:'GBP'}),product('04','A',{category:'dumbbells'})];
+ const start=Date.parse('2026-11-04T00:00:00+02:00');
+ const picks=catalogOfferSelections(rows,suppliers,start+3600000);
+ const expected=rows.filter(p=>p.category==='dumbbells' && p.id!==picks.ofertaZilei[0].product_id).map(p=>p.id).sort();
+ assert.deepEqual(picks.superPret.map(p=>p.product_id).sort(),expected);
+ assert.ok(picks.superPret.some(p=>p.product.condition==='used'));
+ const used=picks.superPret.find(p=>p.product_id==='03');
+ assert.equal(used.listed_price_amount,2999);assert.equal(used.listed_price_currency,'GBP');assert.equal(used.price_eur,null);
+ for(const offer of picks.superPret){assert.equal(Date.parse(offer.ends_at)-Date.parse(offer.starts_at),12*3600000);assert.equal(offer.selection,'catalog');}
+ const later=catalogOfferSelections([...rows].reverse(),suppliers,start+5*3600000);
+ assert.deepEqual(later.superPret,picks.superPret);
+ assert.ok(!picks.oferteleSaptamanii.some(p=>picks.superPret.some(s=>s.product_id===p.product_id)));
+});

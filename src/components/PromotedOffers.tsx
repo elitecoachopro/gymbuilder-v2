@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, memo, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, memo, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { ArrowRight, ChevronLeft, ChevronRight, Crown, Clock3, Zap, Loader2, Megaphone, Package, Pause, Play } from 'lucide-react';
 import { useClientLocale } from '@/i18n/client';
@@ -44,7 +44,9 @@ export default function PromotedOffers() {
   const paidWeekly = valid(data?.oferteleSaptamanii);
   const paidSuper = valid(data?.superPret);
   const weekly = paidWeekly.length ? paidWeekly : valid(data?.catalogSelections?.oferteleSaptamanii);
-  const superPrice = (paidSuper.length ? paidSuper : valid(data?.catalogSelections?.superPret))[0];
+  const superPrices = paidSuper.length ? paidSuper.slice(0,1) : valid(data?.catalogSelections?.superPret);
+  const superPrice = superPrices[0];
+  const rotatingDumbbells = !paidSuper.length && superPrices.length > 1;
   const dailyChoice = daily || valid(data?.catalogSelections?.ofertaZilei)[0];
   const catalogCopy = en ? 'Equipment from our published catalog, rotating automatically. Catalog prices are shown; no discount is implied.' : 'Echipamente din catalogul publicat, în rotație automată. Afișăm prețul din catalog, fără reduceri presupuse.';
   const empty = (kind: 'daily' | 'weekly' | 'super') => {
@@ -62,9 +64,9 @@ export default function PromotedOffers() {
     <section id="super-pret" aria-labelledby="super-price-heading" className="mx-auto max-w-7xl scroll-mt-[calc(var(--app-header-height)+1rem)] px-4 py-12 sm:py-16">
       <div className="mb-6 flex items-start gap-3"><Zap className="mt-1 h-6 w-6 shrink-0 text-gold-400" aria-hidden="true" /><div>
         <h2 id="super-price-heading" className="text-2xl font-bold text-white sm:text-3xl">{en ? 'Super price' : 'Super preț'}</h2>
-        <p className="mt-2 text-sm text-anthracite-300">{en ? 'One exclusive product for 12 hours. A new selection appears when its display period ends.' : 'Un singur produs exclusiv timp de 12 ore. Selecția se schimbă la încheierea perioadei de afișare.'}</p>
+        <p className="mt-2 text-sm text-anthracite-300">{rotatingDumbbells ? (en ? 'Dumbbells from the catalog, rotating every 6 seconds. Pause to inspect an item. Published prices; no discount is implied. Paid promotions have priority.' : 'Gantere din catalog, în rotație la 6 secunde. Oprește rularea pentru a analiza un produs. Prețuri publicate, fără reduceri presupuse. Promovările plătite au prioritate.') : (en ? 'One exclusive product for 12 hours. A new selection appears when its display period ends.' : 'Un singur produs exclusiv timp de 12 ore. Selecția se schimbă la încheierea perioadei de afișare.')}</p>
       </div></div>
-      {superPrice ? <ExclusiveOffer key={superPrice.id} offer={superPrice} superPrice /> : empty('super')}
+      {rotatingDumbbells ? <OfferCarousel offers={superPrices} label={en ? 'Super price dumbbells' : 'Gantere Super Preț'} featured superPrice countdown /> : superPrice ? <ExclusiveOffer key={superPrice.id} offer={superPrice} superPrice /> : empty('super')}
     </section>
     <section id="oferta-zilei" aria-labelledby="daily-offer-heading" className="scroll-mt-[calc(var(--app-header-height)+1rem)] bg-anthracite-900/50 px-4 py-12 sm:py-16">
       <div className="mx-auto max-w-6xl">
@@ -135,14 +137,24 @@ function PromotionCountdown({ endsAt, catalog }: { endsAt: string; catalog: bool
   const now = useContext(PromotionClock);
   return (
         <div role="timer" aria-live="off" aria-label={en ? 'Time remaining' : 'Timp rămas'} className="mb-4 rounded-xl border border-gold-400/30 bg-gold-400/10 p-3 text-gold-300">
-          <span className="flex items-center gap-2 text-xs"><Clock3 className="h-4 w-4" aria-hidden="true" />{catalog ? (en ? 'Next selection in' : 'Următoarea selecție în') : (en ? 'Ends in' : 'Expiră în')}</span>
+          <span className="flex items-center gap-2 text-xs"><Clock3 className="h-4 w-4" aria-hidden="true" />{catalog ? (en ? 'Catalog selection expires in' : 'Selecția din catalog expiră în') : (en ? 'Ends in' : 'Expiră în')}</span>
           <span className="mt-1 block font-mono text-2xl font-bold tabular-nums">{promotionCountdown(endsAt, now)}</span>
           <span className="text-xs">{en ? 'hours : minutes : seconds' : 'ore : minute : secunde'}</span>
         </div>
   );
 }
 
-function OfferCarousel({ offers, label }: { offers: PromotionListing[]; label: string }) {
+function CarouselClock({ enabled, children }: { enabled: boolean; children: ReactNode }) {
+  const [now, setNow] = useState(()=>Date.now());
+  useEffect(()=>{
+    if (!enabled) return;
+    const timer=window.setInterval(()=>setNow(Date.now()),1000);
+    return ()=>window.clearInterval(timer);
+  },[enabled]);
+  return <PromotionClock.Provider value={now}>{children}</PromotionClock.Provider>;
+}
+
+function OfferCarousel({ offers, label, featured = false, superPrice = false, countdown = false }: { offers: PromotionListing[]; label: string; featured?: boolean; superPrice?: boolean; countdown?: boolean }) {
   const en = useClientLocale() === 'en';
   const track = useRef<HTMLDivElement>(null);
   const carousel = useRef<HTMLDivElement>(null);
@@ -203,7 +215,7 @@ function OfferCarousel({ offers, label }: { offers: PromotionListing[]; label: s
     return () => element?.removeEventListener('focusin', pauseForFocus);
   }, []);
   const hasMore = offers.length > position.visible;
-  return <div ref={carousel} role="region" aria-roledescription={en ? 'carousel' : 'carusel'} aria-label={label}>
+  return <CarouselClock enabled={countdown}><div ref={carousel} role="region" aria-roledescription={en ? 'carousel' : 'carusel'} aria-label={label}>
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
       <p className="text-sm text-anthracite-300" aria-live={playing ? 'off' : 'polite'}>{position.first + 1}–{Math.min(offers.length, position.first + position.visible)} / {offers.length} {en ? 'offers' : 'oferte'}</p>
       <div className="flex items-center gap-2">
@@ -213,7 +225,7 @@ function OfferCarousel({ offers, label }: { offers: PromotionListing[]; label: s
       </div>
     </div>
     <div ref={track} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} onPointerDown={() => setPlaying(false)} className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4">
-      {offers.map((offer, index) => <div key={offer.id} role="group" aria-roledescription={en ? 'slide' : 'diapozitiv'} aria-label={`${index + 1} / ${offers.length}`} className="min-w-0 shrink-0 basis-full snap-start sm:basis-[calc(50%_-_0.5rem)] lg:basis-[calc(33.333%_-_0.667rem)]"><PromotionCard offer={offer} /></div>)}
+      {offers.map((offer, index) => <div key={offer.id} role="group" aria-roledescription={en ? 'slide' : 'diapozitiv'} aria-label={`${index + 1} / ${offers.length}`} className={`min-w-0 shrink-0 basis-full snap-start ${featured ? '' : 'sm:basis-[calc(50%_-_0.5rem)] lg:basis-[calc(33.333%_-_0.667rem)]'}`}><PromotionCard offer={offer} featured={featured} superPrice={superPrice} countdown={countdown} /></div>)}
     </div>
-  </div>;
+  </div></CarouselClock>;
 }
