@@ -23,6 +23,7 @@ export default function GlobalHeader() {
 
   const navLinks = [
     { href: '/products', label: ui('Echipamente') },
+    { href: '/products?category=dumbbells', label: locale === 'en' ? 'Dumbbells' : 'Gantere' },
     { href: '/gym-service', label: 'Gym Service' },
     { href: '/suppliers', label: locale === 'en' ? 'Suppliers' : 'Furnizori' },
     { href: '/configurator/studio', label: locale === 'en' ? 'Design your gym' : 'Proiectează sala' },

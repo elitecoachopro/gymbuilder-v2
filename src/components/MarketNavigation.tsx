@@ -5,10 +5,13 @@ import { ArrowUpRight, Globe2, MapPin } from 'lucide-react';
 import { markets } from '@/lib/markets';
 import { useUiText } from '@/i18n/useUiText';
 
-export default function MarketNavigation({ selected, directory = false, condition }: { selected?: string | null; directory?: boolean; condition?: string }) {
+export default function MarketNavigation({ selected, directory = false, condition, category }: { selected?: string | null; directory?: boolean; condition?: string; category?: string }) {
   const ui = useUiText();
   const path = directory ? '/suppliers' : '/products';
-  const conditionQuery = !directory && (condition === 'used' || condition === 'new') ? `condition=${condition}` : '';
+  const filters = new URLSearchParams();
+  if (!directory && (condition === 'used' || condition === 'new')) filters.set('condition', condition);
+  if (!directory && category && category !== 'all') filters.set('category', category);
+  const conditionQuery = filters.toString();
   return (
     <section id="markets" aria-label={ui('Piețe de echipamente')} className="scroll-mt-[calc(var(--app-header-height)+1rem)]">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">

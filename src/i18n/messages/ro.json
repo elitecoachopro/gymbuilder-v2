@@ -751,7 +751,8 @@
       "accessories": "Accesorii",
       "wellness": "Wellness & Spa",
       "lockers": "Vestiare",
-      "reception": "Recepție"
+      "reception": "Recepție",
+      "dumbbells": "Gantere"
     },
     "variants": {
       "title": "Variante Produs",
@@ -784,7 +785,7 @@
       "title": "Import Produse din CSV",
       "templateDescription": "Descarcă template-ul CSV cu coloanele corecte:",
       "downloadTemplate": "Descarcă Template CSV",
-      "validCategories": "Categorii valide: cardio, strength/forță, functional, accessories/accesorii, wellness, lockers/vestiare, reception/recepție",
+      "validCategories": "Categorii valide: cardio, strength/forță, functional, accessories/accesorii, wellness, lockers/vestiare, reception/recepție, dumbbells/gantere",
       "validConditions": "Stare: nou/new sau sh/second-hand/used",
       "uploadOrPaste": "Încarcă fișierul CSV sau lipește conținutul mai jos",
       "pastePlaceholder": "Sau lipește conținutul CSV aici...\nnume,descriere,pret,categorie,stare,imagine_url\nBandă Pro,Descriere,2500,cardio,nou,https://...",
@@ -856,7 +857,8 @@
       "accessories": "Accesorii",
       "wellness": "Wellness & Spa",
       "lockers": "Vestiare",
-      "reception": "Recepție"
+      "reception": "Recepție",
+      "dumbbells": "Gantere"
     },
     "imagesTitle": "Imagini Produs",
     "productImageAlt": "Produs",
@@ -894,6 +896,7 @@
     "search": "Caută",
     "searching": "Se caută...",
     "noResults": "Niciun rezultat",
-    "searchCount": "Caută {count} Echipamente"
+    "searchCount": "Caută {count} Echipamente",
+    "catDumbbells": "Gantere"
   }
 }

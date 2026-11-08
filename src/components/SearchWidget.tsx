@@ -16,6 +16,7 @@ interface Category {
 const categories: Category[] = [
   { slug: 'all', icon: <LayoutGrid className="w-5 h-5" />, labelKey: 'catAll' },
   { slug: 'cardio', icon: <Heart className="w-5 h-5" />, labelKey: 'catCardio' },
+  { slug: 'dumbbells', icon: <Dumbbell className="w-5 h-5" />, labelKey: 'catDumbbells' },
   { slug: 'strength', icon: <Dumbbell className="w-5 h-5" />, labelKey: 'catStrength' },
   { slug: 'functional', icon: <Zap className="w-5 h-5" />, labelKey: 'catFunctional' },
   { slug: 'accessories', icon: <Wrench className="w-5 h-5" />, labelKey: 'catAccessories' },

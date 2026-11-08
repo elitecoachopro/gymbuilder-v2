@@ -1591,6 +1591,7 @@ export type Database = {
       product_category:
         | "cardio"
         | "strength"
+        | "dumbbells"
         | "functional"
         | "accessories"
         | "wellness"
@@ -1739,6 +1740,7 @@ export const Constants = {
       product_category: [
         "cardio",
         "strength",
+        "dumbbells",
         "functional",
         "accessories",
         "wellness",

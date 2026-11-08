@@ -22,3 +22,16 @@ test('unapproved supplier cannot import published products', async t => {
   const response = await api('/api/supplier/products/import', { cookie: await login(supplier), body: { csvContent } });
   assert.equal(response.status, 403);
 });
+
+
+test('CSV imports Romanian and English dumbbell categories as new and used products', async t => {
+  const supplier = await fixtureSupplier('approved', 'enterprise');
+  t.after(() => cleanupUsers([supplier]));
+  const csvContent = 'name,price,category,condition\nZIVA new pair,150,gantere,new\nZIVA used pair,90,dumbbells,used';
+  const cookie = await login(supplier);
+  const response = await api('/api/supplier/products/import', { cookie, body: { csvContent, confirm: true } });
+  assert.equal(response.status, 200);
+  const { data, error } = await db.from('products').select('category,condition').eq('supplier_id', supplier.supplierId).order('condition');
+  assert.ifError(error);
+  assert.deepEqual(data, [{ category: 'dumbbells', condition: 'new' }, { category: 'dumbbells', condition: 'used' }]);
+});

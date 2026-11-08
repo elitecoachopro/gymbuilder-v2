@@ -1,6 +1,6 @@
 export function translateUi<T>(value: T, locale: string, dictionary: Record<string, string>): T {
   if (typeof value !== 'string') return value;
-  const categories: Record<string, string> = { strength: 'Forță', functional: 'Funcțional', accessories: 'Accesorii', lockers: 'Vestiare', reception: 'Recepție', cardio: 'Cardio', wellness: 'Wellness' };
+  const categories: Record<string, string> = { dumbbells: 'Gantere', strength: 'Forță', functional: 'Funcțional', accessories: 'Accesorii', lockers: 'Vestiare', reception: 'Recepție', cardio: 'Cardio', wellness: 'Wellness' };
   const key = categories[value.trim()] || value.trim();
   if (locale !== 'en') return (categories[value.trim()] || value) as T;
   const direct = dictionary[key];

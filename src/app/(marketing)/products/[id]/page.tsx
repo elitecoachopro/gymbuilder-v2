@@ -184,6 +184,7 @@ export default function ProductDetailPage() {
   const categoryLabels: Record<string, string> = {
     cardio: 'Cardio',
     strength: 'Forță',
+  dumbbells: 'Gantere',
     functional: 'Funcțional',
     accessories: 'Accesorii',
     wellness: 'Wellness',

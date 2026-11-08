@@ -28,6 +28,7 @@ const categories = [
   { slug: 'all', name: 'Toate' },
   { slug: 'cardio', name: 'Cardio' },
   { slug: 'strength', name: 'Forță' },
+  { slug: 'dumbbells', name: 'Gantere' },
   { slug: 'functional', name: 'Funcțional' },
   { slug: 'accessories', name: 'Accesorii' },
   { slug: 'wellness', name: 'Wellness' },
@@ -38,6 +39,7 @@ const categories = [
 const categoryDisplayMap: Record<string, string> = {
   cardio: 'Cardio',
   strength: 'Forță',
+  dumbbells: 'Gantere',
   functional: 'Funcțional',
   accessories: 'Accesorii',
   wellness: 'Wellness',
@@ -147,12 +149,12 @@ export default function ProductsPage() {
     if (next !== queryString) { ownQuery.current = next; window.history.replaceState(null, '', next ? `/products?${next}` : '/products'); }
   }, [queryString, activeCategory, conditionFilter, searchQuery, priceMin, priceMax, sortBy]);
 
-  const catalogTitle = conditionFilter === 'new'
+  const catalogTitle = activeCategory === 'dumbbells' ? 'Gantere' : conditionFilter === 'new'
     ? 'Echipamente Noi'
     : conditionFilter === 'used'
       ? 'Echipamente Second-Hand'
       : 'Echipamente';
-  const showSuppliersSection = conditionFilter !== 'used' && (!!market || !urlSupplier);
+  const showSuppliersSection = activeCategory !== 'dumbbells' && conditionFilter !== 'used' && (!!market || !urlSupplier);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -345,7 +347,7 @@ export default function ProductsPage() {
       <section className="pt-24 pb-8 px-4">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Catalog <span className="gold-gradient">{conditionFilter === 'used' && selectedMarketName ? `${ui(catalogTitle)} · ${ui(selectedMarketName)}` : ui(selectedMarketName || catalogTitle)}</span>
+            Catalog <span className="gold-gradient">{activeCategory === 'dumbbells' ? `${ui('Gantere')}${selectedMarketName ? ` · ${ui(selectedMarketName)}` : ''}` : conditionFilter === 'used' && selectedMarketName ? `${ui(catalogTitle)} · ${ui(selectedMarketName)}` : ui(selectedMarketName || catalogTitle)}</span>
           </h1>
           <p className="text-anthracite-300 text-lg max-w-2xl">
             {ui("Fotografii, specificații și date de contact pentru echipamente fitness. Discută achiziția direct cu furnizorul.")}</p>
@@ -353,7 +355,7 @@ export default function ProductsPage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 pb-10">
-        <MarketNavigation condition={conditionFilter} selected={market} />
+        <MarketNavigation category={activeCategory} condition={conditionFilter} selected={market} />
       </div>
 
       {/* Approved Suppliers — visible even before they publish products */}
