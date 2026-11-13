@@ -17,5 +17,5 @@ export function restoreLoginHandoff(raw: string | null, nonce: string, currentOw
   const document: EditorDocument = { name: value.name, height: parsed.data.height_m, budget: parsed.data.budget_eur, brief: parsed.data.brief, space: parsed.data.space };
   return { document, projectId: saved.projectId as string | null, savedFingerprint: saved.savedFingerprint as string,
     storey: saved.storey === 1 && document.space.upperFloor ? 1 as const : 0 as const,
-    tab: (['room', 'library', 'finishes', 'ai'].includes(saved.tab) ? saved.tab : 'room') as 'room' | 'library' | 'finishes' | 'ai' };
+    tab: (['room', 'zones', 'library', 'finishes', 'ai'].includes(saved.tab) ? saved.tab : 'room') as 'room' | 'zones' | 'library' | 'finishes' | 'ai' };
 }

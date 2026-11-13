@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { EQUIPMENT_CATALOG } from './gym-catalog.ts';
+import { EQUIPMENT_CATALOG, ZONE_DEFINITIONS, areaZoneId, equipmentMatchesArea, equipmentMatchesZone } from './gym-catalog.ts';
 import { visualizationSchema } from './gym-visualization.ts';
 
 const metre = z.number().finite().min(0).max(200);
@@ -12,7 +12,7 @@ const floorSchema = z.object({
   walls: z.array(z.object({ id, x: metre, y: metre, length: positive, axis: z.enum(['x', 'y']), thickness: z.number().min(0.08).max(0.5) }).strict()).max(60),
   openings: z.array(z.object({ id, wallId: id, kind: z.enum(['door', 'window']), offset: metre, width: positive, height: positive, sill: metre }).strict()).max(100),
   columns: z.array(z.object({ id, x: metre, y: metre, w: positive, d: positive }).strict()).max(40),
-  areas: z.array(z.object({ id, name: z.string().min(1).max(80), colour, x: metre, y: metre, w: positive, d: positive }).strict()).max(30),
+  areas: z.array(z.object({ id, zoneId: id.refine(value => ZONE_DEFINITIONS.some(zone => zone.id === value)).optional(), name: z.string().min(1).max(80), colour, x: metre, y: metre, w: positive, d: positive }).strict()).max(30),
   items: z.array(z.object({ id, templateId: id, x: metre, y: metre, rotation: z.number().finite().min(0).max(359) }).strict()).max(300),
   finishes: z.object({ floor: z.enum(['rubber', 'tartan', 'oak', 'concrete']), wall: colour, frame: colour, upholstery: colour }).strict(),
   visualization: visualizationSchema.optional(),
@@ -20,11 +20,23 @@ const floorSchema = z.object({
 }).strict();
 export const spaceSchema = floorSchema.extend({ upperFloor: floorSchema.optional() });
 export type GymSpace = z.infer<typeof spaceSchema>;
+export type SpaceArea = GymSpace['areas'][number];
 export type SpaceItem = GymSpace['items'][number];
 export type SpacePoint = GymSpace['outline'][number];
 export type SpaceWall = GymSpace['walls'][number];
 export type SpaceBox = { x: number; y: number; w: number; d: number };
 const EPS = 0.00001;
+export function areasOverlap(a: SpaceBox, b: SpaceBox) {
+  return a.x < b.x + b.w - EPS && a.x + a.w > b.x + EPS && a.y < b.y + b.d - EPS && a.y + a.d > b.y + EPS;
+}
+
+export function areasForZone(space: GymSpace, zoneId: string, templateId: string) {
+  const model = EQUIPMENT_CATALOG.find(template => template.id === templateId);
+  if (!model || !equipmentMatchesZone(model, zoneId)) return [];
+  const matching = space.areas.filter(area => equipmentMatchesArea(model, area));
+  const exact = matching.filter(area => areaZoneId(area) === zoneId);
+  return exact.length ? exact : matching;
+}
 export const spaceBounds = (space: Pick<GymSpace, 'outline'>) => ({ length: Math.max(...space.outline.map(p => p.x)), width: Math.max(...space.outline.map(p => p.y)) });
 export function spaceArea(space: GymSpace) {
   return Math.abs(space.outline.reduce((sum, p, i, a) => sum + p.x * a[(i + 1) % a.length].y - a[(i + 1) % a.length].x * p.y, 0)) / 2;
@@ -129,7 +141,7 @@ function insideSegment(p: SpacePoint, a: SpacePoint, b: SpacePoint) {
 export function emptySpace(length = 20, width = 15): GymSpace {
   return { version: 1, outline: [{ x: 0, y: 0 }, { x: length, y: 0 }, { x: length, y: width }, { x: 0, y: width }], walls: [], openings: [], columns: [], areas: [], items: [], finishes: { floor: 'rubber', wall: '#e7e5df', frame: '#353b43', upholstery: '#945c39' } };
 }
-export function findSpacePosition(space: GymSpace, templateId: string, height: number, rotation = 0, area?: SpaceBox): SpaceItem | null {
+export function findSpacePosition(space: GymSpace, templateId: string, height: number, rotation = 0, area?: SpaceBox, reserved: readonly SpaceBox[] = []): SpaceItem | null {
   const bounds = spaceBounds(space), t = EQUIPMENT_CATALOG.find(t => t.id === templateId);
   if (!t || t.height_m > height) return null;
   const region = area || { x: 0, y: 0, w: bounds.length, d: bounds.width };
@@ -137,7 +149,7 @@ export function findSpacePosition(space: GymSpace, templateId: string, height: n
   const local = itemPolygon(prototype);
   const halfW = Math.max(...local.map(p => p.x)), halfD = Math.max(...local.map(p => p.y));
   const walls = spaceWalls(space);
-  const obstacles = [...(space.stairwell ? [boxPolygon(space.stairwell)] : []), ...space.items.map(itemPolygon), ...space.columns.map(boxPolygon), ...walls.map(w => boxPolygon(wallBox(w))), ...space.openings.filter(o => o.kind === 'door').flatMap(o => { const wall = walls.find(w => w.id === o.wallId); return wall ? [boxPolygon(doorBox(wall, o))] : []; })];
+  const obstacles = [...reserved.map(boxPolygon), ...space.areas.filter(a => a.id === 'circulatie').map(boxPolygon), ...(space.stairwell ? [boxPolygon(space.stairwell)] : []), ...space.items.map(itemPolygon), ...space.columns.map(boxPolygon), ...walls.map(w => boxPolygon(wallBox(w))), ...space.openings.filter(o => o.kind === 'door').flatMap(o => { const wall = walls.find(w => w.id === o.wallId); return wall ? [boxPolygon(doorBox(wall, o))] : []; })];
   const tryAt = (x: number, y: number): SpaceItem | null => {
     x = Math.round(x * 100) / 100; y = Math.round(y * 100) / 100;
     const poly = local.map(p => ({ x: p.x + x, y: p.y + y }));
@@ -156,7 +168,7 @@ export function populateSpace(space: GymSpace, requests: Array<{ zoneId: string;
   const usedIds = new Set([...space.walls, ...space.openings, ...space.columns, ...space.areas].map(entry => entry.id));
   let itemNumber = 0;
   for (const request of requests) for (const wanted of request.equipment) for (let i = 0; i < wanted.quantity; i++) {
-    const template = EQUIPMENT_CATALOG.find(t => t.id === wanted.templateId && t.zone === request.zoneId);
+    const template = EQUIPMENT_CATALOG.find(t => t.id === wanted.templateId && equipmentMatchesZone(t, request.zoneId));
     if (!template) continue;
     let reason: 'height' | 'budget' | 'space' = 'space';
     let candidate: SpaceItem | null = null;
@@ -164,8 +176,13 @@ export function populateSpace(space: GymSpace, requests: Array<{ zoneId: string;
     else if (budget !== null && spaceCost(next) + template.price_eur > budget) reason = 'budget';
     else if (next.items.length >= 300) reason = 'space';
     else {
-      const area = next.areas.find(a => a.id === request.zoneId);
-      candidate = findSpacePosition(next, template.id, height, 0, area) || findSpacePosition(next, template.id, height, 90, area);
+      const areas = areasForZone(next, request.zoneId, template.id);
+      const destinations = areas.length ? [...areas.slice(i % areas.length), ...areas.slice(0, i % areas.length)] : [undefined];
+      const reserved = areas.length ? [] : next.areas;
+      for (const area of destinations) {
+        candidate = findSpacePosition(next, template.id, height, 0, area, reserved) || findSpacePosition(next, template.id, height, 90, area, reserved);
+        if (candidate) break;
+      }
     }
     if (candidate && next.items.length < 300) {
       let id: string;

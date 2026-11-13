@@ -1,0 +1,110 @@
+[
+  {
+    "zoneId": "receptie",
+    "weight": 8,
+    "equipment": [
+      {
+        "templateId": "desk_receptie",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "zoneId": "vestiare",
+    "weight": 24,
+    "equipment": [
+      {
+        "templateId": "dulap_vestiar",
+        "quantity": 2
+      },
+      {
+        "templateId": "dus",
+        "quantity": 2
+      }
+    ]
+  },
+  {
+    "zoneId": "cardio",
+    "weight": 25,
+    "equipment": [
+      {
+        "templateId": "banda_alergare",
+        "quantity": 3
+      },
+      {
+        "templateId": "bicicleta_spinning",
+        "quantity": 2
+      },
+      {
+        "templateId": "scara_cardio",
+        "quantity": 1
+      },
+      {
+        "templateId": "rowing_machine",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "zoneId": "aparate",
+    "weight": 14,
+    "equipment": [
+      {
+        "templateId": "aparat_piept",
+        "quantity": 1
+      },
+      {
+        "templateId": "aparat_picioare",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "zoneId": "functional",
+    "weight": 9,
+    "equipment": [
+      {
+        "templateId": "box_pliometric",
+        "quantity": 1
+      },
+      {
+        "templateId": "kettlebell",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "zoneId": "studio",
+    "weight": 10,
+    "equipment": [
+      {
+        "templateId": "saltea_yoga",
+        "quantity": 3
+      },
+      {
+        "templateId": "step_aerobic",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "zoneId": "spa",
+    "weight": 7,
+    "equipment": [
+      {
+        "templateId": "sauna",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "zoneId": "auxiliare",
+    "weight": 3,
+    "equipment": [
+      {
+        "templateId": "raft_depozitare",
+        "quantity": 1
+      }
+    ]
+  }
+]

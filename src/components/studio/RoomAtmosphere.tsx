@@ -3,6 +3,8 @@
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { spaceWalls, type GymSpace } from '@/lib/gym-space';
+import { useClientLocale } from '@/i18n/client';
+import { areaZoneId, studioAreaName } from '@/lib/gym-catalog';
 import { useUiText } from '@/i18n/useUiText';
 import { FLOOR_SURFACES } from '@/lib/gym-visualization';
 import { createFloorMaps, type FloorFinish } from '@/lib/gym-pbr-textures';
@@ -41,32 +43,42 @@ const areaFinishes: Record<string, 'rubber' | 'oak' | 'concrete' | 'turf'> = {
   functional: 'turf', receptie: 'oak', vestiare: 'oak', stretching: 'concrete',
 };
 function AreaSurface({ area }: { area: GymSpace['areas'][number] }) {
-  const ui = useUiText();
-  const mode = areaFinishes[area.id] ?? 'rubber';
+  const mode = areaFinishes[area.id] ?? areaFinishes[areaZoneId(area)] ?? 'rubber';
   const maps = useFloorMaps(mode, area.w / FLOOR_SURFACES[mode].tileMetres, area.d / FLOOR_SURFACES[mode].tileMetres);
-  const label = String(ui(area.name));
-  const labelTexture = useMemo(() => {
-    if (area.id === 'functional') return null;
-    const canvas = document.createElement('canvas'); canvas.width = 768; canvas.height = 96;
-    const ctx = canvas.getContext('2d')!;
-    ctx.fillStyle = mode === 'concrete' || mode === 'oak' ? '#293c3b' : '#e2d5b8'; ctx.font = '600 42px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText(label.toLocaleUpperCase(), 384, 62, 740);
-    const map = new THREE.CanvasTexture(canvas); map.colorSpace = THREE.SRGBColorSpace; return map;
-  }, [label, mode,area.id]);
-  useEffect(() => () => labelTexture?.dispose(), [labelTexture]);
-  const labelWidth = Math.min(3.5, area.w * 0.85);
   return <group>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[area.x + area.w / 2, 0.008, area.y + area.d / 2]} receiveShadow>
       <planeGeometry args={[area.w, area.d]} /><meshStandardMaterial {...maps} bumpScale={FLOOR_SURFACES[mode].bumpScale} roughness={FLOOR_SURFACES[mode].roughness} />
     </mesh>
-    {area.id !== 'functional' && <mesh rotation={[-Math.PI / 2, 0, 0]} position={[area.x + area.w / 2, 0.015, area.y + area.d - 0.18]}>
-      <planeGeometry args={[labelWidth, labelWidth / 8]} /><meshBasicMaterial map={labelTexture} transparent depthWrite={false} toneMapped={false} />
-    </mesh>}
     {area.id === 'functional' && Math.max(area.w,area.d) >= 8 && <SledTrack area={area}/>}
     {area.id === 'functional' && Math.max(area.w,area.d) < 8 && [0, 1, 2, 3].map(i => <mesh key={i} rotation={[-Math.PI / 2, 0, 0]} position={[area.x + 0.2 + i * (area.w - 0.4) / 3, 0.012, area.y + area.d / 2]}>
       <planeGeometry args={[0.025, area.d - 0.25]} /><meshStandardMaterial color="#bfcbb7" roughness={1} />
     </mesh>)}
   </group>;
+}
+export function AreaLabel({ area }: { area: GymSpace['areas'][number] }) {
+  const ui = useUiText(), locale = useClientLocale();
+  const label = studioAreaName(area, locale, ui);
+  const map = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 768;
+    canvas.height = 96;
+    const context = canvas.getContext('2d')!;
+    context.fillStyle = '#18232b';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = '#fff5dd';
+    context.font = '600 42px sans-serif';
+    context.textAlign = 'center';
+    context.fillText(label, 384, 62, 730);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  }, [label]);
+  useEffect(() => () => map.dispose(), [map]);
+  const width = Math.min(5, area.w * 0.9, area.d * 6);
+  return <mesh raycast={() => {}} rotation={[-Math.PI / 2, 0, 0]} position={[area.x + area.w / 2, 0.021, area.y + area.d - width / 12]}>
+    <planeGeometry args={[width, width / 8]} />
+    <meshBasicMaterial map={map} toneMapped={false} />
+  </mesh>;
 }
 function WallPanel({ x, z, width, height, rotation, style }: { x: number; z: number; width: number; height: number; rotation: number; style: InteriorStyle }) {
   const geometry = useMemo(() => style === 'minimal' ? null : buildWallFinish(width, height, style), [width, height, style]);

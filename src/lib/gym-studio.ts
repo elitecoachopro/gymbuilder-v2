@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { buildingArea } from './gym-building.ts';
-import { EQUIPMENT_CATALOG, ZONE_DEFINITIONS } from './gym-catalog.ts';
+import { EQUIPMENT_CATALOG, ZONE_DEFINITIONS, equipmentMatchesZone } from './gym-catalog.ts';
 import { importedEquipment } from './gym-imported-equipment.ts';
 import { layoutZones, findEquipmentPosition, validProjectGeometry, type LayoutZone } from './gym-layout.ts';
 import { spaceSchema, spaceBounds, validateSpace } from './gym-space.ts';
@@ -8,7 +8,7 @@ import { spaceSchema, spaceBounds, validateSpace } from './gym-space.ts';
 export const studioConfigurationSchema = z.object({
   version: z.literal(1), height_m: z.number().finite().min(2).max(30),
   budget_eur: z.number().finite().positive().max(99999999).nullable(),
-  brief: z.string().max(6000), zone_ids: z.array(z.string()).min(1).max(10),
+  brief: z.string().max(6000), zone_ids: z.array(z.string()).min(1).max(ZONE_DEFINITIONS.length),
   profile: z.enum(['balanced', 'strength', 'boutique']),
   space: spaceSchema.optional(),
 }).strict().refine(v => new Set(v.zone_ids).size === v.zone_ids.length && v.zone_ids.every(id => ZONE_DEFINITIONS.some(z => z.id === id)));
@@ -39,11 +39,11 @@ export function defaultZoneRequests(brief: GymBrief): ZoneRequest[] {
 
 export function buildGymProposal(brief: GymBrief, requests = defaultZoneRequests(brief)): GymProposal {
   studioConfigurationSchema.parse({ version: 1, height_m: brief.height_m, budget_eur: brief.budget_eur, brief: brief.brief, zone_ids: brief.zone_ids, profile: brief.profile });
-  if (!requests.length || requests.length > 10 || new Set(requests.map(r => r.zoneId)).size !== requests.length) throw new Error('Invalid zone requests');
+  if (!requests.length || requests.length > ZONE_DEFINITIONS.length || new Set(requests.map(r => r.zoneId)).size !== requests.length) throw new Error('Invalid zone requests');
   for (const request of requests) {
     if (!brief.zone_ids.includes(request.zoneId) || !Number.isFinite(request.weight) || request.weight <= 0 || request.weight > 1000 || request.equipment.length > 30) throw new Error('Invalid zone requests');
     for (const item of request.equipment) {
-      if (!Number.isInteger(item.quantity) || item.quantity < 0 || item.quantity > 30 || !EQUIPMENT_CATALOG.some(t => t.id === item.templateId && t.zone === request.zoneId)) throw new Error('Invalid catalog request');
+      if (!Number.isInteger(item.quantity) || item.quantity < 0 || item.quantity > 30 || !EQUIPMENT_CATALOG.some(t => t.id === item.templateId && equipmentMatchesZone(t, request.zoneId))) throw new Error('Invalid catalog request');
     }
   }
   if (requests.reduce((n, r) => n + r.equipment.reduce((m, e) => m + e.quantity, 0), 0) > 500) throw new Error('Too many models');
@@ -91,7 +91,7 @@ export function validStudioProject(project: { total_area: number; length_m: numb
   if (equipment.length > 500) return false;
   for (const item of equipment) {
     const template = EQUIPMENT_CATALOG.find(t => t.id === item.templateId);
-    if (!template || template.height_m > parsed.data.height_m || template.zone !== item.zoneId) return false;
+    if (!template || template.height_m > parsed.data.height_m || !equipmentMatchesZone(template, item.zoneId)) return false;
     if (![0, 90, 180, 270].includes(item.rotation || 0)) return false;
     const rotated = item.rotation === 90 || item.rotation === 270;
     if (Math.abs(item.length_m - (rotated ? template.width_m : template.length_m)) > 0.02 || Math.abs(item.width_m - (rotated ? template.length_m : template.width_m)) > 0.02) return false;

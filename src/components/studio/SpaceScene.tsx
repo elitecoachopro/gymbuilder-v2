@@ -17,7 +17,7 @@ import { SurfaceMaterials, useSurfaceTextures } from './SurfaceMaterials';
 import { EconomicReflections, EquipmentContactShadows } from './StudioLighting';
 import { INTERIOR_PALETTES } from '@/lib/gym-interior';
 import { EquipmentMaterials } from './EquipmentParts';
-import RoomAtmosphere, { useFloorMaps } from './RoomAtmosphere';
+import RoomAtmosphere, { AreaLabel, useFloorMaps } from './RoomAtmosphere';
 import SpaceDimensions from './SpaceDimensions';
 import StrengthInterior from './StrengthInterior';
 import StairArchitecture from './StairArchitecture';
@@ -182,6 +182,7 @@ export function StudioRoom({ space, height, cutaway, showAreas, view }: Pick<Pro
     <StrengthInterior space={space} height={height} />
     <DaylightArchitecture space={space} />
     {showAreas && space.areas.map(area => <mesh key={area.id} rotation={[-Math.PI / 2, 0, 0]} position={[area.x + area.w / 2, 0.012, area.y + area.d / 2]}><planeGeometry args={[area.w, area.d]} /><meshStandardMaterial color={area.colour} transparent opacity={0.2} depthWrite={false} /></mesh>)}
+    {space.areas.filter(area => showAreas || (space.finishes.floor === 'rubber' && area.id !== 'functional')).map(area => <AreaLabel key={area.id} area={area} />)}
     {space.columns.map(c => <mesh key={c.id} position={[c.x + c.w / 2, height / 2, c.y + c.d / 2]} castShadow><boxGeometry args={[c.w, height, c.d]} /><meshStandardMaterial color="#a4a6a3" roughness={0.9} /></mesh>)}
   </group>;
 }

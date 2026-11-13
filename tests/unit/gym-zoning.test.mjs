@@ -2,6 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildZonedGymProposal } from '../../src/lib/gym-zoning.ts';
 import { emptySpace, itemPolygon, validateSpace, spaceArea } from '../../src/lib/gym-space.ts';
+import zoneRequests300 from '../../src/lib/gym-demo-zones-300.json' with { type: 'json' };
+import { aiDesignSchema } from '../../src/lib/gym-ai.ts';
+import { createGymAiReview, applyGymAiReview } from '../../src/lib/gym-ai-proposal.ts';
+import { createEditorHistory, undoEditor } from '../../src/lib/gym-editor-history.ts';
 import { EQUIPMENT_CATALOG } from '../../src/lib/gym-catalog.ts';
 const zones = [
  {zoneId:'receptie',weight:8,equipment:[{templateId:'desk_receptie',quantity:1},{templateId:'canapea',quantity:1}]},
@@ -64,4 +68,39 @@ test('the shared corridor and both changing-room centre access strips stay free 
  const {space}=buildZonedGymProposal(emptySpace(20,10),zones,3.5,null);
  const reserved=[space.areas.find(a=>a.id==='circulatie'),...space.areas.filter(a=>a.id.startsWith('vestiare-')||a.id==='receptie').map(a=>({x:a.x+a.w/2-0.5,y:a.y,w:1,d:a.d}))];
  for(const item of space.items){const p=itemPolygon(item);const box={x:Math.min(...p.map(p=>p.x)),y:Math.min(...p.map(p=>p.y)),right:Math.max(...p.map(p=>p.x)),bottom:Math.max(...p.map(p=>p.y))};for(const r of reserved)assert.ok(!(box.x<r.x+r.w-0.001 && box.right>r.x+0.001 && box.y<r.y+r.d-0.001 && box.bottom>r.y+0.001),item.templateId);}
+});
+
+test('300 m² proposal creates named zones, including empty rooms, and places equipment in its zone', () => {
+  const original = emptySpace(20, 15);
+  const design = aiDesignSchema.parse({
+    summary: 'Amenajare de test', questions: [], profile: 'balanced',
+    length_m: 20, width_m: 15, total_area: 300, height_m: 3.5, budget_eur: 60000,
+    zones: zoneRequests300,
+  });
+  const spaceProposal = buildZonedGymProposal(original, design.zones, 3.5, 60000);
+  const { space, omitted, zoning } = spaceProposal;
+  const editor = createEditorHistory({ name: 'Sala 300 m²', height: 3.5, budget: 60000, brief: 'Amenajare pe zone', space: original });
+  const review = createGymAiReview({ design, spaceProposal }, editor.present, 0);
+  assert.equal(editor.present.document.space.areas.length, 0);
+  const applied = applyGymAiReview(editor, review, 0, false);
+  assert.equal(applied.error, null);
+  assert.equal(applied.mode, '3d');
+  assert.deepEqual(applied.state.present.document.space, space);
+  assert.deepEqual(undoEditor(applied.state).present, editor.present);
+  assert.equal(zoning, 'generated');
+  assert.equal(spaceArea(space), 300);
+  assert.equal(validateSpace(space, 3.5, 60000), null);
+  assert.deepEqual(omitted, []);
+  for (const [id, name] of [
+    ['cardio', 'Zona de cardio'],
+    ['studio', 'Sala pentru clase'],
+    ['spa', 'Zona de recuperare'],
+    ['auxiliare', 'Spații auxiliare'],
+  ]) assert.equal(space.areas.find(area => area.id === id)?.name, name);
+  assert.ok(space.openings.some(opening => opening.id === 'zoning-door-studio'));
+  assert.ok(space.openings.some(opening => opening.id === 'zoning-door-spa'));
+  for (const item of space.items) {
+    const zone = design.zones.find(zone => zone.equipment.some(equipment => equipment.templateId === item.templateId)).zoneId;
+    assert.ok(space.areas.some(area => (area.id === zone || (zone === 'vestiare' && area.id.startsWith('vestiare-'))) && within(item, area)), item.templateId);
+  }
 });

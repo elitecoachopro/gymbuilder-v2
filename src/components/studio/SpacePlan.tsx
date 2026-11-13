@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { assessEquipmentUsage } from '@/lib/gym-equipment-clearance';
-import { EQUIPMENT_CATALOG } from '@/lib/gym-catalog';
+import { EQUIPMENT_CATALOG, studioAreaName } from '@/lib/gym-catalog';
 import { itemPolygon, spaceBounds, spaceWalls, wallBox, type SpaceItem, type GymSpace } from '@/lib/gym-space';
 import { editStructure, structureGesture, type StructureCommand, type StructureGesture } from '@/lib/gym-space-edit';
 import { useUiText } from '@/i18n/useUiText';
@@ -108,7 +108,7 @@ export default function SpacePlan({ space, selected, onSelect, onMove, onEdit, h
       <defs><pattern id={gridId} width="1" height="1" patternUnits="userSpaceOnUse"><path d="M 1 0 L 0 0 0 1" fill="none" stroke="#b1bab5" strokeWidth="0.018" /></pattern></defs>
       <polygon points={space.outline.map(p => `${p.x},${p.y}`).join(' ')} fill="#ebede7" stroke="#4c555a" strokeWidth="0.12" />
       <polygon points={space.outline.map(p => `${p.x},${p.y}`).join(' ')} fill={`url(#${gridId})`} />
-      {space.areas.map(a => <g key={a.id}><rect x={a.x} y={a.y} width={a.w} height={a.d} fill={a.colour} opacity="0.16" /><text x={a.x + 0.16} y={a.y + 0.4} fontSize="0.26" fill="#47545a">{ui(a.name)}</text></g>)}
+      {space.areas.map(a => <g key={a.id}><rect x={a.x} y={a.y} width={a.w} height={a.d} fill={a.colour} opacity="0.16" /><text x={a.x + 0.16} y={a.y + 0.4} fontSize="0.26" fill="#47545a">{studioAreaName(a, locale, ui)}</text></g>)}
       {showUsage && usage?.envelope && <g role="img" aria-label={t('Contur orientativ de utilizare', 'Estimated usage outline')} pointerEvents="none"><title>{t('Contur punctat: estimare de utilizare, nu amprentă fizică.', 'Dashed outline: usage estimate, not physical footprint.')}{usage.conflicts.length ? t(' Există suprapuneri orientative.', ' Advisory overlaps detected.') : ''}</title><polygon points={usage.envelope.map(p => `${p.x},${p.y}`).join(' ')} fill={usage.conflicts.length ? '#e69b18' : '#3384b8'} fillOpacity="0.16" stroke={usage.conflicts.length ? '#9a5800' : '#0758b6'} strokeWidth="0.06" strokeDasharray="0.18 0.12" /></g>}
       {walls.map(w => { const b = wallBox(w), editable = space.walls.some(v => v.id === w.id); return <g className={svgControl} key={w.id} role={editable ? 'button' : undefined} tabIndex={editable ? 0 : undefined} aria-label={editable ? `${t('Perete interior', 'Partition wall')} ${space.walls.findIndex(v => v.id === w.id) + 1}` : undefined} aria-pressed={editable ? selected === w.id : undefined} onKeyDown={e => keyboardSelect(e, w.id)} onPointerDown={e => { if (editable) select(e, w.id, { kind: 'wall-move', id: w.id }); }}>
         <rect x={b.x} y={b.y} width={b.w} height={b.d} fill={selected === w.id ? '#b08d57' : '#68716e'} />{editable && <line x1={w.x} y1={w.y} x2={w.x + (w.axis === 'x' ? w.length : 0)} y2={w.y + (w.axis === 'y' ? w.length : 0)} stroke="transparent" strokeWidth="16" vectorEffect="non-scaling-stroke" />}
