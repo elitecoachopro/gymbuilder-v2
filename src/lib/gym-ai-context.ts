@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { aiDesignSchema, type AiDesign } from './gym-ai.ts';
-import { EQUIPMENT_CATALOG } from './gym-catalog.ts';
+import { EQUIPMENT_CATALOG, ZONE_DEFINITIONS } from './gym-catalog.ts';
 import { floorBudget, floorSpace } from './gym-building.ts';
 import { spaceSchema, spaceArea, spaceBounds, validateSpace, type GymSpace } from './gym-space.ts';
 
@@ -8,7 +8,7 @@ const contextSchema = z.object({
   length_m: aiDesignSchema.shape.length_m, width_m: aiDesignSchema.shape.width_m,
   total_area: aiDesignSchema.shape.total_area, height_m: aiDesignSchema.shape.height_m,
   budget_eur: aiDesignSchema.shape.budget_eur,
-  zone_ids: z.array(z.string().max(50)).max(10), profile: aiDesignSchema.shape.profile,
+  zone_ids: z.array(z.string().max(50)).max(ZONE_DEFINITIONS.length), profile: aiDesignSchema.shape.profile,
 });
 const gymAiInputSchema = z.object({ brief: z.string().trim().min(10).max(6000), locale: z.enum(['ro', 'en']), context: contextSchema, space: spaceSchema.optional(), target_floor: z.union([z.literal(0), z.literal(1)]).default(0), automatic_zoning: z.boolean().default(true) });
 

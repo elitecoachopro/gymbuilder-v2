@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Modal from '@/components/Modal';
 import { useClientLocale } from '@/i18n/client';
 import { useUiText } from '@/i18n/useUiText';
-import { EQUIPMENT_CATALOG } from '@/lib/gym-catalog';
+import { EQUIPMENT_CATALOG, studioAreaName } from '@/lib/gym-catalog';
 import { spaceCost } from '@/lib/gym-space';
 import type { GymAiReview } from '@/lib/gym-ai-proposal';
 import SpacePlan from './SpacePlan';
@@ -22,6 +22,15 @@ export default function AiProposalReview({ review, current, graphicsFailed, heig
     <p className="font-medium">{t('Interpretarea AI → amplasarea în plan', 'AI interpretation → placement in the plan')}</p>
     <p className="text-xs text-anthracite-300">{t('Compară această listă cu cerința ta înainte să aplici. Cantitățile interpretate de AI nu sunt o confirmare că toate cerințele din text au fost îndeplinite.', 'Compare this list with your brief before applying. AI-interpreted quantities do not confirm that every requirement in your text has been fulfilled.')}</p>
     <ul aria-label={t('Echipamente cerute de AI și amplasate', 'AI-requested and placed equipment')} className="space-y-2">{review.fulfillment.filter(item => item.requested > 0 || item.placed > 0).map(item => <li key={item.templateId} className="rounded border border-white/10 p-2"><p>{ui(EQUIPMENT_CATALOG.find(model => model.id === item.templateId)?.name)}</p><p className="text-xs">{t('AI cere', 'AI requests')}: {item.requested} · {t('În plan', 'In plan')}: {item.placed} · {t('Neamplasate', 'Not placed')}: {item.omitted}</p></li>)}</ul>
+    {proposal.space.areas.length > 0 && <details>
+      <summary className="cursor-pointer min-h-11 py-2 text-gold-200">{t('Vezi suprafețele zonelor', 'View zone areas')}</summary>
+      <ul className="space-y-1">
+        {proposal.space.areas.map(area => <li key={area.id} className="flex justify-between gap-3">
+          <span>{studioAreaName(area, locale, ui)}</span>
+          <span className="shrink-0">{(area.w * area.d).toLocaleString(locale, { maximumFractionDigits: 1 })} m²</span>
+        </li>)}
+      </ul>
+    </details>}
     <p className="font-medium">{review.source.storey === 0 ? t('Parter', 'Ground floor') : t('Etaj 1', 'First floor')} · {proposal.space.items.length} {t('obiecte propuse', 'proposed objects')}</p>
     <p>{t('Se înlocuiesc toate dotările acestui nivel:', 'All equipment on this floor will be replaced:')} {review.replacedCount} → {proposal.space.items.length}. {t('Celălalt nivel este păstrat.', 'The other floor is preserved.')}</p>
     <p>€{spaceCost(proposal.space).toLocaleString(locale)} / {review.budget === null ? t('fără plafon', 'no cap') : `€${review.budget.toLocaleString(locale)}`} {t('disponibil pentru acest nivel', 'available for this floor')}</p>

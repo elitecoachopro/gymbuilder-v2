@@ -145,6 +145,36 @@ function Model({ templateId }: { templateId: string }) {
     case 'person_coach': return <FictionalPerson pose="coach"/>;
     case 'sled_training': return <SledTraining/>;
     case 'banda_alergare': case 'bicicleta_spinning': case 'eliptica': return <CardioEquipment type={templateId} />;
+    case 'scara_cardio': return <group>
+      <Part p={[0, 0.08, 0]} s={[1.55, 0.16, 0.85]} finish="rubber" />
+      {Array.from({ length: 7 }, (_, i) => <Part key={i} p={[-0.63 + i * 0.21, 0.17 + i * 0.092, 0]} s={[0.21, 0.34 + i * 0.184, 0.58]} finish="rubber" sharp />)}
+      {[-0.38, 0.38].map(z => <group key={z}>
+        <Part p={[0.37, 0.65, z]} s={[0.69, 1.07, 0.07]} finish="shell" />
+        <Rod a={[0.52, 0.15, z]} b={[0.52, 1.82, z]} />
+        <Rod a={[0.52, 1.82, z]} b={[-0.46, 1.22, z]} />
+      </group>)}
+      <Rod a={[0.51, 0.98, 0]} b={[0.51, 2.05, 0]} />
+      <Console x={0.54} y={2.05} width={0.56} />
+    </group>;
+    case 'step_aerobic': return <group>
+      {[-0.34, 0.34].map(x => <Part key={x} p={[x, 0.08, 0]} s={[0.18, 0.16, 0.34]} finish="shell" />)}
+      <Part p={[0, 0.18, 0]} s={[0.9, 0.04, 0.35]} finish="rubber" />
+    </group>;
+    case 'masa_masaj': return <group>
+      <Foot x={-0.71} z={0} width={0.6} /><Foot x={0.71} z={0} width={0.6} />
+      {[-0.71, 0.71].map(x => <Rod key={x} a={[x, 0.06, 0]} b={[x, 0.72, 0]} />)}
+      <Pad p={[0, 0.75, 0]} s={[1.9, 0.1, 0.72]} />
+    </group>;
+    case 'raft_depozitare': return <group>
+      {[-0.57, 0.57].flatMap(x => [-0.2, 0.2].map(z => <Part key={`${x}:${z}`} p={[x, 0.9, z]} s={[0.045, 1.8, 0.045]} />))}
+      {[0.15, 0.65, 1.15, 1.75].map(y => <Part key={y} p={[0, y, 0]} s={[1.2, 0.045, 0.45]} finish="wood" />)}
+    </group>;
+    case 'kettlebell': return <group>
+      <Ball p={[0, 0.102, 0]} s={[0.122, 0.102, 0.098]} />
+      <Rod a={[-0.072, 0.165, 0]} b={[-0.08, 0.276, 0]} radius={0.015} />
+      <Rod a={[0.072, 0.165, 0]} b={[0.08, 0.276, 0]} radius={0.015} />
+      <Rod a={[-0.08, 0.276, 0]} b={[0.08, 0.276, 0]} radius={0.015} />
+    </group>;
     case 'rowing_machine': return <Rower />;
     case 'banca_reglabila': return <Bench />;
     case 'rack_squat': return <Rack />;
