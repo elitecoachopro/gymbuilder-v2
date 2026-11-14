@@ -31,6 +31,8 @@ interface Supplier extends ServiceDetailsData {
   full_name: string;
   email: string;
   verification_photos?: string[];
+  sells_new: boolean;
+  sells_used: boolean;
 }
 
 interface ReviewItem {
@@ -49,6 +51,13 @@ type ContactMessage = Database['public']['Tables']['contact_messages']['Row'];
 type NewsletterSubscriber = Database['public']['Tables']['newsletter_subscribers']['Row'];
 type AdminContactRequest = Pick<Database['public']['Tables']['contact_requests']['Row'], 'id' | 'client_name' | 'client_email' | 'client_phone' | 'message' | 'product_id' | 'supplier_id' | 'status' | 'created_at' | 'viewed_at'> & { supplier_name: string };
 
+const supplierFilters = [
+  { id: 'all', label: 'Toți furnizorii', matches: (_supplier: Supplier) => true },
+  { id: 'new', label: 'Echipamente noi', matches: (supplier: Supplier) => supplier.sells_new },
+  { id: 'used', label: 'Echipamente SH', matches: (supplier: Supplier) => supplier.sells_used },
+  { id: 'unclassified', label: 'Fără echipamente în catalog', matches: (supplier: Supplier) => !supplier.sells_new && !supplier.sells_used },
+] as const;
+
 const sidebarLinks = [
   { href: '/admin', label: 'Dashboard', icon: BarChart3, active: true },
   { href: '/suppliers', label: 'Catalog furnizori', icon: Building2, active: false },
@@ -59,6 +68,8 @@ export default function AdminDashboard() {
   const ui = useUiText();
   const router = useRouter();
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [supplierFilter, setSupplierFilter] = useState<(typeof supplierFilters)[number]['id']>('all');
+  const visibleSuppliers = suppliers.filter(supplierFilters.find(filter => filter.id === supplierFilter)!.matches);
   const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -644,12 +655,11 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <PromotionPaymentReview />
-          <TrafficCounters audience="admin" />
           {/* Section Switch */}
-          <div className="flex gap-1 bg-anthracite-900 rounded-lg p-1 mb-6 w-full sm:w-fit overflow-x-auto">
+          <div role="group" aria-label={ui("Secțiuni administrative")} className="flex flex-wrap gap-1 bg-anthracite-900 rounded-lg p-1 mb-6 w-full sm:w-fit">
             <button
               onClick={() => setAdminSection('suppliers')}
+              aria-pressed={adminSection === 'suppliers'}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
                 adminSection === 'suppliers'
                   ? 'bg-anthracite-700 text-gold-400'
@@ -662,6 +672,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => setAdminSection('reviews')}
+              aria-pressed={adminSection === 'reviews'}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
                 adminSection === 'reviews'
                   ? 'bg-anthracite-700 text-gold-400'
@@ -674,6 +685,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => { setAdminSection('newsletter'); fetchNewsletter(); }}
+              aria-pressed={adminSection === 'newsletter'}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
                 adminSection === 'newsletter'
                   ? 'bg-anthracite-700 text-gold-400'
@@ -684,6 +696,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => { setAdminSection('contact'); fetchContactMessages(); }}
+              aria-pressed={adminSection === 'contact'}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
                 adminSection === 'contact'
                   ? 'bg-anthracite-700 text-gold-400'
@@ -696,6 +709,7 @@ export default function AdminDashboard() {
             </button>
             <button
               onClick={() => { setAdminSection('cereri'); fetchAllRequests(); }}
+              aria-pressed={adminSection === 'cereri'}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
                 adminSection === 'cereri'
                   ? 'bg-anthracite-700 text-gold-400'
@@ -949,6 +963,23 @@ export default function AdminDashboard() {
           ) : (
           /* Suppliers Section */
           <>
+          <div role="group" aria-label={ui("Tipul echipamentelor furnizorului")} className="flex flex-wrap gap-2 mb-4">
+            {supplierFilters.map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={supplierFilter === id}
+                onClick={() => setSupplierFilter(id)}
+                className={`min-h-11 rounded-lg px-3 py-2 text-sm font-medium border ${
+                  supplierFilter === id
+                    ? 'border-gold-400/50 bg-gold-400/10 text-gold-400'
+                    : 'border-anthracite-700 text-anthracite-300 hover:text-white'
+                }`}
+              >
+                {ui(label)}
+              </button>
+            ))}
+          </div>
           {/* Tabs */}
           <div className="flex gap-1 bg-anthracite-900 rounded-lg p-1 mb-6 w-full sm:w-fit overflow-x-auto">
             <button
@@ -992,20 +1023,20 @@ export default function AdminDashboard() {
               <Loader2 className="w-8 h-8 text-gold-400 animate-spin mb-4" />
               <p className="text-anthracite-400 text-sm">{ui("Se încarcă furnizorii...")}</p>
             </div>
-          ) : suppliers.length === 0 ? (
+          ) : visibleSuppliers.length === 0 ? (
             <div className="text-center py-20">
               <Users className="w-16 h-16 text-anthracite-600 mx-auto mb-4" />
               <h2 className="text-xl font-semibold text-white mb-2">
-                {ui(activeTab === 'pending' ? 'Niciun furnizor pending' :
+                {ui(supplierFilter !== 'all' ? 'Niciun furnizor în această categorie' : activeTab === 'pending' ? 'Niciun furnizor pending' :
                  activeTab === 'approved' ? 'Niciun furnizor aprobat' : 'Niciun furnizor respins')}
               </h2>
               <p className="text-anthracite-400 text-sm">
-                {ui(activeTab === 'pending' ? 'Toate cererile au fost procesate.' : 'Nu există furnizori cu acest status.')}
+                {ui(supplierFilter !== 'all' ? 'Schimbă categoria sau statusul pentru a vedea alți furnizori.' : activeTab === 'pending' ? 'Toate cererile au fost procesate.' : 'Nu există furnizori cu acest status.')}
               </p>
             </div>
           ) : (
             <div className="space-y-4">
-              {suppliers.map((supplier) => (
+              {visibleSuppliers.map((supplier) => (
                 <div key={supplier.id} className="bg-anthracite-800 border border-anthracite-700 rounded-xl p-4 sm:p-6">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     {/* Supplier Info */}
@@ -1132,6 +1163,10 @@ export default function AdminDashboard() {
           )}
           </>
           )}
+          <div className="mt-8">
+            <PromotionPaymentReview />
+            <TrafficCounters audience="admin" />
+          </div>
         </div>
       </div>
     </main>
