@@ -39,10 +39,14 @@ export async function GET(request: NextRequest) {
   const status = searchParams.get('status') || 'pending';
 
   if (!['pending', 'approved', 'rejected'].includes(status)) return await localizedJson({ error: 'Date invalide.' }, { status: 400 });
-  // Get suppliers with the requested status (no join to avoid FK detection issues)
+  // Fetch one product ID per condition to classify each supplier without loading its catalog.
   const { data: suppliers, error } = await supabase
     .from('supplier_profiles')
-    .select('id, user_id, company_name, country, city, website, phone, description, status, plan, verified, created_at, verification_photos, requested_plan, business_type, service_categories, service_areas, service_brands')
+    .select('id, user_id, company_name, country, city, website, phone, description, status, plan, verified, created_at, verification_photos, requested_plan, business_type, service_categories, service_areas, service_brands, new_products:products!products_supplier_id_fkey(id), used_products:products!products_supplier_id_fkey(id)')
+    .eq('new_products.condition', 'new')
+    .eq('used_products.condition', 'used')
+    .limit(1, { referencedTable: 'new_products' })
+    .limit(1, { referencedTable: 'used_products' })
     .eq('status', status as Database['public']['Enums']['supplier_status'])
     .order('created_at', { ascending: false });
 
@@ -62,7 +66,7 @@ export async function GET(request: NextRequest) {
 
     const userMap = new Map((users || []).map(u => [u.id, u]));
 
-    for (const supplier of suppliers) {
+    for (const { new_products, used_products, ...supplier } of suppliers) {
       const user = userMap.get(supplier.user_id || '');
       const paths = Array.isArray(supplier.verification_photos) ? supplier.verification_photos.filter((path: unknown): path is string => typeof path === 'string') : [];
       const verificationPhotos = await Promise.all(paths.map(async (path: string) => {
@@ -72,6 +76,8 @@ export async function GET(request: NextRequest) {
       }));
       enrichedSuppliers.push({
         ...supplier,
+        sells_new: new_products.length > 0,
+        sells_used: used_products.length > 0,
         verification_photos: verificationPhotos.filter(Boolean),
         full_name: user?.full_name || 'N/A',
         email: user?.email || 'N/A',
